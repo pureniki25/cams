@@ -459,10 +459,17 @@ public class PlatformRepaymentController {
             List<RepaymentProjFactRepay> projFactRepays = repaymentProjFactRepayService.selectList(
                     new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", projPlanList.getProjPlanListId())
             );
-            Map<Integer,RepaymentProjFactRepay> projFactRepayMap = Maps.newHashMap();
+            Map<Object,RepaymentProjFactRepay> projFactRepayMap = Maps.newHashMap();
             //按费用项大类plan_item_type把重复的费用项进行合并累加
             if (projFactRepays != null && projFactRepays.size() > 0) {
                 for (RepaymentProjFactRepay fr : projFactRepays) {
+                	/*
+                	 * 若是滞纳金 ：60， 分线上滞纳金和线下滞纳金，传给平台的只有线上滞纳金，所以这不能合并 
+                	 */
+                	if (fr.getPlanItemType().intValue() == 60) {
+                		projFactRepayMap.put(fr.getFeeId(), fr);
+						continue;
+					}
                     if(projFactRepayMap.containsKey(fr.getPlanItemType())){
                         RepaymentProjFactRepay tempFactRepay = projFactRepayMap.get(fr.getPlanItemType());
                         tempFactRepay.setFactAmount(tempFactRepay.getFactAmount().add(fr.getFactAmount()));
@@ -481,18 +488,16 @@ public class PlatformRepaymentController {
                 List<TdrepayRechargeDetail> detailFeeList = Lists.newArrayList();
                 //for (RepaymentProjFactRepay r : projFactRepays) {
                 for(RepaymentProjFactRepay r: projFactRepayMap.values()){
+                	//实还金额应该包含滞纳金
+                	factRepayAmount = factRepayAmount.add(r.getFactAmount());
                     //累计费用，线下（资产公司）的滞纳金排除在外，注意用value和uuid去区分.  OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5)
                     /*if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().equals(r.getPlanItemType())
                             || RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     } */
-                	LOGGER.info("--1--r.getFeeId(): {}" , r.getFeeId());
                     if (RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid().equals(r.getFeeId())) {
                         continue;
                     }
-                    LOGGER.info("--2--r.getFeeId(): {}" , r.getFeeId());
-                    //实还金额应该包含滞纳金
-                    factRepayAmount = factRepayAmount.add(r.getFactAmount());
                     //resourceAmount = resourceAmount.add(r.getFactAmount());
                     rechargeAmount = rechargeAmount.add(r.getFactAmount());
                     TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();
