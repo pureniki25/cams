@@ -1,6 +1,8 @@
 package com.hongte.alms.base.collection.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hongte.alms.base.enums.PaymentPlatformEnums;
+
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
 import org.slf4j.Logger;
@@ -96,12 +98,23 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     @Excel(name = "期数状态", orderNum = "18",   isImportField = "true_st")
     private String peroidStatus ;//期数状态,首期/本金期/末期
     
+    @Excel(name = "平台标志位", orderNum = "19",   isImportField = "true_st")
+    private String plateTypeText ;//1.团贷网;2.你我金融;3.粤财;4.线下出款
+    
     /**
      * 平台标志位：1.团贷网;2.你我金融;3.粤财;4.线下出款
      */
     private Integer plateType;
     
-    public Integer getPlateType() {
+    public String getPlateTypeText() {
+		return PaymentPlatformEnums.getName(plateType);
+	}
+
+	public void setPlateTypeText(String plateTypeText) {
+		this.plateTypeText = plateTypeText;
+	}
+
+	public Integer getPlateType() {
 		return plateType;
 	}
 
