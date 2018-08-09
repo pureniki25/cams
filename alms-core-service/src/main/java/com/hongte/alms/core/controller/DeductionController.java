@@ -13,6 +13,7 @@ import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 
 import com.hongte.alms.base.service.*;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
+import com.hongte.alms.base.feignClient.dto.ThirdPlatform;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -133,7 +135,16 @@ public class DeductionController {
         		return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
         	}
         	
-      
+//        	 List<WithholdingPlatform>  platformList =new ArrayList();
+//        	 WithholdingPlatform withholdingPlatform=null;
+//        	 for(ThirdPlatform thirdPlatform:bankCardInfo.getThirdPlatformList()) {
+//        		 withholdingPlatform=new WithholdingPlatform();
+//        		 withholdingPlatform.setPlatformId(thirdPlatform.getPlatformID());
+//        		 withholdingPlatform.setPlatformName(PlatformEnum.getByKey(thirdPlatform.getPlatformID()).getName());
+//        		 platformList.add(withholdingPlatform);
+//        	 }
+            
+            
         	
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
@@ -276,15 +287,52 @@ public class DeductionController {
    @ApiOperation(value = "获取代扣平台信息")
    @GetMapping("/getDeductionPlatformInfo")
    @ResponseBody
-   public Result<Map<String,Object>> getDeductionPlatformInfo(
-   ){
-	      List<WithholdingPlatform>  platformList = withholdingplatformService.selectList(new EntityWrapper<WithholdingPlatform>());
+	public Result<Map<String, Object>> getDeductionPlatformInfo(@RequestParam("identifyCard") String identifyCard) {
 
-	      Map<String,Object> retMap = new HashMap<>();
-    	   retMap.put("platformList",(JSONArray) JSON.toJSON(platformList, JsonUtil.getMapping()));
-    	    return Result.success(retMap);
-       }
-   
+		BankCardInfo bankCardInfo = null;
+		List<BankCardInfo> bankCardInfos = null;
+		try {
+			Result result = customerInfoXindaiRemoteApi.getBankcardInfo(identifyCard);
+			if (result.getCode().equals("1")) {
+
+				bankCardInfos = JSON.parseArray(result.getData().toString(), BankCardInfo.class);
+				if (bankCardInfos != null && bankCardInfos.size() > 0) {
+					for (BankCardInfo card : bankCardInfos) {
+						if (card.getPlatformType() == 1 && card.getWithholdingType() == 1) {// 团贷网平台注册的银行卡并且是代扣主卡
+							bankCardInfo = card;
+						}
+					}
+					if (bankCardInfo == null) {
+						return Result.error("-1", "该客户找不到对应团贷网平台银行卡信息");
+					}
+				} else {
+					return Result.error("-1", "该客户找不到对应银行卡信息");
+				}
+			} else {
+				return Result.error("-1", result.getMsg());
+			}
+
+		} catch (Exception e) {
+			return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
+		}
+		List<WithholdingPlatform> platformList = new ArrayList();
+		WithholdingPlatform withholdingPlatform = null;
+		for (ThirdPlatform thirdPlatform : bankCardInfo.getThirdPlatformList()) {
+			withholdingPlatform = new WithholdingPlatform();
+			withholdingPlatform.setPlatformId(thirdPlatform.getPlatformID());
+			withholdingPlatform.setPlatformName(PlatformEnum.getByKey(thirdPlatform.getPlatformID()).getName());
+			platformList.add(withholdingPlatform);
+		}
+		withholdingPlatform = new WithholdingPlatform();
+		withholdingPlatform.setPlatformId(5);
+		withholdingPlatform.setPlatformName(PlatformEnum.getByKey(5).getName());
+		platformList.add(withholdingPlatform);
+
+		Map<String, Object> retMap = new HashMap<>();
+		retMap.put("platformList", (JSONArray) JSON.toJSON(platformList, JsonUtil.getMapping()));
+		return Result.success(retMap);
+	}
+
    /*
     * 获取银行信息
     * @author chenzs
