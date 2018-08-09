@@ -1269,7 +1269,11 @@ public class RechargeServiceImpl implements RechargeService {
 
 			
 		} 
-		
+		if(result.getReturnCode().equals("EIP_TD_FAIL")) {//无此订单=============
+			log.setRepayStatus(0);
+			log.setUpdateTime(new Date());
+			withholdingRepaymentLogService.updateById(log);
+		} 
 		
 		if (result.getReturnCode().equals("0000")&&getBankSearchResultMsg(result).getStatus().equals("1")) {
 			log.setRepayStatus(0);
