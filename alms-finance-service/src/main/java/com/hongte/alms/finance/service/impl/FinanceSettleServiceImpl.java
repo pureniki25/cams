@@ -403,17 +403,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())>0) {
 							/*足够还掉某一个费用项*/
 							financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(planListDetailShowPayDto.getShowPayMoney()));
-//							repaymentProjPlanListDetail.setProjFactAmount(planListDetailShowPayDto.getShowPayMoney());
-//							repaymentProjPlanListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
 							createProjFactRepay(planListDetailShowPayDto.getShowPayMoney(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 						}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())==0) {
 							financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(planListDetailShowPayDto.getShowPayMoney()));
-//							repaymentProjPlanListDetail.setProjFactAmount(planListDetailShowPayDto.getShowPayMoney());
-//							repaymentProjPlanListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
 							createProjFactRepay(planListDetailShowPayDto.getShowPayMoney(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 						}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())<0) {
-//							repaymentProjPlanListDetail.setProjFactAmount(financeSettleBaseDto.getCuralDivideAmount());
-//							repaymentProjPlanListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
 							createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 							changeRepaymentResources(planListDetailShowPayDto,repaymentProjPlanListDetail, financeSettleBaseDto);
 						}
@@ -466,7 +460,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(settleFeesVO.getAmount())<0) {
 								createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), projPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 								financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(financeSettleBaseDto.getCuralDivideAmount()));
-								
 								changeRepaymentResources(planListDetailShowPayDto,projPlanListDetail, financeSettleBaseDto);
 							}
 							
@@ -511,17 +504,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())>0) {
 							/*足够还掉某一个费用项*/
 							financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(planListDetailShowPayDto.getShowPayMoney()));
-//							repaymentProjPlanListDetail.setProjFactAmount(planListDetailShowPayDto.getShowPayMoney());
-//							repaymentProjPlanListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
 							createProjFactRepay(planListDetailShowPayDto.getShowPayMoney(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 						}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())==0) {
 							financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(planListDetailShowPayDto.getShowPayMoney()));
-//							repaymentProjPlanListDetail.setProjFactAmount(planListDetailShowPayDto.getShowPayMoney());
-//							repaymentProjPlanListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
 							createProjFactRepay(planListDetailShowPayDto.getShowPayMoney(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 						}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())<0) {
-//							repaymentProjPlanListDetail.setProjFactAmount(financeSettleBaseDto.getCuralDivideAmount());
-//							repaymentProjPlanListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
 							createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 							changeRepaymentResources(planListDetailShowPayDto,repaymentProjPlanListDetail, financeSettleBaseDto);
 						}
@@ -628,26 +615,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                	/*更新业务plan*/
 	                	bizPlanSettleDto.getRepaymentBizPlan().setPlanStatus(e.getValue());
 	                	bizPlanSettleDto.getRepaymentBizPlan().updateAllColumnById();
-	                	/*更新业务planList*/
-	                	bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
-	                	bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setRepayFlag(PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue());
-	                	bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().updateAllColumnById();
 	                	
-	                	/*更新财务管理列表*/
-//	                	RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
-//		                synch.setPlanListId(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getPlanListId());
-//		                synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
-//		                synch.setCurrentStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getCurrentStatus());
-//		                synch.setCurrentSubStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getCurrentSubStatus());
-//		                synch.setRepayStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getRepayStatus());
-//		                synch.setRepayFlag(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getRepayFlag());
-//		                synch.setFinanceConfirmUser(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getFinanceConfirmUser());
-//		                synch.setFinanceConfirmUserName(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getFinanceConfirmUserName());
-//		                synch.setFactAmountExt(financeSettleBaseDto.getRepayFactAmount());
-//		                synch.setPlanStatusExt(e.getValue());
-//		                repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
-		                /*更新财务管理列表*/
-		                
 	                	for (RepaymentProjPlanSettleDto repaymentProjPlanSettleDto : bizPlanSettleDto.getProjPlanStteleDtos()) {
 							/*更新标PLAN*/
 	                		repaymentProjPlanSettleDto.getRepaymentProjPlan().setPlanStatus(e.getValue());
@@ -661,8 +629,18 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							projPlanList.add(repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList());
 						}
 	                	
+	                	BigDecimal factReapy = BigDecimal.ZERO;
+	                	BigDecimal onLineFee = BigDecimal.ZERO;
+	                	BigDecimal planAmount = BigDecimal.ZERO;
+	                	
 	                	for (RepaymentBizPlanListDetail bizPlanListDetail : bizPlanSettleDto.getCurrBizPlanListDto().getBizPlanListDetails()) {
-							List<RepaymentProjFactRepay> bizPlanFactRepay = calcBizPlanFactRepay(bizPlanSettleDto.getRepaymentBizPlan().getPlanId(), bizPlanListDetail.getPlanDetailId(), financeSettleBaseDto);
+							
+	                		planAmount = planAmount.add(bizPlanListDetail.getPlanAmount());
+	                		if (bizPlanListDetail.getShareProfitIndex() < Constant.ONLINE_OFFLINE_FEE_BOUNDARY) {
+								onLineFee = onLineFee.add(bizPlanListDetail.getPlanAmount());
+							}
+	                		
+	                		List<RepaymentProjFactRepay> bizPlanFactRepay = calcBizPlanFactRepay(bizPlanSettleDto.getRepaymentBizPlan().getPlanId(), bizPlanListDetail.getPlanDetailId(), financeSettleBaseDto);
 							if (CollectionUtils.isEmpty(bizPlanFactRepay)) {
 								continue;
 							}
@@ -674,7 +652,22 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 								bizPlanListDetail.setFactRepayDate(repaymentProjFactRepay.getFactRepayDate());
 								bizPlanListDetail.updateAllColumnById();
 							}
+							
+							factReapy = factReapy.add(bizPlanListDetail.getFactAmount());
 						}
+	                	if (factReapy.compareTo(BigDecimal.ZERO)>0) {
+	                		bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
+	                	}else if (factReapy.compareTo(onLineFee)>=0) {
+	                		bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
+						}else if (factReapy.compareTo(planAmount)>=0) {
+							bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+						}
+	                	
+	                	
+	                	/*更新业务planList*/
+	                	bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
+	                	bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setRepayFlag(PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue());
+	                	bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().updateAllColumnById();
 					}
 	                
 	                //更新结清期备注
