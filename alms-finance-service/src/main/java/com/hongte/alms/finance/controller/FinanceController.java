@@ -146,6 +146,7 @@ public class FinanceController {
     @Qualifier("SysUserRoleService")
     SysUserRoleService sysUserRoleService;
 
+    
 	@Value("${oss.readUrl}")
 	private String ossReadUrl ;
 	@GetMapping(value = "/repayBaseInfo")
@@ -170,6 +171,11 @@ public class FinanceController {
 		for (BizOutputRecord bizOutputRecord : outputRecords) {
 			outPutMoney = outPutMoney.add(bizOutputRecord.getFactOutputMoney());
 		}
+		List<TuandaiProjectInfo> tuandaiProjectInfos = tuandaiProjectInfoService.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", businessId));
+		BigDecimal borrowAmount = BigDecimal.ZERO;
+		for (TuandaiProjectInfo tuandaiProjectInfo : tuandaiProjectInfos) {
+			borrowAmount = borrowAmount.add(tuandaiProjectInfo.getFullBorrowMoney());
+		}
 		JSONObject r = new JSONObject();
 		r.put("businessId", businessId);
 		r.put("afterId", afterId);
@@ -181,7 +187,7 @@ public class FinanceController {
 		r.put("repaymentType", basicRepaymentType.getRepaymentTypeName());
 		r.put("repayDate", DateUtil.formatDate(repaymentBizPlanList.getDueDate()));
 		r.put("repayAmount", repaymentBizPlanList.getTotalBorrowAmount());
-		r.put("borrowAmount", basicBusiness.getBorrowMoney());
+		r.put("borrowAmount", borrowAmount);
 		r.put("borrowLimit", basicBusiness.getBorrowLimit());
 		r.put("borrowLimitUnit", basicBusiness.getBorrowLimitUnit());
 		r.put("borrowRate", basicBusiness.getBorrowRate());
@@ -640,9 +646,9 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryProjOtherFee")
 	@ApiOperation(value = "获取标维度的其他费用")
-	public Result<List<String>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
+	public Result<Map<String, List<String>>> queryProjOtherFee(@RequestParam("projPlanListId") String projPlanListId) {
 		try {
-			Result<List<String>> result;
+			Result<Map<String, List<String>>> result;
 			
 			logger.info("@queryProjOtherFee@获取标维度的其他费用--开始[{}]", projPlanListId);
 			
@@ -659,9 +665,9 @@ public class FinanceController {
 	
 	@GetMapping(value = "/queryBizOtherFee")
 	@ApiOperation(value = "获取业务维度的其他费用")
-	public Result<List<String>> queryBizOtherFee(@RequestParam("planListId") String planListId) {
+	public Result<Map<String, List<String>>> queryBizOtherFee(@RequestParam("planListId") String planListId) {
 		try {
-			Result<List<String>> result;
+			Result<Map<String, List<String>>> result;
 			
 			logger.info("@queryBizOtherFee@获取业务维度的其他费用--开始[{}]", planListId);
 			
@@ -1228,7 +1234,19 @@ public class FinanceController {
 			/*判断当前期或业务是否已结清*/
 			/*判断结清期是否逾期,最后一期不在判断范围以内*/
 			BasicBusiness business = basicBusinessService.selectById(businessId);
-			RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).eq("after_id", afterId));
+			Wrapper<RepaymentBizPlanList> eq = new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).eq("after_id", afterId);
+			if (!StringUtil.isEmpty(planId)) {
+				eq.eq("plan_id", planId);
+			}
+			RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(eq);
+			if (bizPlanList.getCurrentStatus().equals(RepayPlanStatus.REPAYED.getName())) {
+				return Result.error("已还款不能结清");
+			}
+			if (bizPlanList.getRepayStatus()!=null) {
+				if (bizPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ONLINE_REPAID.getKey())) {
+					return Result.error("线上部分已还款不能结清");
+				}
+			}
 			if (bizPlanList.getPeriod() < business.getBorrowLimit()) {
 				if (bizPlanList.getCurrentStatus().equals(RepayPlanStatus.OVERDUE.getName())) {
 					return Result.error("逾期不能结清");
@@ -1236,7 +1254,11 @@ public class FinanceController {
 			}
 			/*判断结清期是否逾期,最后一期不在判断范围以内*/
 			/*检查往期还款状态*/
-			List<RepaymentBizPlanList> lastPeriods = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business).lt("period", bizPlanList.getPeriod()));
+			Wrapper<RepaymentBizPlanList> lt = new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).lt("period", bizPlanList.getPeriod());
+			if (!StringUtil.isEmpty(planId)) {
+				lt.eq("plan_id", planId);
+			}
+			List<RepaymentBizPlanList> lastPeriods = repaymentBizPlanListService.selectList(lt);
 			for (RepaymentBizPlanList repaymentBizPlanList : lastPeriods) {
 				if (repaymentBizPlanList.getRepayStatus()==null) {
 					return Result.error(repaymentBizPlanList.getAfterId()+"未还款不能结清");

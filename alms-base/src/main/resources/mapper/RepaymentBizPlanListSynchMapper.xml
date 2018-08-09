@@ -164,9 +164,10 @@
               case
                 WHEN t2.due_date is null then 0
                 WHEN t2.due_date>now() THEN 0
+                WHEN t2.current_status = '逾期' then to_days(now())- to_days(t2.due_date)
                 WHEN t2.fact_repay_date is null then to_days(now())- to_days(t2.due_date)
                 WHEN t2.fact_repay_date<t2.due_date THEN 0
-                ELSE  to_days(t2.fact_repay_date)- to_days(t2.due_date)
+                ELSE to_days(t2.fact_repay_date)- to_days(t2.due_date)
                 end
             ]]>
         ),
@@ -224,6 +225,7 @@
               case
                 WHEN t2.due_date is null then 0
                 WHEN t2.due_date>now() THEN 0
+                WHEN t2.current_status = '逾期' then to_days(now())- to_days(t2.due_date)
                 WHEN t2.fact_repay_date is null then to_days(now())- to_days(t2.due_date)
                 WHEN t2.fact_repay_date<t2.due_date THEN 0
                 ELSE  to_days(t2.fact_repay_date)- to_days(t2.due_date)
@@ -286,7 +288,8 @@
 		IFNULL(t1.update_user,0) != IFNULL(t2.update_user,0) or
 		IFNULL(t1.current_sub_status,0) != IFNULL(t2.current_sub_status,0) or
 		IFNULL(t1.repay_status,0) != IFNULL(t2.repay_status,0) or
-		IFNULL(t1.src_type,0) != IFNULL(t2.src_type,0)
+		IFNULL(t1.src_type,0) != IFNULL(t2.src_type,0) or
+		t2.current_status = '逾期'
 		)
   </update>
   

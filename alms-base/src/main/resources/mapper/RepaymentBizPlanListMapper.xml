@@ -361,6 +361,15 @@
 				when (pl.src_type = 2 and pl.repay_status is null ) then '未还款'
 			END AS repayStatus, pl.accountant_confirm_status AS financeConfirmStatus
 				,pl.fact_amount_ext AS repaidAmount, pl.src_type AS srcType
+				, CASE
+				WHEN (pl.plan_status_ext = 0) THEN '还款中'
+				WHEN (pl.plan_status_ext = 10) THEN '已结清'
+				WHEN (pl.plan_status_ext = 20) THEN '已结清'
+				WHEN (pl.plan_status_ext = 30) THEN '亏损结清'
+				WHEN (pl.plan_status_ext = 31) THEN '坏账结清'
+				WHEN (pl.plan_status_ext = 50) THEN '已申请展期'
+				ELSE null
+				END AS planStatusExt
 			FROM tb_repayment_biz_plan_list_synch pl
 			<if test="paymentPlatformCode!=null">
 	        JOIN tb_tuandai_project_info as ttpi ON pl.business_id = ttpi.business_id
@@ -606,7 +615,15 @@
 			    `tb_repayment_biz_plan_list_detail` t2 
 			  WHERE t1.plan_list_id = t2.plan_list_id 
 			    AND t1.plan_list_id = rbpl.plan_list_id) amount,
-			  0 otherFee,
+			  (SELECT 
+			    IFNULL(SUM(t2.plan_amount), 0) otherFee 
+			  FROM
+			    `tb_repayment_biz_plan_list` t1,
+			    `tb_repayment_biz_plan_list_detail` t2 
+			  WHERE t1.plan_list_id = t2.plan_list_id 
+			    AND t1.plan_list_id = rbpl.plan_list_id 
+			   -- AND t2.account_status = 0 
+			    AND t2.plan_item_type NOT IN (10, 20, 30, 50, 60)) otherFee,
 			  0 surplus,
 			  CASE
 			    rbpl.`current_status` 
@@ -730,7 +747,7 @@
 			    `tb_repayment_biz_plan_list_detail` t2 
 			  WHERE t1.plan_list_id = t2.plan_list_id 
 			    AND t1.plan_list_id = rbpl.plan_list_id 
-			    AND t2.account_status = 0 
+			   -- AND t2.account_status = 0 
 			    AND t2.plan_item_type NOT IN (10, 20, 30, 50, 60)) otherFee,
 			  (SELECT 
 			    IFNULL(SUM(t.over_repay_money), 0) over_repay_money_1 

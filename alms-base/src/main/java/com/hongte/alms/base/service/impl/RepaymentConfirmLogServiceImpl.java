@@ -49,6 +49,7 @@ import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
 import com.hongte.alms.base.service.MoneyPoolService;
+import com.hongte.alms.base.service.RepaymentBizPlanListSynchService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
@@ -131,6 +132,10 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 	RepaymentBizPlanListSynchMapper repaymentBizPlanListSynchMapper ;
     
     @Autowired
+	@Qualifier("RepaymentBizPlanListSynchService")
+	RepaymentBizPlanListSynchService repaymentBizPlanListSynchService;
+    
+    @Autowired
 	RepaymentConfirmPlatRepayLogMapper repaymentConfirmPlatRepayLogMapper ;
     
     @Autowired
@@ -145,14 +150,15 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     @Transactional(rollbackFor = Exception.class)
     public Result revokeConfirm(String businessId, String afterId) throws Exception{
         /*找还款确认记录*/
-        List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`", false));
+        List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).orderBy("create_time", false));
         if (logs == null || logs.size() == 0) {
             return Result.error("500", "找不到任何一条相关的确认还款记录");
         }
         RepaymentConfirmLog log = logs.get(0);
-        if (log.getType().equals(2)) {
-			return Result.error("500","请先撤销"+log.getAfterId()+"的结清");
-		}
+        
+//        if (log.getType().equals(2)) {
+//			return Result.error("500","请先撤销"+log.getAfterId()+"的结清");
+//		}
         if(!loginUserInfoHelper.getUserId().equals("0111130000")) {
         	   if(log.getRepaySource()!=10) {//如果不是线下转账的不能撤销
                    return Result.error("500", "最后一次还款不是线下转账不能被撤销");
@@ -299,17 +305,17 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             repaymentBizPlanListMapper.deleteById(list.getPlanListId());
             list.insert();
             
-            RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
-            synch.setPlanListId(list.getPlanListId());
-            synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
-            synch.setCurrentStatus(list.getCurrentStatus());
-            synch.setCurrentSubStatus(list.getCurrentSubStatus());
-            synch.setRepayStatus(list.getRepayStatus());
-            synch.setRepayFlag(list.getRepayFlag());
-            synch.setFinanceConfirmUser(list.getFinanceConfirmUser());
-            synch.setFinanceConfirmUserName(list.getFinanceConfirmUserName());
-            synch.setFactAmountExt(bplFactAmount);
-            repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
+//            RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
+//            synch.setPlanListId(list.getPlanListId());
+//            synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
+//            synch.setCurrentStatus(list.getCurrentStatus());
+//            synch.setCurrentSubStatus(list.getCurrentSubStatus());
+//            synch.setRepayStatus(list.getRepayStatus());
+//            synch.setRepayFlag(list.getRepayFlag());
+//            synch.setFinanceConfirmUser(list.getFinanceConfirmUser());
+//            synch.setFinanceConfirmUserName(list.getFinanceConfirmUserName());
+//            synch.setFactAmountExt(bplFactAmount);
+//            repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
             
             repaymentBizPlanListBak.delete(new EntityWrapper<>()
                     .eq("plan_list_id", repaymentBizPlanListBak.getPlanListId())
@@ -356,6 +362,8 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 		}
         /*删除合规化还款调用记录 结束*/
         log.deleteById();
+        /*更新财务管理列表*/
+        repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
         return Result.success();
     }
 
