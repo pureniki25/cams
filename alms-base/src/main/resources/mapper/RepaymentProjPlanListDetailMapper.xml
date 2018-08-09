@@ -104,7 +104,7 @@
 	
 	<select id="calcSurplusPlatformFees" resultType="java.math.BigDecimal">
 		SELECT DISTINCT
-			sum(ppld.proj_plan_amount)
+			sum(ppld.proj_plan_amount-IFNULL(ppld.proj_fact_amount,0))
 		FROM
 			tb_repayment_proj_plan_list_detail ppld
 			LEFT JOIN tb_repayment_proj_plan_list ppl ON ppld.proj_plan_list_id = ppl.proj_plan_list_id
