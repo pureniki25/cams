@@ -1389,24 +1389,29 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest2);
 				break;
 			case 30: // 平台服务费
-				paramDTO.setTuandaiAmount(feeValue);
-				tdrepayAdvanceLog.setTuandaiAmount(feeValue);
+				BigDecimal tuandaiAmount = paramDTO.getTuandaiAmount() == null ? feeValue : paramDTO.getTuandaiAmount().add(feeValue);
+				paramDTO.setTuandaiAmount(tuandaiAmount);
+				tdrepayAdvanceLog.setTuandaiAmount(tuandaiAmount);
 				break;
 			case 40: // 资产端服务费
-				paramDTO.setOrgAmount(feeValue);
-				tdrepayAdvanceLog.setOrgAmount(feeValue);
+				BigDecimal orgAmount = paramDTO.getOrgAmount() == null ? feeValue : paramDTO.getOrgAmount().add(feeValue);
+				paramDTO.setOrgAmount(orgAmount);
+				tdrepayAdvanceLog.setOrgAmount(orgAmount);
 				break;
 			case 50: // 担保公司服务费
-				paramDTO.setGuaranteeAmount(feeValue);
-				tdrepayAdvanceLog.setGuaranteeAmount(feeValue);
+				BigDecimal guaranteeAmount = paramDTO.getGuaranteeAmount() == null ? feeValue : paramDTO.getGuaranteeAmount().add(feeValue);
+				paramDTO.setGuaranteeAmount(guaranteeAmount);
+				tdrepayAdvanceLog.setGuaranteeAmount(guaranteeAmount);
 				break;
 			case 60: // 仲裁服务费
-				paramDTO.setArbitrationAmount(feeValue);
-				tdrepayAdvanceLog.setArbitrationAmount(feeValue);
+				BigDecimal arbitrationAmount = paramDTO.getArbitrationAmount() == null ? feeValue : paramDTO.getArbitrationAmount().add(feeValue);
+				paramDTO.setArbitrationAmount(arbitrationAmount);
+				tdrepayAdvanceLog.setArbitrationAmount(arbitrationAmount);
 				break;
 			case 70: // 逾期费用（罚息）
-				paramDTO.setOverDueAmount(feeValue);
-				tdrepayAdvanceLog.setOverDueAmount(feeValue);
+				BigDecimal overDueAmount = paramDTO.getOverDueAmount() == null ? feeValue : paramDTO.getOverDueAmount().add(feeValue);
+				paramDTO.setOverDueAmount(overDueAmount);
+				tdrepayAdvanceLog.setOverDueAmount(overDueAmount);
 				break;
 
 			default:
