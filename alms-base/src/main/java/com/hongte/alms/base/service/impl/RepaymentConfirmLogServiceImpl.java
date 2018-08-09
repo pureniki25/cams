@@ -49,6 +49,7 @@ import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
 import com.hongte.alms.base.service.MoneyPoolService;
+import com.hongte.alms.base.service.RepaymentBizPlanListSynchService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
@@ -129,6 +130,10 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
     @Autowired
 	RepaymentBizPlanListSynchMapper repaymentBizPlanListSynchMapper ;
+    
+    @Autowired
+	@Qualifier("RepaymentBizPlanListSynchService")
+	RepaymentBizPlanListSynchService repaymentBizPlanListSynchService;
     
     @Autowired
 	RepaymentConfirmPlatRepayLogMapper repaymentConfirmPlatRepayLogMapper ;
@@ -300,17 +305,17 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             repaymentBizPlanListMapper.deleteById(list.getPlanListId());
             list.insert();
             
-            RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
-            synch.setPlanListId(list.getPlanListId());
-            synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
-            synch.setCurrentStatus(list.getCurrentStatus());
-            synch.setCurrentSubStatus(list.getCurrentSubStatus());
-            synch.setRepayStatus(list.getRepayStatus());
-            synch.setRepayFlag(list.getRepayFlag());
-            synch.setFinanceConfirmUser(list.getFinanceConfirmUser());
-            synch.setFinanceConfirmUserName(list.getFinanceConfirmUserName());
-            synch.setFactAmountExt(bplFactAmount);
-            repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
+//            RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
+//            synch.setPlanListId(list.getPlanListId());
+//            synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
+//            synch.setCurrentStatus(list.getCurrentStatus());
+//            synch.setCurrentSubStatus(list.getCurrentSubStatus());
+//            synch.setRepayStatus(list.getRepayStatus());
+//            synch.setRepayFlag(list.getRepayFlag());
+//            synch.setFinanceConfirmUser(list.getFinanceConfirmUser());
+//            synch.setFinanceConfirmUserName(list.getFinanceConfirmUserName());
+//            synch.setFactAmountExt(bplFactAmount);
+//            repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
             
             repaymentBizPlanListBak.delete(new EntityWrapper<>()
                     .eq("plan_list_id", repaymentBizPlanListBak.getPlanListId())
@@ -357,6 +362,8 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 		}
         /*删除合规化还款调用记录 结束*/
         log.deleteById();
+        /*更新财务管理列表*/
+        repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
         return Result.success();
     }
 
