@@ -126,6 +126,10 @@ public class FinanceSettleBaseDto {
 
 	private List<SettleFeesVO> otherFees = new ArrayList<>();
 
+	/**
+	 * 减免费用项
+	 */
+	private List<SettleFeesVO> derates = new ArrayList<>() ;
 	
 	//当前期
 	List<RepaymentBizPlanSettleDto> currentPeriods ;

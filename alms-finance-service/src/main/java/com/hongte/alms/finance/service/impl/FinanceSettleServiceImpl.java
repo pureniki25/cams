@@ -213,6 +213,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         
         SettleInfoVO settleInfoVO = settleInfoVO(financeSettleReq);
         financeSettleBaseDto.setSettleInfoVO(settleInfoVO);
+        financeSettleBaseDto.setDerates(settleInfoVO.getDerates());
         
         List<RepaymentBizPlanSettleDto> currentPeriods = getCurrentPeriod(financeSettleReq, financeSettleBaseDto);
         financeSettleBaseDto.setCurrentPeriods(currentPeriods);
@@ -400,83 +401,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         });
     }
 
-
-
-
-    public void makeRepaymentPlan(FinanceSettleBaseDto financeSettleBaseDto, RepaymentBizPlanList repaymentBizPlanList, List<RepaymentSettleMoneyDto> beforSettleMoneyDto, List<RepaymentSettleMoneyDto> afterSettleMoneyDto) {
-        RepaymentBizPlanDto repaymentBizPlanDto = new RepaymentBizPlanDto();
-
-        String businessId = repaymentBizPlanList.getBusinessId();
-        String planIdW = repaymentBizPlanList.getPlanId();
-        String afterId = repaymentBizPlanList.getAfterId();
-        String uuid = financeSettleBaseDto.getUuid();
-
-
-//        RepaymentBizPlanList repaymentBizPlanList = bizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId).eq("plan_id", planIdW));
-        if (repaymentBizPlanList != null) {
-            String planId = repaymentBizPlanList.getPlanId();
-            Integer period = repaymentBizPlanList.getPeriod();
-            Date dueDate = repaymentBizPlanList.getDueDate();
-
-
-            List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanMapper.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId).eq("plan_id", planId));
-            if (repaymentBizPlans == null || repaymentBizPlans.size() > 1) {
-                throw new ServiceRuntimeException("数据有误");
-            }
-
-            RepaymentBizPlan repaymentBizPlan = repaymentBizPlans.get(0);
-            repaymentBizPlanDto.setRepaymentBizPlan(repaymentBizPlan);
-
-            financeSettleBaseDto.setPlanId(planId);
-            financeSettleBaseDto.setBusinessId(businessId);
-            financeSettleBaseDto.setAfterId(afterId);
-
-            //==============================标的还款信息填充开始
-            makeRepaymentProjPlan(repaymentBizPlanDto, financeSettleBaseDto, beforSettleMoneyDto, afterSettleMoneyDto);
-            //==============================标的还款信息填充结束
-
-            List<RepaymentBizPlanBak> repaymentBizPlanBaks = financeSettleBaseDto.getRepaymentBizPlanBaks();
-            RepaymentBizPlanBak repaymentBizPlanBak = new RepaymentBizPlanBak();
-            BeanUtils.copyProperties(repaymentBizPlan, repaymentBizPlanBak);
-            repaymentBizPlanBak.setSettleLogId(uuid);
-            repaymentBizPlanBaks.add(repaymentBizPlanBak);
-
-
-            //业务还款计划DTO 只保存当期
-            List<RepaymentBizPlanListDto> bizPlanListDtos = new ArrayList<>();
-            RepaymentBizPlanListDto repaymentBizPlanListDto = new RepaymentBizPlanListDto();
-            repaymentBizPlanListDto.setRepaymentBizPlanList(repaymentBizPlanList);
-
-
-            //备份业务还款计划DTO 只保存当期
-            List<RepaymentBizPlanListBak> repaymentBizPlanListBaks = financeSettleBaseDto.getRepaymentBizPlanListBaks();
-            RepaymentBizPlanListBak repaymentBizPlanListBak = new RepaymentBizPlanListBak();
-            BeanUtils.copyProperties(repaymentBizPlanList, repaymentBizPlanListBak);
-            repaymentBizPlanListBaks.add(repaymentBizPlanListBak);
-
-            String planListId = repaymentBizPlanList.getPlanListId();
-            List<RepaymentBizPlanListDetail> repaymentBizPlanListDetailList = repaymentBizPlanListDetailMapper.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", planListId));
-
-            repaymentBizPlanListDto.setBizPlanListDetails(repaymentBizPlanListDetailList);
-            if (CollectionUtils.isNotEmpty(repaymentBizPlanListDetailList)) {
-                List<RepaymentBizPlanListDetailBak> repaymentBizPlanListDetailBaks = financeSettleBaseDto.getRepaymentBizPlanListDetailBaks();
-
-                for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : repaymentBizPlanListDetailList) {
-                    RepaymentBizPlanListDetailBak repaymentBizPlanListDetailBak = new RepaymentBizPlanListDetailBak();
-                    BeanUtils.copyProperties(repaymentBizPlanListDetail, repaymentBizPlanListDetailBak);
-                    repaymentBizPlanListDetailBaks.add(repaymentBizPlanListDetailBak);
-                }
-            }
-            bizPlanListDtos.add(repaymentBizPlanListDto);
-            repaymentBizPlanDto.setBizPlanListDtos(bizPlanListDtos);
-        }
-
-    }
-
-
-    /* (non-Javadoc)
-     * @see com.hongte.alms.finance.service.FinanceSettleService#makeRepaymentPlanAllPlan(com.hongte.alms.finance.req.FinanceSettleBaseDto, com.hongte.alms.finance.req.FinanceSettleReq)
-     */
     @Override
     public void makeRepaymentPlanAllPlan(FinanceSettleBaseDto financeSettleBaseDto, FinanceSettleReq financeSettleReq) {
 
@@ -525,6 +449,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralResource().getRepayAmount());
 					}
 				}
+                
                 for(RepaymentProjPlanSettleDto repaymentProjPlanSettleDto:projPlanSettleDtoList){
                 	//先还线上部分
                 	financeSettleBaseDto.setProjPlanId(repaymentProjPlanSettleDto.getRepaymentProjPlan().getProjPlanId());
@@ -994,6 +919,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
      */
     private void changeRepaymentResources(PlanListDetailShowPayDto fee,RepaymentProjPlanListDetail projListDetail,FinanceSettleBaseDto financeSettleBaseDto) {
 		BigDecimal unpaid = projListDetail.getProjPlanAmount().subtract(projListDetail.getProjFactAmount());
+		if (unpaid.compareTo(BigDecimal.ZERO) < 0) {
+			unpaid = fee.getShowPayMoney().subtract(projListDetail.getProjFactAmount());
+		}
 		if (changeRepaymentResources(financeSettleBaseDto)) {
 			if (financeSettleBaseDto.getCuralDivideAmount().compareTo(unpaid)>=0) {
 				projListDetail.setProjFactAmount(financeSettleBaseDto.getCuralDivideAmount());
@@ -2184,8 +2112,30 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         List<RepaymentResource> repaymentResources = financeSettleBaseDto.getRepaymentResources();
         BigDecimal surplus = financeSettleReq.getSurplusFund();
         List<String> mprIds = financeSettleReq.getMprIds();
-        
-        
+
+        /*将减免的resource查出添加进来*/
+		for (RepaymentBizPlanSettleDto bizPlanSettleDto : financeSettleBaseDto.getCurrentPeriods()) {
+			RepaymentBizPlanList planList = bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList();
+			for (SettleFeesVO settleFeesVO : financeSettleBaseDto.getDerates()) {
+				RepaymentResource repaymentResource = new RepaymentResource();
+				UUID uuid = UUID.randomUUID();
+				repaymentResource.setResourceId(String.valueOf(uuid));
+				repaymentResource.setAfterId(planList.getAfterId());
+				repaymentResource.setBusinessId(planList.getBusinessId());
+				repaymentResource.setOrgBusinessId(planList.getOrigBusinessId());
+				repaymentResource.setCreateDate(new Date());
+				repaymentResource.setCreateUser(financeSettleBaseDto.getUserId());
+				repaymentResource.setIsCancelled(0);
+				repaymentResource.setRepayAmount(settleFeesVO.getAmount());
+				repaymentResource.setRepayDate(new Date());
+				repaymentResource.setRepaySource(RepayPlanRepaySrcEnum.DERATE.getValue().toString());
+				repaymentResource.setRepaySourceRefId(settleFeesVO.getPlanItemName());
+				repaymentResource.setConfirmLogId(financeSettleBaseDto.getUuid());
+				repaymentResources.add(repaymentResource);
+				/*减免金额不加入实还金额里面*/
+			}
+		}
+		 /*将减免的resource查出添加进来*/
         
         if (!CollectionUtils.isEmpty(mprIds)) {
         	List<MoneyPoolRepayment> moneyPoolRepaymentList = moneyPoolRepaymentMapper.selectList(new EntityWrapper<MoneyPoolRepayment>().in("id", mprIds));
@@ -2613,10 +2563,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					settleFeesVO.setFeeName(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getDesc());
 				}
 			}
-			
+			/*注意,此处特意将ApplyDerateType.ApplyDerateTypeId放进planItemName*/
+			settleFeesVO.setPlanItemName(d.getApplyDerateTypeId());
+			/*注意,此处特意将ApplyDerateType.ApplyDerateTypeId放进planItemName*/
 			settleFeesVO.setFeeId(d.getFeeId());
 			settleFeesVO.setPlanItemType(d.getDerateType());
-			settleFeesVO.setPlanItemName(d.getDerateTypeName());
 			settleFeesVO.setShareProfitIndex(1);
 			derate.add(settleFeesVO);
 		}
