@@ -1,15 +1,15 @@
 package com.hongte.alms.base.collection.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.hongte.alms.base.enums.PaymentPlatformEnums;
+import java.util.Date;
 
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hongte.alms.base.enums.PaymentPlatformEnums;
 
 /**
  * @author zengkun
@@ -99,7 +99,8 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     private String peroidStatus ;//期数状态,首期/本金期/末期
     
     @Excel(name = "平台标志位", orderNum = "19",   isImportField = "true_st")
-    private String plateTypeText ;//1.团贷网;2.你我金融;3.粤财;4.线下出款
+    @TableField(exist = false)
+    private String plateTypeText;//1.团贷网;2.你我金融;3.粤财;4.线下出款
     
     /**
      * 平台标志位：1.团贷网;2.你我金融;3.粤财;4.线下出款
@@ -107,7 +108,12 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     private Integer plateType;
     
     public String getPlateTypeText() {
-		return PaymentPlatformEnums.getName(plateType);
+    	if(plateType == null) {
+    		plateTypeText = "";
+    	}else {
+    		plateTypeText = PaymentPlatformEnums.getName(plateType);
+    	}
+		return plateTypeText;
 	}
 
 	public void setPlateTypeText(String plateTypeText) {
