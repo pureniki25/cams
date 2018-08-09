@@ -135,9 +135,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     RepaymentConfirmPlatRepayLogService repaymentConfirmPlatRepayLogService;
 
     @Autowired
-    RepaymentBizPlanListSynchService repaymentBizPlanListSynchService;
-
-    @Autowired
     @Qualifier("RepaymentConfirmLogService")
     RepaymentConfirmLogService confirmLogService;
 
@@ -190,6 +187,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     @Autowired
     @Qualifier("WithholdingRepaymentLogService")
     private WithholdingRepaymentLogService withholdingRepaymentLogService ;
+    
+    @Autowired
+	@Qualifier("RepaymentBizPlanListSynchService")
+	RepaymentBizPlanListSynchService repaymentBizPlanListSynchService;
     
     @Override
     @Transactional(rollbackFor = {ServiceRuntimeException.class, Exception.class})
@@ -244,7 +245,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         
         //处理还款来源,整合成RepaymentResource
         handleRepaymentResource(financeSettleBaseDto, financeSettleReq);
-        
         /*创建还款日志*/
         createConfirmLog(financeSettleBaseDto);
         //数据填充及bak及入库
@@ -705,18 +705,19 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                	bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().updateAllColumnById();
 	                	
 	                	/*更新财务管理列表*/
-	                	RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
-		                synch.setPlanListId(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getPlanListId());
-		                synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
-		                synch.setCurrentStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getCurrentStatus());
-		                synch.setCurrentSubStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getCurrentSubStatus());
-		                synch.setRepayStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getRepayStatus());
-		                synch.setRepayFlag(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getRepayFlag());
-		                synch.setFinanceConfirmUser(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getFinanceConfirmUser());
-		                synch.setFinanceConfirmUserName(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getFinanceConfirmUserName());
-		                synch.setFactAmountExt(financeSettleBaseDto.getRepayFactAmount());
-		                synch.setPlanStatusExt(e.getValue());
-		                repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
+//	                	RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
+//		                synch.setPlanListId(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getPlanListId());
+//		                synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
+//		                synch.setCurrentStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getCurrentStatus());
+//		                synch.setCurrentSubStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getCurrentSubStatus());
+//		                synch.setRepayStatus(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getRepayStatus());
+//		                synch.setRepayFlag(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getRepayFlag());
+//		                synch.setFinanceConfirmUser(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getFinanceConfirmUser());
+//		                synch.setFinanceConfirmUserName(bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().getFinanceConfirmUserName());
+//		                synch.setFactAmountExt(financeSettleBaseDto.getRepayFactAmount());
+//		                synch.setPlanStatusExt(e.getValue());
+//		                repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
+		                /*更新财务管理列表*/
 		                
 	                	for (RepaymentProjPlanSettleDto repaymentProjPlanSettleDto : bizPlanSettleDto.getProjPlanStteleDtos()) {
 							/*更新标PLAN*/
@@ -772,6 +773,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                                logger.error(e.getMessage(), e);
 	                            }
 	                            tdrepayRecharge(projPlanList);
+	                            /*更新财务管理列表*/
+	                            repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
 	                        } catch (Exception e) {
 	                            logger.error(e.getMessage(), e);
 	                            Thread.currentThread().interrupt();
@@ -779,6 +782,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                        logger.info("调用平台合规化还款接口结束");
 	                    }
 	                });
+	                
 	                
 				}
 				
