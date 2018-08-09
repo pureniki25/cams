@@ -327,79 +327,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         
     }
 
-    /**
-     * 创建结清记录
-     *
-     * @param dto
-     * @param financeSettleReq
-     * @author 王继光
-     * 2018年7月17日 上午11:19:50
-     */
-    //TODO 这个还没被调用
-    private void createSettleLog(FinanceSettleBaseDto dto, FinanceSettleReq financeSettleReq) {
-        /*查当前期*/
-        RepaymentBizPlanList cur = bizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", financeSettleReq.getBusinessId()).eq("after_id", financeSettleReq.getAfterId()));
-        /*查本次结清的所有还款计划期数*/
-        EntityWrapper<RepaymentBizPlanList> eWrapper = new EntityWrapper<RepaymentBizPlanList>();
-        eWrapper.eq("orig_business_id", financeSettleReq.getBusinessId()).orderBy("due_date", false);
-        if (!StringUtil.isEmpty(financeSettleReq.getPlanId())) {
-            eWrapper.eq("plan_id", financeSettleReq.getPlanId());
-        }
-        List<RepaymentBizPlanList> list = bizPlanListService.selectList(eWrapper);
-        Date now = new Date();
-        /*比较当前期与最后一期的关系*/
-        if (list.get(0).getAfterId().equals(cur.getAfterId())) {
-            int diff = DateUtil.getDiffDays(now, cur.getFactRepayDate());
-            if (diff > 0) {
-                dto.setPreSettle(true);
-            } else {
-                dto.setPreSettle(false);
-            }
-        } else {
-            dto.setPreSettle(true);
-        }
-
-        RepaymentSettleLog log = new RepaymentSettleLog();
-        log.setBusinessId(financeSettleReq.getBusinessId());
-        log.setCreateTime(now);
-        log.setCreateUser(dto.getUserId());
-        log.setCreateUserName(dto.getUserName());
-        log.setOrgBusinessId(dto.getOrgBusinessId());
-        log.setPlanId(dto.getPlanId());
-        log.setPlanListId(cur.getPlanListId());
-        log.setSettleLogId(dto.getUuid());
-
-        dto.setRepaymentSettleLog(log);
-    }
-
-    //拆分还款的规则应优先还共借标的，在还主借标的，若有多个共借标，则有优先还上标金额较小的标的，若共借标中的金额先等，则优先还满标时间较早的标的。
-    public void settleSort(List<RepaymentProjPlanDto> repaymentProjPlanDtos) {
-        Collections.sort(repaymentProjPlanDtos, new Comparator<RepaymentProjPlanDto>() {
-            // 排序规则说明 需补充 从小标到大标，再到主借标
-            //同等
-            @Override
-            public int compare(RepaymentProjPlanDto arg0, RepaymentProjPlanDto arg1) {
-                if (arg0.getTuandaiProjectInfo().getMasterIssueId().equals(arg0.getTuandaiProjectInfo().getProjectId())) {
-                    return 1;
-                } else if (arg1.getTuandaiProjectInfo().getMasterIssueId().equals(arg1.getTuandaiProjectInfo().getProjectId())) {
-                    return -1;
-                }
-                if (arg0.getRepaymentProjPlan().getBorrowMoney()
-                        .compareTo(arg1.getRepaymentProjPlan().getBorrowMoney()) < 0) {
-                    return -1;
-                }
-                if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
-                        .before(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
-                    return -1;
-                } else if (arg0.getTuandaiProjectInfo().getQueryFullSuccessDate()
-                        .after(arg1.getTuandaiProjectInfo().getQueryFullSuccessDate())) {
-                    return 1;
-                }
-                return 0;
-            }
-
-        });
-    }
 
     @Override
     public void makeRepaymentPlanAllPlan(FinanceSettleBaseDto financeSettleBaseDto, FinanceSettleReq financeSettleReq) {
@@ -776,7 +703,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                            }
 	                            tdrepayRecharge(projPlanList);
 	                            /*更新财务管理列表*/
+	                            repaymentBizPlanListSynchService.updateRepaymentBizPlan();
 	                            repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
+	                            repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
 	                        } catch (Exception e) {
 	                            logger.error(e.getMessage(), e);
 	                            Thread.currentThread().interrupt();
