@@ -102,7 +102,7 @@
 			</if>
 	</select>
 	
-	<select id="calcSurplusService" resultType="java.math.BigDecimal">
+	<select id="calcSurplusPlatformFees" resultType="java.math.BigDecimal">
 		SELECT DISTINCT
 			sum(ppld.proj_plan_amount)
 		FROM
@@ -112,7 +112,7 @@
 		WHERE
 			ppl.business_id = #{businessId}
 			AND pp.project_id = #{projectId}
-			AND ppld.plan_item_type = 30
+			AND ppld.plan_item_type = 50
 			AND ppl.period > #{period}
 			<if test="planId != null">
 				AND pp.plan_id = #{planId}

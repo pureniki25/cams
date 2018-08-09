@@ -119,14 +119,14 @@ public interface FinanceService {
      * @param planListId
      * @return
      */
-    List<String> queryBizOtherFee(String planListId);
+    Map<String, List<String>> queryBizOtherFee(String planListId);
     
     /**
      * 获取标维度的其他费用
      * @param projPlanListId
      * @return
      */
-    List<String> queryProjOtherFee(String projPlanListId);
+    Map<String, List<String>> queryProjOtherFee(String projPlanListId);
     
     /**
      * 获取业务维度贷款余额（非源业务编号）

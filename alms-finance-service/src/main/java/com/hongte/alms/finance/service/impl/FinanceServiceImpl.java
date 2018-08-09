@@ -1748,21 +1748,29 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Override
-	public List<String> queryBizOtherFee(String planListId) {
+	public Map<String, List<String>> queryBizOtherFee(String planListId) {
 		try {
-			List<String> resultList = new ArrayList<>();
+			Map<String, List<String>> resultMap = new HashMap<>();
+			List<String> factAmountResultList = new ArrayList<>();
+			List<String> planAmountResultList = new ArrayList<>();
 			List<RepaymentBizPlanListDetail> details = repaymentBizPlanListDetailService
 					.selectList(new EntityWrapper<RepaymentBizPlanListDetail>()
 							.notIn("plan_item_type", 10, 20, 30, 50, 60).eq("plan_list_id", planListId));
 			if (CollectionUtils.isNotEmpty(details)) {
 				for (RepaymentBizPlanListDetail detail : details) {
-					BigDecimal factAmount = detail.getFactAmount();
-					resultList.add(
+					BigDecimal factAmount = detail.getFactAmount();	// 实还
+					BigDecimal planAmount = detail.getPlanAmount(); // 应还
+					factAmountResultList.add(
 							detail.getPlanItemName() + ": " + (factAmount == null ? BigDecimal.valueOf(0) : factAmount)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					planAmountResultList.add(
+							detail.getPlanItemName() + ": " + (planAmount == null ? BigDecimal.valueOf(0) : planAmount)
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 				}
+				resultMap.put("factAmountResultList", factAmountResultList);
+				resultMap.put("planAmountResultList", planAmountResultList);
 			}
-			return resultList;
+			return resultMap;
 		} catch (Exception e) {
 			logger.error("查询业务还款计划其他费用异常", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
@@ -1770,21 +1778,29 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Override
-	public List<String> queryProjOtherFee(String projPlanListId) {
+	public Map<String, List<String>> queryProjOtherFee(String projPlanListId) {
 		try {
-			List<String> resultList = new ArrayList<>();
+			Map<String, List<String>> resultMap = new HashMap<>();
+			List<String> factAmountResultList = new ArrayList<>();
+			List<String> planAmountResultList = new ArrayList<>();
 			List<RepaymentProjPlanListDetail> details = repaymentProjPlanListDetailService
 					.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPlanListId)
 							.notIn("plan_item_type", 10, 20, 30, 50, 60));
 			if (CollectionUtils.isNotEmpty(details)) {
 				for (RepaymentProjPlanListDetail detail : details) {
-					BigDecimal projFactAmount = detail.getProjFactAmount();
-					resultList.add(detail.getPlanItemName() + ": "
+					BigDecimal projFactAmount = detail.getProjFactAmount();	// 实还
+					BigDecimal projPlanAmount = detail.getProjPlanAmount(); // 应还
+					factAmountResultList.add(detail.getPlanItemName() + ": "
 							+ (projFactAmount == null ? BigDecimal.valueOf(0) : projFactAmount)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+					planAmountResultList.add(detail.getPlanItemName() + ": "
+							+ (projPlanAmount == null ? BigDecimal.valueOf(0) : projPlanAmount)
+							.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 				}
+				resultMap.put("factAmountResultList", factAmountResultList);
+				resultMap.put("planAmountResultList", planAmountResultList);
 			}
-			return resultList;
+			return resultMap;
 		} catch (Exception e) {
 			logger.error("查询标还款计划其他费用异常", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
