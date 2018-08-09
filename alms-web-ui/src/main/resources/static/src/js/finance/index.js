@@ -180,9 +180,6 @@ window.layinit(function (htConfig) {
                             var time = parseInt(days / (1000 * 60 * 60 * 24));
                             let color = 'blue'
                             let content = p.row.repayStatus||p.row.status
-                            if(p.row.planStatusExt && p.row.planStatusExt!= '还款中'){
-                                content = p.row.planStatusExt
-                            }
 
                             if (p.row.status == '逾期') {
                                 if (time <= 15 && time > 1) {
@@ -202,6 +199,12 @@ window.layinit(function (htConfig) {
                             if(p.row.status == '逾期' && p.row.repayStatus == '未还款'){
                                 content = '逾期'
                             }
+
+                            if(p.row.planStatusExt && p.row.planStatusExt!= '还款中'){
+                                content = p.row.planStatusExt
+                                color = 'blue'
+                            }
+                            
                             return h('Tag', {
                                 props: {
                                     color: color
