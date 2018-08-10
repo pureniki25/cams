@@ -746,6 +746,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                            repaymentBizPlanListSynchService.updateRepaymentBizPlan();
 	                            repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
 	                            repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
+	                            shareProfitService.updateRepayPlanToLMS(businessId);
 	                        } catch (Exception e) {
 	                            logger.error(e.getMessage(), e);
 	                            Thread.currentThread().interrupt();
