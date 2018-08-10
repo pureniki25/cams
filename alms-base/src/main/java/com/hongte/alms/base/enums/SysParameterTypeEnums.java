@@ -21,7 +21,8 @@ public enum SysParameterTypeEnums {
 	CAR_STATUS(12,"车辆状态"),
 	CAR_DERATE_TYPE(13,"车贷减免费用类型"),
 	HOUSE_DERATE_TYPE(14,"房减免费用类型"),
-	PROFIT_ITEM_TYPE(15,"费用项类型");
+	PROFIT_ITEM_TYPE(15,"费用项类型"),
+	RIGHT_STEP_TIME(201,"权限同步时间间隔");
 //	borrowLimitUnit
 
 	private Integer key; // 数据保存的值

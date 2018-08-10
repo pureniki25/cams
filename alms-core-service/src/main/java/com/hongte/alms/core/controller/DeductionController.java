@@ -22,6 +22,7 @@ import com.hongte.alms.base.vo.module.BankLimitVO;
 
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 
 import io.swagger.annotations.Api;
@@ -288,49 +289,56 @@ public class DeductionController {
    @GetMapping("/getDeductionPlatformInfo")
    @ResponseBody
 	public Result<Map<String, Object>> getDeductionPlatformInfo(@RequestParam("identifyCard") String identifyCard) {
+     if(!StringUtil.isEmpty(identifyCard)) {
+    	 BankCardInfo bankCardInfo = null;
+ 		List<BankCardInfo> bankCardInfos = null;
+ 		try {
+ 			Result result = customerInfoXindaiRemoteApi.getBankcardInfo(identifyCard);
+ 			if (result.getCode().equals("1")) {
 
-		BankCardInfo bankCardInfo = null;
-		List<BankCardInfo> bankCardInfos = null;
-		try {
-			Result result = customerInfoXindaiRemoteApi.getBankcardInfo(identifyCard);
-			if (result.getCode().equals("1")) {
+ 				bankCardInfos = JSON.parseArray(result.getData().toString(), BankCardInfo.class);
+ 				if (bankCardInfos != null && bankCardInfos.size() > 0) {
+ 					for (BankCardInfo card : bankCardInfos) {
+ 						if (card.getPlatformType() == 1 && card.getWithholdingType() == 1) {// 团贷网平台注册的银行卡并且是代扣主卡
+ 							bankCardInfo = card;
+ 						}
+ 					}
+ 					if (bankCardInfo == null) {
+ 						return Result.error("-1", "该客户找不到对应团贷网平台银行卡信息");
+ 					}
+ 				} else {
+ 					return Result.error("-1", "该客户找不到对应银行卡信息");
+ 				}
+ 			} else {
+ 				return Result.error("-1", result.getMsg());
+ 			}
 
-				bankCardInfos = JSON.parseArray(result.getData().toString(), BankCardInfo.class);
-				if (bankCardInfos != null && bankCardInfos.size() > 0) {
-					for (BankCardInfo card : bankCardInfos) {
-						if (card.getPlatformType() == 1 && card.getWithholdingType() == 1) {// 团贷网平台注册的银行卡并且是代扣主卡
-							bankCardInfo = card;
-						}
-					}
-					if (bankCardInfo == null) {
-						return Result.error("-1", "该客户找不到对应团贷网平台银行卡信息");
-					}
-				} else {
-					return Result.error("-1", "该客户找不到对应银行卡信息");
-				}
-			} else {
-				return Result.error("-1", result.getMsg());
-			}
+ 		} catch (Exception e) {
+ 			return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
+ 		}
+ 		List<WithholdingPlatform> platformList = new ArrayList();
+ 		WithholdingPlatform withholdingPlatform = null;
+ 		for (ThirdPlatform thirdPlatform : bankCardInfo.getThirdPlatformList()) {
+ 			withholdingPlatform = new WithholdingPlatform();
+ 			withholdingPlatform.setPlatformId(thirdPlatform.getPlatformID());
+ 			withholdingPlatform.setPlatformName(PlatformEnum.getByKey(thirdPlatform.getPlatformID()).getName());
+ 			platformList.add(withholdingPlatform);
+ 		}
+ 		withholdingPlatform = new WithholdingPlatform();
+ 		withholdingPlatform.setPlatformId(5);
+ 		withholdingPlatform.setPlatformName(PlatformEnum.getByKey(5).getName());
+ 		platformList.add(withholdingPlatform);
 
-		} catch (Exception e) {
-			return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
-		}
-		List<WithholdingPlatform> platformList = new ArrayList();
-		WithholdingPlatform withholdingPlatform = null;
-		for (ThirdPlatform thirdPlatform : bankCardInfo.getThirdPlatformList()) {
-			withholdingPlatform = new WithholdingPlatform();
-			withholdingPlatform.setPlatformId(thirdPlatform.getPlatformID());
-			withholdingPlatform.setPlatformName(PlatformEnum.getByKey(thirdPlatform.getPlatformID()).getName());
-			platformList.add(withholdingPlatform);
-		}
-		withholdingPlatform = new WithholdingPlatform();
-		withholdingPlatform.setPlatformId(5);
-		withholdingPlatform.setPlatformName(PlatformEnum.getByKey(5).getName());
-		platformList.add(withholdingPlatform);
-
-		Map<String, Object> retMap = new HashMap<>();
-		retMap.put("platformList", (JSONArray) JSON.toJSON(platformList, JsonUtil.getMapping()));
-		return Result.success(retMap);
+ 		Map<String, Object> retMap = new HashMap<>();
+ 		retMap.put("platformList", (JSONArray) JSON.toJSON(platformList, JsonUtil.getMapping()));
+ 		return Result.success(retMap);
+     }else {
+    	 List<WithholdingPlatform>  platformList = withholdingplatformService.selectList(new EntityWrapper<WithholdingPlatform>());
+	      Map<String,Object> retMap = new HashMap<>();
+   	      retMap.put("platformList",(JSONArray) JSON.toJSON(platformList, JsonUtil.getMapping()));
+   	      return Result.success(retMap);
+     }
+		
 	}
 
    /*
