@@ -63,8 +63,11 @@ public class SetUserPermissionJob extends IJobHandler  {
             List<SysUser> list =  sysUserService.selectList(new EntityWrapper<SysUser>());
             
             for(SysUser user:list){
+            	logger.info("同步等待{}!",steps);
             	Thread.sleep(steps);
+            	logger.info("同步用户{}权限开始!",user.getUserId());
                 sysUserPermissionService.setUserPermissons(user.getUserId());
+                logger.info("同步用户{}权限完成!",user.getUserId());
                 
             }
 
