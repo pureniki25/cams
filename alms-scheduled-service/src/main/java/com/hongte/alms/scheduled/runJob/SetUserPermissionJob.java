@@ -13,6 +13,8 @@ import com.hongte.alms.scheduled.job.AutoSetCollectionJob;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
+import com.xxl.job.core.log.XxlJobLogger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,11 +65,14 @@ public class SetUserPermissionJob extends IJobHandler  {
             List<SysUser> list =  sysUserService.selectList(new EntityWrapper<SysUser>());
             
             for(SysUser user:list){
-            	logger.info("同步等待{}!",steps);
+            	XxlJobLogger.log("@SyncDaihouJob@同步用户等待[{}]",steps);
+            	logger.info("同步用户等待{}!",steps);
             	Thread.sleep(steps);
+            	XxlJobLogger.log("@SyncDaihouJob@同步用户权限开始[{}],时间[{}]",user.getUserId(),new Date().getTime());
             	logger.info("同步用户{}权限开始!",user.getUserId());
                 sysUserPermissionService.setUserPermissons(user.getUserId());
                 logger.info("同步用户{}权限完成!",user.getUserId());
+                XxlJobLogger.log("@SyncDaihouJob@同步用户权限结束时间[{}],时间[{}]",user.getUserId(),new Date().getTime());
                 
             }
 
