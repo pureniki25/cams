@@ -199,6 +199,12 @@ window.layinit(function (htConfig) {
                             if(p.row.status == '逾期' && p.row.repayStatus == '未还款'){
                                 content = '逾期'
                             }
+
+                            if(p.row.planStatusExt && p.row.planStatusExt!= '还款中'){
+                                content = p.row.planStatusExt
+                                color = 'blue'
+                            }
+                            
                             return h('Tag', {
                                 props: {
                                     color: color

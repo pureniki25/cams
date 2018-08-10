@@ -361,6 +361,15 @@
 				when (pl.src_type = 2 and pl.repay_status is null ) then '未还款'
 			END AS repayStatus, pl.accountant_confirm_status AS financeConfirmStatus
 				,pl.fact_amount_ext AS repaidAmount, pl.src_type AS srcType
+				, CASE
+				WHEN (pl.plan_status_ext = 0) THEN '还款中'
+				WHEN (pl.plan_status_ext = 10) THEN '已结清'
+				WHEN (pl.plan_status_ext = 20) THEN '已结清'
+				WHEN (pl.plan_status_ext = 30) THEN '亏损结清'
+				WHEN (pl.plan_status_ext = 31) THEN '坏账结清'
+				WHEN (pl.plan_status_ext = 50) THEN '已申请展期'
+				ELSE null
+				END AS planStatusExt
 			FROM tb_repayment_biz_plan_list_synch pl
 			<if test="paymentPlatformCode!=null">
 	        JOIN tb_tuandai_project_info as ttpi ON pl.business_id = ttpi.business_id
