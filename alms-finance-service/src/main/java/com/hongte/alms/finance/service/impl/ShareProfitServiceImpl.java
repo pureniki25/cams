@@ -1603,7 +1603,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			                financeBaseDto.getCurTimeRepaidProjPlanList().add(projPlanList);
 			                setRepayConfirmedFlagPro(projPlanList, financeBaseDto);
 			            } else {
-			                projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
+//			                projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 			                projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
 			                projPlanList.setRepayFlag(null);
 			                
@@ -1648,7 +1648,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			            } else {
 
 //							bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
-			            	bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 							bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
 							bizPlanList.setRepayFlag(null);
 			                if (bplFactAmount.compareTo(bplOnlineAmount) >= 0) {
