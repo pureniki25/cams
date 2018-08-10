@@ -377,6 +377,39 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					}
 				}
                 
+                /*如果有减免,先处理减免*/
+                for (SettleFeesVO derateFee : financeSettleBaseDto.getDerates()) {
+					for (RepaymentProjPlanSettleDto repaymentProjPlanSettleDto : projPlanSettleDtoList) {
+						List<PlanListDetailShowPayDto> planListDetailShowPayDtos = sortFeeByShareProfitIndex(repaymentProjPlanSettleDto);
+						for (PlanListDetailShowPayDto planListDetailShowPayDto : planListDetailShowPayDtos) {
+							if (derateFee.getFeeId().equals(planListDetailShowPayDto.getFeelId()) 
+									&& derateFee.getAmount().compareTo(BigDecimal.ZERO) >0 ) {
+								BigDecimal showPayMoney = planListDetailShowPayDto.getShowPayMoney();
+								BigDecimal derate = derateFee.getAmount();
+								
+								if (derate.compareTo(showPayMoney)<0) {
+									showPayMoney = showPayMoney.subtract(derate);
+									derate = BigDecimal.ZERO;
+								}else if(derate.compareTo(showPayMoney)==0) {
+									showPayMoney = BigDecimal.ZERO;
+									derate = BigDecimal.ZERO;
+								}else {
+									showPayMoney = BigDecimal.ZERO;
+									derate = derate.subtract(showPayMoney);
+								}
+								
+								planListDetailShowPayDto.setShowPayMoney(showPayMoney);
+								derateFee.setAmount(derate);
+								if (derate.compareTo(BigDecimal.ZERO)==0) {
+									financeSettleBaseDto.setResourceIndex(financeSettleBaseDto.getResourceIndex()+1);
+									financeSettleBaseDto.setCuralResource(financeSettleBaseDto.getRepaymentResources().get(financeSettleBaseDto.getResourceIndex()));
+								}
+							}
+						}
+					}
+				}
+                /*如果有减免,先处理减免*/
+                
                 for(RepaymentProjPlanSettleDto repaymentProjPlanSettleDto:projPlanSettleDtoList){
                 	//先还线上部分
                 	financeSettleBaseDto.setProjPlanId(repaymentProjPlanSettleDto.getRepaymentProjPlan().getProjPlanId());
@@ -1796,6 +1829,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
     }
 
+    
     /**
      * 处理还款来源
      * @author 王继光
@@ -1810,28 +1844,25 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         List<String> mprIds = financeSettleReq.getMprIds();
 
         /*将减免的resource查出添加进来*/
-		for (RepaymentBizPlanSettleDto bizPlanSettleDto : financeSettleBaseDto.getCurrentPeriods()) {
-			RepaymentBizPlanList planList = bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList();
-			for (SettleFeesVO settleFeesVO : financeSettleBaseDto.getDerates()) {
-				RepaymentResource repaymentResource = new RepaymentResource();
-				UUID uuid = UUID.randomUUID();
-				repaymentResource.setResourceId(String.valueOf(uuid));
-				repaymentResource.setAfterId(planList.getAfterId());
-				repaymentResource.setBusinessId(planList.getBusinessId());
-				repaymentResource.setOrgBusinessId(planList.getOrigBusinessId());
-				repaymentResource.setCreateDate(new Date());
-				repaymentResource.setCreateUser(financeSettleBaseDto.getUserId());
-				repaymentResource.setIsCancelled(0);
-				repaymentResource.setRepayAmount(settleFeesVO.getAmount());
-				repaymentResource.setRepayDate(new Date());
-				repaymentResource.setRepaySource(RepayPlanRepaySrcEnum.DERATE.getValue().toString());
-				repaymentResource.setRepaySourceRefId(settleFeesVO.getPlanItemName());
-				repaymentResource.setConfirmLogId(financeSettleBaseDto.getUuid());
-				repaymentResources.add(repaymentResource);
-				/*减免金额不加入实还金额里面*/
-			}
+		for (SettleFeesVO settleFeesVO : financeSettleBaseDto.getDerates()) {
+			RepaymentResource repaymentResource = new RepaymentResource();
+			UUID uuid = UUID.randomUUID();
+			repaymentResource.setResourceId(String.valueOf(uuid));
+			repaymentResource.setAfterId(financeSettleBaseDto.getAfterId());
+			repaymentResource.setBusinessId(financeSettleBaseDto.getBusinessId());
+			repaymentResource.setOrgBusinessId(financeSettleBaseDto.getOrgBusinessId());
+			repaymentResource.setCreateDate(new Date());
+			repaymentResource.setCreateUser(financeSettleBaseDto.getUserId());
+			repaymentResource.setIsCancelled(0);
+			repaymentResource.setRepayAmount(settleFeesVO.getAmount());
+			repaymentResource.setRepayDate(new Date());
+			repaymentResource.setRepaySource(RepayPlanRepaySrcEnum.DERATE.getValue().toString());
+			repaymentResource.setRepaySourceRefId(settleFeesVO.getPlanItemName());
+			repaymentResource.setConfirmLogId(financeSettleBaseDto.getUuid());
+			repaymentResources.add(repaymentResource);
+			/*减免金额不加入实还金额里面*/
 		}
-		 /*将减免的resource查出添加进来*/
+		/*将减免的resource查出添加进来*/
         
         if (!CollectionUtils.isEmpty(mprIds)) {
         	List<MoneyPoolRepayment> moneyPoolRepaymentList = moneyPoolRepaymentMapper.selectList(new EntityWrapper<MoneyPoolRepayment>().in("id", mprIds));
@@ -2244,7 +2275,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
      * @return
      */
     private List<SettleFeesVO> listDerate(String planListId) {
-		List<ApplyDerateType> listDerate = applyDerateTypeMapper.listDerate(planListId);
+		List<ApplyDerateType> listDerate = applyDerateTypeMapper.listDerate(planListId,1);
 		List<SettleFeesVO> derate = new ArrayList<>();
 		for (ApplyDerateType d : listDerate) {
 			SettleFeesVO settleFeesVO = new SettleFeesVO();
@@ -2267,7 +2298,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 			settleFeesVO.setShareProfitIndex(1);
 			derate.add(settleFeesVO);
 		}
-		//TODO 还有减免 其他费用项 还没做好,但是当前并不需要
+		//TODO 还有减免 其他费用项 还没做好,但是当前2018/8/10并不需要
 		return derate ;
 	}
     
