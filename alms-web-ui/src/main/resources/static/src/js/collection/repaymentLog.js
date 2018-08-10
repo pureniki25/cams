@@ -422,7 +422,7 @@ var getDeductionPlatformInfo=function(){
 	
 	
     var self = this;  
-    var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo"
+    var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo?identifyCard="
     axios.get(reqStr)
         .then(function (result) {
             if (result.data.code == "1") {
