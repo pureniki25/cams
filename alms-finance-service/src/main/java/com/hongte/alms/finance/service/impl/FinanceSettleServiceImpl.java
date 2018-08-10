@@ -2787,6 +2787,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 				periodProjDetailVO.setMaster(projectInfo.getProjectId().equals(projectInfo.getMasterIssueId()));
 				periodProjDetailVO.setUserName(projectInfo.getRealName());
 				periodProjDetailVO.setQueryFullSuccessDate(projectInfo.getQueryFullSuccessDate());
+				periodProjDetailVO.setProjAmount(projectInfo.getFullBorrowMoney());
 				
 				if (CollectionUtils.isEmpty(financeSettleBaseDto.getCurrPeriodProjDetailVOList())) {
 					financeSettleBaseDto.setCurrPeriodProjDetailVOList(new ArrayList<>());
