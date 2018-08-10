@@ -204,7 +204,7 @@ window.layinit(function (htConfig) {
                                 content = p.row.planStatusExt
                                 color = 'blue'
                             }
-                            
+
                             return h('Tag', {
                                 props: {
                                     color: color
@@ -570,7 +570,7 @@ window.layinit(function (htConfig) {
                 app.form.curPage = page;
                 app.search()
             },
-            revokeConfirm(p) {debugger
+            revokeConfirm(p) {
 //             	 if (p.bankRepay== true) {
 //                     app.$Message.warning({
 //                         content: '银行代扣不能撤销'

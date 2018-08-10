@@ -404,7 +404,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                         currentAccrual =repaymentBizPlanListDetail.getPlanAmount();
                     }else if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PRINCIPAL.getValue())){
                         currentPrinciple = repaymentBizPlanListDetail.getPlanAmount();
-                    }else if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue())){
+                    }else if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue())){//分公司服务费，归到服务费
+                        currentSerivceFee = currentSerivceFee.add(repaymentBizPlanListDetail.getPlanAmount());
+                    }else if(repaymentBizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PLAT_CHARGE.getValue())){//平台月收服务费，归到服务费
                         currentSerivceFee = currentSerivceFee.add(repaymentBizPlanListDetail.getPlanAmount());
                     }
                     else {
@@ -426,7 +428,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 bizAfterDto.setBorrowDate(repaymentBizPlanList.getDueDate());//还款日期
                 bizAfterDto.setCarBusinessAfterType("还款中");//[还款状态分类]：还款中，已还款，逾期
                 bizAfterDto.setRepayService(currentSerivceFee);//本期应还分公司服务费
-                bizAfterDto.setOtherMoney(otherFee.toPlainString()); //其他费用
+//                bizAfterDto.setOtherMoney(otherFee.toPlainString()); //其他费用(这是实还值)
+                bizAfterDto.setCurrentOtherMoney(otherFee); //其他费用（这是应还值）
 //                bizAfterDto.setCreatedate(new Date());
                 bizAfterDto.setRepayedFlag(0);
                 bizAfterDto.setReserve2("还款中");
@@ -881,7 +884,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 log.setInterfacename("创建并存储还款计划");
                 log.setSendJsonEncrypt(creatRepayPlanReq.getBusinessBasicInfoReq().getBusinessId());
                 log.setSendJson(JSON.toJSONString(creatRepayPlanReq));
-                log.setReturnJson(JSON.toJSONString(dtos));
+                log.setReturnJson(JSON.toJSONString(planReturnInfoDto));
 //                log.setReturnJsonDecrypt(JSON.toJSONString(dtos));
                 log.setSystem("");
                 log.setSendUrl("");
