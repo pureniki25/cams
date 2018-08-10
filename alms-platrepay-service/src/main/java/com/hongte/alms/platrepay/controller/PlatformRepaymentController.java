@@ -429,31 +429,31 @@ public class PlatformRepaymentController {
 
 							if (amount != null) {
 								planRepaymentMap.put("10", amount);
-								planRepaymentRechargeAmount.add(amount);
+								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(amount);
 							}
 							if (interestAmount != null) {
 								planRepaymentMap.put("20", interestAmount);
-								planRepaymentRechargeAmount.add(interestAmount);
+								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(interestAmount);
 							}
 							if (guaranteeAmount != null) {
 								planRepaymentMap.put("50", guaranteeAmount);
-								planRepaymentRechargeAmount.add(guaranteeAmount);
+								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(guaranteeAmount);
 							}
 							if (arbitrationAmount != null) {
 								planRepaymentMap.put("60", arbitrationAmount);
-								planRepaymentRechargeAmount.add(arbitrationAmount);
+								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(arbitrationAmount);
 							}
 							if (orgAmount != null) {
 								planRepaymentMap.put("40", orgAmount);
-								planRepaymentRechargeAmount.add(orgAmount);
+								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(orgAmount);
 							}
 							if (tuandaiAmount != null) {
 								planRepaymentMap.put("30", tuandaiAmount);
-								planRepaymentRechargeAmount.add(tuandaiAmount);
+								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(tuandaiAmount);
 							}
 							if (agencyAmount != null) {
 								planRepaymentMap.put("80", agencyAmount);
-								planRepaymentRechargeAmount.add(agencyAmount);
+								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(agencyAmount);
 							}
 
 						}
@@ -521,44 +521,44 @@ public class PlatformRepaymentController {
 
 								if (penaltyAmount != null) {
 									guaranteePaymentMap.put("70", penaltyAmount);
-									guaranteeRepaymentRechargeAmount.add(penaltyAmount);
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(penaltyAmount);
 								}
 								if (tuandaiAmount != null) {
 									if (vo.getSettleType().intValue() != 0 && planRepaymentMap.containsKey("30")) {
 										guaranteePaymentMap.put("30", planRepaymentMap.get("30"));
-										guaranteeRepaymentRechargeAmount.add(tuandaiAmount);
+										guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(tuandaiAmount);
 									}else {
 										guaranteePaymentMap.put("30", tuandaiAmount);
-										guaranteeRepaymentRechargeAmount.add(tuandaiAmount);
+										guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(tuandaiAmount);
 									}
 								}
 								if (orgAmount != null) {
 									guaranteePaymentMap.put("40", orgAmount);
-									guaranteeRepaymentRechargeAmount.add(orgAmount);
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(orgAmount);
 								}
 								if (guaranteeAmount != null) {
 									guaranteePaymentMap.put("50", guaranteeAmount);
-									guaranteeRepaymentRechargeAmount.add(guaranteeAmount);
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(guaranteeAmount);
 								}
 								if (arbitrationAmount != null) {
 									guaranteePaymentMap.put("60", arbitrationAmount);
-									guaranteeRepaymentRechargeAmount.add(arbitrationAmount);
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(arbitrationAmount);
 								}
 								if (agencyAmount != null) {
 									guaranteePaymentMap.put("80", agencyAmount);
-									guaranteeRepaymentRechargeAmount.add(agencyAmount);
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(agencyAmount);
 								}
 
 								// 从计划接口中分离出本金和利息
 								// 本金
 								if (planRepaymentMap.containsKey("10")) {
 									guaranteePaymentMap.put("10", planRepaymentMap.get("10"));
-									guaranteeRepaymentRechargeAmount.add(planRepaymentMap.get("10"));
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(planRepaymentMap.get("10"));
 								}
 								// 利息
 								if (planRepaymentMap.containsKey("20")) {
 									guaranteePaymentMap.put("20", planRepaymentMap.get("20"));
-									guaranteeRepaymentRechargeAmount.add(planRepaymentMap.get("20"));
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(planRepaymentMap.get("20"));
 								}
 
 							}
