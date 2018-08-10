@@ -332,7 +332,7 @@
 		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
 			SELECT DISTINCT pl.plan_id AS planId, pl.confirm_flag AS confirmFlag, pl.plan_list_id AS planListId, pl.business_id AS businessId, pl.orig_business_id AS orgBusinessId
 				, pl.period AS period, pl.after_id AS afterId, 
-				pl.company_id_ext AS dept, 
+				pl.company_name_ext AS dept, 
 				pl.operator_name_ext AS operator, 
 				pl.customer_name_ext AS customer
 				, pl.phone_number_ext AS phoneNumber, pl.business_ctype_ext AS businessType, pl.due_date AS planRepayDate, pl.borrow_money_ext AS borrowMoney
