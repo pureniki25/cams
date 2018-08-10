@@ -27,7 +27,8 @@ public interface ApplyDerateTypeMapper extends SuperMapper<ApplyDerateType> {
 	 * @author 王继光
 	 * 2018年8月7日 上午9:10:06
 	 * @param planListId
+	 * @param isSettle 1=结清用的减免 0=还款用的减免
 	 * @return
 	 */
-	List<ApplyDerateType> listDerate(String planListId);
+	List<ApplyDerateType> listDerate(@Param("planListId")String planListId,@Param("isSettle")Integer isSettle);
 }

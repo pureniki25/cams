@@ -363,7 +363,10 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         /*删除合规化还款调用记录 结束*/
         log.deleteById();
         /*更新财务管理列表*/
+        
+        repaymentBizPlanListSynchService.updateRepaymentBizPlan();
         repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
+        repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
         return Result.success();
     }
 

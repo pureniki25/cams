@@ -40,6 +40,7 @@ public class FinanceSettleController {
         Result result = null;
         try {
             List<CurrPeriodProjDetailVO> currVo = financeSettleService.financeSettle(financeSettleReq);
+            Thread.sleep(3000);
             result = Result.success(currVo);
         } catch (ServiceRuntimeException se) {
             result = Result.error("500", se.getMessage());

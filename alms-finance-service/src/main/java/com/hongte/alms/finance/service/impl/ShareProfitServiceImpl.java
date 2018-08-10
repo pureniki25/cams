@@ -1603,11 +1603,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			                financeBaseDto.getCurTimeRepaidProjPlanList().add(projPlanList);
 			                setRepayConfirmedFlagPro(projPlanList, financeBaseDto);
 			            } else {
-			                projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 			                projPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
 			                projPlanList.setRepayFlag(null);
 			                
 			                if (pjlFactAmount.compareTo(pjlOnlineAmount) >= 0) {
+				                projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 			                	projPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
                                 financeBaseDto.getCurTimeRepaidProjPlanList().add(projPlanList);
 			                } else {
@@ -1647,11 +1647,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			                
 			            } else {
 
-//							bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
-			            	bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 							bizPlanList.setCurrentSubStatus(RepayPlanStatus.REPAYING.getName());
 							bizPlanList.setRepayFlag(null);
 			                if (bplFactAmount.compareTo(bplOnlineAmount) >= 0) {
+								bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
 			                } else {
 			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());

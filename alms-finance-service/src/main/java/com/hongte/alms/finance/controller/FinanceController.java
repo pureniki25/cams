@@ -1254,7 +1254,7 @@ public class FinanceController {
 			}
 			/*判断结清期是否逾期,最后一期不在判断范围以内*/
 			/*检查往期还款状态*/
-			Wrapper<RepaymentBizPlanList> lt = new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).lt("period", bizPlanList.getPeriod());
+			Wrapper<RepaymentBizPlanList> lt = new EntityWrapper<RepaymentBizPlanList>().eq("business_id", business.getBusinessId()).lt("due_date", bizPlanList.getDueDate());
 			if (!StringUtil.isEmpty(planId)) {
 				lt.eq("plan_id", planId);
 			}

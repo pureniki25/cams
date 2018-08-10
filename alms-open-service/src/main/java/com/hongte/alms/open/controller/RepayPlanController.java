@@ -284,6 +284,7 @@ public class RepayPlanController {
                                 break;
                             //分公司服务费：资产端分公司服务费
                             case 30:
+                            case 50:  //资金端平台服务费  属于服务费
                                 //paramMap.put("subCompanyServiceFee", planListDetail.getPlanAmount());
                                 //paramMap.put("factSubCompanyServiceFee", planListDetail.getFactAmount());
                                 //可能有多个分公司服务费，要循环累加
