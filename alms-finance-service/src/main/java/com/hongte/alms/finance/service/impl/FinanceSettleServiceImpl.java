@@ -1059,7 +1059,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 //更新标的状态
                 BigDecimal allMoney = updateProjPlan(projMoneyMap, financeSettleBaseDto, afterIdNow);
                 //更新业务的状态 及保存结清操作记录 更新流水状态
-                updateBizPlan(projMoneyMap, financeSettleBaseDto, allMoney, planIdNow, afterIdNow);
+                //合并报错，临时注释
+//                updateBizPlan(projMoneyMap, financeSettleBaseDto, allMoney, planIdNow, afterIdNow);
 
                 updateMoneyPoolRepayment(financeSettleReq);
 
@@ -1212,7 +1213,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         return settleFeesMoneyLists;
     }
 
-    /**
+ /*   *//**
      * 更新业务的状态
      *
      * @param projMoneyMap
@@ -1220,7 +1221,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
      * @param allMoney
      * @param planIdNow
      * @param afterIdNow
-     */
+     *//*
     public void updateBizPlan(Map<String, CurrPeriodProjDetailVO> projMoneyMap, FinanceSettleBaseDto financeSettleBaseDto, BigDecimal allMoney, String planIdNow, String afterIdNow) {
         //所有的金额 更新业务还款计划状态
         BigDecimal allFactMoney = BigDecimal.ZERO;
@@ -1458,7 +1459,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
             repaymentConfirmLogMapper.insert(repaymentConfirmLog);
         }
-    }
+    }*/
 
     /**
      * 更新标的状态
