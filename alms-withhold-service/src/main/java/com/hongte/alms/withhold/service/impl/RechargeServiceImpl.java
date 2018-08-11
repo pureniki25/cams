@@ -649,9 +649,28 @@ public class RechargeServiceImpl implements RechargeService {
 	 * @param remoteResult
 	 * @return
 	 */
+	/**
+	 * 获取易宝代扣结果
+	 * 
+	 * @param remoteResult
+	 * @return
+	 */
 	private ResultData getYBResultMsg(com.ht.ussp.core.Result remoteResult) {
 		ResultData resultData=new ResultData();
-		resultData.setResultMsg(remoteResult.getCodeDesc());
+		if(remoteResult.getData()!=null) {
+		String dataJson = JSONObject.toJSONString(remoteResult.getData());
+		Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
+		String yborderid = (String) resultMap.get("yborderid");
+		String status = (String) resultMap.get("status");
+			if(!StringUtil.isEmpty(yborderid)) {
+				resultData.setResultMsg(remoteResult.getCodeDesc());
+				resultData.setStatus(status);
+			}else {
+				resultData.setResultMsg(remoteResult.getCodeDesc());
+			}
+		}else {
+			resultData.setResultMsg(remoteResult.getCodeDesc());
+		}
 		return resultData;
 	}
 
