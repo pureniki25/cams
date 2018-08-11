@@ -332,7 +332,7 @@
 		parameterType="com.hongte.alms.base.dto.FinanceManagerListReq">
 			SELECT DISTINCT pl.plan_id AS planId, pl.confirm_flag AS confirmFlag, pl.plan_list_id AS planListId, pl.business_id AS businessId, pl.orig_business_id AS orgBusinessId
 				, pl.period AS period, pl.after_id AS afterId, 
-				pl.company_id_ext AS dept, 
+				pl.company_name_ext AS dept, 
 				pl.operator_name_ext AS operator, 
 				pl.customer_name_ext AS customer
 				, pl.phone_number_ext AS phoneNumber, pl.business_ctype_ext AS businessType, pl.due_date AS planRepayDate, pl.borrow_money_ext AS borrowMoney
@@ -361,6 +361,15 @@
 				when (pl.src_type = 2 and pl.repay_status is null ) then '未还款'
 			END AS repayStatus, pl.accountant_confirm_status AS financeConfirmStatus
 				,pl.fact_amount_ext AS repaidAmount, pl.src_type AS srcType
+				, CASE
+				WHEN (pl.plan_status_ext = 0) THEN '还款中'
+				WHEN (pl.plan_status_ext = 10) THEN '已结清'
+				WHEN (pl.plan_status_ext = 20) THEN '已结清'
+				WHEN (pl.plan_status_ext = 30) THEN '亏损结清'
+				WHEN (pl.plan_status_ext = 31) THEN '坏账结清'
+				WHEN (pl.plan_status_ext = 50) THEN '已申请展期'
+				ELSE null
+				END AS planStatusExt
 			FROM tb_repayment_biz_plan_list_synch pl
 			<if test="paymentPlatformCode!=null">
 	        JOIN tb_tuandai_project_info as ttpi ON pl.business_id = ttpi.business_id

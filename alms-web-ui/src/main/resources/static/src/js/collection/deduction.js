@@ -18,7 +18,7 @@ var layer;
         	
         };
         getDeductionInfo();
-        getDeductionPlatformInfo();
+        //getDeductionPlatformInfo();
       
         vm = new Vue({
         	el: '#app',
@@ -66,7 +66,7 @@ var layer;
                     haveUnderRepay:'',
                     repaying:'',
                     business:[],
-                    bankCardInfo:[],
+                    bankCardInfo:'',
                     pList:[]
 
                     
@@ -331,8 +331,7 @@ var layer;
                      	vm.ajax_data.onLineOverDueMoney=result.data.data.onLineOverDueMoney;
                
                     }
-                 	vm.platformId='5';
-                 	doOperate();
+                 	
                       if(vm.ajax_data.strType==2){
                       	url=basePath+ "RepaymentLogController/searchAfterRepayLog?businessId="+vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
                       }else{
@@ -405,6 +404,7 @@ var layer;
                    	            	//vm.ajax_data.repayAllAmount=repayMoney;
                    	            	//getTotalShouldPay();
                                 vm.loading = false;
+                                getDeductionPlatformInfo(vm.ajax_data.identifyCard);
                             }
                         });
 
@@ -445,11 +445,11 @@ var layer;
 	
 	
 	
-	var getDeductionPlatformInfo=function(){
+	function getDeductionPlatformInfo(identifyCard){
 		
 		
         var self = this;  
-        var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo"
+        var reqStr =basePath+ "DeductionController/getDeductionPlatformInfo?identifyCard="+identifyCard
         axios.get(reqStr)
             .then(function (result) {debugger	
                 if (result.data.code == "1") {
@@ -457,7 +457,7 @@ var layer;
           
                     vm.platformList = result.data.data.platformList;
                
-           
+                    doOperate();
                     
                 } else {
                     self.$Modal.error({content: '获取数据失败：' + result.data.msg});

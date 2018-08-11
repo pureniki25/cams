@@ -37,4 +37,14 @@ public enum PlatformEnum implements IEnum {
     public String getName(){
         return this.name;
     }
+    
+	public static PlatformEnum getByKey(Integer key){
+		for(PlatformEnum d : PlatformEnum.values()){
+			if(key==d.value){
+				return d;
+			}
+		}
+		return null;
+
+	}
 }
