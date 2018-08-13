@@ -278,7 +278,7 @@ public class RechargeServiceImpl implements RechargeService {
 					result.setCode("2");
 					result.setMsg(resultData.getResultMsg());
 					log.setRepayStatus(2);
-					log.setRemark(resultData.getResultMsg());
+					log.setRemark("处理中");
 					log.setUpdateTime(new Date());
 					withholdingRepaymentLogService.updateById(log);
 			
@@ -1330,13 +1330,11 @@ public class RechargeServiceImpl implements RechargeService {
 
 	
 	/**
-      * 0：待付（创建的订单未支付成功）
-		1：已付（订单已经支付成功）
-		2：已撤销（待支付订单有效期为1 天，过期后
-		自动撤销）
-		3：阻断交易（订单因为高风险而被阻断）
-		4：失败
-		5：处理中
+      * 0：失败
+		1：成功
+		2：未处理
+		3：处理中
+		4：已撤销
 	 */
 	@Override
 	public void getYBResult(WithholdingRepaymentLog log) {
@@ -1375,13 +1373,13 @@ public class RechargeServiceImpl implements RechargeService {
 				logger.error("易宝代扣成功短信发送错误,logId:{0}",log.getLogId());
 			}
 
-		} else if (result.getReturnCode().equals("0000") && (resultData.getStatus().equals("5")||resultData.getStatus().equals("0"))) {//处理中
+		} else if (result.getReturnCode().equals("0000") && (resultData.getStatus().equals("3")||resultData.getStatus().equals("2"))) {//处理中
 			log.setRepayStatus(2);
 			log.setRemark(resultData.getResultMsg());
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 
-		}else if (result.getReturnCode().equals("0000") && (resultData.getStatus().equals("4")||resultData.getStatus().equals("2")||resultData.getStatus().equals("3"))) {//失败
+		}else if (result.getReturnCode().equals("0000") && (resultData.getStatus().equals("0")||resultData.getStatus().equals("4"))) {//失败
 			log.setRepayStatus(0);
 			log.setRemark(resultData.getResultMsg());
 			log.setUpdateTime(new Date());
