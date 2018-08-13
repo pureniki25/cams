@@ -2022,7 +2022,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             if (!financeSettleReq.getPreview()) {
                 accountantOverRepayLog.insert();
                 financeSettleBaseDto.getRepaymentConfirmLog().setSurplusUseRefId(accountantOverRepayLog.getId().toString());
-                financeSettleBaseDto.getRepaymentConfirmLog().insert()getClass();
+                financeSettleBaseDto.getRepaymentConfirmLog().insert();
                 repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
                 repaymentResource.insert();
                 if (mprIds.size() == 0) {
