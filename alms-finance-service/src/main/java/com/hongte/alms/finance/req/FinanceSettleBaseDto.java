@@ -137,5 +137,7 @@ public class FinanceSettleBaseDto {
 	List<RepaymentBizPlanSettleDto> bizSettleBizPlanDtos;
 	// 整个业务结清标的还款计划列表
 	List<RepaymentProjPlanSettleDto> bizSettleProjPlanDtos;
+	
+	RepaymentConfirmLog repaymentConfirmLog ;
 
 }

@@ -4,6 +4,7 @@ import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,11 @@ public class RepaymentProjPlanSettleDto extends  RepaymentProjPlanDto {
      * 当前期结清应还费用项Map  Map<feeId,PlanListDetailShowPayDto>
      */
     private Map<String,PlanListDetailShowPayDto> curShowPayFeels;
+    
+    /**
+     * 当前期实还金额  Map<feeId,费用>
+     */
+    private Map<String,BigDecimal> curFactRepayAmount ;
 
     /**
      * 当前期之前的业务还款计划列表

@@ -18,6 +18,7 @@ import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.*;
+import com.hongte.alms.base.enums.repayPlan.PepayPlanRepayFlagStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
@@ -1260,10 +1261,16 @@ public class FinanceController {
 			}
 			List<RepaymentBizPlanList> lastPeriods = repaymentBizPlanListService.selectList(lt);
 			for (RepaymentBizPlanList repaymentBizPlanList : lastPeriods) {
-				if (repaymentBizPlanList.getRepayStatus()==null) {
+				if (repaymentBizPlanList.getRepayStatus()==null ) {
+					if (repaymentBizPlanList.getRepayFlag()!=null&&repaymentBizPlanList.getRepayFlag()==PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue()) {
+						continue;
+					}
 					return Result.error(repaymentBizPlanList.getAfterId()+"未还款不能结清");
 				}
 				if (repaymentBizPlanList.getRepayStatus().equals(SectionRepayStatusEnum.SECTION_REPAID.getKey())) {
+					if (repaymentBizPlanList.getRepayFlag()!=null&&repaymentBizPlanList.getRepayFlag()==PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue()) {
+						continue;
+					}
 					return Result.error(repaymentBizPlanList.getAfterId()+"部分还款不能结清");
 				}
 			}

@@ -10,6 +10,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.SysBank;
+import com.hongte.alms.base.entity.SysBankLimit;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
@@ -22,6 +23,7 @@ import com.hongte.alms.base.vo.module.BankLimitVO;
 
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 
 import io.swagger.annotations.Api;
@@ -89,7 +91,9 @@ public class DeductionController {
     @Qualifier("MoneyPoolRepaymentService")
     MoneyPoolRepaymentService moneyPoolRepaymentService;
 
- 
+    @Autowired
+    @Qualifier("SysBankLimitService")
+    SysBankLimitService sysBankLimitService;
 
     @Autowired
     @Qualifier("RepaymentBizPlanListDetailService")
@@ -288,49 +292,82 @@ public class DeductionController {
    @GetMapping("/getDeductionPlatformInfo")
    @ResponseBody
 	public Result<Map<String, Object>> getDeductionPlatformInfo(@RequestParam("identifyCard") String identifyCard) {
+     if(!StringUtil.isEmpty(identifyCard)) {
+    	 BankCardInfo bankCardInfo = null;
+ 		List<BankCardInfo> bankCardInfos = null;
+ 		try {
+ 			Result result = customerInfoXindaiRemoteApi.getBankcardInfo(identifyCard);
+ 			if (result.getCode().equals("1")) {
 
-		BankCardInfo bankCardInfo = null;
-		List<BankCardInfo> bankCardInfos = null;
-		try {
-			Result result = customerInfoXindaiRemoteApi.getBankcardInfo(identifyCard);
-			if (result.getCode().equals("1")) {
+ 				bankCardInfos = JSON.parseArray(result.getData().toString(), BankCardInfo.class);
+ 				if (bankCardInfos != null && bankCardInfos.size() > 0) {
+ 					for (BankCardInfo card : bankCardInfos) {
+ 						if (card.getPlatformType() == 1 && card.getWithholdingType() == 1) {// 团贷网平台注册的银行卡并且是代扣主卡
+ 							bankCardInfo = card;
+ 						}
+ 					}
+ 					if (bankCardInfo == null) {
+ 						return Result.error("-1", "该客户找不到对应团贷网平台银行卡信息");
+ 					}
+ 				} else {
+ 					return Result.error("-1", "该客户找不到对应银行卡信息");
+ 				}
+ 			} else {
+ 				return Result.error("-1", result.getMsg());
+ 			}
 
-				bankCardInfos = JSON.parseArray(result.getData().toString(), BankCardInfo.class);
-				if (bankCardInfos != null && bankCardInfos.size() > 0) {
-					for (BankCardInfo card : bankCardInfos) {
-						if (card.getPlatformType() == 1 && card.getWithholdingType() == 1) {// 团贷网平台注册的银行卡并且是代扣主卡
-							bankCardInfo = card;
-						}
-					}
-					if (bankCardInfo == null) {
-						return Result.error("-1", "该客户找不到对应团贷网平台银行卡信息");
-					}
-				} else {
-					return Result.error("-1", "该客户找不到对应银行卡信息");
-				}
-			} else {
-				return Result.error("-1", result.getMsg());
-			}
+ 		} catch (Exception e) {
+ 			return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
+ 		}
+ 		List<WithholdingPlatform> platformList = new ArrayList();
+ 		WithholdingPlatform withholdingPlatform = null;
+ 		for (ThirdPlatform thirdPlatform : bankCardInfo.getThirdPlatformList()) {
+ 			withholdingPlatform = new WithholdingPlatform();
+ 			withholdingPlatform.setPlatformId(thirdPlatform.getPlatformID());
+ 			withholdingPlatform.setPlatformName(PlatformEnum.getByKey(thirdPlatform.getPlatformID()).getName());
+ 			platformList.add(withholdingPlatform);
+ 		}
+ 		withholdingPlatform = new WithholdingPlatform();
+ 		withholdingPlatform.setPlatformId(5);
+ 		withholdingPlatform.setPlatformName(PlatformEnum.getByKey(5).getName());
+ 		platformList.add(withholdingPlatform);
 
-		} catch (Exception e) {
-			return Result.error("-1", "调用信贷获取客户银行卡信息接口出错");
-		}
-		List<WithholdingPlatform> platformList = new ArrayList();
-		WithholdingPlatform withholdingPlatform = null;
-		for (ThirdPlatform thirdPlatform : bankCardInfo.getThirdPlatformList()) {
-			withholdingPlatform = new WithholdingPlatform();
-			withholdingPlatform.setPlatformId(thirdPlatform.getPlatformID());
-			withholdingPlatform.setPlatformName(PlatformEnum.getByKey(thirdPlatform.getPlatformID()).getName());
-			platformList.add(withholdingPlatform);
-		}
-		withholdingPlatform = new WithholdingPlatform();
-		withholdingPlatform.setPlatformId(5);
-		withholdingPlatform.setPlatformName(PlatformEnum.getByKey(5).getName());
-		platformList.add(withholdingPlatform);
-
-		Map<String, Object> retMap = new HashMap<>();
-		retMap.put("platformList", (JSONArray) JSON.toJSON(platformList, JsonUtil.getMapping()));
-		return Result.success(retMap);
+ 		Map<String, Object> retMap = new HashMap<>();
+ 		retMap.put("platformList", (JSONArray) JSON.toJSON(platformList, JsonUtil.getMapping()));
+ 		return Result.success(retMap);
+     }else {
+    	 List<WithholdingPlatform>  platformList = withholdingplatformService.selectList(new EntityWrapper<WithholdingPlatform>());
+	      Map<String,Object> retMap = new HashMap<>();
+   	      retMap.put("platformList",(JSONArray) JSON.toJSON(platformList, JsonUtil.getMapping()));
+   	      return Result.success(retMap);
+     }
+		
+	}
+   
+   
+   /*
+    * 获取平台信息
+    * @author chenzs
+    * @date 2018年8月13日
+    * @return 代扣平台信息
+    */
+   @ApiOperation(value = "获取代扣额度")
+   @GetMapping("/getBankRepayLimit")
+   @ResponseBody
+	public Result<Map<String, Object>> getBankRepayLimit(@RequestParam("platformId") Integer platformId,@RequestParam("bankCode") String bankCode) {
+	   
+	  List<SysBankLimit> list= sysBankLimitService.selectList(new EntityWrapper<SysBankLimit>().eq("platform_id", platformId).eq("bank_code", bankCode));
+	  String oneLimit="";
+	  String monthLimit="";
+	  if(list.size()>0) {
+		  oneLimit=list.get(0).getOnceLimit()==null?"":list.get(0).getOnceLimit().toString();
+		  monthLimit=list.get(0).getMonthLimit()==null?"":list.get(0).getMonthLimit().toString();
+	  }
+	  Map<String, Object> retMap = new HashMap<>();
+      retMap.put("oneLimit", JSON.toJSON(oneLimit, JsonUtil.getMapping()));
+      retMap.put("monthLimit", JSON.toJSON(monthLimit, JsonUtil.getMapping()));
+      return Result.success(retMap);
+	   
 	}
 
    /*

@@ -68,12 +68,15 @@ var layer;
                     business:[],
                     bankCardInfo:'',
                     pList:[]
+               
 
                     
 
                 },
                 platformList:[],
-                platformId:5
+                platformId:5,
+                oneLimit:'',
+                monthLimit:''
                 
          
         	},
@@ -114,6 +117,7 @@ var layer;
 	        content:'/collectionUI/bankLimitUI'
 	    });
 
+	    
 	}
 	function withHoldingRecord(){debugger
 //		if(vm.ajax_data.issueSplitType==1&&vm.platformId==5){debugger
@@ -245,6 +249,28 @@ var layer;
 	
 
 	}
+	
+	 function getBankRepayLimit(){debugger
+	        var self = this;  
+	        var reqStr =basePath+ "DeductionController/getBankRepayLimit?platformId="+vm.platformId+"&bankCode="+vm.ajax_data.bankCardInfo.bankCode
+	        axios.get(reqStr)
+	            .then(function (result) {debugger	
+	                if (result.data.code == "1") {
+	                	
+	          
+	                    vm.oneLimit = result.data.data.oneLimit;
+	                    vm.monthLimit = result.data.data.monthLimit;
+	               
+	                    
+	                } else {
+	                    self.$Modal.error({content: '获取代扣额度失败：' + result.data.msg});
+	                }
+	            })
+	   
+	        .catch(function (error) {
+	            vm.$Modal.error({content: '获取代扣额度接口调用异常!'});
+	        });
+	 }
 	
 
 	/*
@@ -490,6 +516,7 @@ var layer;
         		vm.ajax_data.restAmount=0;
         	}
         }
+	    getBankRepayLimit();
 	}
 
 	function sleep(numberMillis) {debugger
