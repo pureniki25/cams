@@ -100,7 +100,7 @@
 					select business_id from tb_sys_user_permission where page_type = 5 and user_id = #{userId}    	
                 )
             </if>
-            <!-- and user.user_id=#{userId} -->
+          
 
         </where>
 
@@ -123,8 +123,8 @@
         LEFT JOIN tb_basic_business business on repay.original_business_id=business.business_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_basic_business_type as b_type ON business.business_type = b_type.business_type_id
-        left JOIN tb_sys_user_permission user_permission on user_permission.business_id=repay.original_business_id
-        left join tb_sys_user user on user.user_id=user_permission.user_id
+<!--         left JOIN tb_sys_user_permission user_permission on user_permission.business_id=repay.original_business_id -->
+<!--         left join tb_sys_user user on user.user_id=user_permission.user_id -->
         left join tb_withholding_platform as platform on platform.platform_id=repay.bind_platform_id
 
 
@@ -156,7 +156,11 @@
             <if test="businessTypeId !=null and businessTypeId !=''">
                 and b_type.business_type_id = #{businessTypeId}
             </if>
-            and user.user_id=#{userId}
+            <if test="userId !=null and userId != '' and needPermission == 1">
+                and repay.original_business_id in (
+					select business_id from tb_sys_user_permission where page_type = 5 and user_id = #{userId}    	
+                )
+            </if>
 
         </where>
 
@@ -177,8 +181,8 @@
         LEFT JOIN tb_basic_business business on repay.original_business_id=business.business_id
         LEFT JOIN tb_basic_company as company ON business.company_id = company.area_id
         LEFT JOIN tb_basic_business_type as b_type ON business.business_type = b_type.business_type_id
-        left JOIN tb_sys_user_permission user_permission on user_permission.business_id=repay.original_business_id
-        left join tb_sys_user user on user.user_id=user_permission.user_id
+<!--         left JOIN tb_sys_user_permission user_permission on user_permission.business_id=repay.original_business_id -->
+<!--         left join tb_sys_user user on user.user_id=user_permission.user_id -->
         left join tb_withholding_platform as platform on platform.platform_id=repay.bind_platform_id
 
 
@@ -208,7 +212,11 @@
             <if test="businessTypeId !=null and businessTypeId !=''">
                 and b_type.business_type_id = #{businessTypeId}
             </if>
-            and user.user_id=#{userId}
+            <if test="userId !=null and userId != '' and needPermission == 1">
+                and repay.original_business_id in (
+					select business_id from tb_sys_user_permission where page_type = 5 and user_id = #{userId}    	
+                )
+            </if>
             and repay.repay_status =1
         </where>
 

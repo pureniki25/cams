@@ -102,20 +102,20 @@ public class WithholdingRepaymentLogController {
 	    public PageResult<List<RepaymentLogVO>> selectRepaymentLogList(@ModelAttribute RepaymentLogReq  req){
 
 	        try{
-	            //取最近3天记录
-	        	if(req.getDateBegin()==null&&req.getDateEnd()==null) {
-		            Calendar calendar = Calendar.getInstance();
-		            calendar.setTime(new Date());
-	                calendar.set(Calendar.HOUR_OF_DAY, -48);
-	                calendar.set(Calendar.MINUTE, 0);
-	                calendar.set(Calendar.SECOND, 0);
-	                req.setDateBegin(calendar.getTime());
-	                calendar.setTime(new Date());
-	                calendar.set(Calendar.HOUR_OF_DAY, 24);
-	                calendar.set(Calendar.MINUTE, 0);
-	                calendar.set(Calendar.SECOND, 0);
-	                req.setDateEnd(calendar.getTime());
-	        	}
+//	            //取最近3天记录
+//	        	if(req.getDateBegin()==null&&req.getDateEnd()==null) {
+//		            Calendar calendar = Calendar.getInstance();
+//		            calendar.setTime(new Date());
+//	                calendar.set(Calendar.HOUR_OF_DAY, -48);
+//	                calendar.set(Calendar.MINUTE, 0);
+//	                calendar.set(Calendar.SECOND, 0);
+//	                req.setDateBegin(calendar.getTime());
+//	                calendar.setTime(new Date());
+//	                calendar.set(Calendar.HOUR_OF_DAY, 24);
+//	                calendar.set(Calendar.MINUTE, 0);
+//	                calendar.set(Calendar.SECOND, 0);
+//	                req.setDateEnd(calendar.getTime());
+//	        	}
 	        	
 	        	 Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
 	             wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());
@@ -241,54 +241,67 @@ public class WithholdingRepaymentLogController {
 	        
 	    }
 	    
-	    /**
-	     * 获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数
-	     * @author chenzs
-	     * @date 2018年3月12日
-	     * @return 详情
-	     */
-	    @ApiOperation(value = "获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数")
-	    @GetMapping("/getCountInfo")
-	    @ResponseBody
-	    public Result<Map<String,String>>getCountInfo( @RequestParam("companyId") String companyId,@RequestParam("keyName")String keyName,@RequestParam("platformId")String platformId,
-	    		
-	    		@RequestParam("dateBegin")Date dateBegin,@RequestParam("dateEnd")Date dateEnd,@RequestParam("repayStatus")String repayStatus,@RequestParam("businessTypeId")String businessTypeId){
-	    	   Map<String,String> retMap = new HashMap<String,String>();
-	    	   RepaymentLogReq req=new RepaymentLogReq();
-	    	   req.setBusinessTypeId(businessTypeId);
-	    	   req.setCompanyId(companyId);
-	    	   req.setDateBegin(dateBegin);
-	    	   req.setDateEnd(dateEnd);
-	    	   req.setRepayStatus(repayStatus);
-	    	   req.setPlatformId(platformId);
-	    	   req.setKeyName(keyName);
-	       	String userId=loginUserInfoHelper.getUserId();
-	    	   req.setUserId(userId);
-	    	   RepaymentLogVO  repaymentLogVO=null;
-	 
-	    	//查找代扣业务总条数
-	        repaymentLogVO=withholdingRepaymentlogService.selectSumByBusinessId(req);
-	        String countByBusinessId=repaymentLogVO.getCountByBusinessId();
-	        
-	      //查找代扣成功流水总条数
-	        req.setRepayStatus("1");
-	        repaymentLogVO=withholdingRepaymentlogService.selectSumByLogId(req);
-	        String countbyLogId=repaymentLogVO.getCountbyLogId();
-	        //查找代扣成功总额
-	        String SumRepayAmount=repaymentLogVO.getSumRepayAmount();
-	    	//查找代扣业务成功总条数
-            repaymentLogVO= withholdingRepaymentlogService.selectSumByBusinessId(req);
-            String countByBusinessIdSucess=repaymentLogVO.getCountByBusinessId();
-	
-	        retMap.put("countByBusinessIdSucess",countByBusinessIdSucess);
-	        retMap.put("countByBusinessId",countByBusinessId);
-	        retMap.put("countbyLogId",countbyLogId);
-	        retMap.put("SumRepayAmount",SumRepayAmount);
+	/**
+	 * 获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数
+	 * 
+	 * @author chenzs
+	 * @date 2018年3月12日
+	 * @return 详情
+	 */
+	@ApiOperation(value = "获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数")
+	@GetMapping("/getCountInfo")
+	@ResponseBody
+	public Result<Map<String, String>> getCountInfo(@RequestParam("companyId") String companyId,
+			@RequestParam("keyName") String keyName, @RequestParam("platformId") String platformId,
 
-	        
-	        return Result.success(retMap);
-	        
-	    }
+			@RequestParam("dateBegin") Date dateBegin, @RequestParam("dateEnd") Date dateEnd,
+			@RequestParam("repayStatus") String repayStatus, @RequestParam("businessTypeId") String businessTypeId) {
+		Map<String, String> retMap = new HashMap<String, String>();
+		RepaymentLogReq req = new RepaymentLogReq();
+		req.setBusinessTypeId(businessTypeId);
+		req.setCompanyId(companyId);
+		req.setDateBegin(dateBegin);
+		req.setDateEnd(dateEnd);
+		req.setRepayStatus(repayStatus);
+		req.setPlatformId(platformId);
+		req.setKeyName(keyName);
+		String userId = loginUserInfoHelper.getUserId();
+		req.setUserId(userId);
+		RepaymentLogVO repaymentLogVO = null;
+
+		Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
+		wrapperSysUserRole.eq("user_id", loginUserInfoHelper.getUserId());
+		wrapperSysUserRole
+				.and(" role_code in (SELECT role_code FROM tb_sys_role WHERE role_area_type = 1 AND page_type = 5 ) ");
+		List<SysUserRole> userRoles = sysUserRoleService.selectList(wrapperSysUserRole);
+		if (null != userRoles && !userRoles.isEmpty()) {
+			req.setNeedPermission(0);// 全局用户 不需要验证权限
+		}
+
+		req.setUserId(loginUserInfoHelper.getUserId());
+
+		// 查找代扣业务总条数
+		repaymentLogVO = withholdingRepaymentlogService.selectSumByBusinessId(req);
+		String countByBusinessId = repaymentLogVO.getCountByBusinessId();
+
+		// 查找代扣成功流水总条数
+		req.setRepayStatus("1");
+		repaymentLogVO = withholdingRepaymentlogService.selectSumByLogId(req);
+		String countbyLogId = repaymentLogVO.getCountbyLogId();
+		// 查找代扣成功总额
+		String SumRepayAmount = repaymentLogVO.getSumRepayAmount();
+		// 查找代扣业务成功总条数
+		repaymentLogVO = withholdingRepaymentlogService.selectSumByBusinessId(req);
+		String countByBusinessIdSucess = repaymentLogVO.getCountByBusinessId();
+
+		retMap.put("countByBusinessIdSucess", countByBusinessIdSucess);
+		retMap.put("countByBusinessId", countByBusinessId);
+		retMap.put("countbyLogId", countbyLogId);
+		retMap.put("SumRepayAmount", SumRepayAmount);
+
+		return Result.success(retMap);
+
+	}
 	    
 	    
 	    @Value("${ht.excel.file.save.path:/tmp/}")

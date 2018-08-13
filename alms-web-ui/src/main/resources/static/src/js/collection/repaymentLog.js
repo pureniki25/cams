@@ -284,7 +284,7 @@ window.layinit(function (htConfig) {
                     type: 2,
                     title: title,
                     maxmin: true,
-                    area: ['1250px', '800px'],
+                    area: ['95%', '95%'],
                     content:url
                 });
             }
@@ -326,15 +326,15 @@ function getDetailUrl(){
 //获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数
 var getCountInfo=function(){debugger
     var self = this;   
-  if(dataObject.dateBegin==''){
-	  dataObject.dateBegin=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1).getTime();
-		vm.searchForm.dateRange[0]=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1);
-  }
-  
-  if(dataObject.dateEnd==''){
-	  dataObject.dateEnd=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1).getTime();
-		vm.searchForm.dateRange[1]=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1);
-  }
+//  if(dataObject.dateBegin==''){
+//	  dataObject.dateBegin=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1).getTime();
+//		vm.searchForm.dateRange[0]=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1);
+//  }
+//  
+//  if(dataObject.dateEnd==''){
+//	  dataObject.dateEnd=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1).getTime();
+//		vm.searchForm.dateRange[1]=new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1);
+//  }
 $.ajax({
     type : 'GET',
     async : false,
@@ -457,23 +457,11 @@ var getData = function(){debugger
     	if(vm.searchForm.dateRange[0]!=null){
     		 dataObject.dateBegin = vm.searchForm.dateRange[0].getTime();
     		 vm.searchForm.dateBegin=vm.searchForm.dateRange[0].getTime();
-    	}else{
-    		var date1=new Date();
-    		vm.searchForm.dateRange[0]=date1;
-    		vm.searchForm.dateRange[0].setTime(new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1));
-    		 dataObject.dateBegin=vm.searchForm.dateRange[0].getTime();
-    
     	}
      	if(vm.searchForm.dateRange[1]!=null){
             var date =vm.searchForm.dateRange[1];
             dataObject.dateEnd=date.getTime();
        	 vm.searchForm.dateEnd=date.getTime();
-   	   }else{
-   		   var date2=new Date();
-   		vm.searchForm.dateRange[1]=date2;
-		vm.searchForm.dateRange[1].setTime(new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1));
-		 dataObject.dateEnd=vm.searchForm.dateRange[1].getTime();
-   		
    	   }
 
     }
