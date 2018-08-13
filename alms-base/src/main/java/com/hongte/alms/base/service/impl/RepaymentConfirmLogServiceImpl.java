@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.hongte.alms.base.dto.PlatformRepaymentDto;
 import com.hongte.alms.base.dto.PlatformRepaymentReq;
 import com.hongte.alms.base.entity.AccountantOverRepayLog;
@@ -27,6 +28,7 @@ import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
@@ -49,7 +51,9 @@ import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanMapper;
 import com.hongte.alms.base.mapper.RepaymentResourceMapper;
 import com.hongte.alms.base.service.MoneyPoolService;
+import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanListSynchService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
@@ -142,27 +146,50 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     @Qualifier("SysApiCallFailureRecordService")
 	SysApiCallFailureRecordService sysApiCallFailureRecordService ;
     
+    @Autowired
+    @Qualifier("RepaymentBizPlanListService")
+    RepaymentBizPlanListService repaymentBizPlanListService ;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanService")
+    RepaymentBizPlanService repaymentBizPlanService ;
     
     @Autowired
 	LoginUserInfoHelper 	loginUserInfoHelper;
     
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result revokeConfirm(String businessId, String afterId) throws Exception{
+    public Result revokeConfirm(String businessId, String afterId,boolean isRevokeSettle) throws Exception{
+//    	如果撤销还款,需要判断覆盖其上方的还款记录是否相同的还款计划;
+//    	如果撤销结清,按倒叙撤销
+    	
+    	RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
+    	RepaymentBizPlan bizPlan = repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", bizPlanList.getPlanId()));
+    	
+    	
         /*找还款确认记录*/
-        List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).orderBy("create_time", false));
+    	Wrapper<RepaymentConfirmLog> wrapper = new EntityWrapper<RepaymentConfirmLog>()
+    			.eq("business_id", businessId)
+    			.orderBy("create_time", false);
+    	
+    	if (!isRevokeSettle) {
+    		if (bizPlan.getPlanStatus()!=null&&bizPlan.getPlanStatus()>(RepayPlanSettleStatusEnum.REPAYINF.getValue())) {
+				throw new ServiceRuntimeException("当前还款计划已结清,先撤销结清,再撤销此还款");
+			}
+    		wrapper.eq("after_id", afterId);
+			wrapper.eq("type", 1);
+		}else {
+			wrapper.eq("type", 2);
+		}
+        List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(wrapper);
+        
         if (logs == null || logs.size() == 0) {
             return Result.error("500", "找不到任何一条相关的确认还款记录");
         }
         RepaymentConfirmLog log = logs.get(0);
         
-//        if (log.getType().equals(2)) {
-//			return Result.error("500","请先撤销"+log.getAfterId()+"的结清");
-//		}
-        if(!loginUserInfoHelper.getUserId().equals("0111130000")) {
-        	   if(log.getRepaySource()!=10) {//如果不是线下转账的不能撤销
-                   return Result.error("500", "最后一次还款不是线下转账不能被撤销");
-               }
+	    if(log.getRepaySource()!=10) {//如果不是线下转账的不能撤销
+           return Result.error("500", "最后一次还款不是线下转账不能被撤销");
         }
      
 
@@ -170,8 +197,6 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             return Result.error("500", "该还款记录不能被撤销");
         }
 
-
-        List<RepaymentBizPlanList> repaymentBizPlanLists = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
 
 		/*找实还明细记录*/
         List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper
@@ -199,18 +224,18 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
 
                 logger.info("=========查询是否有资金分发结果{}",JSON.toJSONString(listResult));
-//                if("1".equals(listResult.getCode())){
-//                    List<PlatformRepaymentDto> data = listResult.getData();
-//                    if(!CollectionUtils.isEmpty(data)){
-//                        for(PlatformRepaymentDto platformRepaymentDto : data){
-//                            if(req.getConfirmLogId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
-//                                if(platformRepaymentDto.getProcessStatus()==1 || platformRepaymentDto.getProcessStatus()==2){
-//                                    throw new ServiceRuntimeException("已分发记录不能被撤销");
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
+                if("1".equals(listResult.getCode())){
+                    List<PlatformRepaymentDto> data = listResult.getData();
+                    if(!CollectionUtils.isEmpty(data)){
+                        for(PlatformRepaymentDto platformRepaymentDto : data){
+                            if(req.getConfirmLogId().equals(platformRepaymentDto.getConfirmLogId())){ //planlistId相等
+                                if(platformRepaymentDto.getProcessStatus()==1 || platformRepaymentDto.getProcessStatus()==2){
+                                    throw new ServiceRuntimeException("已分发记录不能被撤销");
+                                }
+                            }
+                        }
+                    }
+                }
 			}
             
         }

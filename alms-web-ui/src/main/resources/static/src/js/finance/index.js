@@ -256,63 +256,6 @@ window.layinit(function (htConfig) {
                                                         });
                                                         return;
                                                     }
-                                                    // let lastRepayConfirm = true
-                                                    // $.ajax({
-                                                    //     type : 'GET',
-                                                    //     async : false,
-                                                    //     url : fpath +'finance/lastRepayConfirm?businessId='+p.row.businessId+'&afterId='+p.row.afterId,
-                                                    //     headers : {
-                                                    //         app : 'ALMS',
-                                                    //         Authorization : "Bearer " + getToken()
-                                                    //     }, 
-                                                    //     success : function(data) {
-                                                    //             console.log(data);
-                                                    //             if(data.code=='1'){
-                                                    //                 if(data.data==0||data.data==10||data.data==11||data.data==21||data.data==31){
-                                                    //                     lastRepayConfirm = true ;
-                                                    //                 }else{
-                                                    //                     lastRepayConfirm = false ;
-                                                    //                 }
-                                                    //             }else{
-                                                    //                 app.$Message.error({content:data.msg})
-                                                    //             }
-                                                    //         },
-                                                    //     error : function() {
-                                                    //         console.log(data);
-                                                    //     }
-                                                    // });
-                                                    
-                                                    /* $.ajax({
-                                                        type : 'GET',
-                                                        async : false,
-                                                        url : fpath+'finance/checkLastRepay?businessId='+p.row.businessId+'&afterId='+p.row.afterId,
-                                                        headers : {
-                                                            app : 'ALMS',
-                                                            Authorization : "Bearer " + getToken()
-                                                        }, 
-                                                        success : function(data) {
-                                                                console.log(data);
-                                                                if(data.code=='1'){
-                                                                    lastRepayDianfuweijieqing = false 
-                                                                }else{
-                                                                    lastRepayDianfuweijieqing = true
-                                                                }
-                                                            },
-                                                        error : function() {
-                                                            console.log(data);
-                                                        }
-                                                    }); */
-
-                                                    // if(!lastRepayConfirm){
-                                                    //     app.$Message.warning({content:'上次自动代扣的业务此次不能线下还款'})
-                                                    //     return ;
-                                                    // }
-                                                    // app.checkLastRepay(p.row.businessId,p.row.afterId);
-                                                    // if(app.lastRepayDianfuweijieqing){
-                                                    //     app.$Message.warning({content:'往期存在垫付未结清记录'})
-                                                    //     return ;
-                                                    // }
-                                                    // window.location.href = link ;
 
                                                     app.check(p.row.businessId,p.row.afterId,null,'repay');
                                                     if (app.checkFlag) {
@@ -332,7 +275,10 @@ window.layinit(function (htConfig) {
                                                     })
                                                 } else {
                                                     if (call == 'revokeConfirm') {
-                                                        app.revokeConfirm(p.row)
+                                                        app.revokeConfirm(p.row,false)
+                                                    }
+                                                    if (call == 'revokeSettle'){
+                                                        app.revokeConfirm(p.row,true)
                                                     }
                                                     if (call == 'confirmWithhold') {
                                                         let url = '/finance/confirmWithhold?businessId=' + p.row.businessId + '&afterId=' + p.row.afterId
@@ -347,16 +293,6 @@ window.layinit(function (htConfig) {
                                                         })
                                                     }
                                                     if (call == 'settle') {
-                                                        // if(p.row.repayStatus != '未还款' && p.row.repayStatus != '部分还款'){
-                                                        //     app.$Message.warning({
-                                                        //         content : '当前期已还款或线上部分已还款的不能结清'
-                                                        //     })
-                                                        // }
-                                                        // app.checkLastRepay(p.row.businessId,p.row.afterId);
-                                                        // if(app.lastRepayDianfuweijieqing){
-                                                        //     app.$Message.warning({content:'往期存在垫付未结清记录'})
-                                                        //     return ;
-                                                        // }
 
                                                         app.check(p.row.businessId,p.row.afterId,null,'settle');
                                                         if (app.checkFlag) {
@@ -377,16 +313,6 @@ window.layinit(function (htConfig) {
                                                         })
                                                     }
                                                     if (call == 'planSettle') {
-                                                        // if(p.row.repayStatus != '未还款' && p.row.repayStatus != '部分还款'){
-                                                        //     app.$Message.warning({
-                                                        //         content : '当前期已还款或线上部分已还款的不能结清'
-                                                        //     })
-                                                        // }
-                                                        // app.checkLastRepay(p.row.businessId,p.row.afterId);
-                                                        // if(app.lastRepayDianfuweijieqing){
-                                                        //     app.$Message.warning({content:'往期存在垫付未结清记录'})
-                                                        //     return ;
-                                                        // }
                                                         app.check(p.row.businessId,p.row.afterId,p.row.planId,'settle');
                                                         if (app.checkFlag) {
                                                             app.$Message.warning({
@@ -443,6 +369,7 @@ window.layinit(function (htConfig) {
                                 p.row.afterId + '&planListId=' +
                                 p.row.planListId);
                             let revokeConfirm = initMenuItem('撤销还款确认', null, 'revokeConfirm')
+                            let revokeSettle = initMenuItem('撤销结清', null, 'revokeSettle')
                             let confirmWithhold = initMenuItem('代扣确认', null, 'confirmWithhold')
                             let settle = initMenuItem('财务结清', null, 'settle')
                             let planSettle = initMenuItem('还款计划结清', null, 'planSettle')
@@ -454,8 +381,13 @@ window.layinit(function (htConfig) {
                                 menu.push(confirmWithhold)
                                 menu.push(planSettle)
                                 menu.push(settle)
-                                   menu.push(withhold)
+                                menu.push(withhold)
                             }
+
+                            if (p.row.planStatusExt != '还款中'){
+                                menu.push(revokeSettle)
+                            }
+
                             let poptipContent;
                             if (p.row.srcType == 2) {
                                 poptipContent = [
@@ -570,26 +502,21 @@ window.layinit(function (htConfig) {
                 app.form.curPage = page;
                 app.search()
             },
-            revokeConfirm(p) {
-//             	 if (p.bankRepay== true) {
-//                     app.$Message.warning({
-//                         content: '银行代扣不能撤销'
-//                     });
-//                     return;
-//                 }
+            revokeConfirm(p,revokeSettle) {
                 app.$Modal.confirm({
                     content:'是否确认取消还款?',
                     onOk(){
                         axios.get(fpath + 'finance/revokeConfirm', {
                             params: {
                                 businessId: p.businessId,
-                                afterId: p.afterId
+                                afterId: p.afterId,
+                                isRevokeSettle:revokeSettle
                             }
                         })
                         .then(function (res) {
                             if (res.data.code == '1') {
                                 app.$Message.success({
-                                    content: "撤销还款成功!"
+                                    content: revokeSettle?"撤销结清成功!":"撤销还款成功!"
                                 })
                                 app.search()
                             } else {
@@ -693,18 +620,6 @@ window.layinit(function (htConfig) {
                 });
 
 
-            /*  axios.get(cpath + 'sys/param/getParam', { params: { paramType: '会计确认状态' } })
-                 .then(function (res) {
-                     if (res.data.code == '1') {
-                         app.accountingConfirmStatus = res.data.data
-                     } else {
-                         app.$Message.error({ content: '获取会计确认状态失败' })
-                         console.log(res.data.msg);
-                     }
-                 })
-                 .catch(function (err) {
-                     app.$Message.error({ content: '获取会计确认状态失败' })
-                 }) */
 
             axios.get(fpath + 'finance/getCompanys')
                 .then(function (res) {
@@ -746,19 +661,6 @@ window.layinit(function (htConfig) {
                     })
                 })
 
-            /*  axios.get(cpath + 'sys/param/getParam', { params: { paramType: '贷后状态' } })
-                .then(function (res) {
-                    if (res.data.code == '1') {
-                        app.collectionStatus = res.data.data
-                    } else {
-                        app.$Message.error({ content: '获取贷后状态失败' })
-                        console.log(res.data.msg);
-                    }
-                })
-                .catch(function (err) {
-                    app.$Message.error({ content: '获取贷后状态失败' })
-                })
- */
             this.search()
             this.queryPaymentPlatform();
         }

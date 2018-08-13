@@ -17,15 +17,16 @@ import com.hongte.alms.common.service.BaseService;
  * @since 2018-05-25
  */
 public interface RepaymentConfirmLogService extends BaseService<RepaymentConfirmLog> {
-	/**
-     * 撤销还款确认
+    /**
      * @author 王继光
-     * 2018年5月26日 下午12:46:50
+     * 2018年8月13日 下午9:13:29
      * @param businessId
      * @param afterId
+     * @param isRevokeSettle 是否撤销结清,true=撤销结清,false=撤销还款
      * @return
+     * @throws Exception
      */
-    public Result revokeConfirm(String businessId,String afterId) throws Exception;
+    public Result revokeConfirm(String businessId,String afterId,boolean isRevokeSettle) throws Exception;
     
     /**
      * 本期已确认还款标的信息

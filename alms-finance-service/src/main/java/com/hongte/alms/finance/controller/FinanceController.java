@@ -704,11 +704,16 @@ public class FinanceController {
 	
 	@GetMapping(value = "/revokeConfirm")
 	@ApiOperation(value = "撤销还款确认")
-	public Result revokeConfirm(String businessId,String afterId) {
+	public Result revokeConfirm(String businessId,String afterId,Boolean isRevokeSettle) {
 		try {
 			logger.info("@revokeConfirm@撤销还款确认--开始[{}]", businessId,afterId);
 			Result result = null;
-			result = confrimLogService.revokeConfirm(businessId, afterId);
+			
+			if (isRevokeSettle==null) {
+				isRevokeSettle = false ;
+			}
+			
+			result = confrimLogService.revokeConfirm(businessId, afterId,isRevokeSettle);
 			logger.info("@revokeConfirm@撤销还款确认--结束[{}]", result);
 			return result;
 		}  catch (ServiceRuntimeException se) {
