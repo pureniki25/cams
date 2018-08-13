@@ -814,9 +814,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			}
 		}
 
-		resultMap.put("assetsCharge", assetsCharge);
-		resultMap.put("guaranteeCharge", guaranteeCharge);
-		resultMap.put("agencyCharge", agencyCharge);
+		resultMap.put("assetsCharge", BigDecimal.valueOf(assetsCharge).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+		resultMap.put("guaranteeCharge", BigDecimal.valueOf(guaranteeCharge).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+		resultMap.put("agencyCharge", BigDecimal.valueOf(agencyCharge).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 		return resultMap;
 	}
 
