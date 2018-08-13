@@ -253,6 +253,72 @@ public class RechargeController {
 		}
 	}
 
+	/**
+	 * 快捷充值金额
+	 * 
+	 * @param vo
+	 * @param clientIp
+	 * @param rechargeUserId
+	 * @param oIdPartner
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	private Result quickRechargeAmount(RechargeModalVO vo, String oIdPartner) {
+		String cmOrderNo = UUID.randomUUID().toString();
+
+		RechargeModalDTO dto = new RechargeModalDTO();
+		dto.setAmount(BigDecimal.valueOf(vo.getRechargeAmount()).setScale(2, BigDecimal.ROUND_HALF_UP));
+		// 若转账类型为1 对公，则在银行编码后 + "2B"
+		dto.setBankCode("1".equals(vo.getTransferType()) ? vo.getBankCode() + "2B" : vo.getBankCode());
+		dto.setClientIp(vo.getClientIp());
+		dto.setChargeType(vo.getChargeType()); // 1：网关、2：快捷、3：代充值
+		dto.setCmOrderNo(cmOrderNo);
+		dto.setoIdPartner(oIdPartner);
+		dto.setRechargeUserId(vo.getRechargeUserId());
+
+		AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, cmOrderNo, dto, oIdPartner);
+
+		agencyRechargeLogService.insert(agencyRechargeLog);
+
+		com.ht.ussp.core.Result result = null;
+		LOG.info("代充值接口/eip/td/assetside/agencyRecharge参数信息，{}", JSONObject.toJSONString(dto));
+		try {
+
+			result = eipRemote.agencyRecharge(dto);
+			LOG.info("代充值接口/eip/td/assetside/agencyRecharge返回信息，{}", JSONObject.toJSONString(result));
+
+			if (result == null) {
+				return Result.error("调用EPI平台接口失败！");
+			}
+		} catch (Exception e) {
+			agencyRechargeLog.setResultJson(e.getMessage());
+			handleUpdateLogFail(cmOrderNo, agencyRechargeLog);
+			LOG.error("提交充值数据失败", e);
+			return Result.error("系统异常！");
+		}
+
+		try {
+			if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+
+				agencyRechargeLog.setResultJson(JSONObject.toJSONString(result));
+				agencyRechargeLog.setUpdateTime(new Date());
+				agencyRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+
+				agencyRechargeLogService.update(agencyRechargeLog,
+						new EntityWrapper<AgencyRechargeLog>().eq("cm_order_no", cmOrderNo));
+			} else {
+				agencyRechargeLog.setResultJson(JSONObject.toJSONString(result));
+				handleUpdateLogFail(cmOrderNo, agencyRechargeLog);
+			}
+			return Result.build(result.getReturnCode(), result.getMsg(), result.getData());
+		} catch (Exception e) {
+			agencyRechargeLog.setResultJson(e.getMessage());
+			handleUpdateLogFail(cmOrderNo, agencyRechargeLog);
+			LOG.error("提交充值数据失败", e);
+			return Result.error("系统异常！");
+		}
+	}
+
 	private void handleUpdateLogFail(String cmOrderNo, AgencyRechargeLog agencyRechargeLog) {
 		agencyRechargeLog.setUpdateTime(new Date());
 		agencyRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
@@ -362,7 +428,7 @@ public class RechargeController {
 			if (StringUtil.isEmpty(oIdPartner)) {
 				return Result.error(INVALID_PARAM_CODE, "找不到对应的商户号，请检查充值账户类型是否正确");
 			}
-			return rechargeAmount(vo, oIdPartner);
+			return quickRechargeAmount(vo, oIdPartner);
 		} catch (Exception e) {
 			LOG.error("查询充值订单失败", e);
 			return Result.error("查询充值订单失败！");

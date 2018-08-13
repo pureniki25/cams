@@ -10,6 +10,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.SysBank;
+import com.hongte.alms.base.entity.SysBankLimit;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
@@ -90,7 +91,9 @@ public class DeductionController {
     @Qualifier("MoneyPoolRepaymentService")
     MoneyPoolRepaymentService moneyPoolRepaymentService;
 
- 
+    @Autowired
+    @Qualifier("SysBankLimitService")
+    SysBankLimitService sysBankLimitService;
 
     @Autowired
     @Qualifier("RepaymentBizPlanListDetailService")
@@ -339,6 +342,32 @@ public class DeductionController {
    	      return Result.success(retMap);
      }
 		
+	}
+   
+   
+   /*
+    * 获取平台信息
+    * @author chenzs
+    * @date 2018年8月13日
+    * @return 代扣平台信息
+    */
+   @ApiOperation(value = "获取代扣额度")
+   @GetMapping("/getBankRepayLimit")
+   @ResponseBody
+	public Result<Map<String, Object>> getBankRepayLimit(@RequestParam("platformId") Integer platformId,@RequestParam("bankCode") String bankCode) {
+	   
+	  List<SysBankLimit> list= sysBankLimitService.selectList(new EntityWrapper<SysBankLimit>().eq("platform_id", platformId).eq("bank_code", bankCode));
+	  String oneLimit="";
+	  String monthLimit="";
+	  if(list.size()>0) {
+		  oneLimit=list.get(0).getOnceLimit()==null?"":list.get(0).getOnceLimit().toString();
+		  monthLimit=list.get(0).getMonthLimit()==null?"":list.get(0).getMonthLimit().toString();
+	  }
+	  Map<String, Object> retMap = new HashMap<>();
+      retMap.put("oneLimit", JSON.toJSON(oneLimit, JsonUtil.getMapping()));
+      retMap.put("monthLimit", JSON.toJSON(monthLimit, JsonUtil.getMapping()));
+      return Result.success(retMap);
+	   
 	}
 
    /*
