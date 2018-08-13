@@ -275,7 +275,7 @@ public class RechargeServiceImpl implements RechargeService {
 				}
 				 //*****************挡板测试代码结束************************//
 				if (remoteResult.getReturnCode().equals("0000") ) {
-					result.setCode("2");
+					result.setCode("1");
 					result.setMsg(resultData.getResultMsg());
 					log.setRepayStatus(2);
 					log.setRemark("处理中");
