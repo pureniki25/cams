@@ -215,6 +215,8 @@ public class Constant {
 	public static final String INSTALMENT_CREDIT_LOAN = "家装分期";
 	public static final String COMMERCE_COMPANY_LOAN = "商贸贷共借";
 	public static final String PROPRIETOR_COMPANY_LOAN = "业主贷共借";
+	public static final String CAR_JOINTLY_TYPE = "车贷共借";
+	public static final String HOUSE_JOINTLY_TYPE = "房贷共借";
 	
 	/**
 	 * 线上线下部分分界线,参考tb_repayment_biz_plan_list_detail.share_profit_index和tb_repayment_proj_plan_list_detail.share_profit_index <br/>
