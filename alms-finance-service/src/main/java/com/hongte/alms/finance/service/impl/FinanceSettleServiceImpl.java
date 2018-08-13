@@ -250,10 +250,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 			}
 		}
         
-        //处理还款来源,整合成RepaymentResource
-        handleRepaymentResource(financeSettleBaseDto, financeSettleReq);
         /*创建还款日志*/
         createConfirmLog(financeSettleBaseDto);
+        //处理还款来源,整合成RepaymentResource
+        handleRepaymentResource(financeSettleBaseDto, financeSettleReq);
         //数据填充及bak及入库
         makeRepaymentPlanAllPlan(financeSettleBaseDto, financeSettleReq);
         /*计算结余金额*/
@@ -317,7 +317,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             
             if (!financeSettleBaseDto.getPreview()) {
             	accountantOverRepayLog.insert();
-            	repaymentConfirmLog.setSurplusUseRefId(accountantOverRepayLog.getId().toString());
+            	repaymentConfirmLog.setSurplusRefId(accountantOverRepayLog.getId().toString());
     		}
 		}
         
@@ -328,9 +328,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         repaymentConfirmLog.setRepaySource(10);
         repaymentConfirmLog.setType(2);//还款日志类型，1=还款日志，2=结清日志
         
-        if (!financeSettleBaseDto.getPreview()) {
+        financeSettleBaseDto.setRepaymentConfirmLog(repaymentConfirmLog);
+        
+        /*if (!financeSettleBaseDto.getPreview()) {
         	repaymentConfirmLog.insert();
-		}
+		}*/
         
     }
 
@@ -2019,8 +2021,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
             if (!financeSettleReq.getPreview()) {
                 accountantOverRepayLog.insert();
-                financeSettleBaseDto.getRepaymentSettleLog().setSurplusUseRefId(accountantOverRepayLog.getId().toString());
-
+                financeSettleBaseDto.getRepaymentConfirmLog().setSurplusUseRefId(accountantOverRepayLog.getId().toString());
+                financeSettleBaseDto.getRepaymentConfirmLog().insert();
                 repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
                 repaymentResource.insert();
                 if (mprIds.size() == 0) {
