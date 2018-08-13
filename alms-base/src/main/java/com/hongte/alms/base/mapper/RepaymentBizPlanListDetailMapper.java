@@ -22,7 +22,7 @@ public interface RepaymentBizPlanListDetailMapper extends SuperMapper<RepaymentB
 
 	Map<String, Object> totalRepaymentFactAmount(@Param(value = "origBusinessId") String origBusinessId);
 
-	List<SettleFeesVO> selectLastPlanListLackFees(@Param("businessId") String businessId,@Param("period")Integer period,
+	List<SettleFeesVO> selectLastPlanListLackFees(@Param("businessId") String businessId,@Param("dueDate")Date dueDate,
 			@Param("planId") String planId);
 
 	List<SettleFeesVO> selectLastPlanListDerateFees(@Param("businessId") String businessId,@Param("dueDate") Date dueDate,
