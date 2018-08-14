@@ -1709,21 +1709,21 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     
                 } else if (PepayPlanProjExtRatCalEnum.BY_REMIND_MONEY.getValue() == projExtRate.getCalcWay()) {
                     //2剩余本金*费率值
-                    BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), req.getPlanId());
+                    BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), bizPlanList.getPlanId());
                     penalty = penalty.add(upaid.multiply(projExtRate.getRateValue()));
                 } else if (PepayPlanProjExtRatCalEnum.RATE_VALUE.getValue() == projExtRate.getCalcWay()) {
                     //3.1*费率值'
                     penalty = penalty.add(projExtRate.getRateValue());
                 } else if (PepayPlanProjExtRatCalEnum.REMIND_PLAT_FEE.getValue() == projExtRate.getCalcWay()) {
                     //4 剩余的平台服务费合计
-                    penalty = penalty.add(repaymentProjPlanListDetailMapper.calcSurplusPlatformFees(bizPlanList.getBusinessId(), projExtRate.getProjectId(), req.getPlanId(), bizPlanList.getPeriod()));
+                    penalty = penalty.add(repaymentProjPlanListDetailMapper.calcSurplusPlatformFees(bizPlanList.getBusinessId(), projExtRate.getProjectId(), bizPlanList.getPlanId(), bizPlanList.getPeriod()));
                 } else if (PepayPlanProjExtRatCalEnum.BY_MONTH_COM_FEE.getValue() == projExtRate.getCalcWay()) {
                     //5 费率值*月收分公司服务费
-                    BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcService(bizPlanList.getBusinessId(), projExtRate.getProjectId(), req.getPlanId(), bizPlanList.getPeriod());
+                    BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcService(bizPlanList.getBusinessId(), projExtRate.getProjectId(), bizPlanList.getPlanId(), bizPlanList.getPeriod());
                     penalty = penalty.add(projExtRate.getRateValue().multiply(serviceFee));
                 } else if (PepayPlanProjExtRatCalEnum.BY_MONTH_PLAT_FEE.getValue() == projExtRate.getCalcWay()) {
                     //6 费率值*月收平台服务费
-                    BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcPlatFee(bizPlanList.getBusinessId(), projExtRate.getProjectId(), req.getPlanId(), bizPlanList.getPeriod());
+                    BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcPlatFee(bizPlanList.getBusinessId(), projExtRate.getProjectId(), bizPlanList.getPlanId(), bizPlanList.getPeriod());
                     penalty = penalty.add(projExtRate.getRateValue().multiply(platformFee));
                 } else if (PepayPlanProjExtRatCalEnum.BY_REM_MONEY_AND_FEE.getValue() == projExtRate.getCalcWay()) {
                     //(剩余本金*费率值*剩余期数) - 分公司服务费违约金 - 平台服务费违约金
@@ -1732,18 +1732,18 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 	BasicBusiness business = basicBusinessMapper.selectById(bizPlanList.getBusinessId());
                 	int surplusPeriod = business.getBorrowLimit() - bizPlanList.getPeriod() ;
                 	
-                    BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), req.getPlanId());
+                    BigDecimal upaid = repaymentProjPlanMapper.sumProjectItem10Unpaid(projExtRate.getProjectId(), bizPlanList.getPlanId());
                     BigDecimal p6 = upaid.multiply(new BigDecimal("0.06")) ;
                     
                     BigDecimal servicePenalty = projExtRateMapper.calcProjextRate(
                             projExtRate.getProjectId(), RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue().toString(), RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid(),bizPlanList.getPeriod().toString());
-                    BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcService(bizPlanList.getBusinessId(), projExtRate.getProjectId(), req.getPlanId(), bizPlanList.getPeriod());
+                    BigDecimal serviceFee = repaymentProjPlanListDetailMapper.calcService(bizPlanList.getBusinessId(), projExtRate.getProjectId(), bizPlanList.getPlanId(), bizPlanList.getPeriod());
                     BigDecimal service = servicePenalty.multiply(serviceFee);
                     
                     
                     BigDecimal platformPenalty = projExtRateMapper.calcProjextRate(
                             projExtRate.getProjectId(), RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue().toString(), RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid(),bizPlanList.getPeriod().toString());
-                    BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcPlatFee(bizPlanList.getBusinessId(), projExtRate.getProjectId(), req.getPlanId(), bizPlanList.getPeriod());
+                    BigDecimal platformFee = repaymentProjPlanListDetailMapper.calcPlatFee(bizPlanList.getBusinessId(), projExtRate.getProjectId(), bizPlanList.getPlanId(), bizPlanList.getPeriod());
                     BigDecimal platform = platformPenalty.multiply(platformFee);
                     
                     penalty = (upaid.multiply(projExtRate.getRateValue()).multiply(new BigDecimal(surplusPeriod))) ;

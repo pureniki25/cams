@@ -97,7 +97,7 @@
 
 	<select id="sumProjectItem10Unpaid" resultType="java.math.BigDecimal">
 		SELECT
-			sum(proj_plan_amount-IFNULL(proj_fact_amount,0)) as unpaid
+			IFNULL(sum(proj_plan_amount-IFNULL(proj_fact_amount,0)) ,0) as unpaid
 		FROM
 			tb_repayment_proj_plan rpp
 			left join tb_repayment_proj_plan_list rppl on rppl.proj_plan_id = rpp.proj_plan_id
