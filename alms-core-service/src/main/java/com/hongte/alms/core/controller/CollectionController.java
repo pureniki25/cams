@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import com.hongte.alms.base.service.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.poi.excel.ExcelExportUtil;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -34,9 +36,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.collection.entity.CollectionPersonSet;
+import com.hongte.alms.base.collection.entity.CollectionPersonSetDetail;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.StaffPersonType;
 import com.hongte.alms.base.collection.service.CollectionLogService;
+import com.hongte.alms.base.collection.service.CollectionPersonSetDetailService;
+import com.hongte.alms.base.collection.service.CollectionPersonSetService;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.collection.service.PhoneUrgeService;
 import com.hongte.alms.base.collection.vo.AfterLoanStandingBookReq;
@@ -124,7 +130,19 @@ public class CollectionController {
     @Autowired
     @Qualifier("SysUserRoleService")
     SysUserRoleService sysUserRoleService;
-
+    
+    @Autowired
+    @Qualifier("CollectionPersonSetDetailService")
+    CollectionPersonSetDetailService collectionPersonSetDetailService;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanListSynchService")
+    RepaymentBizPlanListSynchService repaymentBizPlanListSynchService;
+    
+    @Autowired
+    @Qualifier("CollectionPersonSetService")
+    CollectionPersonSetService collectionPersonSetService;
+    
 //    private final StorageService storageService;
 //
 //    @Autowired
@@ -393,7 +411,8 @@ public class CollectionController {
     @ApiOperation(value="取得分配电催界面下拉选项框数据")
     @GetMapping("getPhoneUrgeSelectsData")
     public Result<Map<String,JSONArray>> getPhoneUrgeSelectsData(
-            @RequestParam("staffType")  String staffType
+            @RequestParam("staffType")  String staffType,
+            @RequestParam("crpIds")  String crpIds
     ) {
         logger.info("@分配电催界面@取得分配电催界面下拉选项框数据--开始[{}]" , staffType);
         Map<String,JSONArray> retMap = new HashMap<String,JSONArray>();
@@ -409,16 +428,68 @@ public class CollectionController {
         List<BasicBusinessType> btype_list =  basicBusinessTypeService.selectList(new EntityWrapper<BasicBusinessType>().orderBy("business_type_id"));
         retMap.put("businessType",(JSONArray) JSON.toJSON(btype_list, JsonUtil.getMapping()));
 
+        List<String> listTeam1 = new ArrayList<>();
+        List<String> listTeam2 = new ArrayList<>();
+        
+        if(crpIds != null && StringUtils.isNotEmpty(crpIds)) {
+        	//1找出业务单号  业务还款计划列表
+        	//2找出单号区域信息  基础业务信息表
+        	List<RepaymentBizPlanListSynch> listRepaymentBizPlanListSynch = repaymentBizPlanListSynchService.selectList(new EntityWrapper<RepaymentBizPlanListSynch>().in("plan_list_id", crpIds.split(",")));
+        	List<String> companyList = new ArrayList<>();
+        	List<String> areaList = new ArrayList<>();
+        	for(RepaymentBizPlanListSynch repaymentBizPlanListSynch : listRepaymentBizPlanListSynch) {
+        		if(StringUtils.isNotBlank(repaymentBizPlanListSynch.getCompanyIdExt())) {
+        			companyList.add(repaymentBizPlanListSynch.getCompanyIdExt());
+        		}else {
+        			areaList.add(repaymentBizPlanListSynch.getDistrictIdExt());
+        		}
+        	}
+        	
+        	//3找出区域电催设置  tb_collection_person_set
+        	List<String> listColPersonId = new ArrayList<>();
+        	List<CollectionPersonSet> listCollectionPersonSet = collectionPersonSetService.selectList(new EntityWrapper<CollectionPersonSet>().in("company_code", companyList));
+        	List<CollectionPersonSet> listAreaCollectionPersonSet = collectionPersonSetService.selectList(new EntityWrapper<CollectionPersonSet>().in("area_code", areaList));
+        	listCollectionPersonSet.addAll(listAreaCollectionPersonSet);
+        	for (CollectionPersonSet collectionPersonSet : listCollectionPersonSet) {
+        		listColPersonId.add(collectionPersonSet.getColPersonId());
+			}
+        	
+        	//4找出区域电催负责人 tb_collection_person_set_detail
+        	List<CollectionPersonSetDetail> listCollectionPersonSetDetail = collectionPersonSetDetailService.selectList(new EntityWrapper<CollectionPersonSetDetail>().in("col_person_id", listColPersonId));
+        	for (CollectionPersonSetDetail collectionPersonSetDetail : listCollectionPersonSetDetail) {
+        		//清算一组
+        		if(collectionPersonSetDetail.getTeam() == 1) {
+        			listTeam1.add(collectionPersonSetDetail.getUserId());
+        		}
+        		//清算二组
+        		else {
+        			listTeam2.add(collectionPersonSetDetail.getUserId());
+        		}
+			}
+        }
         //跟进人员
         List<Map<String,String>> opr_list = new LinkedList<Map<String,String>>();
         List<SysUser> oprList =new LinkedList<>();
         if(staffType.equals(StaffPersonType.PHONE_STAFF.getKey())){
             //跟进人员
             oprList =  sysUserService.selectUsersByRole(SysRoleEnums.HD_LIQ_COMMISSIONER.getKey());
-
+            List<SysUser> tempList =new LinkedList<>();
+            for (SysUser sysUser : oprList) {
+            	if(!listTeam1.contains(sysUser.getUserId())) {
+            		tempList.add(sysUser);
+            	}
+			}
+            oprList.removeAll(tempList);
+            
         }else{
             oprList =  sysUserService.selectUsersByRole(SysRoleEnums.HD_ASSET_COMMISSIONE.getKey());
-
+            List<SysUser> tempList =new LinkedList<>();
+            for (SysUser sysUser : oprList) {
+            	if(!listTeam2.contains(sysUser.getUserId())) {
+            		tempList.add(sysUser);
+            	}
+			}
+            oprList.removeAll(tempList);
         }
         for(SysUser user:oprList){
             Map<String,String> opr1 = new HashMap<String, String>();
@@ -454,7 +525,6 @@ public class CollectionController {
             collectionStatusService.setBusinessStaff(voList,staffUserId,describe,staffType, CollectionSetWayEnum.MANUAL_SET);
             //同步设置信息到信贷
             collectionStatusService.SyncBusinessColStatusToXindai(voList,staffUserId,describe,staffType);
-
 
             logger.info("@分配电催页面@设置电催人员--结束[{}]","");
             return Result.success();
