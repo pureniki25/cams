@@ -435,9 +435,9 @@ public class PlatformRepaymentController {
 									JSONObject parseObject = (JSONObject) JSONObject
 											.toJSON(queryRepaymentEarlierResult.getData());
 									if (parseObject != null) {
-										amount = BigDecimal.valueOf((Double) parseObject.get("principal"));
-										interestAmount = BigDecimal.valueOf((Double) parseObject.get("interest"));
-										tuandaiAmount = BigDecimal.valueOf((Double) parseObject.get("platformCharge"));
+										amount = BigDecimal.valueOf(parseObject.getDouble("principal"));
+										interestAmount = BigDecimal.valueOf(parseObject.getDouble("interest"));
+										tuandaiAmount = BigDecimal.valueOf(parseObject.getDouble("platformCharge"));
 									}
 								} else {
 									LOGGER.info("@对接合规还款接口@  提前结清平台费用查询出错 平台返回数据 [{}] ",
@@ -706,15 +706,14 @@ public class PlatformRepaymentController {
 					}
 
 					/*
-					 * 如果实还金额大于充值金额，则不允许资金分发 -- （肖莹环提出规则，2018-08-13）
+					 * 如果充值金额大于实还金额，则不允许资金分发 -- （肖莹环提出规则，2018-08-13）
 					 */
-					double factRepayAmount2 = vo.getFactRepayAmount() == null ? 0
-							: vo.getFactRepayAmount().doubleValue();
-					double rechargeAmount = vo.getRechargeAmount() == null ? 0 : vo.getRechargeAmount().doubleValue();
-					if (factRepayAmount2 > rechargeAmount) {
-						LOGGER.info("实还金额不能大于充值金额 输入参数 projectPlanId:[{}] factRepayAmount2:[{}]  rechargeAmount[{}] ",
+					BigDecimal factRepayAmount2 = vo.getFactRepayAmount() == null ? BigDecimal.ZERO : vo.getFactRepayAmount();
+					BigDecimal rechargeAmount = vo.getRechargeAmount() == null ? BigDecimal.ZERO : vo.getRechargeAmount();
+					if (rechargeAmount.compareTo(factRepayAmount2) > 0) {
+						LOGGER.info("充值金额不能大于实还金额输入参数 projectPlanId:[{}] factRepayAmount2:[{}]  rechargeAmount[{}] ",
 								projPlanListId, factRepayAmount2, rechargeAmount);
-						return Result.error("实还金额不能大于充值金额");
+						return Result.error("充值金额不能大于实还金额");
 					}
 
 					// 用实还赋值流水金额

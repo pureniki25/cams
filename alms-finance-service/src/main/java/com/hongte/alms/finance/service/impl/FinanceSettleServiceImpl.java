@@ -613,21 +613,27 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 				if (!financeSettleBaseDto.getPreview()) {
 					for (RepaymentBizPlanBak bak : financeSettleBaseDto.getRepaymentBizPlanBaks()) {
+						bak.setConfirmLogId(financeSettleBaseDto.getRepaymentConfirmLog().getConfirmLogId());
 						bak.insert();
 					}
 					for (RepaymentBizPlanListBak bak : financeSettleBaseDto.getRepaymentBizPlanListBaks()) {
+						bak.setConfirmLogId(financeSettleBaseDto.getRepaymentConfirmLog().getConfirmLogId());
 						bak.insert();
 					}
 					for (RepaymentBizPlanListDetailBak bak : financeSettleBaseDto.getRepaymentBizPlanListDetailBaks()) {
+						bak.setConfirmLogId(financeSettleBaseDto.getRepaymentConfirmLog().getConfirmLogId());
 						bak.insert();
 					}
 					for (RepaymentProjPlanBak bak : financeSettleBaseDto.getRepaymentProjPlanBaks()) {
+						bak.setConfirmLogId(financeSettleBaseDto.getRepaymentConfirmLog().getConfirmLogId());
 						bak.insert();
 					}
 					for (RepaymentProjPlanListBak bak : financeSettleBaseDto.getRepaymentProjPlanListBaks()) {
+						bak.setConfirmLogId(financeSettleBaseDto.getRepaymentConfirmLog().getConfirmLogId());
 						bak.insert();
 					}
 					for (RepaymentProjPlanListDetailBak bak : financeSettleBaseDto.getRepaymentProjPlanListDetailBaks()) {
+						bak.setConfirmLogId(financeSettleBaseDto.getRepaymentConfirmLog().getConfirmLogId());
 						bak.insert();
 					}
 					
@@ -671,7 +677,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							repaymentProjPlanSettleDto.getRepaymentProjPlan().updateAllColumnById();
 							
 							/*将标的细项回填业务细项*/
-							
 							for (Entry<String, BigDecimal> entry : repaymentProjPlanSettleDto.getCurFactRepayAmount().entrySet()) {
 								for (RepaymentBizPlanListDetail bizPlanListDetail : bizPlanSettleDto.getCurrBizPlanListDto().getBizPlanListDetails()) {
 									if (bizPlanListDetail.getFeeId().equals(entry.getKey())) {
@@ -682,7 +687,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 									}
 								}
 							}
-							
+							/*将标的细项回填业务细项*/
 							
 							/*更新标PLANList*/
 							repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList().setFactRepayDate(financeSettleBaseDto.getRepaymentResources().get(financeSettleBaseDto.getRepaymentResources().size()-1).getRepayDate());
@@ -890,10 +895,12 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		if (pfact.compareTo(BigDecimal.ZERO) > 0) {
 			repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList()
 					.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
-		} else if (pfact.compareTo(pOnlinePlanAmount) >= 0) {
+		}  
+		if (pfact.compareTo(pOnlinePlanAmount) >= 0) {
 			repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList()
 					.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
-		} else if (pfact.compareTo(pAllPlanAmount) >= 0) {
+		}  
+		if (pfact.compareTo(pAllPlanAmount) >= 0) {
 			repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList()
 					.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 		}
