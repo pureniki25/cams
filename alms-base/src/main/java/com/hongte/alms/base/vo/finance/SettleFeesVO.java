@@ -45,4 +45,24 @@ public class SettleFeesVO {
 	 * planList 不一定有值
 	 */
 	private String planListId ;
+	
+	/**
+	 * planListDetailId 不一定有值
+	 */
+	private String planListDetailId ;
+	
+//	@Override
+//	public boolean equals(Object o) {
+//		if (!(o instanceof SettleFeesVO)) {
+//			return false ;
+//		}
+//		SettleFeesVO oFeesVO = (SettleFeesVO) o ;
+//		if (oFeesVO.getAmount().equals(this.getAmount())
+//				&& oFeesVO.getFeeId().equals(this.getFeeId())
+//				&& oFeesVO.getFeeName()) {
+//			
+//		}
+//		return false;
+//		
+//	}
 }

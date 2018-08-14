@@ -297,7 +297,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                     .eq("proj_plan_detail_id", repaymentProjPlanListDetailBak.getProjPlanDetailId())
                     .eq("confirm_log_id", repaymentProjPlanListDetailBak.getConfirmLogId()));
         }
-
+        
         for (RepaymentProjPlanListBak repaymentProjPlanListBak : selectList5) {
             RepaymentProjPlanList list = new RepaymentProjPlanList();
             BeanUtils.copyProperties(repaymentProjPlanListBak, list);
@@ -341,6 +341,26 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                     .eq("plan_id", repaymentBizPlanBak.getPlanId())
                     .eq("confirm_log_id", repaymentBizPlanBak.getConfirmLogId()));
         }
+        
+        if (log.getType().equals(2)) {
+        	Wrapper<RepaymentProjPlanListDetail> wrapper2 = new EntityWrapper<RepaymentProjPlanListDetail>().eq("business_id", log.getBusinessId()).eq("plan_item_type",RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue());
+			Wrapper<RepaymentBizPlanListDetail> wrapper3 = new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", log.getBusinessId()).eq("plan_item_type",RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue());
+			
+			if (log.getPlanId()!=null) {
+				List<String> bizplanLists = new ArrayList<>() ;
+				List<RepaymentBizPlanList> selectList7 = repaymentBizPlanListMapper.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", log.getPlanId()));
+				for (RepaymentBizPlanList repaymentBizPlanList : selectList7) {
+					bizplanLists.add(repaymentBizPlanList.getPlanListId());
+				}
+				if (!CollectionUtils.isEmpty(selectList7)) {
+					wrapper2.in("plan_list_id", selectList7);
+					wrapper3.in("plan_list_id", selectList7);
+				}
+			}
+			
+			repaymentProjPlanListDetailMapper.delete(wrapper2);
+			repaymentBizPlanListDetailMapper.delete(wrapper3);
+		}
         
         /*删除合规化还款调用记录 开始*/
         List<RepaymentConfirmPlatRepayLog> repaymentConfirmPlatRepayLogs = repaymentConfirmPlatRepayLogMapper.selectList(new EntityWrapper<RepaymentConfirmPlatRepayLog>().eq("confirm_log_id", log.getConfirmLogId()));
