@@ -30,7 +30,7 @@ public enum BusinessTypeEnum implements IEnum {
     PROPRIETOR_COMPANY_TYPE(29, "业主贷共借", 1011, Constant.PROPRIETOR_COMPANY_LOAN, 4),
 	COMMERCE_TYPE(30, "商贸贷", 1007, Constant.COMMERCE_LOAN, 0),
 	CAR_JOINTLY_TYPE(31, "车贷共借", 1012, Constant.CAR_JOINTLY_TYPE, 11),
-	HOUSE_JOINTLY_TYPE(32, "房贷共借", 1013, Constant.CAR_JOINTLY_TYPE, 11),
+	HOUSE_JOINTLY_TYPE(32, "房贷共借", 1013, Constant.HOUSE_JOINTLY_TYPE, 11),
 	YOU_FANG_TYPE(35, "优房贷", 1002, Constant.HOUSE_LOAN, 5);
 
 
