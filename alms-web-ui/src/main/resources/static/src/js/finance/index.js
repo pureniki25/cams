@@ -504,7 +504,7 @@ window.layinit(function (htConfig) {
             },
             revokeConfirm(p,revokeSettle) {
                 app.$Modal.confirm({
-                    content:'是否确认取消还款?',
+                    content:'注意!是否确认取消还款,取消后无法再撤回?',
                     onOk(){
                         axios.get(fpath + 'finance/revokeConfirm', {
                             params: {

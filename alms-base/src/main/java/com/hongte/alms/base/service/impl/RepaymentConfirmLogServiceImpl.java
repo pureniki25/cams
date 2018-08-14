@@ -70,6 +70,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -289,68 +290,53 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 		
 		/*根据bak的主键找现在的记录,先删除,再新增*/
         for (RepaymentProjPlanListDetailBak repaymentProjPlanListDetailBak : selectList6) {
-            RepaymentProjPlanListDetail detail = new RepaymentProjPlanListDetail(repaymentProjPlanListDetailBak);
-            repaymentProjPlanListDetailMapper.deleteById(detail.getProjPlanDetailId());
-            detail.insert();
+            RepaymentProjPlanListDetail detail = new RepaymentProjPlanListDetail();
+            BeanUtils.copyProperties(repaymentProjPlanListDetailBak, detail);
+            repaymentProjPlanListDetailMapper.updateAllColumnById(detail);
             repaymentProjPlanListDetailBak.delete(new EntityWrapper<>()
                     .eq("proj_plan_detail_id", repaymentProjPlanListDetailBak.getProjPlanDetailId())
                     .eq("confirm_log_id", repaymentProjPlanListDetailBak.getConfirmLogId()));
         }
 
         for (RepaymentProjPlanListBak repaymentProjPlanListBak : selectList5) {
-            RepaymentProjPlanList list = new RepaymentProjPlanList(repaymentProjPlanListBak);
-            repaymentProjPlanListMapper.deleteById(list.getProjPlanListId());
-            list.insert();
+            RepaymentProjPlanList list = new RepaymentProjPlanList();
+            BeanUtils.copyProperties(repaymentProjPlanListBak, list);
+            repaymentProjPlanListMapper.updateAllColumnById(list);
             repaymentProjPlanListBak.delete(new EntityWrapper<>()
                     .eq("proj_plan_list_id", repaymentProjPlanListBak.getProjPlanListId())
                     .eq("confirm_log_id", repaymentProjPlanListBak.getConfirmLogId()));
         }
 
         for (RepaymentProjPlanBak repaymentProjPlanBak : selectList4) {
-            RepaymentProjPlan plan = new RepaymentProjPlan(repaymentProjPlanBak);
-            repaymentProjPlanMapper.deleteById(plan.getProjPlanId());
-            plan.insert();
+            RepaymentProjPlan plan = new RepaymentProjPlan();
+            BeanUtils.copyProperties(repaymentProjPlanBak, plan);
+            repaymentProjPlanMapper.updateAllColumnById(plan);
             repaymentProjPlanBak.delete(new EntityWrapper<>()
                     .eq("proj_plan_id", repaymentProjPlanBak.getProjPlanId())
                     .eq("confirm_log_id", repaymentProjPlanBak.getConfirmLogId()));
         }
-        BigDecimal bplFactAmount = BigDecimal.ZERO ;
         for (RepaymentBizPlanListDetailBak repaymentBizPlanListDetailBak : selectList3) {
-            RepaymentBizPlanListDetail detail = new RepaymentBizPlanListDetail(repaymentBizPlanListDetailBak);
-            repaymentBizPlanListDetailMapper.deleteById(detail.getPlanDetailId());
-            detail.insert();
-            bplFactAmount = bplFactAmount.add(detail.getFactAmount()==null?BigDecimal.ZERO:detail.getFactAmount());
+            RepaymentBizPlanListDetail detail = new RepaymentBizPlanListDetail();
+            BeanUtils.copyProperties(repaymentBizPlanListDetailBak, detail);
+            repaymentBizPlanListDetailMapper.updateAllColumnById(detail);
             repaymentBizPlanListDetailBak.delete(new EntityWrapper<>()
                     .eq("plan_detail_id", repaymentBizPlanListDetailBak.getPlanDetailId())
                     .eq("confirm_log_id", repaymentBizPlanListDetailBak.getConfirmLogId()));
         }
 
         for (RepaymentBizPlanListBak repaymentBizPlanListBak : selectList2) {
-            RepaymentBizPlanList list = new RepaymentBizPlanList(repaymentBizPlanListBak);
-            repaymentBizPlanListMapper.deleteById(list.getPlanListId());
-            list.insert();
-            
-//            RepaymentBizPlanListSynch synch = new RepaymentBizPlanListSynch() ;
-//            synch.setPlanListId(list.getPlanListId());
-//            synch = repaymentBizPlanListSynchMapper.selectOne(synch) ;
-//            synch.setCurrentStatus(list.getCurrentStatus());
-//            synch.setCurrentSubStatus(list.getCurrentSubStatus());
-//            synch.setRepayStatus(list.getRepayStatus());
-//            synch.setRepayFlag(list.getRepayFlag());
-//            synch.setFinanceConfirmUser(list.getFinanceConfirmUser());
-//            synch.setFinanceConfirmUserName(list.getFinanceConfirmUserName());
-//            synch.setFactAmountExt(bplFactAmount);
-//            repaymentBizPlanListSynchMapper.updateAllColumnById(synch);
-            
+            RepaymentBizPlanList list = new RepaymentBizPlanList();
+            BeanUtils.copyProperties(repaymentBizPlanListBak, list);
+            repaymentBizPlanListMapper.updateAllColumnById(list);
             repaymentBizPlanListBak.delete(new EntityWrapper<>()
                     .eq("plan_list_id", repaymentBizPlanListBak.getPlanListId())
                     .eq("confirm_log_id", repaymentBizPlanListBak.getConfirmLogId()));
         }
 
         for (RepaymentBizPlanBak repaymentBizPlanBak : selectList) {
-            RepaymentBizPlan plan = new RepaymentBizPlan(repaymentBizPlanBak);
-            repaymentBizPlanMapper.deleteById(plan.getPlanId());
-            plan.insert();
+            RepaymentBizPlan plan = new RepaymentBizPlan();
+            BeanUtils.copyProperties(repaymentBizPlanBak, plan);
+            repaymentBizPlanMapper.updateAllColumnById(plan);
             repaymentBizPlanBak.delete(new EntityWrapper<>()
                     .eq("plan_id", repaymentBizPlanBak.getPlanId())
                     .eq("confirm_log_id", repaymentBizPlanBak.getConfirmLogId()));
