@@ -756,6 +756,8 @@ public class PlatformRepaymentController {
 					LOGGER.info("@对接合规还款接口@ 调用代充值资金分发参数接入接口失败 vo:[{}]", JSON.toJSONString(vo));
 					return Result.error("合规还款失败:" + result.getMsg());
 				}
+			}else {
+				return Result.error("查询平台标的还款计划失败");
 			}
 			LOGGER.info("@对接合规还款接口@ 调用代充值资金分发成功 vo:[{}]", JSON.toJSONString(vo));
 			return Result.success(JSON.toJSONString(vo));
