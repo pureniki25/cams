@@ -289,6 +289,16 @@ public class PlatformRepaymentController {
 					break;
 				}
 			}
+
+			if ((businessType.intValue() == 1 || businessType.intValue() == 9)
+					|| !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
+				businessType = 31;
+			}
+
+			if ((businessType.intValue() == 2 || businessType.intValue() == 11 || businessType.intValue() == 35)
+					|| !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
+				businessType = 32;
+			}
 			vo.setBusinessType(businessType);
 
 			// 实还日期
@@ -386,7 +396,7 @@ public class PlatformRepaymentController {
 
 					if (CollectionUtils.isEmpty(dtos)) {
 						LOGGER.info("@对接合规还款接口@  从平台获取标的还款计划为空 平台返回数据 [{}] ", JSONObject.toJSONString(ret));
-						return Result.error("500", "从平台获取标的还款计划为空");
+						return Result.error("从平台获取标的还款计划为空");
 					}
 
 					for (TdPlatformPlanRepaymentDTO dto : dtos) {
@@ -407,10 +417,13 @@ public class PlatformRepaymentController {
 							BigDecimal orgAmount = dto.getOrgAmount();
 							BigDecimal tuandaiAmount = dto.getTuandaiAmount();
 							BigDecimal agencyAmount = dto.getAgencyAmount();
-							
+
 							if (vo.getSettleType().intValue() != 0) {
+								Map<String, Object> paramMap2 = new HashMap<>();
+								paramMap2.put("projectId", projPlan.getProjectId());
+								paramMap2.put("orgType", 1);
 								com.ht.ussp.core.Result queryRepaymentEarlierResult = eipRemote
-										.queryRepaymentEarlier(paramMap);
+										.queryRepaymentEarlier(paramMap2);
 								LOGGER.info("提前结清平台费用查询，标id：{}；接口返回数据：{}", projPlan.getProjectId(),
 										JSONObject.toJSONString(queryRepaymentEarlierResult));
 
@@ -418,12 +431,18 @@ public class PlatformRepaymentController {
 										&& Constant.REMOTE_EIP_SUCCESS_CODE
 												.equals(queryRepaymentEarlierResult.getReturnCode())
 										&& queryRepaymentEarlierResult.getData() != null) {
-									Map queryRepaymentEarlierMap = JSONObject.parseObject(queryRepaymentEarlierResult.getData().toString(), Map.class);
-									if (queryRepaymentEarlierMap != null && !queryRepaymentEarlierMap.isEmpty()) {
-										amount = (BigDecimal) queryRepaymentEarlierMap.get("principal");
-										interestAmount = (BigDecimal) queryRepaymentEarlierMap.get("interest");
-										tuandaiAmount = (BigDecimal) queryRepaymentEarlierMap.get("platformCharge");
+
+									JSONObject parseObject = (JSONObject) JSONObject
+											.toJSON(queryRepaymentEarlierResult.getData());
+									if (parseObject != null) {
+										amount = BigDecimal.valueOf(parseObject.getDouble("principal"));
+										interestAmount = BigDecimal.valueOf(parseObject.getDouble("interest"));
+										tuandaiAmount = BigDecimal.valueOf(parseObject.getDouble("platformCharge"));
 									}
+								} else {
+									LOGGER.info("@对接合规还款接口@  提前结清平台费用查询出错 平台返回数据 [{}] ",
+											JSONObject.toJSONString(queryRepaymentEarlierResult));
+									return Result.error("提前结清平台费用查询出错");
 								}
 							}
 
@@ -521,15 +540,18 @@ public class PlatformRepaymentController {
 
 								if (penaltyAmount != null) {
 									guaranteePaymentMap.put("70", penaltyAmount);
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(penaltyAmount);
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+											.add(penaltyAmount);
 								}
 								if (tuandaiAmount != null) {
 									if (vo.getSettleType().intValue() != 0 && planRepaymentMap.containsKey("30")) {
 										guaranteePaymentMap.put("30", planRepaymentMap.get("30"));
-										guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(tuandaiAmount);
-									}else {
+										guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+												.add(tuandaiAmount);
+									} else {
 										guaranteePaymentMap.put("30", tuandaiAmount);
-										guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(tuandaiAmount);
+										guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+												.add(tuandaiAmount);
 									}
 								}
 								if (orgAmount != null) {
@@ -538,27 +560,32 @@ public class PlatformRepaymentController {
 								}
 								if (guaranteeAmount != null) {
 									guaranteePaymentMap.put("50", guaranteeAmount);
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(guaranteeAmount);
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+											.add(guaranteeAmount);
 								}
 								if (arbitrationAmount != null) {
 									guaranteePaymentMap.put("60", arbitrationAmount);
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(arbitrationAmount);
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+											.add(arbitrationAmount);
 								}
 								if (agencyAmount != null) {
 									guaranteePaymentMap.put("80", agencyAmount);
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(agencyAmount);
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+											.add(agencyAmount);
 								}
 
 								// 从计划接口中分离出本金和利息
 								// 本金
 								if (planRepaymentMap.containsKey("10")) {
 									guaranteePaymentMap.put("10", planRepaymentMap.get("10"));
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(planRepaymentMap.get("10"));
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+											.add(planRepaymentMap.get("10"));
 								}
 								// 利息
 								if (planRepaymentMap.containsKey("20")) {
 									guaranteePaymentMap.put("20", planRepaymentMap.get("20"));
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(planRepaymentMap.get("20"));
+									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+											.add(planRepaymentMap.get("20"));
 								}
 
 							}
@@ -678,6 +705,17 @@ public class PlatformRepaymentController {
 						vo.setRechargeAmount(planRepaymentRechargeAmount);
 					}
 
+					/*
+					 * 如果充值金额大于实还金额，则不允许资金分发 -- （肖莹环提出规则，2018-08-13）
+					 */
+					BigDecimal factRepayAmount2 = vo.getFactRepayAmount() == null ? BigDecimal.ZERO : vo.getFactRepayAmount();
+					BigDecimal rechargeAmount = vo.getRechargeAmount() == null ? BigDecimal.ZERO : vo.getRechargeAmount();
+					if (rechargeAmount.compareTo(factRepayAmount2) > 0) {
+						LOGGER.info("充值金额不能大于实还金额输入参数 projectPlanId:[{}] factRepayAmount2:[{}]  rechargeAmount[{}] ",
+								projPlanListId, factRepayAmount2, rechargeAmount);
+						return Result.error("充值金额不能大于实还金额");
+					}
+
 					// 用实还赋值流水金额
 					vo.setResourceAmount(factRepayAmount);
 					vo.setDetailList(detailFeeList);
@@ -718,6 +756,8 @@ public class PlatformRepaymentController {
 					LOGGER.info("@对接合规还款接口@ 调用代充值资金分发参数接入接口失败 vo:[{}]", JSON.toJSONString(vo));
 					return Result.error("合规还款失败:" + result.getMsg());
 				}
+			}else {
+				return Result.error("查询平台标的还款计划失败");
 			}
 			LOGGER.info("@对接合规还款接口@ 调用代充值资金分发成功 vo:[{}]", JSON.toJSONString(vo));
 			return Result.success(JSON.toJSONString(vo));

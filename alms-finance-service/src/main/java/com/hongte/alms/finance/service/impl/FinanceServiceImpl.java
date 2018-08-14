@@ -55,6 +55,7 @@ import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanPayedTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
@@ -814,7 +815,8 @@ public class FinanceServiceImpl implements FinanceService {
 				matchedMoneyPoolVO = new MatchedMoneyPoolVO();
 				matchedMoneyPoolVO.setAccountMoney(repaymentResource.getRepayAmount());
 				matchedMoneyPoolVO.setTradeDate(repaymentResource.getRepayDate());
-				matchedMoneyPoolVO.setRemark("还款来源:" + repaymentResource.getRepaySource());
+				
+				matchedMoneyPoolVO.setRemark("还款来源:" + RepayPlanRepaySrcEnum.getByValue(Integer.valueOf(repaymentResource.getRepaySource())).getDesc());
 				break;
 			}
 			list.add(matchedMoneyPoolVO);

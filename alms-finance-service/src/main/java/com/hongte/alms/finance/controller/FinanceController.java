@@ -18,6 +18,7 @@ import com.hongte.alms.base.dto.RepaymentRegisterInfoDTO;
 import com.hongte.alms.base.dto.core.LayTableQuery;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.*;
+import com.hongte.alms.base.enums.repayPlan.PepayPlanRepayFlagStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
@@ -703,11 +704,16 @@ public class FinanceController {
 	
 	@GetMapping(value = "/revokeConfirm")
 	@ApiOperation(value = "撤销还款确认")
-	public Result revokeConfirm(String businessId,String afterId) {
+	public Result revokeConfirm(String businessId,String afterId,Boolean isRevokeSettle) {
 		try {
 			logger.info("@revokeConfirm@撤销还款确认--开始[{}]", businessId,afterId);
 			Result result = null;
-			result = confrimLogService.revokeConfirm(businessId, afterId);
+			
+			if (isRevokeSettle==null) {
+				isRevokeSettle = false ;
+			}
+			
+			result = confrimLogService.revokeConfirm(businessId, afterId,isRevokeSettle);
 			logger.info("@revokeConfirm@撤销还款确认--结束[{}]", result);
 			return result;
 		}  catch (ServiceRuntimeException se) {
@@ -1260,10 +1266,16 @@ public class FinanceController {
 			}
 			List<RepaymentBizPlanList> lastPeriods = repaymentBizPlanListService.selectList(lt);
 			for (RepaymentBizPlanList repaymentBizPlanList : lastPeriods) {
-				if (repaymentBizPlanList.getRepayStatus()==null) {
+				if (repaymentBizPlanList.getRepayStatus()==null ) {
+					if (repaymentBizPlanList.getRepayFlag()!=null&&repaymentBizPlanList.getRepayFlag()==PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue()) {
+						continue;
+					}
 					return Result.error(repaymentBizPlanList.getAfterId()+"未还款不能结清");
 				}
 				if (repaymentBizPlanList.getRepayStatus().equals(SectionRepayStatusEnum.SECTION_REPAID.getKey())) {
+					if (repaymentBizPlanList.getRepayFlag()!=null&&repaymentBizPlanList.getRepayFlag()==PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue()) {
+						continue;
+					}
 					return Result.error(repaymentBizPlanList.getAfterId()+"部分还款不能结清");
 				}
 			}
