@@ -41,4 +41,8 @@ public class SettleFeesVO {
 	 * 核销顺序,不一定有值
 	 */
 	private Integer shareProfitIndex ;
+	/**
+	 * planList 不一定有值
+	 */
+	private String planListId ;
 }
