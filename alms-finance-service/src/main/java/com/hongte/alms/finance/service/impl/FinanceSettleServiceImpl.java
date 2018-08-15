@@ -1891,6 +1891,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         if (StringUtil.isEmpty(planId)) {
             List<String> planLists = curPeriod(repaymentBizPlanList);
+            if (CollectionUtils.isEmpty(planLists)) {
+				throw new ServiceRuntimeException("找不到当前期");
+			}
             List<RepaymentBizPlanList> list = repaymentBizPlanListMapper.selectBatchIds(planLists);
 
             for (RepaymentBizPlanList repaymentBizPlanList2 : list) {
@@ -2292,9 +2295,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     if(bizPlanList.getPeriod() == curRepaymentBizPlanList.getPeriod()){
                         continue;
                     }
-                    if(bizPlanList.getPeriod()<curRepaymentBizPlanList.getPeriod()){
+                    if(bizPlanList.getPeriod()<curRepaymentBizPlanList.getPeriod() && bizPlanList.getPlanId().equals(curRepaymentBizPlanList.getPlanId())){
                         beforePlanListDtos.add(dto);
-                    }else if(bizPlanList.getPeriod()>curRepaymentBizPlanList.getPeriod()){
+                    }else if(bizPlanList.getPeriod()>curRepaymentBizPlanList.getPeriod() && bizPlanList.getPlanId().equals(curRepaymentBizPlanList.getPlanId())){
                         afterPlanListDtos.add(dto);
                         
                         /*顺便备份结清期往后的期数*/
@@ -2383,7 +2386,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					
                     RepaymentProjPlanListDto projPlanListDto = creatProjPlanListDto(repaymentProjPlanList,financeSettleBaseDto);
                     projPlanDto.setProjPlanListDtos(projPlanListDto);
-                    if(repaymentProjPlanList.getPeriod()>curRepayProjPlanList.getPeriod()){
+                    if(repaymentProjPlanList.getPeriod()>curRepayProjPlanList.getPeriod() && repaymentProjPlanList.getProjPlanId().equals(curRepayProjPlanList.getProjPlanId())){
                         afterProjPlanListDtos.add(projPlanListDto);
                         
                         /*备份结清期往后的标的期数*/
@@ -2392,7 +2395,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         				afterProjPlanListBak.setConfirmLogId(financeSettleBaseDto.getUuid());
                         financeSettleBaseDto.getRepaymentProjPlanListBaks().add(afterProjPlanListBak);
                         
-                    }else if(repaymentProjPlanList.getPeriod()<curRepayProjPlanList.getPeriod()){
+                    }else if(repaymentProjPlanList.getPeriod()<curRepayProjPlanList.getPeriod() && repaymentProjPlanList.getProjPlanId().equals(curRepayProjPlanList.getProjPlanId())){
                         beforeProjPlanListDtos.add(projPlanListDto);
                     }
 
