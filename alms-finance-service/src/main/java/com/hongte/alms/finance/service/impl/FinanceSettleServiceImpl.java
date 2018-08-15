@@ -786,6 +786,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							/*将标的细项回填业务细项*/
 							for (Entry<String, BigDecimal> entry : repaymentProjPlanSettleDto.getCurFactRepayAmount().entrySet()) {
 								for (RepaymentBizPlanListDetail bizPlanListDetail : bizPlanSettleDto.getCurrBizPlanListDto().getBizPlanListDetails()) {
+									if (bizPlanListDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue())) {
+										continue;
+									}
+									
 									if (bizPlanListDetail.getFeeId().equals(entry.getKey())) {
 										if (bizPlanListDetail.getFactAmount()==null) {
 											bizPlanListDetail.setFactAmount(BigDecimal.ZERO);

@@ -379,13 +379,13 @@ window.layinit(function (htConfig) {
                                 menu.push(repayConfirm)
                                 menu.push(revokeConfirm)
                                 menu.push(confirmWithhold)
-                                // menu.push(planSettle)
-                                // menu.push(settle)
+                                menu.push(planSettle)
+                                menu.push(settle)
                                 menu.push(withhold)
                             }
 
                             if (p.row.planStatusExt != '还款中'){
-                                // menu.push(revokeSettle)
+                                menu.push(revokeSettle)
                             }
 
                             let poptipContent;
@@ -510,6 +510,10 @@ window.layinit(function (htConfig) {
                 app.$Modal.confirm({
                     content:'注意!是否确认取消还款,取消后无法再撤回?',
                     onOk(){
+                        app.$Message.loading({
+                            content:'撤销中,请稍后...',
+                            duration:0
+                        })
                         axios.get(fpath + 'finance/revokeConfirm', {
                             params: {
                                 businessId: p.businessId,
@@ -518,6 +522,7 @@ window.layinit(function (htConfig) {
                             }
                         })
                         .then(function (res) {
+                            app.$Message.destroy()
                             if (res.data.code == '1') {
                                 app.$Message.success({
                                     content: revokeSettle?"撤销结清成功!":"撤销还款成功!"
@@ -530,6 +535,7 @@ window.layinit(function (htConfig) {
                             }
                         })
                         .catch(function (err) {
+                            app.$Message.destroy()
                             console.log(err);
                         })
                     }

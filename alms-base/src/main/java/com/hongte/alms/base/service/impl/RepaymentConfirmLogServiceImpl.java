@@ -353,9 +353,9 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 				for (RepaymentBizPlanList repaymentBizPlanList : selectList7) {
 					bizplanLists.add(repaymentBizPlanList.getPlanListId());
 				}
-				if (!CollectionUtils.isEmpty(selectList7)) {
-					wrapper2.in("plan_list_id", selectList7);
-					wrapper3.in("plan_list_id", selectList7);
+				if (!CollectionUtils.isEmpty(bizplanLists)) {
+					wrapper2.in("plan_list_id", bizplanLists);
+					wrapper3.in("plan_list_id", bizplanLists);
 				}
 			}
 			
