@@ -150,10 +150,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Qualifier("MoneyPoolService")
 	MoneyPoolService moneyPoolService ;
     
-    @Autowired
-    @Qualifier("SysParameterService")
-    private SysParameterService sysParameterService ;
-    
     private ThreadLocal<String> businessId = new ThreadLocal<String>();
     private ThreadLocal<String> orgBusinessId = new ThreadLocal<String>();
     private ThreadLocal<String> afterId = new ThreadLocal<String>();
@@ -1574,8 +1570,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     public void updateInMem(ConfirmRepaymentReq req, FinanceBaseDto financeBaseDto) {
 //        Set<RepaymentProjPlanListDetail> updatedProjPlanDetails = financeBaseDto.getUpdatedProjPlanDetails();
 
-    	SysParameter forgiveDay = sysParameterService.selectOne(new EntityWrapper<SysParameter>().eq("param_name", "宽限期")) ;
-    	Calendar calendar = Calendar.getInstance();
         for (RepaymentBizPlanListDto planListDto : financeBaseDto.getPlanDto().getBizPlanListDtos()) {
 			for (RepaymentBizPlanListDetail planListDetail : planListDto.getBizPlanListDetails()) {
 				List<RepaymentProjFactRepay> list = financeBaseDto.getProjFactRepays().get(planListDetail.getPlanDetailId());
@@ -1615,15 +1609,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			                if (pjlFactAmount.compareTo(pjlOnlineAmount) >= 0) {
 				                projPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 			                	projPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
-			                	
-			                	/*宽限期内已还线上部分的置位为已还款*/
-			                    calendar.setTime(projPlanList.getDueDate());
-			                    calendar.add(Calendar.DAY_OF_YEAR, Integer.valueOf(forgiveDay.getParamValue()));
-			                    if (DateUtil.getDiffDays(projPlanList.getFactRepayDate(), calendar.getTime()) >= 0 ) {
-			                    	projPlanList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
-								}
-			                    /*宽限期内已还线上部分的置位为已还款*/
-			                    
                                 financeBaseDto.getCurTimeRepaidProjPlanList().add(projPlanList);
 			                } else {
 			                	projPlanList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
@@ -1667,14 +1652,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			                if (bplFactAmount.compareTo(bplOnlineAmount) >= 0) {
 								bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYING.getName());
 			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
-			                    
-			                    /*宽限期内已还线上部分的置位为已还款*/
-			                    calendar.setTime(bizPlanList.getDueDate());
-			                    calendar.add(Calendar.DAY_OF_YEAR, Integer.valueOf(forgiveDay.getParamValue()));
-			                    if (DateUtil.getDiffDays(bizPlanList.getFactRepayDate(), calendar.getTime()) >= 0 ) {
-			                    	bizPlanList.setCurrentStatus(RepayPlanStatus.REPAYED.getName());
-								}
-			                    /*宽限期内已还线上部分的置位为已还款*/
 			                } else {
 			                    bizPlanList.setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
 			                }
