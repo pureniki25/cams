@@ -78,6 +78,15 @@ public enum RepayPlanFeeTypeEnum implements IEnum {
         }
         return null;
     }
+    
+    public static RepayPlanFeeTypeEnum feeIdOf(String feeId) {
+    	for(RepayPlanFeeTypeEnum d : RepayPlanFeeTypeEnum.values()){
+            if(d.uuid.equals(feeId)){
+                return d;
+            }
+        }
+        return null;
+    }
 
 
     @Override
