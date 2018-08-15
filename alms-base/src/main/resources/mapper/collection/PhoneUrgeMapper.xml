@@ -368,7 +368,7 @@
         pList.plan_list_id AS  crpId,
         (case when pList.plan_status_ext = 10 or pList.plan_status_ext = 20 OR  pList.plan_status_ext =30 then '已结清' else pList.current_status end)as statusName,
         col_status.collection_status as colStatus,
-
+		(case when pList.src_type = 1 then null when pList.repay_status = 1 then '部分还款' when pList.repay_status = 2 then '线上已还款' when pList.repay_status = 3 then '全部已还款' else pList.repay_status end)as repayStatus,
 		pList.borrow_limit_ext as borrowLimit ,
 		pList.repayment_type_id_ext as repaymentTypeId ,
 		pList.class_name_ext className,

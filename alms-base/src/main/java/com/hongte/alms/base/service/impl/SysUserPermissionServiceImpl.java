@@ -198,12 +198,12 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 					j = permissions.size();
 				}
 				List<SysUserPermission> subPermissions =  permissions.subList(i, j);
-				msgThreadAsync.execute(new Runnable() {
-					@Override
-					public void run() {
+//				msgThreadAsync.execute(new Runnable() {
+//					@Override
+//					public void run() {
 						sysUserPermissionService.insertBatch(subPermissions,1000);
-					}
-	        	});
+//					}
+//	        	});
         	}
         }
     }

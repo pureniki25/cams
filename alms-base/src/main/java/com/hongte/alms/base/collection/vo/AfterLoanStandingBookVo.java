@@ -85,6 +85,9 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
 //    private Integer status; //还款状态
     @Excel(name = "还款状态", orderNum = "15",   isImportField = "true_st")
     private String statusName; //还款状态 名称
+    
+    @Excel(name = "部分还款子状态", orderNum = "15",   isImportField = "true_st")
+    private String repayStatus; //还款状态 名称
 
     @Excel(name = "业务状态", orderNum = "16",   isImportField = "true_st")
     private String afterColStatusName;//贷后状态 名称
@@ -115,11 +118,20 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     	}
 		return plateTypeText;
 	}
+    
+
+	public String getRepayStatus() {
+		return repayStatus;
+	}
+
+	public void setRepayStatus(String repayStatus) {
+		this.repayStatus = repayStatus;
+	}
 
 	public void setPlateTypeText(String plateTypeText) {
 		this.plateTypeText = plateTypeText;
 	}
-
+	
 	public Integer getPlateType() {
 		return plateType;
 	}
