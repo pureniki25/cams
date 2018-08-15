@@ -1543,6 +1543,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         		detail.updateAllColumnById();
 			}
         	if (detail.getProjPlanDetailId()!=null && detail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue())) {
+        		detail.setProjPlanDetailId(UUID.randomUUID().toString());
         		detail.insert();
 			}
 		}
