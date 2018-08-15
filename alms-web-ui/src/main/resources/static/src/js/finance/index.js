@@ -379,13 +379,13 @@ window.layinit(function (htConfig) {
                                 menu.push(repayConfirm)
                                 menu.push(revokeConfirm)
                                 menu.push(confirmWithhold)
-                                menu.push(planSettle)
-                                menu.push(settle)
+                                // menu.push(planSettle)
+                                // menu.push(settle)
                                 menu.push(withhold)
                             }
 
                             if (p.row.planStatusExt != '还款中'){
-                                menu.push(revokeSettle)
+                                // menu.push(revokeSettle)
                             }
 
                             let poptipContent;
@@ -396,8 +396,12 @@ window.layinit(function (htConfig) {
                                         slot: 'content'
                                     }, menu)
                                 ]
-                            } else {
+                            } 
+                            if(p.row.srcType == 1) {
                                 poptipContent = '暂不能处理信贷生成的业务'
+                            }
+                            if(p.row.plateType && p.row.plateType == 2) {
+                                poptipContent = '暂不能处理你我金融的业务'
                             }
 
 
