@@ -1,5 +1,8 @@
 package com.hongte.alms.base.service;
 
+import java.util.List;
+
+import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.SysUserPermission;
 import com.hongte.alms.base.vo.user.SelfBoaInUserInfo;
 import com.hongte.alms.common.service.BaseService;
@@ -19,6 +22,8 @@ public interface SysUserPermissionService extends BaseService<SysUserPermission>
      * @param userId
      */
     void setUserPermissons(String userId);
+    
+    void setUserPermissonsInBusinessList(String userId, List<StaffBusinessVo> voList);
 
 	void updateUserPermision(SelfBoaInUserInfo userInfo);
 
