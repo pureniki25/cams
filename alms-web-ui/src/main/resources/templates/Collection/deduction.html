@@ -111,8 +111,8 @@
 	     <tr>
 	      <td class="column">单笔限额</td>
 	      <td colspan="3">{{oneLimit}}</td>
-	      <td class="column">单月限额</td>
-	      <td colspan="3">{{monthLimit}}</td>
+	      <td class="column">单日限额</td>
+	      <td colspan="3">{{dayLimit}}</td>
 	    </tr>
 	    
 	    
@@ -122,8 +122,9 @@
 
          <Card>
             <p slot="title">
-                  代扣信息
+                  代扣信息                        
             </p>
+            <p style="color:red">  {{limitTips}}</p>
 
      <table class="layui-table">
 	  <colgroup>

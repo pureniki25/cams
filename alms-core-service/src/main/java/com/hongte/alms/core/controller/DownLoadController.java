@@ -158,6 +158,7 @@ public class DownLoadController  implements Serializable {
 			if (vo != null && vo.getConfirmTimeEnd() != null) {
 				vo.setConfirmTimeEnd(DateUtil.addDay2Date(1, vo.getConfirmTimeEnd()));
 			}
+			vo.setIsExport(1);	// 导出
 			int count = tdrepayRechargeLogMapper.countComplianceRepaymentData(vo);
 			if (count == 0) {
 				// 生成本地

@@ -96,7 +96,9 @@
 		WHERE
 			<include refid="ComplianceRepaymentDataCondition"/>
 		ORDER BY t.`confirm_time` DESC
-		LIMIT ${(page-1) * limit}, ${limit}
+		<if test="isExport == 0">
+			LIMIT ${(page-1) * limit}, ${limit}
+		</if>
 	</select>
 	
     <select id="countComplianceRepaymentData" resultType="int">

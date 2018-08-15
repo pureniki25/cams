@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,10 +31,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.assets.car.vo.FileVo;
-import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
-import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
-import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.Doc;
 import com.hongte.alms.base.entity.DocTmp;
 import com.hongte.alms.base.entity.DocType;
@@ -49,12 +45,9 @@ import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.process.entity.Process;
-import com.hongte.alms.base.process.enums.ProcessApproveResult;
-import com.hongte.alms.base.process.enums.ProcessStatusEnums;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeStepService;
-import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.process.vo.ProcessSaveReq;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.DocService;
@@ -267,7 +260,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return houseLoanData;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = Exception.class)
+	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {ServiceRuntimeException.class, Exception.class})
 	@Override
 	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl) {
 		TransferOfLitigationVO transferLitigationData = null;
@@ -907,75 +900,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			}
 		}
 		return previousFees;
-	}
-
-	@Transactional(rollbackFor = Exception.class)
-	@Override
-	public void saveCarProcessApprovalResult(ProcessLogReq req, String sendUrl) {
-		try {
-			// 存储审批结果信息
-			Process process = processService.saveProcessApprovalResult(req, ProcessTypeEnums.CAR_LOAN_LITIGATION);
-			String businessId = process.getBusinessId();
-			String processId = process.getProcessId();
-			List<TransferLitigationCar> cars = transferLitigationCarService
-					.selectList(new EntityWrapper<TransferLitigationCar>().eq("business_id", businessId)
-							.eq("process_id", processId));
-			Integer status = process.getStatus();
-			Integer processResult = process.getProcessResult();
-			if (!CollectionUtils.isEmpty(cars) && status == ProcessStatusEnums.END.getKey()
-					&& processResult == ProcessApproveResult.PASS.getKey()) {
-				sendTransferLitigationData(businessId, sendUrl);
-				// 更新贷后状态为 移交诉讼
-				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
-						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
-				// 同时更新信贷的贷后状态
-				List<StaffBusinessVo> voList = new LinkedList<>();
-				StaffBusinessVo vo = new StaffBusinessVo();
-				vo.setCrpId(req.getCrpId());
-				vo.setBusinessId(req.getBusinessId());
-				voList.add(vo);
-				collectionStatusService.SyncBusinessColStatusToXindai(voList, null, "界面设置移交诉讼",
-						CollectionStatusEnum.TO_LAW_WORK.getPageStr());
-			}
-		} catch (Exception e) {
-			LOG.error("---saveCarProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
-			throw new ServiceRuntimeException(e.getMessage(), e);
-		}
-
-	}
-
-	@Transactional(rollbackFor = Exception.class)
-	@Override
-	public void saveHouseProcessApprovalResult(ProcessLogReq req, String sendUrl) {
-		try {
-			// 存储审批结果信息
-			Process process = processService.saveProcessApprovalResult(req, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
-			String businessId = process.getBusinessId();
-			String processId = process.getProcessId();
-			List<TransferLitigationHouse> houses = transferLitigationHouseService
-					.selectList(new EntityWrapper<TransferLitigationHouse>().eq("business_id", businessId)
-							.eq("process_id", processId));
-			Integer status = process.getStatus();
-			Integer processResult = process.getProcessResult();
-			if (!CollectionUtils.isEmpty(houses) && status == ProcessStatusEnums.END.getKey()
-					&& processResult == ProcessApproveResult.PASS.getKey()) {
-				sendTransferLitigationData(businessId, sendUrl);
-				// 更新贷后状态为 移交诉讼
-				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
-						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
-				// 同时更新信贷的贷后状态
-				List<StaffBusinessVo> voList = new LinkedList<>();
-				StaffBusinessVo vo = new StaffBusinessVo();
-				vo.setCrpId(req.getCrpId());
-				vo.setBusinessId(req.getBusinessId());
-				voList.add(vo);
-				collectionStatusService.SyncBusinessColStatusToXindai(voList, null, "界面设置移交诉讼",
-						CollectionStatusEnum.TO_LAW_WORK.getPageStr());
-			}
-		} catch (Exception e) {
-			LOG.error("---saveHouseProcessApprovalResult--- 存储房贷审批结果信息失败！", e);
-			throw new ServiceRuntimeException(e.getMessage(), e);
-		}
 	}
 
 	/**
