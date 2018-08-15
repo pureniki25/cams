@@ -447,9 +447,15 @@ public class CollectionController {
         	
         	//3找出区域电催设置  tb_collection_person_set
         	List<String> listColPersonId = new ArrayList<>();
-        	List<CollectionPersonSet> listCollectionPersonSet = collectionPersonSetService.selectList(new EntityWrapper<CollectionPersonSet>().in("company_code", companyList));
-        	List<CollectionPersonSet> listAreaCollectionPersonSet = collectionPersonSetService.selectList(new EntityWrapper<CollectionPersonSet>().in("area_code", areaList));
-        	listCollectionPersonSet.addAll(listAreaCollectionPersonSet);
+        	List<CollectionPersonSet> listCollectionPersonSet = new ArrayList<>();
+        	
+        	if(!companyList.isEmpty()) {
+        		listCollectionPersonSet = collectionPersonSetService.selectList(new EntityWrapper<CollectionPersonSet>().in("company_code", companyList));
+        	}
+        	if(!areaList.isEmpty()) {
+        		List<CollectionPersonSet> listAreaCollectionPersonSet = collectionPersonSetService.selectList(new EntityWrapper<CollectionPersonSet>().in("area_code", areaList));
+        		listCollectionPersonSet.addAll(listAreaCollectionPersonSet);
+        	}
         	for (CollectionPersonSet collectionPersonSet : listCollectionPersonSet) {
         		listColPersonId.add(collectionPersonSet.getColPersonId());
 			}

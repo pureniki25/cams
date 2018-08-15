@@ -128,6 +128,7 @@ window.layinit(function (htConfig) {
                        var  dateObj = getData();
                        getCountInfo();
                         table.reload('listTable', {
+                        	 url: basePath +'RepaymentLogController/selectRepaymentLogList',
                             where: {
                                 companyId:vm.searchForm.companyId, //分公司ID
                                 keyName:vm.searchForm.keyName,   //业务编号 或客户名称
@@ -255,7 +256,7 @@ window.layinit(function (htConfig) {
                         toolbar: '#barTools'
                     }
             ]], //设置表头
-            url: basePath +'RepaymentLogController/selectRepaymentLogList',
+//            url: basePath +'RepaymentLogController/selectRepaymentLogList',
             //method: 'post' //如果无需自定义HTTP类型，可不加该参数
             //request: {} //如果无需自定义请求参数，可不加该参数
             //response: {} //如果无需自定义数据响应名称，可不加该参数
@@ -325,7 +326,20 @@ function getDetailUrl(){
 
 //获取代扣业务条数，成功代扣流水数，成功代扣总额，成功代扣业务条数
 var getCountInfo=function(){debugger
-    var self = this;   
+    var self = this;  
+
+if(typeof(vm.searchForm.dateRange[0])=='undefined'){
+	dataObject.dateBegin="";
+}else if(vm.searchForm.dateRange[0]!=''){
+    dataObject.dateBegin=new Date(vm.searchForm.dateRange[0]).getTime();
+}
+
+if(typeof(vm.searchForm.dateRange[1])=='undefined'){
+	dataObject.dateEnd="";
+}else if(vm.searchForm.dateRange[1]!=''){
+	dataObject.dateEnd=new Date(vm.searchForm.dateRange[1]).getTime();
+}
+
 //  if(dataObject.dateBegin==''){
 //	  dataObject.dateBegin=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1).getTime();
 //		vm.searchForm.dateRange[0]=new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1);
@@ -457,13 +471,20 @@ var getData = function(){debugger
     	if(vm.searchForm.dateRange[0]!=null){
     		 dataObject.dateBegin = vm.searchForm.dateRange[0].getTime();
     		 vm.searchForm.dateBegin=vm.searchForm.dateRange[0].getTime();
+    	}else{
+    		 vm.searchForm.dateBegin="";
     	}
      	if(vm.searchForm.dateRange[1]!=null){
             var date =vm.searchForm.dateRange[1];
             dataObject.dateEnd=date.getTime();
        	 vm.searchForm.dateEnd=date.getTime();
+   	   }else{
+   		vm.searchForm.dateEnd="";
    	   }
 
+    }else{
+    	 vm.searchForm.dateBegin="";
+    		vm.searchForm.dateEnd="";
     }
     return dataObject;
 }
