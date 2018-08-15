@@ -57,7 +57,4 @@ public interface TransferOfLitigationService {
      */
     Map<String, Object> carLoanBilling(CarLoanBilVO carLoanBilVO);
     
-    void saveHouseProcessApprovalResult(ProcessLogReq req, String sendUrl);
-    void saveCarProcessApprovalResult(ProcessLogReq req, String sendUrl);
-    
 }
