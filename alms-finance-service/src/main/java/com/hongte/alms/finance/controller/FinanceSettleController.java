@@ -61,7 +61,7 @@ public class FinanceSettleController {
         logger.info("@financeSettle@资金结清撤回开始[{}]");
         Result result = null;
         try {
-            financeSettleService.financeSettleRecall(businessId,afterId);
+//            financeSettleService.financeSettleRecall(businessId,afterId);
             result = Result.success();
         } catch (ServiceRuntimeException se) {
             result = Result.error(se.getErrorCode(), se.getMessage());
