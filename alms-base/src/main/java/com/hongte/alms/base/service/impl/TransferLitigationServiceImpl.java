@@ -321,23 +321,24 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
 			String returnJson = JSONObject.toJSONString(litigationResponse);
 			transferLitigationLog.setResultJson(returnJson);
-			if (litigationResponse != null && litigationResponse.getCode() == 1
-					&& litigationResponse.getData().isImportSuccess()) {
+			if (litigationResponse != null) {
+				
 				transferLitigationLog.setResultCode(litigationResponse.getCode());
 				transferLitigationLog.setResultMsg(litigationResponse.getMsg());
-				LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
-				transferLitigationLogService.insert(transferLitigationLog);
-			} else {
-				LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
-				transferLitigationLogService.insert(transferLitigationLog);
-				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);
+				
+				if (litigationResponse.getCode() == 1 && litigationResponse.getData().isImportSuccess()) {
+					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
+					transferLitigationLogService.insert(transferLitigationLog);
+				}else {
+					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
+					throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);
+				}
 			}
-
-		} catch (ServiceRuntimeException e) {
-			throw new ServiceRuntimeException(e.getMessage(), e);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			transferLitigationLog.setResultJson(e.getMessage());
+			if (StringUtil.isEmpty(transferLitigationLog.getResultJson())) {
+				transferLitigationLog.setResultJson(e.getMessage());
+			}
 			transferLitigationLogService.insert(transferLitigationLog);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
@@ -444,8 +445,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				builder.append(str);
 			}
 
-			litigationResponse = (LitigationResponse) JSONObject.parseObject(builder.toString(),
-					LitigationResponse.class);
+			litigationResponse = JSONObject.parseObject(builder.toString(), LitigationResponse.class);
 		} finally {
 			if (reader != null) {
 				reader.close();
@@ -1004,7 +1004,16 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	}
 
 	public static void main(String[] args) {
-		String jsonString = JSONObject.toJSONString(null);
-		System.out.println(jsonString);
+		int i = 1;
+		int j = 0;
+		try {
+			if (i == 1) {
+				throw new ServiceRuntimeException("i == 1");
+			}
+		} catch (ServiceRuntimeException e) {
+			System.out.println("1");
+		} catch (Exception e2) {
+			System.out.println("2");
+		}
 	}
 }

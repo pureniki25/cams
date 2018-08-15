@@ -76,7 +76,8 @@ var layer;
                 platformList:[],
                 platformId:5,
                 oneLimit:'',
-                monthLimit:''
+                dayLimit:'',
+                limitTips:''
                 
          
         	},
@@ -258,8 +259,38 @@ var layer;
 	                if (result.data.code == "1") {
 	                	
 	          
-	                    vm.oneLimit = result.data.data.oneLimit;
-	                    vm.monthLimit = result.data.data.monthLimit;
+	                    vm.oneLimit = Number(result.data.data.oneLimit);
+	                    vm.dayLimit = Number(result.data.data.dayLimit);
+	                    /*本期代扣额度 < 单笔代扣额度：
+	                    * 所绑定的银行卡单笔代扣额度为X元，单日限额为X元，该期可以一笔代扣。
+	                
+	                    */
+	                    if(vm.ajax_data.planAllAmount<vm.oneLimit){
+	                    	vm.limitTips='所绑定的银行卡单笔代扣额度为'+vm.oneLimit+'元，单日限额为'+vm.dayLimit+'元，该期可以一笔代扣'
+	                    }else if(vm.ajax_data.planAllAmount>vm.oneLimit&&vm.ajax_data.planAllAmount<vm.dayLimit){//本期代扣额度>单笔代扣额度，但是小于单日限额：
+	                    	var times=parseInt(vm.ajax_data.planAllAmount/vm.oneLimit);
+	                    	var rest=vm.ajax_data.planAllAmount%vm.oneLimit;
+	                    	if(rest>0){
+	                    		times=times+1
+	                    	}
+	                    
+	                    	vm.limitTips='所绑定的银行卡单笔代扣额度为'+vm.oneLimit+'元，单日限额为'+vm.dayLimit+',单次限额不够，本次还款需要代扣'+times+'次'
+	                    }else if(vm.ajax_data.planAllAmount>vm.oneLimit&&vm.ajax_data.planAllAmount>vm.dayLimit){//本期代扣额度>单笔代扣额度>单日限额：N=本期应还金额/单笔限额 进一次，T=单日限额/单笔限额。
+	                      	var times=parseInt(vm.ajax_data.planAllAmount/vm.oneLimit);
+	                    	var rest=vm.ajax_data.planAllAmount%vm.oneLimit;
+	                    	if(rest>0){
+	                    		times=times+1
+	                    	}
+	                    	var todayTimes=parseInt(vm.dayLimit/vm.oneLimit);
+	                    	var todayRest=vm.dayLimi%vm.oneLimit;
+	                    	if(todayRest>0){
+	                    		todayTimes=todayTimes+1
+	                    	}
+	                    	vm.limitTips='所绑定的银行卡单笔代扣额度为'+vm.oneLimit+'元，单日限额为'+vm.dayLimit+',单日限额不够，本次还款需要代扣'+times+'次，今日只能代扣'+todayTimes+'次'
+	                    }else{
+	                    	vm.limitTips='';
+	                    }
+	                    
 	               
 	                    
 	                } else {

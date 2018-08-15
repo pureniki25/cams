@@ -391,9 +391,13 @@ window.layinit(function(htConfig){
                 }, {
 
                     field: 'statusName',
-                    width:90,
-                    title: '还款状态'
-                },{
+                    width:120,
+                    title: '还款状态',
+                    templet:function(d){
+                    	var repayStatus = "("+d.repayStatus+")"
+                        return d.statusName+(d.repayStatus?repayStatus:'')
+                    }
+                }, {
 
                     field: 'afterColStatusName',
                     width:90,
