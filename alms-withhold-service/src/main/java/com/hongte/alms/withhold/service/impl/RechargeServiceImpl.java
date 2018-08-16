@@ -274,16 +274,17 @@ public class RechargeServiceImpl implements RechargeService {
 					}
 				}
 				 //*****************挡板测试代码结束************************//
-				if (remoteResult.getReturnCode().equals("0000") && resultData.getResultMsg().equals("交易成功")) {
-					result.setCode("1");
-					result.setMsg(resultData.getResultMsg());
-					log.setRepayStatus(1);
-					log.setRemark(resultData.getResultMsg());
-					log.setUpdateTime(new Date());
-					withholdingRepaymentLogService.updateById(log);
-			
-		
-				} else if (resultData.getResultMsg().contains("系统异常")) {
+//				if (remoteResult.getReturnCode().equals("0000") && resultData.getResultMsg().equals("交易成功")) {
+//					result.setCode("1");
+//					result.setMsg(resultData.getResultMsg());
+//					log.setRepayStatus(1);
+//					log.setRemark(resultData.getResultMsg());
+//					log.setUpdateTime(new Date());
+//					withholdingRepaymentLogService.updateById(log);
+//			
+//		
+//				} else 
+				if (resultData.getResultMsg().contains("系统异常")) {
 					result.setCode("2");
 					result.setMsg(resultData.getResultMsg());
 					log.setRepayStatus(2);
@@ -463,14 +464,15 @@ public class RechargeServiceImpl implements RechargeService {
 						BigDecimal.valueOf(amount),appType);
 
 				BankRechargeReqDto dto = new BankRechargeReqDto();
-				for (Object channelObject : channles) {// 需要循环签约子渠道
+//				for (Object channelObject : channles) {// 需要循环签约子渠道
 	
 					dto.setAmount(amount);
-					if(aggreeSwitch.getParamValue().equals("1")) {
-						dto.setChannelType(((SignedProtocol)channelObject).getChannelType().toString());// 子渠道
-					}else {
-						dto.setChannelType(((WithholdingChannel)channelObject).getSubPlatformId().toString());// 子渠道
-					}
+//					if(aggreeSwitch.getParamValue().equals("1")) {
+//						dto.setChannelType(((SignedProtocol)channelObject).getChannelType().toString());// 子渠道
+//					}else {
+//						dto.setChannelType(((WithholdingChannel)channelObject).getSubPlatformId().toString());// 子渠道
+//					}
+					dto.setChannelType((channel.getSubPlatformId().toString()));// 子渠道
 					logger.info("============================银行代扣，调用的子渠道是:"+dto.getChannelType()+"=====================================");
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
 					dto.setCmOrderNo(merchOrderId);
@@ -519,7 +521,7 @@ public class RechargeServiceImpl implements RechargeService {
 						log.setRemark(resultData.getResultMsg());
 						log.setUpdateTime(new Date());
 						withholdingRepaymentLogService.updateById(log);
-						break;
+//						break;
 					} else if (remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue())||remoteResult.getReturnCode().equals("INTERNAL_ERROR")||remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_TIMEOU.getValue())) {
 						result.setCode("2");
 						result.setMsg(resultData.getResultMsg());
@@ -528,7 +530,7 @@ public class RechargeServiceImpl implements RechargeService {
 						log.setUpdateTime(new Date());
 						withholdingRepaymentLogService.updateById(log);
 
-						break;
+//						break;
 					} else if(resultData.getResultMsg().equals("服务调用异常")){
 						result.setCode("2");
 						result.setMsg(resultData.getResultMsg());
@@ -537,7 +539,7 @@ public class RechargeServiceImpl implements RechargeService {
 						log.setUpdateTime(new Date());
 						withholdingRepaymentLogService.updateById(log);
 
-						break;
+//						break;
 						
 					} if (!remoteResult.getReturnCode().equals("0000")&&(!remoteResult.getReturnCode().equals(RepayResultCodeEnum.YH_HANDLER_EXCEPTION.getValue()))&&(!remoteResult.getReturnCode().equals("INTERNAL_ERROR"))) {
 							result.setCode("-1");
@@ -548,11 +550,11 @@ public class RechargeServiceImpl implements RechargeService {
 						withholdingRepaymentLogService.updateById(log);
 						// 失败，重试其他子渠道
 						
-					continue;
+//					continue;
 					}
 					
 
-				}
+//				}
 				try {
 					Thread.sleep(5000);
 					getBankResult(log,oIdPartner);
@@ -1270,6 +1272,11 @@ public class RechargeServiceImpl implements RechargeService {
 			
 		} 
 		
+		if(result.getReturnCode().equals("EIP_TD_FAIL")) {//无此订单=============
+			log.setRepayStatus(0);
+			log.setUpdateTime(new Date());
+			withholdingRepaymentLogService.updateById(log);
+		} 
 		
 		if (result.getReturnCode().equals("0000")&&getBankSearchResultMsg(result).getStatus().equals("1")) {
 			log.setRepayStatus(0);
@@ -1492,6 +1499,26 @@ public class RechargeServiceImpl implements RechargeService {
 		log.insert();
 		sysExceptionLogService.insertOrUpdate(log);
 		
+	}
+
+
+
+	@Override
+	public List<WithholdingChannel> getBankChannels(List<WithholdingChannel> channels,BankCardInfo bankCardInfo) {
+		//判断是否开启协议代扣开关
+		SysParameter  aggreeSwitch = sysParameterService.selectOne(
+				new EntityWrapper<SysParameter>().eq("param_type", "agreement_withholding")
+						.eq("status", 1).orderBy("param_value"));
+		List<WithholdingChannel> withholdChannels=new ArrayList<WithholdingChannel>();
+		List<SignedProtocol> protocolChannels=bankCardInfo.getSignedProtocolList();
+		for(WithholdingChannel withholdingChannel:channels) {
+			for(SignedProtocol signedProtocol:protocolChannels) {
+				if(Integer.valueOf(withholdingChannel.getSubPlatformId())==signedProtocol.getChannelType()) {
+					withholdChannels.add(withholdingChannel);
+				}
+			}
+		}
+		return withholdChannels;
 	}
 
 

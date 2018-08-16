@@ -188,8 +188,12 @@ public interface RechargeService {
 	
 	 void RecordExceptionLog(String OriginalBusinessId,String afterId,String msg);
 	 
+	 /**
+	  * 获取可用的银行代扣渠道,主要是当协议代扣开关开启的时候，要筛选出配置的银行代扣渠道和该客户协议代扣签约的渠道的交集
+	  */
 	 
-	 
+	 List<WithholdingChannel> getBankChannels(List<WithholdingChannel> channels,BankCardInfo bankCardInfo);
+		 
 	 
 	 
 	 
