@@ -286,9 +286,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			List<LitigationBorrowerDetailed> litigationBorrowerDetaileds = transferOfLitigationMapper
 					.queryLitigationBorrowerDetailed(businessId);
-			if (CollectionUtils.isEmpty(litigationBorrowerDetaileds)) {
-				throw new ServiceRuntimeException("没有找到借款人明细，发送诉讼系统失败！");
-			}
+			/*
+			 * 跟喻尊龙确认后，去掉借款人明细校验，2018-08-16.
+			 */
+//			if (CollectionUtils.isEmpty(litigationBorrowerDetaileds)) {
+//				throw new ServiceRuntimeException("没有找到借款人明细，发送诉讼系统失败！");
+//			}
 			transferLitigationData.setLitigationBorrowerDetailedList(litigationBorrowerDetaileds);
 
 			transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
