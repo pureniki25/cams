@@ -673,7 +673,7 @@ public class PlatformRepaymentController {
 							detailFee.setFeeValue(r.getFactAmount());
 						}
 						if (r.getRepaySource() != null) {
-							if (r.getRepaySource().intValue() != 30) {
+							if ((r.getRepaySource().intValue() != 30) && (r.getRepaySource().intValue() != 31)) {
 								rechargeAmount = rechargeAmount.add(detailFee.getFeeValue());
 							}
 						} else {
