@@ -39,6 +39,7 @@ import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
@@ -669,11 +670,18 @@ public class PlatformRepaymentController {
 						case 60:
 							feeType = 70;
 							break;
+						case 70:
+							if (RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid().equals(r.getFeeId())) {
+								feeType = 40;
+							} else if (RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid().equals(r.getFeeId())) {
+								feeType = 30;
+							}
+							break;
 						case 80:
 							feeType = 80;
 							break;
 						default:
-							return Result.error("没有对应的费用类型给接口");
+							break;
 						}
 						detailFee.setFeeType(feeType);
 						detailFee.setFeeName(FEE_TYPE_MAP.get(feeType));
@@ -706,20 +714,21 @@ public class PlatformRepaymentController {
 					}
 
 					/*
-					 * 如果充值金额大于实还金额，则不允许资金分发 -- （肖莹环提出规则，2018-08-13）
-					 * 取消这个规则 -- （肖莹环提出取消，2018-08-15）
+					 * 如果充值金额大于实还金额，则不允许资金分发 -- （肖莹环提出规则，2018-08-13） 取消这个规则 -- （肖莹环提出取消，2018-08-15）
 					 */
-//					BigDecimal factRepayAmount2 = vo.getFactRepayAmount() == null ? BigDecimal.ZERO : vo.getFactRepayAmount();
-//					BigDecimal rechargeAmount = vo.getRechargeAmount() == null ? BigDecimal.ZERO : vo.getRechargeAmount();
-//					if (rechargeAmount.compareTo(factRepayAmount2) > 0) {
-//						LOGGER.info("充值金额不能大于实还金额输入参数 projectPlanId:[{}] factRepayAmount2:[{}]  rechargeAmount[{}] ",
-//								projPlanListId, factRepayAmount2, rechargeAmount);
-//						return Result.error("充值金额不能大于实还金额");
-//					}
-					
+					// BigDecimal factRepayAmount2 = vo.getFactRepayAmount() == null ?
+					// BigDecimal.ZERO : vo.getFactRepayAmount();
+					// BigDecimal rechargeAmount = vo.getRechargeAmount() == null ? BigDecimal.ZERO
+					// : vo.getRechargeAmount();
+					// if (rechargeAmount.compareTo(factRepayAmount2) > 0) {
+					// LOGGER.info("充值金额不能大于实还金额输入参数 projectPlanId:[{}] factRepayAmount2:[{}]
+					// rechargeAmount[{}] ",
+					// projPlanListId, factRepayAmount2, rechargeAmount);
+					// return Result.error("充值金额不能大于实还金额");
+					// }
+
 					/*
-					 * 0：非结清，10：正常结清，11：逾期结清，20：展期原标结清，30：坏账结清
-					 * 如果坏账结清，则充值金额等于实还金额
+					 * 0：非结清，10：正常结清，11：逾期结清，20：展期原标结清，30：坏账结清 如果坏账结清，则充值金额等于实还金额
 					 */
 					if (vo.getSettleType().intValue() == 30) {
 						vo.setRechargeAmount(vo.getFactRepayAmount());
@@ -765,7 +774,7 @@ public class PlatformRepaymentController {
 					LOGGER.info("@对接合规还款接口@ 调用代充值资金分发参数接入接口失败 vo:[{}]", JSON.toJSONString(vo));
 					return Result.error("合规还款失败:" + result.getMsg());
 				}
-			}else {
+			} else {
 				return Result.error("查询平台标的还款计划失败");
 			}
 			LOGGER.info("@对接合规还款接口@ 调用代充值资金分发成功 vo:[{}]", JSON.toJSONString(vo));
