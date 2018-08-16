@@ -29,9 +29,19 @@ public class CurrPeriodProjDetailVO {
 	//线上滞纳金
 	private BigDecimal onlineOverDue = new BigDecimal("0");
 
-	//违约金
+	//违约金,总计
 	private BigDecimal item70 = new BigDecimal("0");
-
+	//本金违约金
+	private BigDecimal item70principal = BigDecimal.ZERO ;
+	/**
+	 * 分公司月收服务费违约金
+	 */
+	private BigDecimal item70service = BigDecimal.ZERO ;
+	/**
+	 * 平台服务费违约金
+	 */
+	private BigDecimal item70platform = BigDecimal.ZERO ;
+	
 	private BigDecimal subTotal = new BigDecimal("0");
 	private BigDecimal total = new BigDecimal("0");
 	//结余
@@ -236,5 +246,29 @@ public class CurrPeriodProjDetailVO {
             }
 
         });
+	}
+
+	public BigDecimal getItem70principal() {
+		return item70principal;
+	}
+
+	public void setItem70principal(BigDecimal item70principal) {
+		this.item70principal = item70principal;
+	}
+
+	public BigDecimal getItem70service() {
+		return item70service;
+	}
+
+	public void setItem70service(BigDecimal item70service) {
+		this.item70service = item70service;
+	}
+
+	public BigDecimal getItem70platform() {
+		return item70platform;
+	}
+
+	public void setItem70platform(BigDecimal item70platform) {
+		this.item70platform = item70platform;
 	}
 }

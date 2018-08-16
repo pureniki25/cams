@@ -3,6 +3,7 @@ package com.hongte.alms.base.service;
 import org.springframework.stereotype.Service;
 
 import com.hongte.alms.base.entity.TransferLitigationCar;
+import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.common.service.BaseService;
 
 /**
@@ -15,5 +16,7 @@ import com.hongte.alms.common.service.BaseService;
  */
 @Service("TransferLitigationCarService")
 public interface TransferLitigationCarService extends BaseService<TransferLitigationCar> {
+	
+	void saveCarProcessApprovalResult(ProcessLogReq req, String sendUrl);
 
 }

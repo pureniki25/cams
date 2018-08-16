@@ -39,6 +39,7 @@ import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
@@ -371,13 +372,15 @@ public class PlatformRepaymentController {
 			vo.setSettleType(tempProjPlanStatus);
 
 			/*
-			 * 充值金额计算原则：以平台费用为准。 说明：有垫付则按垫付传费用项，否则按查询的标的还未计划信息传费用项
+			 * 肖莹环提出充值金额计算规则：利息以平台应还利息为准，其他费用项以资产端数据为准。 说明：有垫付则按垫付传费用项，否则按查询的标的还未计划信息传费用项
 			 */
 			Map<String, Object> params = Maps.newHashMap();
 			params.put("projectId", projPlan.getProjectId());
 
-			BigDecimal planRepaymentRechargeAmount = BigDecimal.ZERO; // 充值金额：按平台还款计划计算
-			Map<String, BigDecimal> planRepaymentMap = Maps.newHashMap(); // 平台标的还款计划费用map
+			// BigDecimal planRepaymentRechargeAmount = BigDecimal.ZERO; // 充值金额：按平台还款计划计算
+			BigDecimal interestAmount = BigDecimal.ZERO; // 平台利息
+			// Map<String, BigDecimal> planRepaymentMap = Maps.newHashMap(); //
+			// 平台标的还款计划费用map
 
 			/*
 			 * 通过外联平台eip调用团贷查询标的还款计划信息
@@ -410,13 +413,13 @@ public class PlatformRepaymentController {
 							 * 中介服务费)
 							 */
 
-							BigDecimal amount = dto.getAmount();
-							BigDecimal interestAmount = dto.getInterestAmount();
-							BigDecimal guaranteeAmount = dto.getGuaranteeAmount();
-							BigDecimal arbitrationAmount = dto.getArbitrationAmount();
-							BigDecimal orgAmount = dto.getOrgAmount();
-							BigDecimal tuandaiAmount = dto.getTuandaiAmount();
-							BigDecimal agencyAmount = dto.getAgencyAmount();
+							// BigDecimal amount = dto.getAmount();
+							interestAmount = dto.getInterestAmount();
+							// BigDecimal tuandaiAmount = dto.getTuandaiAmount();
+							// BigDecimal guaranteeAmount = dto.getGuaranteeAmount();
+							// BigDecimal arbitrationAmount = dto.getArbitrationAmount();
+							// BigDecimal orgAmount = dto.getOrgAmount();
+							// BigDecimal agencyAmount = dto.getAgencyAmount();
 
 							if (vo.getSettleType().intValue() != 0) {
 								Map<String, Object> paramMap2 = new HashMap<>();
@@ -435,9 +438,9 @@ public class PlatformRepaymentController {
 									JSONObject parseObject = (JSONObject) JSONObject
 											.toJSON(queryRepaymentEarlierResult.getData());
 									if (parseObject != null) {
-										amount = BigDecimal.valueOf((Double) parseObject.get("principal"));
-										interestAmount = BigDecimal.valueOf((Double) parseObject.get("interest"));
-										tuandaiAmount = BigDecimal.valueOf((Double) parseObject.get("platformCharge"));
+										// amount = BigDecimal.valueOf(parseObject.getDouble("principal"));
+										interestAmount = BigDecimal.valueOf(parseObject.getDouble("interest"));
+										// tuandaiAmount = BigDecimal.valueOf(parseObject.getDouble("platformCharge"));
 									}
 								} else {
 									LOGGER.info("@对接合规还款接口@  提前结清平台费用查询出错 平台返回数据 [{}] ",
@@ -446,34 +449,37 @@ public class PlatformRepaymentController {
 								}
 							}
 
-							if (amount != null) {
-								planRepaymentMap.put("10", amount);
-								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(amount);
-							}
-							if (interestAmount != null) {
-								planRepaymentMap.put("20", interestAmount);
-								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(interestAmount);
-							}
-							if (guaranteeAmount != null) {
-								planRepaymentMap.put("50", guaranteeAmount);
-								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(guaranteeAmount);
-							}
-							if (arbitrationAmount != null) {
-								planRepaymentMap.put("60", arbitrationAmount);
-								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(arbitrationAmount);
-							}
-							if (orgAmount != null) {
-								planRepaymentMap.put("40", orgAmount);
-								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(orgAmount);
-							}
-							if (tuandaiAmount != null) {
-								planRepaymentMap.put("30", tuandaiAmount);
-								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(tuandaiAmount);
-							}
-							if (agencyAmount != null) {
-								planRepaymentMap.put("80", agencyAmount);
-								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(agencyAmount);
-							}
+							// if (amount != null) {
+							// planRepaymentMap.put("10", amount);
+							// planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(amount);
+							// }
+							// if (interestAmount != null) {
+							// planRepaymentMap.put("20", interestAmount);
+							// planRepaymentRechargeAmount =
+							// planRepaymentRechargeAmount.add(interestAmount);
+							// }
+							// if (guaranteeAmount != null) {
+							// planRepaymentMap.put("50", guaranteeAmount);
+							// planRepaymentRechargeAmount =
+							// planRepaymentRechargeAmount.add(guaranteeAmount);
+							// }
+							// if (arbitrationAmount != null) {
+							// planRepaymentMap.put("60", arbitrationAmount);
+							// planRepaymentRechargeAmount =
+							// planRepaymentRechargeAmount.add(arbitrationAmount);
+							// }
+							// if (orgAmount != null) {
+							// planRepaymentMap.put("40", orgAmount);
+							// planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(orgAmount);
+							// }
+							// if (tuandaiAmount != null) {
+							// planRepaymentMap.put("30", tuandaiAmount);
+							// planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(tuandaiAmount);
+							// }
+							// if (agencyAmount != null) {
+							// planRepaymentMap.put("80", agencyAmount);
+							// planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(agencyAmount);
+							// }
 
 						}
 					}
@@ -485,120 +491,97 @@ public class PlatformRepaymentController {
 							.error("通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误, returnCode:"
 									+ ret.getReturnCode() + ",msg:" + ret.getMsg() + ",codeDesc:" + ret.getCodeDesc());
 				}
-				if (planRepaymentMap.size() == 0) {
-					LOGGER.info(
-							"@对接合规还款接口@  通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误，没有查到本期结果数据. 输入参数 projectPlanId:[{}]  projectId:[{}]  afterId[{}] ",
-							projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
-					return Result
-							.error("通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误，没有查到本期结果数据.");
-				}
+				/*
+				 * if (planRepaymentMap.size() == 0) { LOGGER.info(
+				 * "@对接合规还款接口@  通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误，没有查到本期结果数据. 输入参数 projectPlanId:[{}]  projectId:[{}]  afterId[{}] "
+				 * , projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId()); return
+				 * Result .error(
+				 * "通过外联平台eip(查询标的还款计划:/repayment/queryRepaymentSchedule)调用团贷查询标的还款计划错误，没有查到本期结果数据."
+				 * ); }
+				 */
 
 				// 三, 是否以垫付接口为准,否则以计划接口为准
-				boolean byGuaranteePayment = false;
-				BigDecimal guaranteeRepaymentRechargeAmount = BigDecimal.ZERO; // 充值金额：按担保公司垫付记录计算
-
-				// 担保公司垫付费用map
-				Map<String, BigDecimal> guaranteePaymentMap = Maps.newHashMap();
-
-				// 通过外联平台eip调用团贷标的还款计划信息查询接口：/repayment/queryProjectPayment
-				com.ht.ussp.core.Result queryProjectPaymentResult = eipRemote.queryProjectPayment(params);
-				LOGGER.info("查询平台标的还款计划，标id：{}；接口返回数据：{}", projPlan.getProjectId(),
-						JSONObject.toJSONString(queryProjectPaymentResult));
-
-				if (queryProjectPaymentResult != null
-						&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.getReturnCode())
-						&& queryProjectPaymentResult.getData() != null) {
-
-					List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
-					if (queryProjectPaymentResult.getData() != null) {
-						JSONObject parseObject = (JSONObject) JSONObject.toJSON(queryProjectPaymentResult.getData());
-						if (parseObject.get("projectPayments") != null) {
-							tdProjectPaymentDTOs = JSONObject.parseArray(
-									JSONObject.toJSONString(parseObject.get("projectPayments")),
-									TdProjectPaymentDTO.class);
-						}
-					}
-
-					if (CollectionUtils.isEmpty(tdProjectPaymentDTOs)) {
-						for (TdProjectPaymentDTO dto : tdProjectPaymentDTOs) {
-							// 获取当前期数
-							if (projPlanList.getPeriod() != null
-									&& projPlanList.getPeriod().intValue() == dto.getPeriod()) {
-
-								TdGuaranteePaymentDTO guaranteePayment = dto.getGuaranteePayment();
-
-								/*
-								 * 平台还款费用类型(10:本金,20:利息;30:平台服务费;40:资产端服务费;50:担保公司服务费;60:仲裁服务费;70:逾期费用（罚息）;80:
-								 * 中介服务费)
-								 */
-								BigDecimal penaltyAmount = guaranteePayment.getPenaltyAmount();
-								BigDecimal tuandaiAmount = guaranteePayment.getTuandaiAmount();
-								BigDecimal orgAmount = guaranteePayment.getOrgAmount();
-								BigDecimal guaranteeAmount = guaranteePayment.getGuaranteeAmount();
-								BigDecimal arbitrationAmount = guaranteePayment.getArbitrationAmount();
-								BigDecimal agencyAmount = guaranteePayment.getAgencyAmount();
-
-								if (penaltyAmount != null) {
-									guaranteePaymentMap.put("70", penaltyAmount);
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
-											.add(penaltyAmount);
-								}
-								if (tuandaiAmount != null) {
-									if (vo.getSettleType().intValue() != 0 && planRepaymentMap.containsKey("30")) {
-										guaranteePaymentMap.put("30", planRepaymentMap.get("30"));
-										guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
-												.add(tuandaiAmount);
-									} else {
-										guaranteePaymentMap.put("30", tuandaiAmount);
-										guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
-												.add(tuandaiAmount);
-									}
-								}
-								if (orgAmount != null) {
-									guaranteePaymentMap.put("40", orgAmount);
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount.add(orgAmount);
-								}
-								if (guaranteeAmount != null) {
-									guaranteePaymentMap.put("50", guaranteeAmount);
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
-											.add(guaranteeAmount);
-								}
-								if (arbitrationAmount != null) {
-									guaranteePaymentMap.put("60", arbitrationAmount);
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
-											.add(arbitrationAmount);
-								}
-								if (agencyAmount != null) {
-									guaranteePaymentMap.put("80", agencyAmount);
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
-											.add(agencyAmount);
-								}
-
-								// 从计划接口中分离出本金和利息
-								// 本金
-								if (planRepaymentMap.containsKey("10")) {
-									guaranteePaymentMap.put("10", planRepaymentMap.get("10"));
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
-											.add(planRepaymentMap.get("10"));
-								}
-								// 利息
-								if (planRepaymentMap.containsKey("20")) {
-									guaranteePaymentMap.put("20", planRepaymentMap.get("20"));
-									guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
-											.add(planRepaymentMap.get("20"));
-								}
-
-							}
-						}
-					}
-				} else {
-					LOGGER.info(
-							"@对接合规还款接口@  通过外联平台eip(标的还款信息查询接口:/repayment/queryProjectPayment)调用团贷标的标的还款信息查询接口错误 输入参数 projectPlanId:[{}] projectId:[{}]  afterId[{}] ",
-							projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId());
-					return Result.error("通过外联平台eip调用团贷标的还款信息查询接口错误, returnCode:"
-							+ queryProjectPaymentResult.getReturnCode() + ",msg:" + queryProjectPaymentResult.getMsg()
-							+ ",codeDesc:" + queryProjectPaymentResult.getCodeDesc());
-				}
+				/*
+				 * boolean byGuaranteePayment = false; BigDecimal
+				 * guaranteeRepaymentRechargeAmount = BigDecimal.ZERO; // 充值金额：按担保公司垫付记录计算
+				 * 
+				 * // 担保公司垫付费用map Map<String, BigDecimal> guaranteePaymentMap =
+				 * Maps.newHashMap();
+				 * 
+				 * // 通过外联平台eip调用团贷标的还款计划信息查询接口：/repayment/queryProjectPayment
+				 * com.ht.ussp.core.Result queryProjectPaymentResult =
+				 * eipRemote.queryProjectPayment(params);
+				 * LOGGER.info("查询平台标的还款计划，标id：{}；接口返回数据：{}", projPlan.getProjectId(),
+				 * JSONObject.toJSONString(queryProjectPaymentResult));
+				 * 
+				 * if (queryProjectPaymentResult != null &&
+				 * Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.
+				 * getReturnCode()) && queryProjectPaymentResult.getData() != null) {
+				 * 
+				 * List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null; if
+				 * (queryProjectPaymentResult.getData() != null) { JSONObject parseObject =
+				 * (JSONObject) JSONObject.toJSON(queryProjectPaymentResult.getData()); if
+				 * (parseObject.get("projectPayments") != null) { tdProjectPaymentDTOs =
+				 * JSONObject.parseArray(
+				 * JSONObject.toJSONString(parseObject.get("projectPayments")),
+				 * TdProjectPaymentDTO.class); } }
+				 * 
+				 * if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) { for
+				 * (TdProjectPaymentDTO dto : tdProjectPaymentDTOs) { // 获取当前期数 if
+				 * (projPlanList.getPeriod() != null && projPlanList.getPeriod().intValue() ==
+				 * dto.getPeriod()) {
+				 * 
+				 * TdGuaranteePaymentDTO guaranteePayment = dto.getGuaranteePayment();
+				 * 
+				 * 
+				 * 平台还款费用类型(10:本金,20:利息;30:平台服务费;40:资产端服务费;50:担保公司服务费;60:仲裁服务费;70:逾期费用（罚息）;80:
+				 * 中介服务费)
+				 * 
+				 * BigDecimal penaltyAmount = guaranteePayment.getPenaltyAmount(); BigDecimal
+				 * tuandaiAmount = guaranteePayment.getTuandaiAmount(); BigDecimal orgAmount =
+				 * guaranteePayment.getOrgAmount(); BigDecimal guaranteeAmount =
+				 * guaranteePayment.getGuaranteeAmount(); BigDecimal arbitrationAmount =
+				 * guaranteePayment.getArbitrationAmount(); BigDecimal agencyAmount =
+				 * guaranteePayment.getAgencyAmount();
+				 * 
+				 * if (penaltyAmount != null) { guaranteePaymentMap.put("70", penaltyAmount);
+				 * guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+				 * .add(penaltyAmount); }
+				 * 
+				 * if (tuandaiAmount != null) { if (vo.getSettleType().intValue() != 0 &&
+				 * planRepaymentMap.containsKey("30")) { guaranteePaymentMap.put("30",
+				 * planRepaymentMap.get("30")); guaranteeRepaymentRechargeAmount =
+				 * guaranteeRepaymentRechargeAmount .add(tuandaiAmount); } else {
+				 * guaranteePaymentMap.put("30", tuandaiAmount);
+				 * guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+				 * .add(tuandaiAmount); } } if (orgAmount != null) {
+				 * guaranteePaymentMap.put("40", orgAmount); guaranteeRepaymentRechargeAmount =
+				 * guaranteeRepaymentRechargeAmount.add(orgAmount); } if (guaranteeAmount !=
+				 * null) { guaranteePaymentMap.put("50", guaranteeAmount);
+				 * guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+				 * .add(guaranteeAmount); } if (arbitrationAmount != null) {
+				 * guaranteePaymentMap.put("60", arbitrationAmount);
+				 * guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+				 * .add(arbitrationAmount); } if (agencyAmount != null) {
+				 * guaranteePaymentMap.put("80", agencyAmount); guaranteeRepaymentRechargeAmount
+				 * = guaranteeRepaymentRechargeAmount .add(agencyAmount); }
+				 * 
+				 * // 从计划接口中分离出本金和利息 // 本金 if (planRepaymentMap.containsKey("10")) {
+				 * guaranteePaymentMap.put("10", planRepaymentMap.get("10"));
+				 * guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
+				 * .add(planRepaymentMap.get("10")); } // 利息 if
+				 * (planRepaymentMap.containsKey("20")) { guaranteePaymentMap.put("20",
+				 * planRepaymentMap.get("20")); guaranteeRepaymentRechargeAmount =
+				 * guaranteeRepaymentRechargeAmount .add(planRepaymentMap.get("20")); }
+				 * 
+				 * } } } } else { LOGGER.info(
+				 * "@对接合规还款接口@  通过外联平台eip(标的还款信息查询接口:/repayment/queryProjectPayment)调用团贷标的标的还款信息查询接口错误 输入参数 projectPlanId:[{}] projectId:[{}]  afterId[{}] "
+				 * , projPlanListId, projPlan.getProjectId(), bizPlanList.getAfterId()); return
+				 * Result.error("通过外联平台eip调用团贷标的还款信息查询接口错误, returnCode:" +
+				 * queryProjectPaymentResult.getReturnCode() + ",msg:" +
+				 * queryProjectPaymentResult.getMsg() + ",codeDesc:" +
+				 * queryProjectPaymentResult.getCodeDesc()); }
+				 */
 
 				/*
 				 * 获取实还明细
@@ -626,6 +609,7 @@ public class PlatformRepaymentController {
 				if (projFactRepayMap.size() > 0) {
 					// 实收总金额
 					BigDecimal factRepayAmount = BigDecimal.ZERO;
+					BigDecimal rechargeAmount = BigDecimal.ZERO;
 
 					List<TdrepayRechargeDetail> detailFeeList = Lists.newArrayList();
 
@@ -656,6 +640,7 @@ public class PlatformRepaymentController {
 							break;
 						case 20:
 							feeType = 20;
+							detailFee.setFeeValue(interestAmount);
 							break;
 						case 30:
 							feeType = 40;
@@ -669,52 +654,61 @@ public class PlatformRepaymentController {
 						case 60:
 							feeType = 70;
 							break;
+						case 70:
+							if (RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid().equals(r.getFeeId())) {
+								feeType = 40;
+							} else if (RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid().equals(r.getFeeId())) {
+								feeType = 30;
+							}
+							break;
 						case 80:
 							feeType = 80;
 							break;
 						default:
-							return Result.error("没有对应的费用类型给接口");
+							break;
 						}
 						detailFee.setFeeType(feeType);
-						detailFee.setFeeName(FEE_TYPE_MAP.get(feeType));
-
-						// 费用
-						if (byGuaranteePayment) {
-							if (planRepaymentMap.containsKey(feeType.toString())) {
-								detailFee.setFeeValue(guaranteePaymentMap.get(feeType.toString()));
-							} else {
-								detailFee.setFeeValue(r.getFactAmount());
-								guaranteeRepaymentRechargeAmount = guaranteeRepaymentRechargeAmount
-										.add(r.getFactAmount());
+						detailFee.setFeeName(r.getPlanItemName());
+						if (detailFee.getFeeValue() == null) {
+							detailFee.setFeeValue(r.getFactAmount());
+						}
+						if (r.getRepaySource() != null) {
+							if (r.getRepaySource().intValue() != 30) {
+								rechargeAmount = rechargeAmount.add(detailFee.getFeeValue());
 							}
 						} else {
-							if (planRepaymentMap.containsKey(feeType.toString())) {
-								detailFee.setFeeValue(planRepaymentMap.get(feeType.toString()));
-							} else {
-								detailFee.setFeeValue(r.getFactAmount());
-								planRepaymentRechargeAmount = planRepaymentRechargeAmount.add(r.getFactAmount());
-							}
+							LOGGER.info("@对接合规还款接口@ 还款方式不能为空 projPlanListId:[{}]", projPlanListId);
+							return Result.error("还款方式不能为空");
 						}
+
+						// 费用
+						/*
+						 * if (byGuaranteePayment) { if
+						 * (planRepaymentMap.containsKey(feeType.toString())) {
+						 * detailFee.setFeeValue(guaranteePaymentMap.get(feeType.toString())); } else {
+						 * detailFee.setFeeValue(r.getFactAmount()); guaranteeRepaymentRechargeAmount =
+						 * guaranteeRepaymentRechargeAmount .add(r.getFactAmount()); } } else { if
+						 * (planRepaymentMap.containsKey(feeType.toString())) {
+						 * detailFee.setFeeValue(planRepaymentMap.get(feeType.toString())); } else {
+						 * detailFee.setFeeValue(r.getFactAmount()); planRepaymentRechargeAmount =
+						 * planRepaymentRechargeAmount.add(r.getFactAmount()); } }
+						 */
 						detailFeeList.add(detailFee);
 					}
 					vo.setFactRepayAmount(factRepayAmount);
 					// 用从外部接口返回的金额总和做为充值金额
-					if (byGuaranteePayment) {
-						vo.setRechargeAmount(guaranteeRepaymentRechargeAmount);
-					} else {
-						vo.setRechargeAmount(planRepaymentRechargeAmount);
-					}
+					/*
+					 * if (byGuaranteePayment) {
+					 * vo.setRechargeAmount(guaranteeRepaymentRechargeAmount); } else {
+					 * vo.setRechargeAmount(planRepaymentRechargeAmount); }
+					 */
+					vo.setRechargeAmount(rechargeAmount);
 
 					/*
-					 * 如果实还金额大于充值金额，则不允许资金分发 -- （肖莹环提出规则，2018-08-13）
+					 * 0：非结清，10：正常结清，11：逾期结清，20：展期原标结清，30：坏账结清 如果坏账结清，则充值金额等于实还金额
 					 */
-					double factRepayAmount2 = vo.getFactRepayAmount() == null ? 0
-							: vo.getFactRepayAmount().doubleValue();
-					double rechargeAmount = vo.getRechargeAmount() == null ? 0 : vo.getRechargeAmount().doubleValue();
-					if (factRepayAmount2 > rechargeAmount) {
-						LOGGER.info("实还金额不能大于充值金额 输入参数 projectPlanId:[{}] factRepayAmount2:[{}]  rechargeAmount[{}] ",
-								projPlanListId, factRepayAmount2, rechargeAmount);
-						return Result.error("实还金额不能大于充值金额");
+					if (vo.getSettleType().intValue() == 30) {
+						vo.setRechargeAmount(vo.getFactRepayAmount());
 					}
 
 					// 用实还赋值流水金额
@@ -757,6 +751,8 @@ public class PlatformRepaymentController {
 					LOGGER.info("@对接合规还款接口@ 调用代充值资金分发参数接入接口失败 vo:[{}]", JSON.toJSONString(vo));
 					return Result.error("合规还款失败:" + result.getMsg());
 				}
+			} else {
+				return Result.error("查询平台标的还款计划失败");
 			}
 			LOGGER.info("@对接合规还款接口@ 调用代充值资金分发成功 vo:[{}]", JSON.toJSONString(vo));
 			return Result.success(JSON.toJSONString(vo));

@@ -7,8 +7,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.alibaba.fastjson.JSONObject;
@@ -59,6 +61,12 @@ public class SettleInfoVO {
 	 * 提前结清违约金	
 	 */
 	private BigDecimal penalty = BigDecimal.ZERO;
+	
+	/**
+	 * 根据planListId存储提前违约金
+	 * Map<planListId, List<SettleFeesVO>>
+	 */
+	private Map<String, List<SettleFeesVO>> penaltyBiz = new HashMap<>() ;
 	/**
 	 * 减免金额	
 	 */

@@ -130,6 +130,12 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	 */
 	@TableField("type")
 	private Integer type ;
+	
+	/**
+	 * 结清的还款计划,当type=2时,此字段才有意义,此字段为null,则为业务结清,此字段有值,则为对应的还款计划结清
+	 */
+	@TableField("plan_id")
+	private String planId ;
 
 	public String getConfirmLogId() {
 		return confirmLogId;
@@ -372,5 +378,13 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	 */
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public String getPlanId() {
+		return planId;
+	}
+
+	public void setPlanId(String planId) {
+		this.planId = planId;
 	}
 }

@@ -1,8 +1,9 @@
 package com.hongte.alms.base.service.impl;
 
-import java.beans.Transient;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
+import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.BasicCompany;
 import com.hongte.alms.base.entity.SysRole;
 import com.hongte.alms.base.entity.SysUser;
@@ -122,6 +124,9 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
      */
 //    @Transient
     public void setUserPermissons(String userId){
+    	
+    	SysUser sysUser = sysUserService.selectById(userId);
+    	
     	String pagePermissionJson = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
     	JSONObject pagePermissionJSONObject = JSONObject.parseObject(pagePermissionJson);
     	
@@ -172,11 +177,10 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 			}
     	}
     	
-    	logger.info("权限明细");
     	logger.info("userId={},权限明细={}",userId,pagePermissionJSONObject);
     	
         //删除原来用户的可看业务信息
-        sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("user_id",userId));
+//        sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("user_id",userId));
 
         //组装权限数据到permissions
         List<SysUserPermission> permissions = new ArrayList<>();
@@ -190,8 +194,84 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage8List()), userId, 8);
         fillSysUserPermission(permissions, removeDuplicateBizIds(myPermissionIdsInfo.getPage9List()), userId, 9);
         
+    	//1获取现有权限
+    	List<SysUserPermission> listSysUserPermissionNow = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("user_id", userId));
+    	
+    	//如果上次判定异常
+    	if(sysUser.getLastPermissionStatus() == 1) {
+    		//去重
+        	List<SysUserPermission> listSysUserPermissionGroup = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>()
+        			.eq("user_id", userId)
+        			.groupBy("business_id,page_type"));
+        	List<Integer> listIds = new ArrayList<>();
+        	for (SysUserPermission sysUserPermission : listSysUserPermissionGroup) {
+        		listIds.add(sysUserPermission.getId());
+			}
+        	
+        	List<Integer> listAllIds = new ArrayList<>();
+        	for (SysUserPermission sysUserPermission : listSysUserPermissionNow) {
+        		listAllIds.add(sysUserPermission.getId());
+			}
+        	listAllIds.removeAll(listIds);
+        	if(!listAllIds.isEmpty()) {
+        		sysUserPermissionService.deleteBatchIds(listAllIds);
+        	}
+    	}
+    	
+    	sysUser.setLastPermissionStatus(1);
+    	
+    	//2对比旧权限与新权限》找出要删除的
+    	List<SysUserPermission> listSysUserPermissionExsits = new ArrayList<>();
+    	List<SysUserPermission> listSysUserPermissionleft = new ArrayList<>();
+    	for(SysUserPermission sysUserPermission : permissions) {
+    		//如果原来的权限包含新权限,获取
+    		for (SysUserPermission sysUserPermissionNow : listSysUserPermissionNow) {
+    			if(sysUserPermission.getBusinessId().equals(sysUserPermissionNow.getBusinessId())
+    					&& sysUserPermission.getPageType().intValue() == sysUserPermissionNow.getPageType().intValue()) {
+    				listSysUserPermissionleft.add(sysUserPermissionNow);
+    			}
+			}
+    	}
+    	List<SysUserPermission> listSysUserPermissionDel = new ArrayList<>();
+    	listSysUserPermissionDel.addAll(listSysUserPermissionNow);
+    	if(listSysUserPermissionDel.removeAll(listSysUserPermissionleft)) {
+    		for(SysUserPermission sysUserPermissionDel: listSysUserPermissionDel) {
+    			sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id", sysUserPermissionDel.getBusinessId()).eq("page_type", sysUserPermissionDel.getPageType()));
+    		}
+    	}
+    	//2对比旧权限与新权限》找出要添加的
+    	for(SysUserPermission sysUserPermission : listSysUserPermissionNow) {
+    		//如果新权限包含原来权限,获取
+    		for (SysUserPermission sysUserPermissionNew : permissions) {
+    			if(sysUserPermission.getBusinessId().equals(sysUserPermissionNew.getBusinessId())
+    					&& sysUserPermission.getPageType().intValue() == sysUserPermissionNew.getPageType().intValue()) {
+    				listSysUserPermissionExsits.add(sysUserPermissionNew);
+    			}
+			}
+    	}
+    	
+    	List<SysUserPermission> listSysUserPermissionAdd = new ArrayList<>();
+    	listSysUserPermissionAdd.addAll(permissions);
+    	if(listSysUserPermissionAdd.removeAll(listSysUserPermissionExsits)) {
+    		if(!listSysUserPermissionAdd.isEmpty()) {
+    			sysUserPermissionService.insertBatch(listSysUserPermissionAdd,1000);
+        	}
+    	}
+    	
+    	sysUser.setLastPermissionTime(new Date());
+    	sysUser.setLastPermissionRows(permissions.size());
+
+    	//核对权限
+    	//1 权限核对 插入数据库是否和计算出的权限一致
+    	int reallyPermissionRows = sysUserPermissionService.selectCount(new EntityWrapper<SysUserPermission>().eq("user_id", userId));
+    	if(reallyPermissionRows == sysUser.getLastPermissionRows()) {
+    		sysUser.setLastPermissionStatus(0);
+    	}
+    	
+    	sysUserService.updateById(sysUser);
+    	
         //新增对应关系,多线程插入
-        if(!permissions.isEmpty()){
+ /*       if(!permissions.isEmpty()){
         	for(int i = 0;i < permissions.size();i=i+10000) {
 				int j = i+10000;
 				if(j >= permissions.size() ) {
@@ -205,9 +285,8 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 					}
 	        	});
         	}
-        }
+        }*/
     }
-
 
 	private JSONObject updatePagePermission(JSONObject pagePermissionJSONObject,String userId) {
     	 //查出用户权限列表
@@ -450,6 +529,128 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 		userInfo.setOrgCode(sysUser.getOrgCode());
 		userInfo.setRoleCodes(ucAppRemote.getUserRole(userId));
 		updateUserPermision(userInfo);
+	}
+
+
+	@Override
+	public void setUserPermissonsInBusinessList(String userId, List<StaffBusinessVo> voList) {
+		if(voList != null && !voList.isEmpty()) {
+		
+		String pagePermissionJson = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
+    	JSONObject pagePermissionJSONObject = JSONObject.parseObject(pagePermissionJson);
+    	
+    	updatePagePermission(pagePermissionJSONObject,userId);
+    	MyPermissionIdsInfo myPermissionIdsInfo = new MyPermissionIdsInfo();
+    	
+    	for(String key : pagePermissionJSONObject.keySet()){
+    		JSONObject pagePermission = pagePermissionJSONObject.getJSONObject(key);
+    		switch (key) {
+			case "hasOverAllRole":
+				
+				break;
+			case "hasAreaRole":
+				//拥有区域性角色
+                Map<String,BasicCompany> companyIds  = basicCompanyService.selectAreaUserCanSeeCompany(userId);
+                List<String> tempBizs = basicBusinessService.selectCompanysBusinessIds(new LinkedList<>(companyIds.keySet()));
+                myPermissionIdsInfo.updatePagePermissionList(tempBizs,pagePermission);
+                break;
+			case "hasFinanceOrderSetAreaRole":
+				//拥有财务跟单设置区域性角色
+                //查找本用户id在财务跟单设置中配置的可访问的business zgh
+                //从财务跟单配置中查询本用户可访问的分公司id及业务类型
+                Page<SysFinancialOrderVO> financialOrderVOPage = sysFinancialOrderService.search(new Page<>(1, Integer.MAX_VALUE), null, null, null, userId);
+                if (financialOrderVOPage != null && financialOrderVOPage.getRecords() != null && financialOrderVOPage.getRecords().size() > 0) {
+                    for (SysFinancialOrderVO fo : financialOrderVOPage.getRecords()) {
+                        List<String> tempBusinessIds = basicBusinessService.findBusinessIds(fo.getCompanyId(), fo.getBusinessTypeId());
+                        myPermissionIdsInfo.updatePagePermissionList(tempBusinessIds,pagePermission);
+                    }
+                }
+				break;
+			case "hasSeeCarBizRole":
+				//拥有车贷业务查看角色(车贷出纳)
+                List<String>  tempCarBizs = basicBusinessService.selectCarBusinessIds();
+                myPermissionIdsInfo.updatePagePermissionList(tempCarBizs,pagePermission);
+				break;
+			case "hasSeeHourseBizRole":
+				//拥有房贷业务查看角色(房贷出纳)
+                List<String>  tempHourseBizs = basicBusinessService.selectHouseBusinessIds();
+                myPermissionIdsInfo.updatePagePermissionList(tempHourseBizs,pagePermission);
+				break;
+			case "hasMyFollowUp":
+				//查找用户跟进的业务ID(根据催收分配表  tb_collection_status 来查找)
+	            List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
+	            myPermissionIdsInfo.updatePagePermissionList(followBids,pagePermission);
+				break;
+			default:
+				break;
+			}
+    	}
+    	
+    	logger.info("userId={},权限明细={}",userId,pagePermissionJSONObject);
+    	
+    	List<String> businessIds = new ArrayList<>();
+    	for(StaffBusinessVo staffBusinessVo : voList) {
+    		businessIds.add(staffBusinessVo.getBusinessId());
+    	}
+    	
+        //组装权限数据到permissions
+        List<SysUserPermission> permissions = new ArrayList<>();
+        fillSysUserPermission(permissions, fitterBusinessIds(removeDuplicateBizIds(myPermissionIdsInfo.getPage1List()),businessIds), userId, 1);
+        fillSysUserPermission(permissions, fitterBusinessIds(removeDuplicateBizIds(myPermissionIdsInfo.getPage2List()),businessIds), userId, 2);
+        fillSysUserPermission(permissions, fitterBusinessIds(removeDuplicateBizIds(myPermissionIdsInfo.getPage3List()),businessIds), userId, 3);
+        fillSysUserPermission(permissions, fitterBusinessIds(removeDuplicateBizIds(myPermissionIdsInfo.getPage4List()),businessIds), userId, 4);
+        fillSysUserPermission(permissions, fitterBusinessIds(removeDuplicateBizIds(myPermissionIdsInfo.getPage5List()),businessIds), userId, 5);
+        fillSysUserPermission(permissions, fitterBusinessIds(removeDuplicateBizIds(myPermissionIdsInfo.getPage6List()),businessIds), userId, 6);
+        fillSysUserPermission(permissions, fitterBusinessIds(removeDuplicateBizIds(myPermissionIdsInfo.getPage7List()),businessIds), userId, 7);
+        fillSysUserPermission(permissions, fitterBusinessIds(removeDuplicateBizIds(myPermissionIdsInfo.getPage8List()),businessIds), userId, 8);
+        fillSysUserPermission(permissions, fitterBusinessIds(removeDuplicateBizIds(myPermissionIdsInfo.getPage9List()),businessIds), userId, 9);
+        
+        	//1获取现有权限
+        	List<SysUserPermission> listSysUserPermissionNow = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("user_id", userId).in("business_id", businessIds));
+        	
+        	//2对比旧权限与新权限》找出要删除的
+        	List<SysUserPermission> listSysUserPermissionExsits = new ArrayList<>();
+        	List<SysUserPermission> listSysUserPermissionleft = new ArrayList<>();
+        	for(SysUserPermission sysUserPermission : permissions) {
+        		//如果原来的权限包含新权限,获取
+        		for (SysUserPermission sysUserPermissionNow : listSysUserPermissionNow) {
+        			if(sysUserPermission.getBusinessId().equals(sysUserPermissionNow.getBusinessId())
+        					&& sysUserPermission.getPageType().intValue() == sysUserPermissionNow.getPageType().intValue()) {
+        				listSysUserPermissionleft.add(sysUserPermissionNow);
+        			}
+				}
+        	}
+        	List<SysUserPermission> listSysUserPermissionDel = new ArrayList<>();
+        	listSysUserPermissionDel.addAll(listSysUserPermissionNow);
+        	if(listSysUserPermissionDel.removeAll(listSysUserPermissionleft)) {
+        		for(SysUserPermission sysUserPermissionDel: listSysUserPermissionDel) {
+        			sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id", sysUserPermissionDel.getBusinessId()).eq("page_type", sysUserPermissionDel.getPageType()));
+        		}
+        	}
+        	//2对比旧权限与新权限》找出要添加的
+        	for(SysUserPermission sysUserPermission : listSysUserPermissionNow) {
+        		//如果新权限包含原来权限,获取
+        		for (SysUserPermission sysUserPermissionNew : permissions) {
+        			if(sysUserPermission.getBusinessId().equals(sysUserPermissionNew.getBusinessId())
+        					&& sysUserPermission.getPageType().intValue() == sysUserPermissionNew.getPageType().intValue()) {
+        				listSysUserPermissionExsits.add(sysUserPermissionNew);
+        			}
+				}
+        	}
+        	
+        	if(permissions.removeAll(listSysUserPermissionExsits)) {
+        		if(!permissions.isEmpty()) {
+        			sysUserPermissionService.insertBatch(permissions,1000);
+            	}
+        	}
+        	
+        }
+	}
+
+
+	private List<String> fitterBusinessIds(ArrayList<String> removeDuplicateBizIds, List<String> businessIds) {
+		 removeDuplicateBizIds.retainAll(businessIds);
+		 return removeDuplicateBizIds;
 	}
 
 }

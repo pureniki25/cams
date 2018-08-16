@@ -21,7 +21,7 @@ public class RepaymentSettleListVO implements Serializable{
 	 */
 	private static final long serialVersionUID = 2141251720743615058L;
 	private String afterId ;
-	@JsonFormat(pattern="yyyy-MM-dd")
+	@JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
 	private Date repayDate;
 	private Integer period ;
 	private Boolean isDefer ;

@@ -314,19 +314,19 @@ public class WithholdingRepaymentLogController {
 	    	req.setUserId(loginUserInfoHelper.getUserId());
 	    	
 	        //取最近3天记录
-        	if(req.getDateBegin()==null&&req.getDateEnd()==null) {
-	            Calendar calendar = Calendar.getInstance();
-	            calendar.setTime(new Date());
-                calendar.set(Calendar.HOUR_OF_DAY, -48);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                req.setDateBegin(calendar.getTime());
-                calendar.setTime(new Date());
-                calendar.set(Calendar.HOUR_OF_DAY, 24);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                req.setDateEnd(calendar.getTime());
-        	}
+//        	if(req.getDateBegin()==null&&req.getDateEnd()==null) {
+//	            Calendar calendar = Calendar.getInstance();
+//	            calendar.setTime(new Date());
+//                calendar.set(Calendar.HOUR_OF_DAY, -48);
+//                calendar.set(Calendar.MINUTE, 0);
+//                calendar.set(Calendar.SECOND, 0);
+//                req.setDateBegin(calendar.getTime());
+//                calendar.setTime(new Date());
+//                calendar.set(Calendar.HOUR_OF_DAY, 24);
+//                calendar.set(Calendar.MINUTE, 0);
+//                calendar.set(Calendar.SECOND, 0);
+//                req.setDateEnd(calendar.getTime());
+//        	}
         	
         	Wrapper<SysUserRole> wrapperSysUserRole = new EntityWrapper<>();
             wrapperSysUserRole.eq("user_id",loginUserInfoHelper.getUserId());

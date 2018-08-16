@@ -62,7 +62,7 @@
 		FROM
 			tb_repayment_biz_plan_list_detail 
 		WHERE
-			plan_list_id IN ( SELECT plan_list_id FROM tb_repayment_biz_plan_list WHERE orig_business_id = #{businessId} AND period &lt; #{period} AND repay_flag != 50
+			plan_list_id IN ( SELECT plan_list_id FROM tb_repayment_biz_plan_list WHERE business_id = #{businessId} AND due_date &lt; #{dueDate} AND ( repay_flag is null or repay_flag != 50 )
 			<if test="planId != null">
 			AND plan_id = #{planId}
 			</if> ) 

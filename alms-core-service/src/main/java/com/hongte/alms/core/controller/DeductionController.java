@@ -358,14 +358,14 @@ public class DeductionController {
 	   
 	  List<SysBankLimit> list= sysBankLimitService.selectList(new EntityWrapper<SysBankLimit>().eq("platform_id", platformId).eq("bank_code", bankCode));
 	  String oneLimit="";
-	  String monthLimit="";
+	  String dayLimit="";
 	  if(list.size()>0) {
 		  oneLimit=list.get(0).getOnceLimit()==null?"":list.get(0).getOnceLimit().toString();
-		  monthLimit=list.get(0).getMonthLimit()==null?"":list.get(0).getMonthLimit().toString();
+		  dayLimit=list.get(0).getDayLimit()==null?"":list.get(0).getDayLimit().toString();
 	  }
 	  Map<String, Object> retMap = new HashMap<>();
       retMap.put("oneLimit", JSON.toJSON(oneLimit, JsonUtil.getMapping()));
-      retMap.put("monthLimit", JSON.toJSON(monthLimit, JsonUtil.getMapping()));
+      retMap.put("dayLimit", JSON.toJSON(dayLimit, JsonUtil.getMapping()));
       return Result.success(retMap);
 	   
 	}

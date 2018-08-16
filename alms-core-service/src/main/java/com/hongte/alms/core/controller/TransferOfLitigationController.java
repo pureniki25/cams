@@ -301,7 +301,7 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<String> saveHouseApprovalLogInfo(@RequestBody ProcessLogReq req) {
 		try {
-			transferOfLitigationService.saveHouseProcessApprovalResult(req, sendUrl);
+			transferLitigationHouseService.saveHouseProcessApprovalResult(req, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage(), ex);
@@ -310,13 +310,12 @@ public class TransferOfLitigationController {
 
 	}
 
-	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "存储车贷移交诉讼审批信息")
 	@PostMapping("/saveCarApprovalLogInfo")
 	@ResponseBody
 	public Result<String> saveCarApprovalLogInfo(@RequestBody ProcessLogReq req) {
 		try {
-			transferOfLitigationService.saveCarProcessApprovalResult(req, sendUrl);
+			transferLitigationCarService.saveCarProcessApprovalResult(req, sendUrl);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage(), ex);
