@@ -64,8 +64,9 @@ public class SetUserPermissionJob extends IJobHandler  {
         	}
         	
             List<SysUser> list =  sysUserService.selectList(new EntityWrapper<SysUser>()
-            		.ge("last_permission_time", DateUtil.getThatDayBegin(new Date()))
-            		.or().eq("last_permission_status", 1));
+            		.le("last_permission_time", DateUtil.getThatDayBegin(new Date()))
+            		.or().eq("last_permission_status", 1)
+            		.or().isNull("last_permission_time"));
             
             for(SysUser user:list){
             	XxlJobLogger.log("@SyncDaihouJob@同步用户等待"+steps);
