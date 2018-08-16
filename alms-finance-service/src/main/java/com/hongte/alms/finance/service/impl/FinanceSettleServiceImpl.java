@@ -451,7 +451,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(planListDetailShowPayDto.getShowPayMoney()));
 							createProjFactRepay(planListDetailShowPayDto.getShowPayMoney(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 						}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())<0) {
-							createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+							if (financeSettleBaseDto.getCuralDivideAmount().compareTo(BigDecimal.ZERO) > 0 ) {
+								createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+							}
+							financeSettleBaseDto.setCuralDivideAmount(BigDecimal.ZERO) ;
 							changeRepaymentResources(planListDetailShowPayDto,repaymentProjPlanListDetail, financeSettleBaseDto);
 						}
 					}
@@ -520,7 +523,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 								createProjFactRepay(settleFeesVO.getAmount(), projPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 								financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(settleFeesVO.getAmount()));
 							}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(settleFeesVO.getAmount())<0) {
-								createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), projPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+								if (financeSettleBaseDto.getCuralDivideAmount().compareTo(BigDecimal.ZERO) > 0 ) {
+									createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), projPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+								}
 								financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(financeSettleBaseDto.getCuralDivideAmount()));
 								changeRepaymentResources(planListDetailShowPayDto,projPlanListDetail, financeSettleBaseDto);
 							}
@@ -607,10 +612,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 										financeSettleBaseDto.getCuralDivideAmount().subtract(settleFeesVO.getAmount()));
 							} else if (financeSettleBaseDto.getCuralDivideAmount()
 									.compareTo(settleFeesVO.getAmount()) < 0) {
-								createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), projPlanListDetail,
-										financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
-								financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount()
-										.subtract(financeSettleBaseDto.getCuralDivideAmount()));
+								if (financeSettleBaseDto.getCuralDivideAmount().compareTo(BigDecimal.ZERO) > 0 ) {
+									createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), projPlanListDetail,
+											financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+								}
+								financeSettleBaseDto.setCuralDivideAmount(BigDecimal.ZERO);
 								changeRepaymentResources(planListDetailShowPayDto, projPlanListDetail,
 										financeSettleBaseDto);
 							}
@@ -660,7 +666,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(planListDetailShowPayDto.getShowPayMoney()));
 							createProjFactRepay(planListDetailShowPayDto.getShowPayMoney(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 						}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())<0) {
-							createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+							if (financeSettleBaseDto.getCuralDivideAmount().compareTo(BigDecimal.ZERO) > 0 ) {
+								createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+							}
+							financeSettleBaseDto.setCuralDivideAmount(BigDecimal.ZERO);
 							changeRepaymentResources(planListDetailShowPayDto,repaymentProjPlanListDetail, financeSettleBaseDto);
 						}
 					}
@@ -708,8 +717,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						createProjFactRepay(settleFeesVO.getAmount(), projPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 						financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(settleFeesVO.getAmount()));
 					}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(settleFeesVO.getAmount())<0) {
-						createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), projPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
-						financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(financeSettleBaseDto.getCuralDivideAmount()));
+						if (financeSettleBaseDto.getCuralDivideAmount().compareTo(BigDecimal.ZERO) > 0 ) {
+							createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), projPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+						}
+						financeSettleBaseDto.setCuralDivideAmount(BigDecimal.ZERO);
 						changeRepaymentResources(planListDetailShowPayDto,projPlanListDetail, financeSettleBaseDto);
 					}
 					
@@ -1169,15 +1180,15 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		}
 		if (changeRepaymentResources(financeSettleBaseDto)) {
 			if (financeSettleBaseDto.getCuralDivideAmount().compareTo(unpaid)>=0) {
-				projListDetail.setProjFactAmount(financeSettleBaseDto.getCuralDivideAmount());
-				projListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
+//				projListDetail.setProjFactAmount(financeSettleBaseDto.getCuralDivideAmount());
+//				projListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
 				createProjFactRepay(unpaid, projListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 				
 				financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(unpaid));
 				return ;
 			}else {
-				projListDetail.setProjFactAmount(projListDetail.getProjFactAmount().add(financeSettleBaseDto.getCuralDivideAmount()));
-				projListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
+//				projListDetail.setProjFactAmount(projListDetail.getProjFactAmount().add(financeSettleBaseDto.getCuralDivideAmount()));
+//				projListDetail.setFactRepayDate(financeSettleBaseDto.getCuralResource().getRepayDate());
 				createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), projListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
 				financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(financeSettleBaseDto.getCuralDivideAmount()));
 				
@@ -2138,7 +2149,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 			List<RepaymentBizPlanList> selectList = repaymentBizPlanListMapper
 					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", req.getBusinessId())
 							.eq("plan_id", repaymentBizPlan.getPlanId()).and(" DATE(due_date) >= DATE({0}) ", settleDate)
-							.eq("current_status", RepayCurrentStatusEnums.还款中.toString()).orderBy("due_date",false));
+							.eq("current_status", RepayCurrentStatusEnums.还款中.toString()).orderBy("due_date"));
 			// 判断当前期列表是否为空
 			if (CollectionUtils.isEmpty(selectList)) {
 				// 找不到还款中的当前期则判断结清日期是否大过还款计划最后一次还款的期限
