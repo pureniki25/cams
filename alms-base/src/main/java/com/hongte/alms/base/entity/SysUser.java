@@ -1,6 +1,7 @@
 package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
@@ -48,6 +49,51 @@ public class SysUser extends Model<SysUser> {
 	@TableField("xd_org_code")
 	@ApiModelProperty(required= true,value = "信贷所属机构编码")
 	private String xdOrgCode;
+	
+	/**
+	 * 该用户权限最后修改时间
+	 */
+	@TableField("last_permission_time")
+	@ApiModelProperty(required= true,value = "该用户权限最后修改时间")
+	private Date lastPermissionTime;
+	
+	/**
+	 * 该用户更新后权限数量
+	 */
+	@TableField("last_permission_rows")
+	@ApiModelProperty(required= true,value = "该用户更新后权限数量")
+	private Integer lastPermissionRows;
+	
+	/**
+	 * 权限更新状态0成功1异常(异常要重新更新)
+	 */
+	@TableField("last_permission_status")
+	@ApiModelProperty(required= true,value = "权限更新状态0成功1异常(异常要重新更新)")
+	private Integer lastPermissionStatus;
+	
+	public Date getLastPermissionTime() {
+		return lastPermissionTime;
+	}
+
+	public void setLastPermissionTime(Date lastPermissionTime) {
+		this.lastPermissionTime = lastPermissionTime;
+	}
+
+	public Integer getLastPermissionRows() {
+		return lastPermissionRows;
+	}
+
+	public void setLastPermissionRows(Integer lastPermissionRows) {
+		this.lastPermissionRows = lastPermissionRows;
+	}
+
+	public Integer getLastPermissionStatus() {
+		return lastPermissionStatus;
+	}
+
+	public void setLastPermissionStatus(Integer lastPermissionStatus) {
+		this.lastPermissionStatus = lastPermissionStatus;
+	}
 
 	public String getXdOrgCode() {
 		return xdOrgCode;
