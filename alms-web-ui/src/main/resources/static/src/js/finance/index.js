@@ -239,6 +239,7 @@ window.layinit(function (htConfig) {
                         title: '操作',
                         render: (h, p) => {
 
+                            let isFinalPeroid = (parseInt(p.row.borrowLimit)==p.row.period)
                             function initMenuItem(title, link, call) {
                                 return h('li', [
                                     h('i-button', {
@@ -375,13 +376,22 @@ window.layinit(function (htConfig) {
                             let planSettle = initMenuItem('还款计划结清', null, 'planSettle')
                             let withhold = initMenuItem('支付公司代扣', null, 'withhold')
 
-                            if (p.row.srcType == 2) {
+                            if (p.row.srcType == 2 && !isFinalPeroid ) {
                                 menu.push(repayConfirm)
                                 menu.push(revokeConfirm)
                                 menu.push(confirmWithhold)
                                 menu.push(planSettle)
                                 menu.push(settle)
                                 menu.push(withhold)
+                            }
+                            
+                            if (p.row.srcType == 2 && isFinalPeroid ) {
+                                // menu.push(repayConfirm)
+                                // menu.push(revokeConfirm)
+                                // menu.push(confirmWithhold)
+                                menu.push(planSettle)
+                                menu.push(settle)
+                                // menu.push(withhold)
                             }
 
                             if (p.row.planStatusExt != '还款中'){
