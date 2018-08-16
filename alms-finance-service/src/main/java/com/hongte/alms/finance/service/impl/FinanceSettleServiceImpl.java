@@ -1426,6 +1426,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(financeSettleReq.getMprIds());
             		for (MoneyPoolRepayment mpr : moneyPoolRepayments) {
             			mpr.setLastState(mpr.getState());
+            			mpr.setUpdateTime(new Date());
+            			mpr.setUpdateUser(loginUserInfoHelper.getUserId());
+            			
             			mpr.setState(RepayRegisterFinanceStatus.财务确认已还款.toString());
             			
             			MoneyPool moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId());
@@ -1433,6 +1436,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             			moneyPool.setLastFinanceStatus(moneyPool.getFinanceStatus());
             			moneyPool.setStatus(RepayRegisterState.完成.toString());
             			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.财务确认已还款.toString());
+            			moneyPool.setUpdateTime(new Date());
+            			moneyPool.setUpdateUser(loginUserInfoHelper.getUserId());
+            			
             			mpr.updateById();
             			moneyPool.updateById();
             		}
@@ -2080,7 +2086,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     new EntityWrapper<RepaymentBizPlanList>()
                             .eq("business_id", now.getBusinessId())
                             .eq("plan_id", repaymentBizPlan.getPlanId())
-                            .gt("due_date", new Date())
+//                            .ge("due_date", new Date())
+                            .and(" DATE(due_date) >= DATE({0}) ", new Date())
                             .eq("current_status", RepayCurrentStatusEnums.还款中.toString())
                             .orderBy("due_date"));
             if (CollectionUtils.isEmpty(selectList)) {
@@ -2130,8 +2137,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 			// 找应还日期离当前日期最近且为还款中的期数作为当前期
 			List<RepaymentBizPlanList> selectList = repaymentBizPlanListMapper
 					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", req.getBusinessId())
-							.eq("plan_id", repaymentBizPlan.getPlanId()).gt("due_date", settleDate)
-							.eq("current_status", RepayCurrentStatusEnums.还款中.toString()).orderBy("due_date"));
+							.eq("plan_id", repaymentBizPlan.getPlanId()).and(" DATE(due_date) >= DATE({0}) ", settleDate)
+							.eq("current_status", RepayCurrentStatusEnums.还款中.toString()).orderBy("due_date",false));
 			// 判断当前期列表是否为空
 			if (CollectionUtils.isEmpty(selectList)) {
 				// 找不到还款中的当前期则判断结清日期是否大过还款计划最后一次还款的期限
@@ -2149,9 +2156,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 			// 再次判断当前期列表是否为空
 			if (CollectionUtils.isEmpty(selectList)) {
 				if (!StringUtil.isEmpty(req.getPlanId())) {
-					logger.error("找此业务还款计划的当前期 RepaymentBizPlanList  businessId:" + req.getBusinessId() + "     planId:"
+					logger.error("找不到此业务还款计划的当前期 RepaymentBizPlanList  businessId:" + req.getBusinessId() + "     planId:"
 							+ repaymentBizPlan.getPlanId());
-					throw new SettleRepaymentExcepiton("找此业务还款计划的当前期",
+					throw new SettleRepaymentExcepiton("找不到此业务还款计划的当前期",
 							ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
 				} else {
 					continue;
@@ -2212,7 +2219,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					new EntityWrapper<RepaymentBizPlanList>()
 					.eq("business_id", req.getBusinessId())
 					.eq("plan_id", repaymentBizPlan.getPlanId())
-					.gt("due_date", settleDate)
+//					.ge("due_date", settleDate)
+					.and(" DATE(due_date) >= DATE({0}) ",settleDate)
 					.eq("current_status", RepayCurrentStatusEnums.还款中.toString())
 					.orderBy("due_date"));
     		//判断当前期列表是否为空
