@@ -172,7 +172,16 @@ public interface RechargeService {
 	 
 	/**
 	 * 易宝代扣结果查询
+	 * 	
+      * 0：待付（创建的订单未支付成功）
+		1：已付（订单已经支付成功）
+		2：已撤销（待支付订单有效期为1 天，过期后
+		自动撤销）
+		3：阻断交易（订单因为高风险而被阻断）
+		4：失败
+		5：处理中
 	 */
+	 
 	 void getYBResult(WithholdingRepaymentLog log);
 	 
 	 
