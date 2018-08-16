@@ -1426,6 +1426,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectBatchIds(financeSettleReq.getMprIds());
             		for (MoneyPoolRepayment mpr : moneyPoolRepayments) {
             			mpr.setLastState(mpr.getState());
+            			mpr.setUpdateTime(new Date());
+            			mpr.setUpdateUser(loginUserInfoHelper.getUserId());
+            			
             			mpr.setState(RepayRegisterFinanceStatus.财务确认已还款.toString());
             			
             			MoneyPool moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId());
@@ -1433,6 +1436,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             			moneyPool.setLastFinanceStatus(moneyPool.getFinanceStatus());
             			moneyPool.setStatus(RepayRegisterState.完成.toString());
             			moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.财务确认已还款.toString());
+            			moneyPool.setUpdateTime(new Date());
+            			moneyPool.setUpdateUser(loginUserInfoHelper.getUserId());
+            			
             			mpr.updateById();
             			moneyPool.updateById();
             		}
