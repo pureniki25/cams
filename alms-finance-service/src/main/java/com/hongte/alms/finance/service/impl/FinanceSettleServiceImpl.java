@@ -1720,7 +1720,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             infoVO.setOverDueDays(diff);
         }
         infoVO.setItem10(repaymentProjPlanListDetailMapper.calcUnpaidPrincipal(req.getBusinessId(), req.getPlanId()));
-        calcCurPeriod(cur, infoVO, settleDate, req.getPlanId());
+        calcCurPeriod(cur, infoVO, settleDate, req);
 
 
         infoVO.setRepayPlanDate(cur.getDueDate());
@@ -1919,14 +1919,14 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
      * @author 王继光
      * 2018年7月7日 下午4:33:49
      */
-    private void calcCurPeriod(RepaymentBizPlanList repaymentBizPlanList, SettleInfoVO infoVO, Date factRepayDate, String planId) {
+    private void calcCurPeriod(RepaymentBizPlanList repaymentBizPlanList, SettleInfoVO infoVO, Date factRepayDate,FinanceSettleReq req) {
 
-        if (StringUtil.isEmpty(planId)) {
-            List<String> planLists = curPeriod(repaymentBizPlanList);
-            if (CollectionUtils.isEmpty(planLists)) {
-				throw new ServiceRuntimeException("找不到当前期");
-			}
-            List<RepaymentBizPlanList> list = repaymentBizPlanListMapper.selectBatchIds(planLists);
+        if (StringUtil.isEmpty(req.getPlanId())) {
+//            List<String> planLists = curPeriod(repaymentBizPlanList);
+//            if (CollectionUtils.isEmpty(planLists)) {
+//				throw new ServiceRuntimeException("找不到当前期");
+//			}
+            List<RepaymentBizPlanList> list = getCurrenPeroids(req);
 
             for (RepaymentBizPlanList repaymentBizPlanList2 : list) {
                 BigDecimal item20 = repaymentProjPlanListDetailMapper.calcBizPlanListUnpaid(repaymentBizPlanList2.getPlanListId(), "20", null);
@@ -2112,6 +2112,13 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                             .eq("current_status", RepayCurrentStatusEnums.还款中.toString())
                             .orderBy("due_date"));
             if (CollectionUtils.isEmpty(selectList)) {
+            	selectList = repaymentBizPlanListMapper.selectList(
+                        new EntityWrapper<RepaymentBizPlanList>()
+                                .eq("business_id", now.getBusinessId())
+                                .eq("plan_id", repaymentBizPlan.getPlanId())
+//                                .ge("due_date", new Date())
+                                .orderBy("due_date",false));
+            	res.add(selectList.get(0).getPlanListId());
                 continue;
             }
             res.add(selectList.get(0).getPlanListId());
@@ -2250,7 +2257,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
                 RepaymentBizPlanList  lastBizPlanList =  BizPlanLists.get(0);
                 //如果最后一期的应还时间小于当前的结清时间
-                if(DateUtil.getDiff(lastBizPlanList.getDueDate(),settleDate) <=0){
+                if(DateUtil.getDiff(lastBizPlanList.getDueDate(),settleDate) >= 0){
                     //且为未还款
                     if(!lastBizPlanList.getCurrentStatus().equals(RepayCurrentStatusEnums.已还款.toString())){
                         selectList = new LinkedList<RepaymentBizPlanList>();
