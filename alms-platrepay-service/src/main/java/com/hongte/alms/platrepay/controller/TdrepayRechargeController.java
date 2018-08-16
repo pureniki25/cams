@@ -57,6 +57,7 @@ import com.hongte.alms.base.vo.module.ComplianceRepaymentVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.platrepay.dto.TdGuaranteePaymentDTO;
@@ -482,9 +483,13 @@ public class TdrepayRechargeController {
 					if (infoVO != null) {
 						IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(infoVO.getBatchId());
 						if (issueSendOutsideLog != null) {
-							JSONObject parseObject = JSONObject.parseObject(issueSendOutsideLog.getReturnJson());
-							if (parseObject != null) {
-								infoVO.setRemark(parseObject.getString("codeDesc"));
+							if (JsonUtil.isJSONValid(issueSendOutsideLog.getReturnJson())) {
+								JSONObject parseObject = JSONObject.parseObject(issueSendOutsideLog.getReturnJson());
+								if (parseObject != null) {
+									infoVO.setRemark(parseObject.getString("codeDesc"));
+								}
+							}else {
+								infoVO.setRemark(issueSendOutsideLog.getReturnJson());
 							}
 						}
 

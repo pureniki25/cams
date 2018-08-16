@@ -84,13 +84,13 @@
 				AND DATE_FORMAT(mp.trade_date,'%Y-%m-%d') = #{tradeDate}
 			</if>
 			<if test="createTimeStart != null and createTimeStart.length != 0 and createTime == null">
-				AND mp.create_time &gt;= #{createTimeStart,jdbcType=DATE}
+				AND ( mp.create_time &gt;= #{createTimeStart,jdbcType=DATE} OR mp.update_time &gt;= #{createTimeStart,jdbcType=DATE} )
 			</if>
 			<if test="createTimeEnd != null and createTimeEnd.length != 0 and createTime == null">
-				AND mp.create_time &lt;= #{createTimeEnd,jdbcType=DATE}
+				AND ( mp.create_time &lt;= #{createTimeEnd,jdbcType=DATE} OR mp.update_time &lt;= #{createTimeEnd,jdbcType=DATE} )
 			</if>
 			<if test="createTime != null and createTime.length != 0 ">
-				AND DATE_FORMAT(mp.create_time,'%Y-%m-%d') = #{createTime}
+				AND ( DATE_FORMAT(mp.create_time,'%Y-%m-%d') = #{createTime} OR DATE_FORMAT(mp.update_time,'%Y-%m-%d') = #{createTime} )
 			</if>
 			<if test="acceptBank != null and acceptBank.length != 0 ">
 				AND mp.accept_bank = #{acceptBank}
@@ -144,13 +144,13 @@
 				AND DATE_FORMAT(mp.trade_date,'%Y-%m-%d') = #{tradeDate}
 			</if>
 			<if test="createTimeStart != null and createTimeStart.length != 0 and createTime == null">
-				AND mp.create_time &gt;= #{createTimeStart,jdbcType=DATE}
+				AND ( mp.create_time &gt;= #{createTimeStart,jdbcType=DATE} OR mp.update_time &gt;= #{createTimeStart,jdbcType=DATE} )
 			</if>
 			<if test="createTimeEnd != null and createTimeEnd.length != 0 and createTime == null">
-				AND mp.create_time &lt;= #{createTimeEnd,jdbcType=DATE}
+				AND ( mp.create_time &lt;= #{createTimeEnd,jdbcType=DATE} OR mp.update_time &lt;= #{createTimeEnd,jdbcType=DATE} )
 			</if>
 			<if test="createTime != null and createTime.length != 0 ">
-				AND DATE_FORMAT(mp.create_time,'%Y-%m-%d') = #{createTime}
+				AND ( DATE_FORMAT(mp.create_time,'%Y-%m-%d') = #{createTime} OR DATE_FORMAT(mp.update_time,'%Y-%m-%d') = #{createTime} )
 			</if>
 			<if test="acceptBank != null and acceptBank.length != 0 ">
 				AND mp.accept_bank = #{acceptBank}
