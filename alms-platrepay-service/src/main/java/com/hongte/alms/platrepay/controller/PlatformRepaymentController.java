@@ -684,7 +684,7 @@ public class PlatformRepaymentController {
 							break;
 						}
 						detailFee.setFeeType(feeType);
-						detailFee.setFeeName(FEE_TYPE_MAP.get(feeType));
+						detailFee.setFeeName(r.getPlanItemName());
 
 						// 费用
 						if (byGuaranteePayment) {
@@ -712,20 +712,6 @@ public class PlatformRepaymentController {
 					} else {
 						vo.setRechargeAmount(planRepaymentRechargeAmount);
 					}
-
-					/*
-					 * 如果充值金额大于实还金额，则不允许资金分发 -- （肖莹环提出规则，2018-08-13） 取消这个规则 -- （肖莹环提出取消，2018-08-15）
-					 */
-					// BigDecimal factRepayAmount2 = vo.getFactRepayAmount() == null ?
-					// BigDecimal.ZERO : vo.getFactRepayAmount();
-					// BigDecimal rechargeAmount = vo.getRechargeAmount() == null ? BigDecimal.ZERO
-					// : vo.getRechargeAmount();
-					// if (rechargeAmount.compareTo(factRepayAmount2) > 0) {
-					// LOGGER.info("充值金额不能大于实还金额输入参数 projectPlanId:[{}] factRepayAmount2:[{}]
-					// rechargeAmount[{}] ",
-					// projPlanListId, factRepayAmount2, rechargeAmount);
-					// return Result.error("充值金额不能大于实还金额");
-					// }
 
 					/*
 					 * 0：非结清，10：正常结清，11：逾期结清，20：展期原标结清，30：坏账结清 如果坏账结清，则充值金额等于实还金额
