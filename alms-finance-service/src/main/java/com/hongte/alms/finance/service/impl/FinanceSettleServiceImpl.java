@@ -484,15 +484,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							
 							repaymentProjPlanSettleDto.getCurShowPayFeels().put(planListDetailShowPayDto.getFeelId(), planListDetailShowPayDto);
 							
-							if (financeSettleBaseDto.isNoMoney()) {
-								if (CollectionUtils.isEmpty(financeSettleBaseDto.getUnderfillFees())) {
-									financeSettleBaseDto.setUnderfillFees(new ArrayList<>());
-								}
-								
-								financeSettleBaseDto.getUnderfillFees().add(planListDetailShowPayDto);
-								
-								continue;
-							}
 							RepaymentProjPlanListDetail repaymentProjPlanListDetail = repaymentProjPlanSettleDto.getCurrProjPlanListDto().getProjPlanListDetails().get(0);
 							RepaymentProjPlanListDetail projPlanListDetail = new RepaymentProjPlanListDetail() ;
 							BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetail);
@@ -508,6 +499,17 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							projPlanListDetail.setPlanItemType(Integer.parseInt(settleFeesVO.getPlanItemType()));
 							projPlanListDetail.setCreateDate(new Date());
 							projPlanListDetail.setCreateUser(financeSettleBaseDto.getUserId());
+							
+							if (financeSettleBaseDto.isNoMoney()) {
+								if (CollectionUtils.isEmpty(financeSettleBaseDto.getUnderfillFees())) {
+									financeSettleBaseDto.setUnderfillFees(new ArrayList<>());
+								}
+								
+								financeSettleBaseDto.getUnderfillFees().add(planListDetailShowPayDto);
+								repaymentProjPlanSettleDto.getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail);
+								continue;
+							}
+							
 							/*由于提前违约金没有应还日期,所以duedate为null*/
 //							projPlanListDetail.setPeriod(repaymentBizPlanList.getPeriod());
 //							projPlanListDetail.setPlanListId(repaymentBizPlanList.getPlanListId());
@@ -559,26 +561,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 //									planListDetailShowPayDto);
 							/*本金违约金不算资金分发,所以要注释这里*/
 							
-							if (financeSettleBaseDto.isNoMoney()) {
-								if (CollectionUtils.isEmpty(financeSettleBaseDto.getUnderfillFees())) {
-									financeSettleBaseDto.setUnderfillFees(new ArrayList<>());
-								}
-	
-								financeSettleBaseDto.getUnderfillFees().add(planListDetailShowPayDto);
-	
-								continue;
-							}
-	
-//							RepaymentProjPlanListDetail projPlanListDetail = new RepaymentProjPlanListDetail();
-//							projPlanListDetail.setProjPlanAmount(settleFeesVO.getAmount());
-//							projPlanListDetail.setFeeId(settleFeesVO.getFeeId());
-//							projPlanListDetail.setPlanItemName(settleFeesVO.getPlanItemName());
-//							projPlanListDetail.setPlanItemType(Integer.parseInt(settleFeesVO.getPlanItemType()));
-//							projPlanListDetail.setPeriod(repaymentBizPlanList.getPeriod());
-//							projPlanListDetail.setPlanListId(repaymentBizPlanList.getPlanListId());
-//							projPlanListDetail.setProjPlanDetailId(null);
-//							projPlanListDetail.setProjPlanListId(null);
-	
 							RepaymentProjPlanListDetail repaymentProjPlanListDetail = repaymentProjPlanSettleDto.getCurrProjPlanListDto().getProjPlanListDetails().get(0);
 							RepaymentProjPlanListDetail projPlanListDetail = new RepaymentProjPlanListDetail() ;
 							BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetail);
@@ -593,6 +575,28 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							projPlanListDetail.setPlanItemType(Integer.parseInt(settleFeesVO.getPlanItemType()));
 							projPlanListDetail.setCreateDate(new Date());
 							projPlanListDetail.setCreateUser(financeSettleBaseDto.getUserId());
+							
+							if (financeSettleBaseDto.isNoMoney()) {
+								if (CollectionUtils.isEmpty(financeSettleBaseDto.getUnderfillFees())) {
+									financeSettleBaseDto.setUnderfillFees(new ArrayList<>());
+								}
+	
+								financeSettleBaseDto.getUnderfillFees().add(planListDetailShowPayDto);
+								repaymentProjPlanSettleDto.getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail);
+								continue;
+							}
+	
+//							RepaymentProjPlanListDetail projPlanListDetail = new RepaymentProjPlanListDetail();
+//							projPlanListDetail.setProjPlanAmount(settleFeesVO.getAmount());
+//							projPlanListDetail.setFeeId(settleFeesVO.getFeeId());
+//							projPlanListDetail.setPlanItemName(settleFeesVO.getPlanItemName());
+//							projPlanListDetail.setPlanItemType(Integer.parseInt(settleFeesVO.getPlanItemType()));
+//							projPlanListDetail.setPeriod(repaymentBizPlanList.getPeriod());
+//							projPlanListDetail.setPlanListId(repaymentBizPlanList.getPlanListId());
+//							projPlanListDetail.setProjPlanDetailId(null);
+//							projPlanListDetail.setProjPlanListId(null);
+	
+							
 							/*由于提前违约金没有应还日期,所以duedate为null*/
 //							projPlanListDetail.setPeriod(repaymentBizPlanList.getPeriod());
 //							projPlanListDetail.setPlanListId(repaymentBizPlanList.getPlanListId());
@@ -845,6 +849,18 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList().setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
 							repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList().setRepayFlag(PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue());
 							repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList().updateAllColumnById();
+							
+							/*更新标的明细*/
+							for (RepaymentProjPlanListDetail detail : repaymentProjPlanSettleDto.getCurrProjPlanListDto().getProjPlanListDetails()) {
+								if (detail.getProjPlanDetailId()!=null && !detail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue())) {
+					        		detail.updateAllColumnById();
+								}
+					        	if (detail.getProjPlanDetailId()!=null && detail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue())) {
+					        		detail.setProjPlanDetailId(UUID.randomUUID().toString());
+					        		detail.insert();
+								}
+							}
+							/*更新标的明细*/
 							
 							/*更新往后期的标的期数*/
 		                	for (RepaymentProjPlanListDto afterProjPlanListDto : repaymentProjPlanSettleDto.getAfterProjPlanListDtos()) {
@@ -1560,13 +1576,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         
         if (!financeSettleBaseDto.getPreview()) {
         	fact.insert();
-        	if (detail.getProjPlanDetailId()!=null && !detail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue())) {
-        		detail.updateAllColumnById();
-			}
-        	if (detail.getProjPlanDetailId()!=null && detail.getPlanItemType().equals(RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue())) {
-        		detail.setProjPlanDetailId(UUID.randomUUID().toString());
-        		detail.insert();
-			}
+        	
 		}
 //        detail.updateById();
         //累加标的实还信息
