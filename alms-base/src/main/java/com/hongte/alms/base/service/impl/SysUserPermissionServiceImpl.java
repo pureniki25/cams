@@ -126,7 +126,6 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     public void setUserPermissons(String userId){
     	
     	SysUser sysUser = sysUserService.selectById(userId);
-    	sysUser.setLastPermissionStatus(1);
     	
     	String pagePermissionJson = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
     	JSONObject pagePermissionJSONObject = JSONObject.parseObject(pagePermissionJson);
@@ -198,6 +197,21 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     	//1获取现有权限
     	List<SysUserPermission> listSysUserPermissionNow = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("user_id", userId));
     	
+    	//如果上次判定异常
+    	if(sysUser.getLastPermissionStatus() == 1) {
+    		//去重
+        	List<SysUserPermission> listSysUserPermissionGroup = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>()
+        			.eq("user_id", userId)
+        			.groupBy("business_id,page_type"));
+        	List<Integer> listIds = new ArrayList<>();
+        	for (SysUserPermission sysUserPermission : listSysUserPermissionGroup) {
+        		listIds.add(sysUserPermission.getId());
+			}
+        	sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("user_id", userId).notIn("id", listIds));
+    	}
+    	
+    	sysUser.setLastPermissionStatus(1);
+    	
     	//2对比旧权限与新权限》找出要删除的
     	List<SysUserPermission> listSysUserPermissionExsits = new ArrayList<>();
     	List<SysUserPermission> listSysUserPermissionleft = new ArrayList<>();
@@ -265,7 +279,6 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         	}
         }*/
     }
-
 
 	private JSONObject updatePagePermission(JSONObject pagePermissionJSONObject,String userId) {
     	 //查出用户权限列表
