@@ -2181,15 +2181,16 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 			if (CollectionUtils.isEmpty(selectList)) {
 				// 找不到还款中的当前期则判断结清日期是否大过还款计划最后一次还款的期限
 
-				RepaymentBizPlanList lastBizPlanList = BizPlanLists.get(0);
-				// 如果最后一期的应还时间小于当前的结清时间
-				if (DateUtil.getDiff(lastBizPlanList.getDueDate(), settleDate) <= 0) {
-					// 且为未还款
-					if (!lastBizPlanList.getCurrentStatus().equals(RepayCurrentStatusEnums.已还款.toString())) {
-						selectList = new LinkedList<RepaymentBizPlanList>();
-						selectList.add(lastBizPlanList);
-					}
-				}
+//				RepaymentBizPlanList lastBizPlanList = BizPlanLists.get(0);
+//				// 如果最后一期的应还时间小于当前的结清时间
+//				if (DateUtil.getDiff(lastBizPlanList.getDueDate(), settleDate) <= 0) {
+//					// 且为未还款
+//					if (!lastBizPlanList.getCurrentStatus().equals(RepayCurrentStatusEnums.已还款.toString())) {
+//						selectList = new LinkedList<RepaymentBizPlanList>();
+//						selectList.add(lastBizPlanList);
+//					}
+//				}
+				selectList.add(finalPeriod);
 			}
 			// 再次判断当前期列表是否为空
 			if (CollectionUtils.isEmpty(selectList)) {
