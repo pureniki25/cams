@@ -2138,7 +2138,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 			List<RepaymentBizPlanList> selectList = repaymentBizPlanListMapper
 					.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", req.getBusinessId())
 							.eq("plan_id", repaymentBizPlan.getPlanId()).and(" DATE(due_date) >= DATE({0}) ", settleDate)
-							.eq("current_status", RepayCurrentStatusEnums.还款中.toString()).orderBy("due_date",false));
+							.eq("current_status", RepayCurrentStatusEnums.还款中.toString()).orderBy("due_date"));
 			// 判断当前期列表是否为空
 			if (CollectionUtils.isEmpty(selectList)) {
 				// 找不到还款中的当前期则判断结清日期是否大过还款计划最后一次还款的期限
