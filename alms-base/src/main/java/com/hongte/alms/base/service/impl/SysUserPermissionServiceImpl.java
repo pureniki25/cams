@@ -207,7 +207,15 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         	for (SysUserPermission sysUserPermission : listSysUserPermissionGroup) {
         		listIds.add(sysUserPermission.getId());
 			}
-        	sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("user_id", userId).notIn("id", listIds));
+        	
+        	List<Integer> listAllIds = new ArrayList<>();
+        	for (SysUserPermission sysUserPermission : listSysUserPermissionNow) {
+        		listAllIds.add(sysUserPermission.getId());
+			}
+        	listAllIds.removeAll(listIds);
+        	if(!listAllIds.isEmpty()) {
+        		sysUserPermissionService.deleteBatchIds(listAllIds);
+        	}
     	}
     	
     	sysUser.setLastPermissionStatus(1);
