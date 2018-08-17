@@ -975,21 +975,44 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                    repaymentConfirmPlatRepayLogService.insert(log);
 	                }
 	                
+	                repaymentBizPlanListSynchService.updateRepaymentBizPlan();
+                    repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
+                    repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
+                    
+//	                executor.execute(new Runnable() {
+//	                    @Override
+//	                    public void run() {
+//	                        logger.info("更新同步表，confirmLogId：{}", financeSettleBaseDto.getUuid());
+//	                        try {
+//	                            //睡一下，让还款的信息先存完。
+//	                            try{
+//	                                Thread.sleep(5000);
+//	                            }catch (InterruptedException e){
+//	                                logger.error(e.getMessage(), e);
+//	                            }
+//	                            /*更新财务管理列表*/
+//	                            
+//	                        } catch (Exception e) {
+//	                            logger.error(e.getMessage(), e);
+//	                            Thread.currentThread().interrupt();
+//	                        }
+//	                        logger.info("调用平台合规化还款接口结束");
+//	                    }
+//	                });
+	                
 	                executor.execute(new Runnable() {
 	                    @Override
 	                    public void run() {
 	                        logger.info("调用平台合规化还款接口开始，confirmLogId：{}", financeSettleBaseDto.getUuid());
+	                        logger.info("调用同步信贷接口开始，businessId：{}", financeSettleBaseDto.getBusinessId());
 	                        try {
 	                            //睡一下，让还款的信息先存完。
 	                            try{
-	                                Thread.sleep(5000);
+	                                Thread.sleep(1000*60);
 	                            }catch (InterruptedException e){
 	                                logger.error(e.getMessage(), e);
 	                            }
 	                            /*更新财务管理列表*/
-	                            repaymentBizPlanListSynchService.updateRepaymentBizPlan();
-	                            repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
-	                            repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
 	                            shareProfitService.updateRepayPlanToLMS(businessId);
 	                            tdrepayRecharge(projPlanList);
 	                        } catch (Exception e) {
