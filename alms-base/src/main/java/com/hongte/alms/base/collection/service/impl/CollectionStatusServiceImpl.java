@@ -25,6 +25,8 @@ import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -285,7 +287,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //                    if(lsys!=null && lsys.size()>0){
 //                        sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
 //                    }
-                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey()) {
+                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && !StringUtils.isBlank(oldStaffUserId)) {
                 		String oldStaffUserIds = oldStaffUserId;
 //                		cunshouThreadAsync.execute(new Runnable() {
 //        					@Override
@@ -300,7 +302,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 //2.新的那个跟单人的permission刷新
                 if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
                         || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
-                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey()) {
+                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && !StringUtils.isBlank(staffUserId)) {
 //                		cunshouThreadAsync.execute(new Runnable() {
 //        					@Override
 //        					public void run() {
