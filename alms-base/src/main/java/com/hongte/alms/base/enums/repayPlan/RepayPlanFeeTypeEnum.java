@@ -1,5 +1,7 @@
 package com.hongte.alms.base.enums.repayPlan;
 
+import java.util.UUID;
+
 import com.baomidou.mybatisplus.enums.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -28,7 +30,7 @@ public enum RepayPlanFeeTypeEnum implements IEnum {
     DEPOSIT_FEE(90,"押金类费用","3aeef26a-9685-4148-98cb-fa3f88181c67",4)
     ,RUSH_RECEIVABLES(100,"冲应收","d5596127-530f-4083-95c5-01e5a75635aa",6)
     ,REBATE(110,"返点","b8c5c29f-dd2c-4a7c-8520-e1e8eb130021",110)  //UUID为随机生成
-
+    ,OTHER_FEE(120,"其他费用","cef85db3-6ece-448e-a9ba-a2db665e9be4",120)
     ;
 
 //    9883ee39-4448-11e8-b4f8-0242ac110003  提前结清本金违约金
@@ -114,4 +116,8 @@ public enum RepayPlanFeeTypeEnum implements IEnum {
     public void setXd_value(Integer xd_value) {
         this.xd_value = xd_value;
     }
+    
+    public static void main(String[] args) {
+		System.out.println(UUID.randomUUID().toString());
+	}
 }

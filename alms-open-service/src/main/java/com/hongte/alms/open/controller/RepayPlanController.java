@@ -345,7 +345,6 @@ public class RepayPlanController {
                         Integer feeType =RepayPlanFeeTypeEnum.getByKey(planListDetail.getPlanItemType()).getXd_value();
                         afterDetail.setAfterFeeType(feeType);
                         afterDetail.setFeeName(planListDetail.getPlanItemName());
-                        afterDetail.setFeeName(FEE_TYPE_MAP.get(feeType));
                         afterDetail.setPlanFeeValue(planListDetail.getPlanAmount());
                         afterDetail.setActualFeeValue(planListDetail.getFactAmount());
                         afterDetail.setPlanRepaymentDate(planListDetail.getDueDate());

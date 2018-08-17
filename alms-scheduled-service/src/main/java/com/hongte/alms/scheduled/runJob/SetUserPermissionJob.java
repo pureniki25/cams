@@ -9,6 +9,7 @@ import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.SysUserPermissionService;
 import com.hongte.alms.base.service.SysUserService;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.scheduled.job.AutoSetCollectionJob;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
@@ -62,7 +63,10 @@ public class SetUserPermissionJob extends IJobHandler  {
 				}
         	}
         	
-            List<SysUser> list =  sysUserService.selectList(new EntityWrapper<SysUser>());
+            List<SysUser> list =  sysUserService.selectList(new EntityWrapper<SysUser>()
+            		.le("last_permission_time", DateUtil.getThatDayBegin(new Date()))
+            		.or().eq("last_permission_status", 1)
+            		.or().isNull("last_permission_time"));
             
             for(SysUser user:list){
             	XxlJobLogger.log("@SyncDaihouJob@同步用户等待"+steps);
