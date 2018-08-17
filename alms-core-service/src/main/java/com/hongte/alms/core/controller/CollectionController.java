@@ -595,6 +595,30 @@ public class CollectionController {
         }
     }
 
+    @ApiOperation(value = "将符合条件的业务移交到诉讼系统")
+    @GetMapping("/setBusinessToLaw")
+    public Result setBusinessToLaw(){
+        try{
+            collectionStatusService.setBusinessToLaw();
+            return Result.success();
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return Result.error("500", "将符合条件的业务移交到诉讼系统:"+ ex.getMessage());
+        }
+    }
+
+    @ApiOperation(value = "将指定的业务移交到诉讼系统")
+    @GetMapping("/setOneBusinessToLaw")
+    public Result setOneBusinessToLaw(String businessId){
+        try{
+            collectionStatusService.setOneBusinessToLaw(businessId);
+            return Result.success();
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return Result.error("500", "将指定的业务移交到诉讼系统:"+ ex.getMessage());
+        }
+    }
+
 
 
 
