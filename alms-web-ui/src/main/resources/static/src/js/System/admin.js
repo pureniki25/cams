@@ -30,6 +30,8 @@ window.layinit(function (htConfig) {
            calLateFeeLoading:false,
            updateAgencyRechargeHandleStatusLoading:false, // 更新代充值处理状态
            setCollectionLoading:false, //分配贷后跟进人员  标志位
+           setBizToLawLoading:false,//移交业务到诉讼系统  标志位
+           setOneBizToLawLoading:false,//移交指定业务到诉讼系统  标志位
            autoRepayLoading:false,
            tdrepyChargeLoading:false,	// 合规化还款加载标识
            retryRepaymentLoading:false,	// 重试平台还款接口加载标识
@@ -59,9 +61,10 @@ window.layinit(function (htConfig) {
            //手动核销的afterId
            afterId:"",
            //手动核销的logId
-           logId:""
+           logId:"",
 
-           
+           //需移交法务的业务id
+           toLawBusinessId:''
 
 	   },
 	   methods: {
@@ -325,6 +328,44 @@ window.layinit(function (htConfig) {
                    })
                    .catch(function (error) {
                        vm.setCollectionLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
+           //自动移交法务
+           setBizToLaw:function(){
+               this.setBizToLawLoading = true;
+               axios.get(basePath +"collection/setBusinessToLaw",{timeout: 0})
+                   .then(function (res) {
+                       vm.setBizToLawLoading = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.setBizToLawLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
+           //将指定业务移交法务
+           setOneBizToLaw:function(){
+               this.setOneBizToLawLoading = true;
+               axios.get(basePath +"collection/setOneBusinessToLaw?businessId="+this.toLawBusinessId,{timeout: 0})
+                   .then(function (res) {
+                       vm.setOneBizToLawLoading = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.setOneBizToLawLoading = false;
                        vm.$Modal.error({content: '接口调用异常!'});
                    });
            },

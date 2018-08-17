@@ -33,7 +33,8 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
             @Param("companyId") String companyId,
             @Param("overDueDays") Integer overDueDays,
             @Param("colStatus") Integer colStatus,
-            @Param("businessType") Integer businessType
+            @Param("businessType") Integer businessType,
+            @Param("businessId") String businessId
     		);
     
     String queryRepaymentBizPlanListByConditions(@Param(value="businessId") String businessId, @Param(value="afterId") String afterId);

@@ -92,6 +92,17 @@ public interface CollectionStatusService extends BaseService<CollectionStatus> {
     public void autoSetBusinessStaff();
 
 
+    /**
+     * 自动移交法务
+     */
+    public void setBusinessToLaw();
+
+    /**
+     * 将指定业务移交法务
+     * @param businessId
+     */
+    public void setOneBusinessToLaw(String businessId);
+
     //根据用户ID查找出用户跟进的业务列表
     public List<String> selectFollowBusinessIds(String userId);
 
