@@ -124,6 +124,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
      */
 //    @Transient
     public void setUserPermissons(String userId){
+    	logger.info("userId={},同步权限",userId);
     	
     	SysUser sysUser = sysUserService.selectById(userId);
     	

@@ -287,7 +287,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //                    if(lsys!=null && lsys.size()>0){
 //                        sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
 //                    }
-                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && StringUtils.isNoneBlank(oldStaffUserId)) {
+                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && !StringUtils.isBlank(oldStaffUserId)) {
                 		String oldStaffUserIds = oldStaffUserId;
                 		sysUserPermissionService.setUserPermissons(oldStaffUserIds);
 //                		cunshouThreadAsync.execute(new Runnable() {
@@ -303,7 +303,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 //2.新的那个跟单人的permission刷新
                 if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
                         || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
-                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && StringUtils.isNoneBlank(staffUserId)) {
+                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && !StringUtils.isBlank(staffUserId)) {
                 		sysUserPermissionService.setUserPermissons(staffUserId);
 //                		cunshouThreadAsync.execute(new Runnable() {
 //        					@Override
