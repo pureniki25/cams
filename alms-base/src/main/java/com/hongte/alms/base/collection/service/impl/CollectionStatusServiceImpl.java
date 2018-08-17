@@ -289,11 +289,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //                    }
                 	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && !StringUtils.isBlank(oldStaffUserId)) {
                 		String oldStaffUserIds = oldStaffUserId;
-                		sysUserPermissionService.setUserPermissons(oldStaffUserIds);
 //                		cunshouThreadAsync.execute(new Runnable() {
 //        					@Override
 //        					public void run() {
-//        						sysUserPermissionService.setUserPermissonsInBusinessList(oldStaffUserIds,voList);
+        						sysUserPermissionService.setUserPermissonsInBusinessList(oldStaffUserIds,voList);
 //        					}
 //        	        	});
                 		
@@ -304,11 +303,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
                         || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
                 	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && !StringUtils.isBlank(staffUserId)) {
-                		sysUserPermissionService.setUserPermissons(staffUserId);
 //                		cunshouThreadAsync.execute(new Runnable() {
 //        					@Override
 //        					public void run() {
-//        						sysUserPermissionService.setUserPermissonsInBusinessList(staffUserId,voList);
+        						sysUserPermissionService.setUserPermissonsInBusinessList(staffUserId,voList);
 //        					}
 //        	        	});
                 	

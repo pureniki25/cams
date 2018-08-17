@@ -124,7 +124,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
      */
 //    @Transient
     public void setUserPermissons(String userId){
-    	logger.info("userId={},同步权限",userId);
+    	logger.info("userId={},自动同步权限开始",userId);
     	
     	SysUser sysUser = sysUserService.selectById(userId);
     	
@@ -235,7 +235,8 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     	}
     	List<SysUserPermission> listSysUserPermissionDel = new ArrayList<>();
     	listSysUserPermissionDel.addAll(listSysUserPermissionNow);
-    	if(listSysUserPermissionDel.removeAll(listSysUserPermissionleft)) {
+    	listSysUserPermissionDel.removeAll(listSysUserPermissionleft);
+    	if(!listSysUserPermissionDel.isEmpty()) {
     		for(SysUserPermission sysUserPermissionDel: listSysUserPermissionDel) {
     			sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id", sysUserPermissionDel.getBusinessId()).eq("page_type", sysUserPermissionDel.getPageType()));
     		}
@@ -253,9 +254,17 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     	
     	List<SysUserPermission> listSysUserPermissionAdd = new ArrayList<>();
     	listSysUserPermissionAdd.addAll(permissions);
-    	if(listSysUserPermissionAdd.removeAll(listSysUserPermissionExsits)) {
+    	listSysUserPermissionAdd.removeAll(listSysUserPermissionExsits);
+    	if(!listSysUserPermissionAdd.isEmpty()) {
     		if(!listSysUserPermissionAdd.isEmpty()) {
-    			sysUserPermissionService.insertBatch(listSysUserPermissionAdd,1000);
+            	for(int i = 0;i < listSysUserPermissionAdd.size();i=i+1000) {
+    				int j = i+1000;
+    				if(j >= listSysUserPermissionAdd.size() ) {
+    					j = listSysUserPermissionAdd.size();
+    				}
+    				List<SysUserPermission> subPermissions =  listSysUserPermissionAdd.subList(i, j);
+    				sysUserPermissionService.insertBatch(subPermissions,100);
+            	}
         	}
     	}
     	
@@ -287,6 +296,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 	        	});
         	}
         }*/
+    	logger.info("userId={},自动同步权限结束",userId);
     }
 
 	private JSONObject updatePagePermission(JSONObject pagePermissionJSONObject,String userId) {
@@ -535,6 +545,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 
 	@Override
 	public void setUserPermissonsInBusinessList(String userId, List<StaffBusinessVo> voList) {
+		logger.info("催收同步用户{}权限开始,业务{}",userId,voList);
 		if(voList != null && !voList.isEmpty()) {
 		
 		String pagePermissionJson = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
@@ -623,7 +634,8 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         	}
         	List<SysUserPermission> listSysUserPermissionDel = new ArrayList<>();
         	listSysUserPermissionDel.addAll(listSysUserPermissionNow);
-        	if(listSysUserPermissionDel.removeAll(listSysUserPermissionleft)) {
+        	listSysUserPermissionDel.removeAll(listSysUserPermissionleft);
+        	if(!listSysUserPermissionDel.isEmpty()) {
         		for(SysUserPermission sysUserPermissionDel: listSysUserPermissionDel) {
         			sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id", sysUserPermissionDel.getBusinessId()).eq("page_type", sysUserPermissionDel.getPageType()));
         		}
@@ -639,13 +651,20 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 				}
         	}
         	
-        	if(permissions.removeAll(listSysUserPermissionExsits)) {
-        		if(!permissions.isEmpty()) {
-        			sysUserPermissionService.insertBatch(permissions,1000);
-            	}
-        	}
-        	
+        	permissions.removeAll(listSysUserPermissionExsits);
+	    		if(!permissions.isEmpty()) {
+	//        			sysUserPermissionService.insertBatch(permissions,1000);
+	            	for(int i = 0;i < permissions.size();i=i+1000) {
+	    				int j = i+1000;
+	    				if(j >= permissions.size() ) {
+	    					j = permissions.size();
+	    				}
+	    				List<SysUserPermission> subPermissions =  permissions.subList(i, j);
+	    				sysUserPermissionService.insertBatch(subPermissions,100);
+	            	}
+	        	}
         }
+		logger.info("催收同步用户{}权限结束,业务{}",userId,voList);
 	}
 
 
