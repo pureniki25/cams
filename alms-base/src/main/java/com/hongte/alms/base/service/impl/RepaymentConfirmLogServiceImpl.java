@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.google.common.collect.Maps;
 import com.hongte.alms.base.dto.PlatformRepaymentDto;
 import com.hongte.alms.base.dto.PlatformRepaymentReq;
 import com.hongte.alms.base.entity.AccountantOverRepayLog;
@@ -26,11 +27,13 @@ import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetailBak;
 import com.hongte.alms.base.entity.RepaymentResource;
 import com.hongte.alms.base.entity.SysApiCallFailureRecord;
+import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.AlmsOpenServiceFeignClient;
 import com.hongte.alms.base.feignClient.PlatformRepaymentFeignClient;
 import com.hongte.alms.base.mapper.AccountantOverRepayLogMapper;
 import com.hongte.alms.base.mapper.RepaymentBizPlanBakMapper;
@@ -59,6 +62,7 @@ import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
@@ -66,6 +70,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -154,6 +159,9 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     @Autowired
     @Qualifier("RepaymentBizPlanService")
     RepaymentBizPlanService repaymentBizPlanService ;
+    
+    @Autowired
+    AlmsOpenServiceFeignClient almsOpenServiceFeignClient ;
     
     @Autowired
 	LoginUserInfoHelper 	loginUserInfoHelper;
@@ -344,8 +352,8 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         }
         
         if (log.getType().equals(2)) {
-        	Wrapper<RepaymentProjPlanListDetail> wrapper2 = new EntityWrapper<RepaymentProjPlanListDetail>().eq("business_id", log.getBusinessId()).eq("plan_item_type",RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue());
-			Wrapper<RepaymentBizPlanListDetail> wrapper3 = new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", log.getBusinessId()).eq("plan_item_type",RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue());
+        	Wrapper<RepaymentProjPlanListDetail> wrapper2 = new EntityWrapper<RepaymentProjPlanListDetail>().eq("business_id", log.getBusinessId()).and(" ( plan_item_type=70 or plan_item_type=120 )");
+			Wrapper<RepaymentBizPlanListDetail> wrapper3 = new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", log.getBusinessId()).and(" ( plan_item_type=70 or plan_item_type=120 )");
 			
 			if (log.getPlanId()!=null) {
 				List<String> bizplanLists = new ArrayList<>() ;
@@ -399,6 +407,30 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         repaymentBizPlanListSynchService.updateRepaymentBizPlan();
         repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
         repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
+        
+        /*同步到信贷*/
+        Result result = null;
+        Map<String, Object> paramMap = Maps.newHashMap();
+        paramMap.put("businessId", businessId);
+        try {
+            result = almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);
+            if (result == null || !"1".equals(result.getCode())) {
+
+                sysApiCallFailureRecordService.save(
+                        AlmsServiceNameEnums.FINANCE,
+                        Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+                        Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+                        businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            sysApiCallFailureRecordService.save(
+                    AlmsServiceNameEnums.FINANCE,
+                    Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+                    Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+                    businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
+        }
+        /*同步到信贷*/
         return Result.success();
     }
 

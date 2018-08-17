@@ -461,7 +461,10 @@ public class CollectionController {
 			}
         	
         	//4找出区域电催负责人 tb_collection_person_set_detail
-        	List<CollectionPersonSetDetail> listCollectionPersonSetDetail = collectionPersonSetDetailService.selectList(new EntityWrapper<CollectionPersonSetDetail>().in("col_person_id", listColPersonId));
+        	List<CollectionPersonSetDetail> listCollectionPersonSetDetail = new ArrayList<>();
+        	if(!listColPersonId.isEmpty()) {
+        		listCollectionPersonSetDetail = collectionPersonSetDetailService.selectList(new EntityWrapper<CollectionPersonSetDetail>().in("col_person_id", listColPersonId));
+        	}
         	for (CollectionPersonSetDetail collectionPersonSetDetail : listCollectionPersonSetDetail) {
         		//清算一组
         		if(collectionPersonSetDetail.getTeam() == 1) {
