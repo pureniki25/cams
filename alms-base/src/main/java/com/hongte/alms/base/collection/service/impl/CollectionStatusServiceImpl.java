@@ -287,12 +287,12 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //                    }
                 	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey()) {
                 		String oldStaffUserIds = oldStaffUserId;
-                		cunshouThreadAsync.execute(new Runnable() {
-        					@Override
-        					public void run() {
+//                		cunshouThreadAsync.execute(new Runnable() {
+//        					@Override
+//        					public void run() {
         						sysUserPermissionService.setUserPermissonsInBusinessList(oldStaffUserIds,voList);
-        					}
-        	        	});
+//        					}
+//        	        	});
                 		
                 	}
                 }
@@ -301,12 +301,12 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
                         || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
                 	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey()) {
-                		cunshouThreadAsync.execute(new Runnable() {
-        					@Override
-        					public void run() {
+//                		cunshouThreadAsync.execute(new Runnable() {
+//        					@Override
+//        					public void run() {
         						sysUserPermissionService.setUserPermissonsInBusinessList(staffUserId,voList);
-        					}
-        	        	});
+//        					}
+//        	        	});
                 	
                 	}
                     /*List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",staffUserId));
