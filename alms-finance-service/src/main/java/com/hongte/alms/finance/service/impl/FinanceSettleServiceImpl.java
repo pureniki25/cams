@@ -960,16 +960,16 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                        try {
 	                            //睡一下，让还款的信息先存完。
 	                            try{
-	                                Thread.sleep(3000);
+	                                Thread.sleep(5000);
 	                            }catch (InterruptedException e){
 	                                logger.error(e.getMessage(), e);
 	                            }
-	                            tdrepayRecharge(projPlanList);
 	                            /*更新财务管理列表*/
 	                            repaymentBizPlanListSynchService.updateRepaymentBizPlan();
 	                            repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
 	                            repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
 	                            shareProfitService.updateRepayPlanToLMS(businessId);
+	                            tdrepayRecharge(projPlanList);
 	                        } catch (Exception e) {
 	                            logger.error(e.getMessage(), e);
 	                            Thread.currentThread().interrupt();
@@ -980,10 +980,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                
 	                
 				}
-				
-                logger.info(JSON.toJSONString(financeSettleBaseDto.getUnderfillFees()));
-
-
         } else {
             logger.error("找不到对应的还款计划列表repaymentBizPlanList  businessId:" + businessId + "     after_id:" + afterId);
             throw new SettleRepaymentExcepiton("找不到对应的还款计划列表", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
@@ -2267,15 +2263,16 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 			if (CollectionUtils.isEmpty(selectList)) {
 			    //找不到还款中的当前期则判断结清日期是否大过还款计划最后一次还款的期限
 
-                RepaymentBizPlanList  lastBizPlanList =  BizPlanLists.get(0);
-                //如果最后一期的应还时间小于当前的结清时间
-                if(DateUtil.getDiff(lastBizPlanList.getDueDate(),settleDate) >= 0){
-                    //且为未还款
-                    if(!lastBizPlanList.getCurrentStatus().equals(RepayCurrentStatusEnums.已还款.toString())){
-                        selectList = new LinkedList<RepaymentBizPlanList>();
-                        selectList.add(lastBizPlanList);
-                    }
-                }
+//                RepaymentBizPlanList  lastBizPlanList =  BizPlanLists.get(0);
+//                //如果最后一期的应还时间小于当前的结清时间
+//                if(DateUtil.getDiff(lastBizPlanList.getDueDate(),settleDate) >= 0){
+//                    //且为未还款
+//                    if(!lastBizPlanList.getCurrentStatus().equals(RepayCurrentStatusEnums.已还款.toString())){
+//                        selectList = new LinkedList<RepaymentBizPlanList>();
+//                        selectList.add(lastBizPlanList);
+//                    }
+//                }
+				selectList.add(finalPeriod);
 			}
 			//再次判断当前期列表是否为空
             if (CollectionUtils.isEmpty(selectList)) {
