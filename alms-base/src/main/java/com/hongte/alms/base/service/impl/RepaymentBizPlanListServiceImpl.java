@@ -86,7 +86,7 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
         return repaymentBizPlanListMapper.selectNeedSetColInfoNormalBizPlansBycomId(
                 companyId,
                 overDueDays,
-                CollectionStatusEnum.PHONE_STAFF.getKey(), businessType);
+                CollectionStatusEnum.PHONE_STAFF.getKey(), businessType,null);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
         return repaymentBizPlanListMapper.selectNeedSetColInfoNormalBizPlansBycomId(
                 companyId,
                 overDueDays,
-                CollectionStatusEnum.COLLECTING.getKey(), businessType);
+                CollectionStatusEnum.COLLECTING.getKey(), businessType,null);
 
     }
 
@@ -103,8 +103,17 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
         return repaymentBizPlanListMapper.selectNeedSetColInfoNormalBizPlansBycomId(
                 null,
                 overDueDays,
-                CollectionStatusEnum.TO_LAW_WORK.getKey(), businessType);
+                CollectionStatusEnum.TO_LAW_WORK.getKey(), businessType,null);
     }
+
+    @Override
+    public List<RepaymentBizPlanList> selectNeedLawNorBizByBizId(Integer overDueDays, Integer businessType,String businessId) {
+        return repaymentBizPlanListMapper.selectNeedSetColInfoNormalBizPlansBycomId(
+                null,
+                overDueDays,
+                CollectionStatusEnum.TO_LAW_WORK.getKey(), businessType,businessId);
+    }
+
 
     @Override
     public String queryRepaymentBizPlanListByConditions(String businessId, String afterId) {

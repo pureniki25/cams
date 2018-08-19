@@ -461,7 +461,10 @@ public class CollectionController {
 			}
         	
         	//4找出区域电催负责人 tb_collection_person_set_detail
-        	List<CollectionPersonSetDetail> listCollectionPersonSetDetail = collectionPersonSetDetailService.selectList(new EntityWrapper<CollectionPersonSetDetail>().in("col_person_id", listColPersonId));
+        	List<CollectionPersonSetDetail> listCollectionPersonSetDetail = new ArrayList<>();
+        	if(!listColPersonId.isEmpty()) {
+        		listCollectionPersonSetDetail = collectionPersonSetDetailService.selectList(new EntityWrapper<CollectionPersonSetDetail>().in("col_person_id", listColPersonId));
+        	}
         	for (CollectionPersonSetDetail collectionPersonSetDetail : listCollectionPersonSetDetail) {
         		//清算一组
         		if(collectionPersonSetDetail.getTeam() == 1) {
@@ -589,6 +592,30 @@ public class CollectionController {
         }catch (Exception ex){
             ex.printStackTrace();
             return Result.error("500", "执行电催、催收分配异常:"+ ex.getMessage());
+        }
+    }
+
+    @ApiOperation(value = "将符合条件的业务移交到诉讼系统")
+    @GetMapping("/setBusinessToLaw")
+    public Result setBusinessToLaw(){
+        try{
+            collectionStatusService.setBusinessToLaw();
+            return Result.success();
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return Result.error("500", "将符合条件的业务移交到诉讼系统:"+ ex.getMessage());
+        }
+    }
+
+    @ApiOperation(value = "将指定的业务移交到诉讼系统")
+    @GetMapping("/setOneBusinessToLaw")
+    public Result setOneBusinessToLaw(String businessId){
+        try{
+            collectionStatusService.setOneBusinessToLaw(businessId);
+            return Result.success();
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return Result.error("500", "将指定的业务移交到诉讼系统:"+ ex.getMessage());
         }
     }
 

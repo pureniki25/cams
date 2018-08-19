@@ -42,7 +42,13 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * @return
      */
     public List<RepaymentBizPlanList> selectNeedLawNorBiz(Integer overDueDays,Integer businessType );
-     
+
+    /**
+     * 查出指定业务需要的还款计划列表
+     * @return
+     */
+    public List<RepaymentBizPlanList> selectNeedLawNorBizByBizId(Integer overDueDays, Integer businessType,String businessId);
+
     String queryRepaymentBizPlanListByConditions(@Param(value="businessId") String businessId, @Param(value="afterId") String afterId);
 
     /**

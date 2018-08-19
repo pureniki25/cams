@@ -316,7 +316,7 @@
 		    AND bb.`business_id` = p.original_business_id) totalPeriods 
 		FROM
 		  tb_basic_business bb,
-		  tb_basic_business_customer bbc,
+		  tb_basic_biz_customer bbc,
 		  (SELECT 
 		    c.fact_principal,
 		    c.`orig_business_id`,
@@ -510,7 +510,7 @@
 		  (SELECT 
 		    a.phone_number 
 		  FROM
-		    tb_basic_business_customer a 
+		    tb_basic_biz_customer a
 		  WHERE a.ismain_customer = 1 
 		    AND a.business_id = bb.`business_id`) phone_number,
 		  (SELECT 

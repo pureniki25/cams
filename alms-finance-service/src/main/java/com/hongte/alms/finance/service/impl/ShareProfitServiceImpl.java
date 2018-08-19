@@ -2237,7 +2237,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             logger.info("触发往信贷更新还未计划数据开始，businessId:[{}]", businessId);
             //睡一下，让还款的信息先存完。
             try{
-                Thread.sleep(1000);
+                Thread.sleep(1000*60);
             }catch (Exception e){
                 logger.error(e.getMessage(), e);
             }
