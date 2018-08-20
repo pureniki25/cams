@@ -43,6 +43,13 @@ public class SysBankLimit extends Model<SysBankLimit> {
 	@TableField("platform_id")
 	@ApiModelProperty(required= true,value = "代扣平台ID，tb_withholding_platform表的外键")
 	private Integer platformId;
+	
+	  /**
+     * 银行代扣子渠道
+     */
+	@TableField("sub_platform_id")
+	@ApiModelProperty(required= true,value = "银行代扣子渠道")
+	private String subPlatformId;
     /**
      * 是否存在单笔代扣限额，0：否，1：是
      */
@@ -220,6 +227,14 @@ public class SysBankLimit extends Model<SysBankLimit> {
 
 	public void setMonthLimit(BigDecimal monthLimit) {
 		this.monthLimit = monthLimit;
+	}
+    
+	public String getSubPlatformId() {
+		return subPlatformId;
+	}
+
+	public void setSubPlatformId(String subPlatformId) {
+		this.subPlatformId = subPlatformId;
 	}
 
 	@Override

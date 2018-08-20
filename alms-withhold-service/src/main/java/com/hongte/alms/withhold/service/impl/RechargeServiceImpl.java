@@ -274,19 +274,6 @@ public class RechargeServiceImpl implements RechargeService {
 					}
 				}
 				 //*****************挡板测试代码结束************************//
-<<<<<<< HEAD
-//				if (remoteResult.getReturnCode().equals("0000") && resultData.getResultMsg().equals("交易成功")) {
-//					result.setCode("1");
-//					result.setMsg(resultData.getResultMsg());
-//					log.setRepayStatus(1);
-//					log.setRemark(resultData.getResultMsg());
-//					log.setUpdateTime(new Date());
-//					withholdingRepaymentLogService.updateById(log);
-//			
-//		
-//				} else 
-				if (resultData.getResultMsg().contains("系统异常")) {
-=======
 				if (remoteResult.getReturnCode().equals("0000") ) {
 					result.setCode("1");
 					result.setMsg(resultData.getResultMsg());
@@ -297,7 +284,6 @@ public class RechargeServiceImpl implements RechargeService {
 			
 		
 				}else if (resultData.getResultMsg().contains("系统异常")) {
->>>>>>> 2e497c44c33b4bfe04fc2b21893f2470700ad708
 					result.setCode("2");
 					result.setMsg(resultData.getResultMsg());
 					log.setRepayStatus(2);
@@ -435,23 +421,7 @@ public class RechargeServiceImpl implements RechargeService {
 								.eq("status", 1).orderBy("param_value"));
 				
 				List channles=null;
-				if(aggreeSwitch.getParamValue().equals("1")) {
-					channles= bankCardInfo.getSignedProtocolList();
-					if(channles.size()==0) {
-						result.setCode("-1");
-						result.setMsg("没有找到相关协议代扣渠道");
-						RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
-						return result;
-					}
-				}else {
-				  channles= withholdingChannelService.selectList(new EntityWrapper<WithholdingChannel>().eq("platform_id", PlatformEnum.YH_FORM.getValue()).eq("channel_status", 1).orderBy("channel_level", false));
-					if(channles.size()==0) {
-						result.setCode("-1");
-						result.setMsg("没有找到相关代扣渠道");
-						RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
-						return result;
-					}
-				}
+			
 				
 				
 				/*
@@ -485,6 +455,7 @@ public class RechargeServiceImpl implements RechargeService {
 //					}else {
 //						dto.setChannelType(((WithholdingChannel)channelObject).getSubPlatformId().toString());// 子渠道
 //					}
+
 					dto.setChannelType((channel.getSubPlatformId().toString()));// 子渠道
 					logger.info("============================银行代扣，调用的子渠道是:"+dto.getChannelType()+"=====================================");
 					dto.setRechargeUserId(bankCardInfo.getPlatformUserID());
@@ -678,6 +649,7 @@ public class RechargeServiceImpl implements RechargeService {
 		String yborderid = (String) resultMap.get("yborderid");
 		String status = (String) resultMap.get("status");
 			if(!StringUtil.isEmpty(yborderid)) {
+				resultData.setResultMsg("交易成功");
 				resultData.setResultMsg(remoteResult.getCodeDesc());
 				resultData.setStatus(status);
 			}else {
@@ -689,6 +661,72 @@ public class RechargeServiceImpl implements RechargeService {
 		return resultData;
 	}
 
+	// private Result excuteEipRemote(Integer platformId,Integer failCount,Double
+	// amount,BankCardInfo info,String merchOrderId) {
+	// Result result=new Result();
+	//
+	// Integer maxFailCount=3;//渠道最大失败次数
+	// if(platformId!=null) {
+	// WithholdingChannel chanel=withholdingChannelService.selectOne(new
+	// EntityWrapper<WithholdingChannel>().eq("platform_id", platformId));
+	// maxFailCount=chanel.getFailTimes();
+	// }
+	// if(failCount>=maxFailCount) {
+	// result.setData(null);
+	// result.setCode("-1");
+	// result.setMsg("当前失败或者执行中次数为:" + failCount + ",超过限制次数，不允许执行。");
+	// }else {
+	// if(platformId==PlatformEnum.YB_FORM.getValue()) {
+	// YiBaoRechargeReqDto dto=new YiBaoRechargeReqDto();
+	// dto.setMerchantaccount(merchOrderId);
+	// dto.setOrderid(merchOrderId);
+	// dto.setTranstime(Long.parseLong(new
+	// SimpleDateFormat("yyyyMMddHHmmss").format(new Date())));
+	// dto.setAmount(amount);
+	// dto.setProductname("");
+	// dto.setIdentityid(info.getIdentityNo());
+	// dto.setIdentitytype("01");
+	// dto.setCard_top(info.getBankCardNumber().substring(0, 6));
+	// dto.setCard_last(info.getBankCardNumber().substring(info.getBankCardNumber().length()-4,
+	// info.getBankCardNumber().length()));
+	// dto.setCallbackurl("172.0.0.1");
+	// dto.setUserip("172.0.0.1");
+	// eipRemote.yibaoRecharge(dto);
+	// }
+	// if(platformId==PlatformEnum.BF_FORM.getValue()) {
+	// BaofuRechargeReqDto dto=new BaofuRechargeReqDto();
+	// dto.setPayCode(info.getBankCode());
+	// dto.setPayCm("2");
+	// dto.setAccNo(info.getBankCardNumber());
+	// dto.setIdCardType("01");
+	// dto.setIdHolder(info.getBankCardName());
+	// dto.setMobile(info.getMobilePhone());
+	// dto.setTransId(merchOrderId);
+	// dto.setTxnAmt(amount);
+	// dto.setTradeDate(String.valueOf(Long.parseLong(new
+	// SimpleDateFormat("yyyyMMddHHmmss").format(new Date()))));
+	// dto.setTransSerialNo(merchOrderId);
+	// eipRemote.baofuRecharge(dto);
+	// }
+	// if(platformId==PlatformEnum.YH_FORM.getValue()) {
+	// List<SysParameter> bankChannels = sysParameterService.selectList(new
+	// EntityWrapper<SysParameter>().eq("param_type",
+	// SysParameterEnums.BANK_CHANNEL.getKey()).eq("status",1).orderBy("row_Index"));
+	//
+	// BankRechargeReqDto dto=new BankRechargeReqDto();
+	// dto.setAmount(amount);
+	// dto.setChannelType("102");//todo需要循环子渠道
+	// dto.setRechargeUserId(info.getPlatformUserID());
+	// dto.setCmOrderNo(merchOrderId);
+	// dto.setOidPartner(oidPartner);
+	// dto.setOrgUserName(orgUserName);
+	// com.ht.ussp.core.Result result1=eipRemote.bankRecharge(dto);
+	// }
+	//
+	// }
+	// return result;
+	//
+	// }
 	
 	
 	/**
@@ -1224,16 +1262,19 @@ public class RechargeServiceImpl implements RechargeService {
 
 			
 		} 
-<<<<<<< HEAD
-		
-=======
->>>>>>> 2e497c44c33b4bfe04fc2b21893f2470700ad708
 		if(result.getReturnCode().equals("EIP_TD_FAIL")) {//无此订单=============
 			log.setRepayStatus(0);
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 		} 
 		
+		
+
+
+
+
+
+
 		if (result.getReturnCode().equals("0000")&&getBankSearchResultMsg(result).getStatus().equals("1")) {
 			log.setRepayStatus(0);
 			log.setRemark(result.getMsg());
@@ -1375,12 +1416,15 @@ public class RechargeServiceImpl implements RechargeService {
 		RepaymentBizPlan plan=repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", pList.getPlanId()));
 
 		
+		
+		
 	
 		logger.info("========调用外联易宝代扣订单查询开始========");
 		com.ht.ussp.core.Result result = eipRemote.queryOrder(paramMap);
 		logger.info("========调用外联易宝代扣订单查询结束,结果为："+result.toString()+"====================================");
 		ResultData resultData=getYBResultMsg(result);
 		if (result.getReturnCode().equals("0000") && resultData.getStatus().equals("1")) {//成功
+			log.setRepayStatus(1);
 			log.setRepayStatus(1); 
 			log.setRemark(resultData.getResultMsg());
 			log.setUpdateTime(new Date());
@@ -1467,10 +1511,7 @@ public class RechargeServiceImpl implements RechargeService {
 
 	@Override
 	public List<WithholdingChannel> getBankChannels(List<WithholdingChannel> channels,BankCardInfo bankCardInfo) {
-		//判断是否开启协议代扣开关
-		SysParameter  aggreeSwitch = sysParameterService.selectOne(
-				new EntityWrapper<SysParameter>().eq("param_type", "agreement_withholding")
-						.eq("status", 1).orderBy("param_value"));
+	
 		List<WithholdingChannel> withholdChannels=new ArrayList<WithholdingChannel>();
 		List<SignedProtocol> protocolChannels=bankCardInfo.getSignedProtocolList();
 		for(WithholdingChannel withholdingChannel:channels) {
