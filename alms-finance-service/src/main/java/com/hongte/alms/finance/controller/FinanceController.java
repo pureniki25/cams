@@ -762,7 +762,7 @@ public class FinanceController {
 				planList.setUpdateTime(new Date());
 				planList.setUpdateUser(loginUserInfoHelper.getUserId());
 				StringBuffer remark = new StringBuffer() ;
-				remark.append(DateUtil.formatDate(new Date())).append(" ").append(loginUserInfoHelper.getUserId()).append("已代扣确认").append("\r\n");
+				remark.append(DateUtil.formatDate(new Date())).append(" ").append(loginUserInfoHelper.getLoginInfo().getUserName()).append("已代扣确认").append("\r\n");
 				planList.setRemark(remark.toString());
 				planList.updateById();
 			}
@@ -811,7 +811,7 @@ public class FinanceController {
 				planList.setUpdateUser(loginUserInfoHelper.getUserId());
 				
 				StringBuffer remark = new StringBuffer() ;
-				remark.append(DateUtil.formatDate(new Date())).append(" ").append(loginUserInfoHelper.getUserId()).append("取消代扣确认").append("\r\n");
+				remark.append(DateUtil.formatDate(new Date())).append(" ").append(loginUserInfoHelper.getLoginInfo().getUserName()).append("取消代扣确认").append("\r\n");
 				planList.setRemark(remark.toString());
 				
 				planList.updateById();
