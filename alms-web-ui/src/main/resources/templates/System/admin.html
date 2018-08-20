@@ -154,6 +154,25 @@
 			</i-button>
 		</div>
 		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>自动移交法务：</i-lable>
+			<i-button :loading="setBizToLawLoading" @click="setBizToLaw">
+				<i-span v-if="!setBizToLawLoading">移交</i-span>
+				<i-span v-else>移交中...</i-span>
+			</i-button>
+		</div>
+
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>将指定业务交法务：</i-lable>
+			业务ID：
+			<div class="layui-inline">
+				<input v-model="toLawBusinessId" class="layui-input" name="id" id="toLawBusinessId">
+			</div>
+			<i-button :loading="setOneBizToLawLoading" @click="setOneBizToLaw">
+				<i-span v-if="!setOneBizToLawLoading">移交</i-span>
+				<i-span v-else>移交中...</i-span>
+			</i-button>
+		</div>
+		<div style="margin-top:10px; margin-left:10px">
 			<i-lable>自动代扣：</i-lable>
 			<i-button :loading="autoRepayLoading" @click="autoRepay">
 				<i-span v-if="!autoRepayLoading">代扣</i-span>

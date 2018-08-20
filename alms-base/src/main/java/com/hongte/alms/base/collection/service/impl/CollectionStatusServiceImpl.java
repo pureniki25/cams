@@ -187,6 +187,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //                	update(entity, wrapper)
 //                    updateBatchById(list);
                     for (CollectionStatus status : list) {
+                        status.setCrpId(null);
                     	update(status, new EntityWrapper<CollectionStatus>().eq("business_id", status.getBusinessId()).eq("crp_id", status.getCrpId()));
 					}
                 }
@@ -256,6 +257,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             }
 
             if(list.size()>0){
+                status.setCrpId(null);
                 update(status,new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()).eq("crp_id",vo.getCrpId()));
             }else{
                 insert(status);
@@ -850,46 +852,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedLawRenewBiz(lawDaysAfterOverDue);
 //        planLists.addAll(renewPlanLists);
         for(RepaymentBizPlanList planList:planLists) {
-            RepaymentBizPlan repaymentBizPlan =  repaymentBizPlanService.selectById(planList.getPlanId());
 
-            try{
-            	String originalBusinessId = repaymentBizPlan.getOriginalBusinessId();
-            	Result result = litigationFeignClient.isImportLitigation(originalBusinessId);
-            	logger.info("调用诉讼系统查询接口，参数：{}；返回信息：{}", originalBusinessId, JSONObject.toJSONString(result));
-            	// 调用诉讼系统查询接口，若调用失败或者非成功状态，则这条数据暂时不处理
-    			if (result == null || !"1".equals(result.getCode())) {
-    				continue;
-    			}else {
-    				// 若调用成功，且状态是true，说明移交过法务
-					if (!(Boolean) result.getData()) {
-						//调用移交诉讼接口
-	    				transferLitigationService.sendTransferLitigationData(
-	    						originalBusinessId,sendUrl);
-					}
-				}
-    			
-                //修改状态
-                setBussinessAfterStatus(
-                        originalBusinessId,
-                        planList.getPlanListId(),
-                        "自动移交法务",
-                        CollectionStatusEnum.TO_LAW_WORK,
-                        CollectionSetWayEnum.AUTO_SET);
-
-                List<StaffBusinessVo> voList = new LinkedList<>();
-                StaffBusinessVo vo  = new StaffBusinessVo();
-                vo.setCrpId(planList.getPlanListId());
-                vo.setBusinessId(originalBusinessId);
-                voList.add(vo);
-
-                //同步贷后状态到信贷
-//                SyncBusinessColStatusToXindai(voList,null,"定时任务自动分配",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
-
-            }catch (Exception e){
-                logger.error("自動移交法务异常",e);
-                e.printStackTrace();
-            }
-
+            setOneRepaymentBizPlanToLaw(planList);
 
 
            /* setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
@@ -912,6 +876,74 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         }
     }
+
+    /**
+     * 将指定业务移交法务
+     * @param businessId
+     */
+    public void setOneBusinessToLaw(String businessId){
+        CollectionTimeSet lawTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.TO_LAW_WORK.getKey()).and("start_time <= NOW()"));
+
+        Integer lawDaysAfterOverDue = lawTimeSet!=null?lawTimeSet.getOverDueDays():91;
+
+        //一般业务
+        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedLawNorBizByBizId(lawDaysAfterOverDue,null,businessId);
+        if(planLists==null || planLists.size()==0){
+            throw new RuntimeException("找不到需要移交法务的业务");
+        }
+//        //展期业务
+//        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedLawRenewBiz(lawDaysAfterOverDue);
+//        planLists.addAll(renewPlanLists);
+        for(RepaymentBizPlanList planList:planLists) {
+
+            setOneRepaymentBizPlanToLaw(planList);
+        }
+
+    }
+
+
+    public  void setOneRepaymentBizPlanToLaw(RepaymentBizPlanList planList){
+        RepaymentBizPlan repaymentBizPlan =  repaymentBizPlanService.selectById(planList.getPlanId());
+
+        try{
+            String originalBusinessId = repaymentBizPlan.getOriginalBusinessId();
+            Result result = litigationFeignClient.isImportLitigation(originalBusinessId);
+            logger.info("调用诉讼系统查询接口，参数：{}；返回信息：{}", originalBusinessId, JSONObject.toJSONString(result));
+            // 调用诉讼系统查询接口，若调用失败或者非成功状态，则这条数据暂时不处理
+            if (result == null || !"1".equals(result.getCode())) {
+                return;
+            }else {
+                // 若调用成功，且状态是true，说明移交过法务
+                if (!(Boolean) result.getData()) {
+                    //调用移交诉讼接口
+                    transferLitigationService.sendTransferLitigationData(
+                            originalBusinessId,sendUrl);
+                }
+            }
+
+            //修改状态
+            setBussinessAfterStatus(
+                    originalBusinessId,
+                    planList.getPlanListId(),
+                    "自动移交法务",
+                    CollectionStatusEnum.TO_LAW_WORK,
+                    CollectionSetWayEnum.AUTO_SET);
+
+            List<StaffBusinessVo> voList = new LinkedList<>();
+            StaffBusinessVo vo  = new StaffBusinessVo();
+            vo.setCrpId(planList.getPlanListId());
+            vo.setBusinessId(originalBusinessId);
+            voList.add(vo);
+
+            //同步贷后状态到信贷
+//                SyncBusinessColStatusToXindai(voList,null,"定时任务自动分配",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
+
+        }catch (Exception e){
+            logger.error("自動移交法务异常",e);
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * 选择跟进电催最后一期业务的人员列表 带跟进业务条数

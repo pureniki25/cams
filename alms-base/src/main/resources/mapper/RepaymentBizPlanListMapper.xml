@@ -69,6 +69,10 @@
          <if test = "businessType != null and businessType!='' and businessType!=0">
             and type.business_type_id = #{businessType}
         </if>
+		<if test = "businessId != null and businessId!=''">
+			and planList.business_id = #{businessId}
+		</if>
+
         AND planList.current_status IN ("还款中","逾期")
         AND (
         SELECT COUNT(1) as num1  FROM tb_collection_status  cStatus

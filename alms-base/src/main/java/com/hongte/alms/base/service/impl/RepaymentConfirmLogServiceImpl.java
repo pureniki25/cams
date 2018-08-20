@@ -352,8 +352,8 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         }
         
         if (log.getType().equals(2)) {
-        	Wrapper<RepaymentProjPlanListDetail> wrapper2 = new EntityWrapper<RepaymentProjPlanListDetail>().eq("business_id", log.getBusinessId()).eq("plan_item_type",RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue());
-			Wrapper<RepaymentBizPlanListDetail> wrapper3 = new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", log.getBusinessId()).eq("plan_item_type",RepayPlanFeeTypeEnum.PENALTY_AMONT.getValue());
+        	Wrapper<RepaymentProjPlanListDetail> wrapper2 = new EntityWrapper<RepaymentProjPlanListDetail>().eq("business_id", log.getBusinessId()).and(" ( plan_item_type=70 or plan_item_type=120 )");
+			Wrapper<RepaymentBizPlanListDetail> wrapper3 = new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", log.getBusinessId()).and(" ( plan_item_type=70 or plan_item_type=120 )");
 			
 			if (log.getPlanId()!=null) {
 				List<String> bizplanLists = new ArrayList<>() ;
