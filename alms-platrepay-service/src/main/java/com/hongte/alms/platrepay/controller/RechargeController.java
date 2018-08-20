@@ -27,13 +27,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.RechargeModalDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
+import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.DepartmentBank;
 import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
+import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.CommonUtil;
 import com.hongte.alms.common.util.Constant;
@@ -69,6 +72,14 @@ public class RechargeController {
 	@Autowired
 	@Qualifier("DepartmentBankService")
 	private DepartmentBankService departmentBankService;
+
+	@Autowired
+	@Qualifier("TuandaiProjectInfoService")
+	private TuandaiProjectInfoService tuandaiProjectInfoService;
+
+	@Autowired
+	@Qualifier("BasicBusiness")
+	private BasicBusiness basicBusiness;
 
 	@ApiOperation(value = "获取所有的线下还款账户")
 	@GetMapping("/listAllDepartmentBank")
@@ -386,9 +397,6 @@ public class RechargeController {
 
 			LOG.info("接收参数：{}", vo);
 
-			if (StringUtil.isEmpty(vo.getRechargeAccountType())) {
-				return Result.error(INVALID_PARAM_CODE, "rechargeAccountType" + INVALID_PARAM_DESC);
-			}
 			if (StringUtil.isEmpty(vo.getOrigBusinessId())) {
 				return Result.error(INVALID_PARAM_CODE, "origBusinessId" + INVALID_PARAM_DESC);
 			}
@@ -416,6 +424,10 @@ public class RechargeController {
 			if (StringUtil.isEmpty(vo.getOperator())) {
 				return Result.error(INVALID_PARAM_CODE, "operator" + INVALID_PARAM_DESC);
 			}
+
+			BasicBusiness business = basicBusiness.selectById(vo.getOrigBusinessId());
+			vo.setRechargeAccountType(
+					String.valueOf(BusinessTypeEnum.getRechargeAccountId(business.getBusinessType())));
 
 			SysParameter sysParameter = tdrepayRechargeService.queryRechargeAccountSysParams(BusinessTypeEnum
 					.getRechargeAccountNameByRechargeAccountId(Integer.parseInt(vo.getRechargeAccountType())));
