@@ -666,8 +666,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         }
 		logger.info("催收同步用户{}权限结束,业务{}",userId,voList);
 	}
-
-
+	
 	private List<String> fitterBusinessIds(ArrayList<String> removeDuplicateBizIds, List<String> businessIds) {
 		 removeDuplicateBizIds.retainAll(businessIds);
 		 return removeDuplicateBizIds;

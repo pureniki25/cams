@@ -294,7 +294,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //                		cunshouThreadAsync.execute(new Runnable() {
 //        					@Override
 //        					public void run() {
-        						sysUserPermissionService.setUserPermissonsInBusinessList(oldStaffUserIds,voList);
+		                		List<StaffBusinessVo> voTempList = new ArrayList<>();
+		                		voTempList.add(vo);
+        						sysUserPermissionService.setUserPermissonsInBusinessList(oldStaffUserIds,voTempList);
 //        					}
 //        	        	});
                 		
@@ -308,7 +310,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //                		cunshouThreadAsync.execute(new Runnable() {
 //        					@Override
 //        					public void run() {
-        						sysUserPermissionService.setUserPermissonsInBusinessList(staffUserId,voList);
+		                		List<StaffBusinessVo> voTempList = new ArrayList<>();
+		                		voTempList.add(vo);
+        						sysUserPermissionService.setUserPermissonsInBusinessList(staffUserId,voTempList);
 //        					}
 //        	        	});
                 	
