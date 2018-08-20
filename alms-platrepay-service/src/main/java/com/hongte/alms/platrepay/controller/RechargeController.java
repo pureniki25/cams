@@ -34,6 +34,7 @@ import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
+import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
@@ -78,8 +79,8 @@ public class RechargeController {
 	private TuandaiProjectInfoService tuandaiProjectInfoService;
 
 	@Autowired
-	@Qualifier("BasicBusiness")
-	private BasicBusiness basicBusiness;
+	@Qualifier("BasicBusinessService")
+	private BasicBusinessService basicBusinessService;
 
 	@ApiOperation(value = "获取所有的线下还款账户")
 	@GetMapping("/listAllDepartmentBank")
@@ -425,7 +426,7 @@ public class RechargeController {
 				return Result.error(INVALID_PARAM_CODE, "operator" + INVALID_PARAM_DESC);
 			}
 
-			BasicBusiness business = basicBusiness.selectById(vo.getOrigBusinessId());
+			BasicBusiness business = basicBusinessService.selectById(vo.getOrigBusinessId());
 			vo.setRechargeAccountType(
 					String.valueOf(BusinessTypeEnum.getRechargeAccountId(business.getBusinessType())));
 
