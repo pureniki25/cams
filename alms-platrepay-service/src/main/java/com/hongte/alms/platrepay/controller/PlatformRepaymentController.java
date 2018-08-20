@@ -594,19 +594,17 @@ public class PlatformRepaymentController {
 				// 按费用项大类plan_item_type把重复的费用项进行合并累加
 
 				if (CollectionUtils.isNotEmpty(projFactRepays)) {
-					for (RepaymentProjFactRepay fr : projFactRepays) {
+					// for (RepaymentProjFactRepay fr : projFactRepays) {
+					//
+					// if (projFactRepayMap.containsKey(fr.getPlanItemType())) {
+					// RepaymentProjFactRepay tempFactRepay =
+					// projFactRepayMap.get(fr.getPlanItemType());
+					// tempFactRepay.setFactAmount(tempFactRepay.getFactAmount().add(fr.getFactAmount()));
+					// } else {
+					// projFactRepayMap.put(fr.getPlanItemType(), fr);
+					// }
+					// }
 
-						if (projFactRepayMap.containsKey(fr.getPlanItemType())) {
-							RepaymentProjFactRepay tempFactRepay = projFactRepayMap.get(fr.getPlanItemType());
-							tempFactRepay.setFactAmount(tempFactRepay.getFactAmount().add(fr.getFactAmount()));
-						} else {
-							projFactRepayMap.put(fr.getPlanItemType(), fr);
-						}
-					}
-
-				}
-
-				if (projFactRepayMap.size() > 0) {
 					// 实收总金额
 					BigDecimal factRepayAmount = BigDecimal.ZERO;
 					BigDecimal rechargeAmount = BigDecimal.ZERO;
@@ -618,7 +616,7 @@ public class PlatformRepaymentController {
 					 */
 					Set<String> notShareProfitFeeIds = getNotShareProfitFeeIds();
 
-					for (RepaymentProjFactRepay r : projFactRepayMap.values()) {
+					for (RepaymentProjFactRepay r : projFactRepays) {
 						// 累计实还金额，包含线下和线上费用
 						factRepayAmount = factRepayAmount.add(r.getFactAmount());
 						/*
@@ -714,6 +712,7 @@ public class PlatformRepaymentController {
 					// 用实还赋值流水金额
 					vo.setResourceAmount(factRepayAmount);
 					vo.setDetailList(detailFeeList);
+
 				}
 
 				// 当期还款状态，目前只有三种，分别为 还款中，逾期，已还款 => 当期结清状态 0：未结清,1：已结清
