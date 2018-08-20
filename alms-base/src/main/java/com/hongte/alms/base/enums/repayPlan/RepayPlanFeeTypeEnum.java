@@ -22,6 +22,7 @@ public enum RepayPlanFeeTypeEnum implements IEnum {
     OVER_DUE_AMONT(60,"滞纳金","097e7d7b-9671-4027-a329-b07375092028",5), //uuid与信贷 固定费用id 一致
     OVER_DUE_AMONT_ONLINE(60,"线上滞纳金","2e646c87-5721-11e8-8a00-0242ac110002",5),
     OVER_DUE_AMONT_UNDERLINE(60,"线下滞纳金","3131c075-5721-11e8-8a00-0242ac110002",5),
+    LACK_FEE(61,"往期少缴费用","aks29304-5721-11e8-8a00-0242ac110002",61),
     PENALTY_AMONT(70,"违约金","79069922-e13a-4229-8656-2a1e19b44879",5)
     ,PRINCIPAL_PENALTY(70,"本金违约金","9883ee39-4448-11e8-b4f8-0242ac110003",5)  //uuid与信贷 固定费用id 一致
     ,SUB_COMPANY_PENALTY(70,"分公司月收服务费违约金","9e0a6fc1-4448-11e8-b4f8-0242ac110003",5)  //uuid与信贷 固定费用id 一致
