@@ -13,6 +13,7 @@ var getSelectsData = function () {
             if (res.data.code == "1") {
                 vm.platformType = res.data.data.platformType;
                 vm.bankType = res.data.data.bankType;
+                vm.subPlatformType=res.data.data.subPlatformType;
             } else {
                 vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
             }
@@ -33,9 +34,11 @@ window.layinit(function (htConfig) {
         data() {
             return {
                 withHoldLimitModel: false,
+                isSubPlatform:false,//是否显示银行代扣子渠道
                 subTitle:'',
                 platformType: [],
                 bankType: [],
+                subPlatformType:[],
                 loading: false,
                 searchForm: {
                     platformId: '', //渠道类型
@@ -44,6 +47,7 @@ window.layinit(function (htConfig) {
                 },
                 withHoldLimitForm: {
                     platformId: '', //渠道类型
+                    subPlatformId: '', //银行代扣子渠道类型
                     bankCode:'',
                     dayLimit:'',
                     onceLimit:'',
@@ -140,6 +144,10 @@ window.layinit(function (htConfig) {
                             {
                                 field: 'platformName',
                                 title: '渠道名称'
+                            },
+                            {
+                                field: 'subPlatformName',
+                                title: '银行代扣子渠道名称'
                             },
                             {
                                 field: 'bankName',
@@ -259,6 +267,7 @@ window.layinit(function (htConfig) {
                             vm.withHoldLimitForm.onceLimit = data.onceLimit;
                             vm.withHoldLimitForm.monthLimit = data.monthLimit;
                             vm.withHoldLimitForm.limitId = data.limitId;
+                            vm.withHoldLimitForm.subPlatformId = data.subPlatformId;
                         }
                     })
                     .catch(function (error) {
@@ -270,6 +279,7 @@ window.layinit(function (htConfig) {
                 this.$refs[name].resetFields();
                 vm.subTitle="新增额度";
                 vm.withHoldLimitModel = true;
+                vm.withHoldLimitForm.limitId='';
             },
             submitHoldLimit(name) {
 
@@ -281,7 +291,7 @@ window.layinit(function (htConfig) {
                 var onceLimit =   vm.withHoldLimitForm.onceLimit ;
                 var monthLimit =  vm.withHoldLimitForm.monthLimit ;
                 var limitId =  vm.withHoldLimitForm.limitId ;
-
+                var subPlatformId =  vm.withHoldLimitForm.subPlatformId ;
                 console.log("platformId", typeof platformId);
                 console.log("status", typeof status);
                 console.log("bankCode", typeof bankCode);
@@ -301,7 +311,8 @@ window.layinit(function (htConfig) {
                                     dayLimit: dayLimit,
                                     onceLimit: onceLimit,
                                     monthLimit: monthLimit,
-                                    limitId: limitId
+                                    limitId: limitId,
+                                    subPlatformId:subPlatformId
                                 }
                             })
                             .then(function (res) {
@@ -331,6 +342,13 @@ window.layinit(function (htConfig) {
                 this.withHoldLimitModel = false;
                 this.$refs[name].resetFields();
                 vm.toLoading();
+            },
+            getSubPlatform(platformId){debugger
+            	if(platformId=='5'){
+            		vm.isSubPlatform=true;
+            	}else{
+            		vm.isSubPlatform=false;
+            	}
             }
 
 

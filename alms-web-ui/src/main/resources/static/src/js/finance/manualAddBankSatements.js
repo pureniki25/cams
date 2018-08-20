@@ -16,6 +16,11 @@ window.layinit(function (htConfig) {
     app = new Vue({
         el: "#app",
         data: {
+            dateOptions: {
+                disabledDate(date) {
+                    return date > new Date()
+                }
+            },
             form: {
                 repaymentDate: '',
                 tradeType: '',
