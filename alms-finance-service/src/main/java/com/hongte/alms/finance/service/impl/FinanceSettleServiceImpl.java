@@ -874,21 +874,22 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 										RepaymentBizPlanListDetail bizPlanListDetail = bizPlanSettleDto.getCurrBizPlanListDto().getBizPlanListDetails().get(0);
 										BeanUtils.copyProperties(bizPlanListDetail, bizPlanDetail);
 										
-										if (bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.PRINCIPAL_PENALTY.getUuid())) {
-											bizPlanDetail.setAccountStatus(0);
-										}
-										if (bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OTHER_FEE.getUuid())) {
-											bizPlanDetail.setAccountStatus(0);
-										}
-										if (bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid())
-												||bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid())
-												||ONLINE_FEES.contains(bizPlanDetail.getFeeId())) {
-											bizPlanDetail.setAccountStatus(30);
-										}
-										if (bizPlanDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue())
-												&&bizPlanDetail.getPlanItemName().equals(RepayPlanFeeTypeEnum.LACK_FEE.getDesc())) {
-											bizPlanDetail.setAccountStatus(0);
-										}
+//										if (bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.PRINCIPAL_PENALTY.getUuid())) {
+//											bizPlanDetail.setAccountStatus(0);
+//										}
+//										if (bizPlanDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.OTHER_FEE.getValue())) {
+//											bizPlanDetail.setAccountStatus(0);
+//										}
+//										if (bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid())
+//												||bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid())
+//												||ONLINE_FEES.contains(bizPlanDetail.getFeeId())) {
+//											bizPlanDetail.setAccountStatus(30);
+//										}
+//										if (bizPlanDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue())
+//												&&bizPlanDetail.getPlanItemName().equals(RepayPlanFeeTypeEnum.LACK_FEE.getDesc())) {
+//											bizPlanDetail.setAccountStatus(0);
+//										}
+										bizPlanDetail.setAccountStatus(repaymentProjPlanListDetail.getAccountStatus());
 										bizPlanDetail.setPlanDetailId(repaymentProjPlanListDetail.getPlanDetailId());
 										bizPlanDetail.setPlanAmount(BigDecimal.ZERO);
 										bizPlanDetail.setFactAmount(BigDecimal.ZERO);
