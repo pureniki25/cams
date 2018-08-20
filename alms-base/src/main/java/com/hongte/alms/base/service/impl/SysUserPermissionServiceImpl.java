@@ -380,6 +380,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
             sysUser.setUserId(userInfo.getUserId());
             sysUser.setOrgCode(userInfo.getOrgCode());
             sysUser.setUserName(userInfo.getUserName());
+            sysUser.setUserStatus(Integer.parseInt(userInfo.getStatus()));
             sysUser.setXdOrgCode("");
             sysUserService.insert(sysUser);
             sysUserPermissionService.setUserPermissons(userInfo.getUserId());
@@ -390,7 +391,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         			|| !userInfo.getStatus().equals(sysUser.getUserStatus()+"")) {
         		sysUser.setUserName(userInfo.getUserName());
         		sysUser.setOrgCode(userInfo.getOrgCode());
-        		sysUser.setUserStatus(sysUser.getUserStatus());
+        		sysUser.setUserStatus(Integer.parseInt(userInfo.getStatus()));
         		sysUserService.updateById(sysUser);
         	}
         }
