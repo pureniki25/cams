@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.customer.vo.CustomerRepayFlowDto;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AreaLevel;
-import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.SysBankLimitService;
 import com.hongte.alms.base.service.SysBankService;
@@ -56,8 +55,6 @@ public class withholdManageController {
     @Autowired
     @Qualifier("SysBankService")
     private SysBankService sysBankService;
-    
-  
 
     @ApiOperation(value = "新增/编辑代扣渠道")
     @RequestMapping("/addOrEditWithholdChannel")
@@ -193,13 +190,8 @@ public class withholdManageController {
 
         //渠道列表
         List<SysBank> sysBankList = sysBankService.selectList(new EntityWrapper<SysBank>());
-        
-        retMap.put("bankType", (JSONArray) JSON.toJSON(sysBankList, JsonUtil.getMapping()));
-        
-        //银行代扣子渠道列表
-        List<WithholdingChannel> withholdingChannels = withholdingChannelService.selectList(new EntityWrapper<WithholdingChannel>().eq("channel_status", 1).eq("platform_id", PlatformEnum.YH_FORM.getValue()));
 
-        retMap.put("subPlatformType", (JSONArray) JSON.toJSON(withholdingChannels, JsonUtil.getMapping()));
+        retMap.put("bankType", (JSONArray) JSON.toJSON(sysBankList, JsonUtil.getMapping()));
 
 
         LOGGER.info("====>>>>>获取额度选项列表结束");
@@ -212,9 +204,6 @@ public class withholdManageController {
         LOGGER.info("====>>>>>新增/编辑代扣额度信息开始[{}]", sysBankLimit);
         Result result = null;
         try {
-        	  if(sysBankLimit.getPlatformId()==PlatformEnum.YH_FORM.getValue()) {
-              	sysBankLimit.setSubPlatformId("");
-              }
             sysBankLimitService.addOrEditWithholdChannel(sysBankLimit);
 
             result = Result.success();
