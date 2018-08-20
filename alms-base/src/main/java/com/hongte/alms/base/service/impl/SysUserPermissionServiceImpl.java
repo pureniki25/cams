@@ -386,9 +386,11 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
             fresh = true;
         }else {
         	if(!userInfo.getUserName().equals(sysUser.getUserName())
-        			|| !userInfo.getOrgCode().equals(sysUser.getOrgCode())) {
+        			|| !userInfo.getOrgCode().equals(sysUser.getOrgCode())
+        			|| !userInfo.getStatus().equals(sysUser.getUserStatus()+"")) {
         		sysUser.setUserName(userInfo.getUserName());
         		sysUser.setOrgCode(userInfo.getOrgCode());
+        		sysUser.setUserStatus(sysUser.getUserStatus());
         		sysUserService.updateById(sysUser);
         	}
         }
