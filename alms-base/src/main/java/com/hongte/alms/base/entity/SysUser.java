@@ -71,6 +71,13 @@ public class SysUser extends Model<SysUser> {
 	@ApiModelProperty(required= true,value = "权限更新状态0成功1异常(异常要重新更新)")
 	private Integer lastPermissionStatus;
 	
+	/**
+	 * 用户状态:'用户状态: 0 正常 1禁用 2离职 4冻结 5锁定
+	 */
+	@TableField("user_status")
+	@ApiModelProperty(required= true,value = "用户状态:'用户状态: 0 正常 1禁用 2离职 4冻结 5锁定")
+	private Integer userStatus;
+	
 	public Date getLastPermissionTime() {
 		return lastPermissionTime;
 	}
@@ -93,6 +100,14 @@ public class SysUser extends Model<SysUser> {
 
 	public void setLastPermissionStatus(Integer lastPermissionStatus) {
 		this.lastPermissionStatus = lastPermissionStatus;
+	}
+
+	public Integer getUserStatus() {
+		return userStatus;
+	}
+
+	public void setUserStatus(Integer userStatus) {
+		this.userStatus = userStatus;
 	}
 
 	public String getXdOrgCode() {
