@@ -292,12 +292,12 @@ public class PlatformRepaymentController {
 			}
 
 			if ((businessType.intValue() == 1 || businessType.intValue() == 9)
-					|| !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
+					&& !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
 				businessType = 31;
 			}
 
 			if ((businessType.intValue() == 2 || businessType.intValue() == 11 || businessType.intValue() == 35)
-					|| !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
+					&& !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
 				businessType = 32;
 			}
 			vo.setBusinessType(businessType);
