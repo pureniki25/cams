@@ -227,6 +227,11 @@ public class RepayPlanController {
                         switch (bizPlanList.getRepayFlag()) {
                             case 0:
                                 repayFlag = 0;
+                                /*线上部分已还款的置位为 财务确认已还款*/
+                                if (bizPlanList.getRepayStatus()!=null && bizPlanList .getRepayStatus() > 1) {
+									repayFlag = 1 ;
+								}
+                                
                                 break;
                             case 6:
                                 repayFlag = 6;

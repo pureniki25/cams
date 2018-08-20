@@ -314,6 +314,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				transferLitigationData.setHouseList(businessHouses);
 			}
 
+			LOG.info("移交法务诉讼系统地址：{}", sendUrl);
 			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
 			String returnJson = JSONObject.toJSONString(litigationResponse);
 			transferLitigationLog.setResultJson(returnJson);

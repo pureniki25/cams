@@ -1628,7 +1628,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                 RepaymentProjPlanListDetail   peroidFeelDetail = creatProjListDetail(projPlanList);
                                 String feeItemId = getFeeItemId(feeReq.getFeeItemId(),feeReq.getFeeType());
                                 peroidFeelDetail.setFeeId(feeItemId);//资产端费用项ID，用于资产端区分同名的项目，若不存在同名费用项，可为空
-                                peroidFeelDetail.setPlanItemName(feeReq.getFeeTypeName());//应还项目名称
+                                peroidFeelDetail.setPlanItemName(feeReq.getFeeItemName());//应还项目名称
                                 peroidFeelDetail.setPlanItemType(feeReq.getFeeType());//应还项目所属分类
                                 peroidFeelDetail.setAccountStatus(feeReq.getAccountStatus());//分账标记
                                 //分润顺序项

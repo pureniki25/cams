@@ -268,7 +268,7 @@
 		    THEN '0' 
 		    WHEN '企业' 
 		    THEN '1' 
-		    ELSE '其他' 
+		    ELSE NULL 
 		  END customerType,
 		  bb.`borrow_money` finalBorrowMoney,
 		  bb.`original_name`,
