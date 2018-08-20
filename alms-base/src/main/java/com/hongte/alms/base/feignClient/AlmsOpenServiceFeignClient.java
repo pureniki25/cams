@@ -2,9 +2,12 @@ package com.hongte.alms.base.feignClient;
 
 import com.hongte.alms.common.result.Result;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
@@ -19,6 +22,9 @@ public interface AlmsOpenServiceFeignClient {
     /*****还款计划相关*******/
     @RequestMapping(value = "/RepayPlan/updateRepayPlanToLMS", headers = {"app=ALMS", "content-type=application/json"}, method = RequestMethod.POST)
     Result updateRepayPlanToLMS(@RequestBody Map<String, Object> paramMap);
+    
+    @GetMapping("/WithHoldingController/searchRepayLog")
+    public Result searchRepayLog(@RequestParam("originalBusinessId") String originalBusinessId, @RequestParam("afterId") String afterId);
 
 
     /*****其它相关1*******/

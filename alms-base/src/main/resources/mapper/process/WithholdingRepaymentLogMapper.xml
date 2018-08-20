@@ -43,7 +43,7 @@
 
         select repay.log_id as logId,repay.original_business_id as originalBusinessId ,repay.after_id as afterId,
         b_type.business_type_name AS businessTypeName, b_type.business_type_id AS businessTypeId,
-        company.district_id as districtId, business.company_id as companyId,
+        company.district_id as districtId, company.area_name as companyId,
 
         business.operator_name as operatorName,repay.customer_name as customerName,
 

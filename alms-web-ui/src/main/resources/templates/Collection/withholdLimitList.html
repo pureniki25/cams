@@ -104,9 +104,16 @@
             <i-form ref="withHoldLimitForm" :model="withHoldLimitForm" :rules="withHoldLimitValidate"
                     :label-width="150">
                 <form-item label="渠道：" prop="platformId">
-                    <i-select v-model="withHoldLimitForm.platformId" clearable filterable style="width: 200px">
+                    <i-select v-model="withHoldLimitForm.platformId" clearable filterable style="width: 200px" @on-change="getSubPlatform(withHoldLimitForm.platformId)">
                         <i-option v-for="item in platformType" :value="item.platformId" :key="item.platformId">{{
                             item.platformName }}
+                        </i-option>
+                    </i-select>
+                </form-item>
+                <form-item label="银行子渠道：" prop="subPlatformId" v-if="isSubPlatform">
+                    <i-select v-model="withHoldLimitForm.subPlatformId" clearable filterable style="width: 200px">
+                        <i-option v-for="item in subPlatformType" :value="item.subPlatformId" :key="item.subPlatformId">{{
+                            item.subPlatformName }}
                         </i-option>
                     </i-select>
                 </form-item>
@@ -117,6 +124,7 @@
                         </i-option>
                     </i-select>
                 </form-item>
+              
                 <form-item label="单日限额：" prop="dayLimit">
                     <i-input v-model="withHoldLimitForm.dayLimit" placeholder="单日限额"
                              style="width: 200px" number></i-input>
