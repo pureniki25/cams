@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
+import com.hongte.alms.base.enums.PaymentPlatformEnums;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.CustomerInfoDto;
@@ -44,6 +45,12 @@ public class CustomerBankcardController {
 	private String apiUrl;
 	
 
+	  /**
+	   * 
+	   * @param identityCard 客户身份唯一标识
+         @param platformType 资金端存管注册类型，1：团贷网，2：你我金融
+	   * @return
+	   */
 	@ApiOperation(value = "获取客户银行卡信息")
 	@GetMapping("/getBankcardInfo")
 	public Result getBankcardInfo(@RequestParam("identityCard") String identityCard) {
@@ -53,6 +60,7 @@ public class CustomerBankcardController {
 		RequestData requestData = new RequestData();
 		JSONObject data = new JSONObject() ;
 		data.put("identityCard", identityCard);
+		data.put("platformType", PaymentPlatformEnums.TUANDAI.getValue());
 		requestData.setData(JSON.toJSONString(data));
 		requestData.setMethodName("BankCard_GetBankCardByIdCard");
 		String encryptStr = JSON.toJSONString(requestData);
