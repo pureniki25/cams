@@ -44,6 +44,10 @@ window.layinit(function (htConfig) {
                         return "只查看房贷业务";
                     }else  if(d.roleAreaType == 6){
                         return "根据财务跟单方式控制";
+                    }else  if(d.roleAreaType == 7){
+                        return "只能查看信用贷";
+                    }else  if(d.roleAreaType == 8){
+                        return "只能查看优房贷";
                     }else{
                         return "未定义的类型";
                     }
