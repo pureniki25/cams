@@ -76,7 +76,7 @@
         AND planList.current_status IN ("还款中","逾期")
         AND (
         SELECT COUNT(1) as num1  FROM tb_collection_status  cStatus
-        WHERE (cStatus.collection_status  = 100)
+        WHERE cStatus.collection_status in (100, 200)
         AND cStatus.business_id = business.business_id
         ) = 0
         AND (
