@@ -187,6 +187,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     private SysApiCallFailureRecordService sysApiCallFailureRecordService;
     
     @Autowired
+    @Qualifier("IssueSendOutsideLogService")
+    private IssueSendOutsideLogService issueSendOutsideLogService ;
+    
+    @Autowired
     @Qualifier("WithholdingRepaymentLogService")
     private WithholdingRepaymentLogService withholdingRepaymentLogService ;
     
@@ -1037,26 +1041,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
                     repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
                     
-//	                executor.execute(new Runnable() {
-//	                    @Override
-//	                    public void run() {
-//	                        logger.info("更新同步表，confirmLogId：{}", financeSettleBaseDto.getUuid());
-//	                        try {
-//	                            //睡一下，让还款的信息先存完。
-//	                            try{
-//	                                Thread.sleep(5000);
-//	                            }catch (InterruptedException e){
-//	                                logger.error(e.getMessage(), e);
-//	                            }
-//	                            /*更新财务管理列表*/
-//	                            
-//	                        } catch (Exception e) {
-//	                            logger.error(e.getMessage(), e);
-//	                            Thread.currentThread().interrupt();
-//	                        }
-//	                        logger.info("调用平台合规化还款接口结束");
-//	                    }
-//	                });
 	                
 	                executor.execute(new Runnable() {
 	                    @Override
@@ -1200,6 +1184,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 //        }
         for(RepaymentProjPlanList repaymentProjPlanList : projPlanLists){
             SysApiCallFailureRecord record = new SysApiCallFailureRecord();
+            IssueSendOutsideLog issueSendOutsideLog = null ;
             Result result = null;
             try {
                 record.setModuleName(AlmsServiceNameEnums.FINANCE.getName());
@@ -1226,15 +1211,28 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                     record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
 //                    sysApiCallFailureRecordService.insert(record);
 
+                    issueSendOutsideLog = issueSendOutsideLogService.createIssueSendOutsideLog(
+                    		loginUserInfoHelper.getUserId(), 
+                    		JSON.toJSONString(paramMap), 
+                    		Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT, 
+                    		Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT, 
+                    		Constant.SYSTEM_CODE_EIP) ;
+                    issueSendOutsideLog.setBusinessId(repaymentProjPlanList.getBusinessId());
+                    issueSendOutsideLog.setSendKey(repaymentProjPlanList.getProjPlanListId());
+                    
                     // 平台合规化还款接口
                     result = platformRepaymentFeignClient.repayment(paramMap);
                     if (result != null) {
+                    	issueSendOutsideLog.setReturnJson(JSON.toJSONString(result));
                         record.setApiReturnInfo(JSONObject.toJSONString(result));
                     }
+                    issueSendOutsideLogService.save(issueSendOutsideLog);
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 record.setApiReturnInfo(e.getMessage());
+                issueSendOutsideLog.setReturnJson(e.getMessage());
+                issueSendOutsideLogService.save(issueSendOutsideLog);
             }
             logger.info("平台合规化还款接口返回结果：{}", JSONObject.toJSONString(result));
             if (result == null || !"1".equals(result.getCode())) {
