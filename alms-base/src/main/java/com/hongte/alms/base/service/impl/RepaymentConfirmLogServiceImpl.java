@@ -72,6 +72,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +166,9 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     
     @Autowired
 	LoginUserInfoHelper 	loginUserInfoHelper;
+    
+    @Autowired
+    Executor executor;
     
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -352,8 +356,8 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         }
         
         if (log.getType().equals(2)) {
-        	Wrapper<RepaymentProjPlanListDetail> wrapper2 = new EntityWrapper<RepaymentProjPlanListDetail>().eq("business_id", log.getBusinessId()).and(" ( plan_item_type=70 or plan_item_type=120 )");
-			Wrapper<RepaymentBizPlanListDetail> wrapper3 = new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", log.getBusinessId()).and(" ( plan_item_type=70 or plan_item_type=120 )");
+        	Wrapper<RepaymentProjPlanListDetail> wrapper2 = new EntityWrapper<RepaymentProjPlanListDetail>().eq("business_id", log.getBusinessId()).and(" ( plan_item_name='往期少缴费用' or plan_item_type=70 or plan_item_type=120 )");
+			Wrapper<RepaymentBizPlanListDetail> wrapper3 = new EntityWrapper<RepaymentBizPlanListDetail>().eq("business_id", log.getBusinessId()).and(" ( plan_item_name='往期少缴费用' or plan_item_type=70 or plan_item_type=120 )");
 			
 			if (log.getPlanId()!=null) {
 				List<String> bizplanLists = new ArrayList<>() ;
@@ -408,29 +412,42 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
         repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
         
-        /*同步到信贷*/
-        Result result = null;
-        Map<String, Object> paramMap = Maps.newHashMap();
-        paramMap.put("businessId", businessId);
-        try {
-            result = almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);
-            if (result == null || !"1".equals(result.getCode())) {
+        executor.execute(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(1000*60);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				
+				/*同步到信贷*/
+		        Result result = null;
+		        Map<String, Object> paramMap = Maps.newHashMap();
+		        paramMap.put("businessId", businessId);
+		        try {
+		            result = almsOpenServiceFeignClient.updateRepayPlanToLMS(paramMap);
+		            if (result == null || !"1".equals(result.getCode())) {
 
-                sysApiCallFailureRecordService.save(
-                        AlmsServiceNameEnums.FINANCE,
-                        Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-                        Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-                        businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            sysApiCallFailureRecordService.save(
-                    AlmsServiceNameEnums.FINANCE,
-                    Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-                    Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-                    businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
-        }
-        /*同步到信贷*/
+		                sysApiCallFailureRecordService.save(
+		                        AlmsServiceNameEnums.FINANCE,
+		                        Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+		                        Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+		                        businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
+		            }
+		        } catch (Exception e) {
+		            logger.error(e.getMessage(), e);
+		            sysApiCallFailureRecordService.save(
+		                    AlmsServiceNameEnums.FINANCE,
+		                    Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+		                    Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+		                    businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
+		        }
+		        /*同步到信贷*/
+			}
+		});
+        
         return Result.success();
     }
 
