@@ -37,7 +37,7 @@
         <Card >
             <i-form ref="form" :model="form" label-position="left" label-width="100" >
                 <form-item prop="repaymentDate" label="还款日期" required>
-                    <date-picker v-model="form.repaymentDate" @on-change="form.repaymentDate=$event"></date-picker>
+                    <date-picker v-model="form.repaymentDate" @on-change="form.repaymentDate=$event" :options="dateOptions"></date-picker>
                 </form-item>
                 <form-item prop="repaymentMoney" label="还款金额" required>
                     <i-input v-model="form.repaymentMoney" number></i-input>

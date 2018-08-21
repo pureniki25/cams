@@ -380,15 +380,18 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
             sysUser.setUserId(userInfo.getUserId());
             sysUser.setOrgCode(userInfo.getOrgCode());
             sysUser.setUserName(userInfo.getUserName());
+            sysUser.setUserStatus(Integer.parseInt(userInfo.getStatus()));
             sysUser.setXdOrgCode("");
             sysUserService.insert(sysUser);
             sysUserPermissionService.setUserPermissons(userInfo.getUserId());
             fresh = true;
         }else {
         	if(!userInfo.getUserName().equals(sysUser.getUserName())
-        			|| !userInfo.getOrgCode().equals(sysUser.getOrgCode())) {
+        			|| !userInfo.getOrgCode().equals(sysUser.getOrgCode())
+        			|| !userInfo.getStatus().equals(sysUser.getUserStatus()+"")) {
         		sysUser.setUserName(userInfo.getUserName());
         		sysUser.setOrgCode(userInfo.getOrgCode());
+        		sysUser.setUserStatus(Integer.parseInt(userInfo.getStatus()));
         		sysUserService.updateById(sysUser);
         	}
         }
@@ -666,8 +669,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         }
 		logger.info("催收同步用户{}权限结束,业务{}",userId,voList);
 	}
-
-
+	
 	private List<String> fitterBusinessIds(ArrayList<String> removeDuplicateBizIds, List<String> businessIds) {
 		 removeDuplicateBizIds.retainAll(businessIds);
 		 return removeDuplicateBizIds;

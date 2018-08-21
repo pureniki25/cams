@@ -761,6 +761,9 @@ public class FinanceController {
 				planList.setAutoWithholdingConfirmedUserName(loginUserInfoHelper.getLoginInfo().getUserName());
 				planList.setUpdateTime(new Date());
 				planList.setUpdateUser(loginUserInfoHelper.getUserId());
+				StringBuffer remark = new StringBuffer() ;
+				remark.append(DateUtil.formatDate(new Date())).append(" ").append(loginUserInfoHelper.getLoginInfo().getUserName()).append("已代扣确认").append("\r\n");
+				planList.setRemark(remark.toString());
 				planList.updateById();
 			}
 
@@ -806,6 +809,11 @@ public class FinanceController {
 				planList.setAutoWithholdingConfirmedUserName(null);
 				planList.setUpdateTime(new Date());
 				planList.setUpdateUser(loginUserInfoHelper.getUserId());
+				
+				StringBuffer remark = new StringBuffer() ;
+				remark.append(DateUtil.formatDate(new Date())).append(" ").append(loginUserInfoHelper.getLoginInfo().getUserName()).append("取消代扣确认").append("\r\n");
+				planList.setRemark(remark.toString());
+				
 				planList.updateById();
 			}
 

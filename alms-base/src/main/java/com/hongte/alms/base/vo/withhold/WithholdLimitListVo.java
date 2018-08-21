@@ -11,4 +11,5 @@ public class WithholdLimitListVo {
     private String dayLimit;//单日限额
     private String monthLimit;//单月限额
     private String status;//启用状态 是否启用此代扣通道，0：关闭，1：启用
+    private String subPlatformName;//银行代扣子渠道
 }
