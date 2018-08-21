@@ -11,6 +11,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.SysBank;
 import com.hongte.alms.base.entity.SysBankLimit;
+import com.hongte.alms.base.entity.WithholdingChannel;
 import com.hongte.alms.base.entity.WithholdingPlatform;
 import com.hongte.alms.base.entity.WithholdingRecordLog;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
@@ -20,7 +21,7 @@ import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.service.*;
 import com.hongte.alms.base.vo.module.BankLimitReq;
 import com.hongte.alms.base.vo.module.BankLimitVO;
-
+import com.hongte.alms.base.vo.module.api.RepayLogResp;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
@@ -28,11 +29,15 @@ import com.hongte.alms.common.vo.PageResult;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
+
+import com.hongte.alms.base.feignClient.AlmsOpenServiceFeignClient;
 import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.feignClient.dto.ThirdPlatform;
@@ -79,6 +84,13 @@ public class DeductionController {
     @Autowired
     @Qualifier("WithholdingRepaymentLogService")
     WithholdingRepaymentLogService withholdingRepaymentLogService;
+    
+    @Autowired
+    @Qualifier("WithholdingChannelService")
+    WithholdingChannelService withholdingChannelService;
+    
+    @Autowired
+    AlmsOpenServiceFeignClient almsOpenServiceFeignClient;
     
     @Autowired
     @Qualifier("SysBankService")
@@ -240,30 +252,36 @@ public class DeductionController {
 	        		}
 	                return Result.success(deductionVo);
             	}else {
-	            	//还款成功和还款中的数据
-	        		List<WithholdingRecordLog> loglist=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
-	        		//还款中的数据
-	        		List<WithholdingRecordLog> repayingList=withholdingRecordLogService.selectList(new EntityWrapper<WithholdingRecordLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
-	        		
-	          		 factAmountSum=getPerListFactAmountSum(planList);
-	          		BigDecimal repayAmount=factAmountSum;
-	        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
+            	   	Result result=almsOpenServiceFeignClient.searchRepayLog(deductionVo.getOriginalBusinessId(), deductionVo.getAfterId());
+                	List<Map<String, Object>> list= (List<Map<String, Object>>) result.getData();
+                	   	//还款成功和还款中的数据
+    	        		//List<WithholdingRepaymentLog> loglist=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).ne("repay_status", 0));
+    	        		// factAmountSum=getPerListFactAmountSum(planList);
+    	        		//还款中的数据
+    	        		//List<WithholdingRepaymentLog> repayingList=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", deductionVo.getOriginalBusinessId()).eq("after_id", deductionVo.getAfterId()).eq("repay_status", 2));
+    	        	
+    	        		BigDecimal repayAmount=factAmountSum;
+    	        		BigDecimal repayingAmount=BigDecimal.valueOf(0);
 
-
-	        		for(WithholdingRecordLog log:repayingList) {
-	        			repayingAmount=repayingAmount.add(log.getCurrentAmount());
-	        		}
-	        		repayAmount=repayAmount.add(repayingAmount);//已经还款的金额
-	        		if(loglist!=null&&loglist.size()>0) {
-	        			deductionVo.setRepayAllAmount(factAmountSum.add(repayingAmount));
-	        			deductionVo.setRepayingAmount(repayingAmount);
-	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
-	        			deductionVo.setRepayAmount(deductionVo.getRestAmount());
-	        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
-	        		}else {
-	        			deductionVo.setRepayAmount(BigDecimal.valueOf(deductionVo.getTotal()));
-	        		}
-	                return Result.success(deductionVo);
+    	        		for(Map log:list) {
+    	        			if(log.get("repayStatus").toString().equals("处理中")) {//还款中
+    	        				repayingAmount=repayingAmount.add(BigDecimal.valueOf(Double.valueOf(log.get("currentAmount").toString())));
+    	        			}
+    	        			if(log.get("repayStatus").toString().equals("成功")) {//成功代扣金额
+    	        				repayAmount=repayAmount.add(BigDecimal.valueOf(Double.valueOf(log.get("currentAmount").toString())));
+    	        			}
+    	        		}
+//    	        		if(list!=null&&list.size()>0) {
+    	        			deductionVo.setRepayAllAmount(factAmountSum.add(repayingAmount));
+    	        			deductionVo.setRepayingAmount(repayingAmount);
+    	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
+    	        			deductionVo.setRepayAmount(deductionVo.getRestAmount());
+    	        			deductionVo.setTotal(deductionVo.getTotal()-deductionVo.getRepayingAmount().doubleValue());
+//    	        		}else {
+//    	        			deductionVo.setRepayAllAmount(factAmountSum);
+//    	        			deductionVo.setRepayAmount(BigDecimal.valueOf(deductionVo.getTotal()));
+//    	        		}
+    	                return Result.success(deductionVo);
             	}
 	
             }else {
@@ -359,9 +377,25 @@ public class DeductionController {
 	  List<SysBankLimit> list= sysBankLimitService.selectList(new EntityWrapper<SysBankLimit>().eq("platform_id", platformId).eq("bank_code", bankCode));
 	  String oneLimit="";
 	  String dayLimit="";
-	  if(list.size()>0) {
-		  oneLimit=list.get(0).getOnceLimit()==null?"":list.get(0).getOnceLimit().toString();
-		  dayLimit=list.get(0).getDayLimit()==null?"":list.get(0).getDayLimit().toString();
+	  if(platformId==PlatformEnum.YH_FORM.getValue()) {
+		  for(int i=0;i<list.size();i++) {
+			  WithholdingChannel channel=withholdingChannelService.selectOne(new EntityWrapper<WithholdingChannel>().eq("platform_id", platformId).eq("sub_platform_id", list.get(i).getSubPlatformId()));
+			  if(channel!=null) {
+				  if(i==0) {
+					oneLimit=channel.getSubPlatformName()+":"+list.get(i).getOnceLimit();
+					dayLimit=channel.getSubPlatformName()+":"+list.get(i).getDayLimit();
+				  }else {
+				  oneLimit=oneLimit+"\r"+" "+channel.getSubPlatformName()+":"+list.get(i).getOnceLimit();
+				  dayLimit=dayLimit+"\r"+" "+channel.getSubPlatformName()+":"+list.get(i).getDayLimit();
+				  }
+				  
+			  }
+		  }
+	  }else {
+		  if(list.size()>0) {
+			  oneLimit=list.get(0).getOnceLimit()==null?"":list.get(0).getOnceLimit().toString();
+			  dayLimit=list.get(0).getDayLimit()==null?"":list.get(0).getDayLimit().toString();
+		  }
 	  }
 	  Map<String, Object> retMap = new HashMap<>();
       retMap.put("oneLimit", JSON.toJSON(oneLimit, JsonUtil.getMapping()));
@@ -449,6 +483,13 @@ public class DeductionController {
 			isRepaying=true;
 		}
 		return isRepaying;
+		
+		
+	}
+	public static void main(String[] args) {
+		String str="\r sfdfs";
+		str=str+"\r fff";
+		System.out.println(str);
 	}
    }
    
