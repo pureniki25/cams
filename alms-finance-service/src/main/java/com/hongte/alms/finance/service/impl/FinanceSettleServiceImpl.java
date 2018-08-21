@@ -572,7 +572,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							projPlanListDetail.setProjPlanDetailId(UUID.randomUUID().toString());
 							projPlanListDetail.setPlanDetailId(settleFeesVO.getPlanListDetailId());
 							/*本金违约金不算资金分发*/
-							projPlanListDetail.setAccountStatus(0);
+							projPlanListDetail.setAccountStatus(20);
 							/*本金违约金不算资金分发*/
 							projPlanListDetail.setProjPlanAmount(settleFeesVO.getAmount());
 							projPlanListDetail.setProjFactAmount(BigDecimal.ZERO);
@@ -652,7 +652,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						if (projDetail == null ) {
 							/*往期少缴费用*/
 							projDetail = new RepaymentProjPlanListDetail() ;
-							projDetail.setAccountStatus(0);
+							projDetail.setAccountStatus(20);
 							projDetail.setBusinessId(financeSettleBaseDto.getBusinessId());
 							projDetail.setCreateDate(new Date());
 							projDetail.setCreateUser(loginUserInfoHelper.getUserId());
@@ -740,7 +740,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					projPlanListDetail.setPlanItemName(settleFeesVO.getFeeName());
 					projPlanListDetail.setPlanItemType(RepayPlanFeeTypeEnum.OTHER_FEE.getValue());
 					projPlanListDetail.setProjFactAmount(BigDecimal.ZERO);
-					projPlanListDetail.setAccountStatus(0);
+					projPlanListDetail.setAccountStatus(20);
 					projPlanListDetail.setPeriod(projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getRepaymentProjPlanList().getPeriod());
 					projPlanListDetail.setPlanListId(projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getRepaymentProjPlanList().getPlanListId());
 					projPlanListDetail.setProjPlanListId(projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getRepaymentProjPlanList().getProjPlanListId());
@@ -874,21 +874,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 										RepaymentBizPlanListDetail bizPlanListDetail = bizPlanSettleDto.getCurrBizPlanListDto().getBizPlanListDetails().get(0);
 										BeanUtils.copyProperties(bizPlanListDetail, bizPlanDetail);
 										
-//										if (bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.PRINCIPAL_PENALTY.getUuid())) {
-//											bizPlanDetail.setAccountStatus(0);
-//										}
-//										if (bizPlanDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.OTHER_FEE.getValue())) {
-//											bizPlanDetail.setAccountStatus(0);
-//										}
-//										if (bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid())
-//												||bizPlanDetail.getFeeId().equals(RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid())
-//												||ONLINE_FEES.contains(bizPlanDetail.getFeeId())) {
-//											bizPlanDetail.setAccountStatus(30);
-//										}
-//										if (bizPlanDetail.getPlanItemType().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue())
-//												&&bizPlanDetail.getPlanItemName().equals(RepayPlanFeeTypeEnum.LACK_FEE.getDesc())) {
-//											bizPlanDetail.setAccountStatus(0);
-//										}
 										bizPlanDetail.setAccountStatus(repaymentProjPlanListDetail.getAccountStatus());
 										bizPlanDetail.setPlanDetailId(repaymentProjPlanListDetail.getPlanDetailId());
 										bizPlanDetail.setPlanAmount(BigDecimal.ZERO);
@@ -909,6 +894,31 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 								}
 							}
 							/*新增提前违约金细项||其他费用||往期少缴*/
+							
+							/*统计实还和应还*/
+							BigDecimal factReapy = BigDecimal.ZERO;
+		                	BigDecimal onLineFee = BigDecimal.ZERO;
+		                	BigDecimal overDueFee = BigDecimal.ZERO;
+		                	BigDecimal planAmount = BigDecimal.ZERO;
+							/*统计实还和应还*/
+		                	
+		                	for (RepaymentProjPlanListDetail projDetail : repaymentProjPlanSettleDto.getCurrProjPlanListDto().getProjPlanListDetails()) {
+								planAmount = planAmount.add(projDetail.getProjPlanAmount());
+								factReapy = factReapy.add(projDetail.getProjFactAmount()==null?BigDecimal.ZERO:projDetail.getProjFactAmount());
+								if (projDetail.getShareProfitIndex() < Constant.ONLINE_OFFLINE_FEE_BOUNDARY) {
+									onLineFee = onLineFee.add(projDetail.getProjPlanAmount());
+								}
+							}
+		                	
+		                	if (factReapy.compareTo(BigDecimal.ZERO)>0) {
+		                		repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList().setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
+		                	}
+		                	if (factReapy.compareTo(onLineFee)>=0) {
+		                		repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList().setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
+							}
+		                	if (factReapy.compareTo(planAmount)>=0) {
+		                		repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList().setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
+							}
 							
 							/*更新标PLANList*/
 							repaymentProjPlanSettleDto.getCurrProjPlanListDto().getRepaymentProjPlanList().setFactRepayDate(financeSettleBaseDto.getRepaymentResources().get(financeSettleBaseDto.getRepaymentResources().size()-1).getRepayDate());
@@ -979,9 +989,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						}
 	                	if (factReapy.compareTo(BigDecimal.ZERO)>0) {
 	                		bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setRepayStatus(SectionRepayStatusEnum.SECTION_REPAID.getKey());
-	                	}else if (factReapy.compareTo(onLineFee)>=0) {
+	                	}
+	                	if (factReapy.compareTo(onLineFee)>=0) {
 	                		bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setRepayStatus(SectionRepayStatusEnum.ONLINE_REPAID.getKey());
-						}else if (factReapy.compareTo(planAmount)>=0) {
+						}
+	                	if (factReapy.compareTo(planAmount)>=0) {
 							bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList().setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 						}
 	                	
