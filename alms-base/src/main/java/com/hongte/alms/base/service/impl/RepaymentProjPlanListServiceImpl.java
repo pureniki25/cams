@@ -124,7 +124,7 @@ public class RepaymentProjPlanListServiceImpl extends
 						BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
 						BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
 						
-						if(pList.getPlanListId().equals("aea29a0a-237d-485b-b6ba-a2ea72e503c1")) {
+						if(pList.getPlanListId().equals("77808a72-33c2-4777-bc3a-dea43f8e00e1")) {
 							System.out.println("stop");
 						}
 						
@@ -448,12 +448,17 @@ public class RepaymentProjPlanListServiceImpl extends
 								RepaymentProjPlanListDetail.class);
 						projDetail.setProjPlanDetailId(UUID.randomUUID().toString());
 						projDetail.setFeeId(feeId);
+						projDetail.setProjFactAmount(null);
+                        projDetail.setFactRepayDate(null);
+						projDetail.setCreateDate(new Date());
 						projDetail.setProjPlanAmount(lateFee);
 						if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-						  projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
+						    projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
+							projDetail.setAccountStatus(20);//20：分账到资产端账户
 						}
 						if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-							  projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()).get("feeLevel"));
+							projDetail.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()).get("feeLevel"));
+							projDetail.setAccountStatus(30);//30：分账到资产端账户（平台）
 						}
 					     projDetail.setPlanItemType(60);
 						String planDetailId="";
@@ -509,12 +514,17 @@ public class RepaymentProjPlanListServiceImpl extends
 						copy.setPlanDetailId(projDetail.getPlanDetailId());
 						copy.setFeeId(feeId);
 						copy.setPlanAmount(lateFee);
+						copy.setFactAmount(null);
+						copy.setFactRepayDate(null);
+						copy.setCreateDate(new Date());
 					    if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
 						  copy.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid()).get("feeLevel"));
+						  copy.setAccountStatus(20);//20：分账到资产端账户
 					    }
 					    if(feeId.equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
 							  copy.setShareProfitIndex(profitItemSetService.getLevel(business.getBusinessType().toString(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue().intValue(), RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()).get("feeLevel"));
-						    }
+							  copy.setAccountStatus(30);//30：分账到资产端账户（平台）   
+					    }
 						copy.setPlanItemType(60);
 						copy.setPlanItemName("滞纳金");
 						repaymentBizPlanListDetailService.insertOrUpdate(copy);

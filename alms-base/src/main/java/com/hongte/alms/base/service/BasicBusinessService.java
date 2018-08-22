@@ -179,6 +179,20 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	 * 车贷移交法务信息
 	 */
 	List<LitigationVO> selectLitigationCarVO( String crpId);
+
+	/**
+	 * @Title: selectCreditBusinessIds  
+	 * @Description: 查看信用贷
+	 * @return List<String>    返回类型  
+	 */
+	List<String> selectCreditBusinessIds();
+
+	/**
+	 * @Title: selectGoodHourseBusinessIds  
+	 * @Description: 查看信用贷
+	 * @return List<String>    返回类型  
+	 */
+	List<String> selectGoodHourseBusinessIds();
 	 
 
 }

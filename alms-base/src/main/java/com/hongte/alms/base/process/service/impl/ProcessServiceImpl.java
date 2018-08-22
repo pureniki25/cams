@@ -936,12 +936,19 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
             int i=0;
             if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.OVERALL.getKey())){//如果角色是全局的
                 List<SysUserRole> userRoles  = sysUserRoleService.selectList(new EntityWrapper<SysUserRole>().eq("role_code",roleCode).groupBy("user_id"));
-                if(userRoles.size()==0){
+                List<SysUserRole> listSysUserRole = new ArrayList<>();
+                for(SysUserRole userRole:userRoles){
+                	SysUser sysUser = sysUserService.selectById(userRole.getUserId());
+                	if(null != sysUser && sysUser.getUserStatus() == 0) {
+                		listSysUserRole.add(userRole);
+                	}
+                }
+                if(listSysUserRole.size()==0){
                     logger.error("流程审批角色对应的用户找不到"+"       roleCode:"+roleCode + "" +
                             "    processTypeId: " + step.getTypeId()+  "         step "+step.getStep());
                     throw new RuntimeException("流程审批角色对应的用户找不到");
                 }
-                for(SysUserRole userRole:userRoles){
+                for(SysUserRole userRole:listSysUserRole){
                     if(i>0){
                         sb.append(",");
                     }

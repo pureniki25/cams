@@ -128,7 +128,9 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     	
     	SysUser sysUser = sysUserService.selectById(userId);
     	
-    	String pagePermissionJson = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
+    	//String pagePermissionJson = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
+    	String pagePermissionJson = "{\"hasOverAllRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCarBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasMyFollowUp\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasFinanceOrderSetAreaRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeCreditBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false},\"hasSeeGoodHourseBizRole\":{\"page6\":false,\"page5\":false,\"page4\":false,\"page3\":false,\"page2\":false,\"page1\":false,\"page0\":false,\"page9\":false,\"page8\":false,\"page7\":false}}";
+    	
     	JSONObject pagePermissionJSONObject = JSONObject.parseObject(pagePermissionJson);
     	
     	updatePagePermission(pagePermissionJSONObject,userId);
@@ -172,6 +174,16 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 				//查找用户跟进的业务ID(根据催收分配表  tb_collection_status 来查找)
 	            List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
 	            myPermissionIdsInfo.updatePagePermissionList(followBids,pagePermission);
+				break;
+			case "hasSeeCreditBizRole":
+				//拥有查看信用贷查看角色
+                List<String>  tempCreditBizs = basicBusinessService.selectCreditBusinessIds();
+                myPermissionIdsInfo.updatePagePermissionList(tempCreditBizs,pagePermission);
+				break;
+			case "hasSeeGoodHourseBizRole":
+				//拥有优房贷业务查看角色
+                List<String>  tempGoodHourse = basicBusinessService.selectGoodHourseBusinessIds();
+                myPermissionIdsInfo.updatePagePermissionList(tempGoodHourse,pagePermission);
 				break;
 			default:
 				break;
@@ -595,6 +607,16 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 				//查找用户跟进的业务ID(根据催收分配表  tb_collection_status 来查找)
 	            List<String> followBids =  collectionStatusService.selectFollowBusinessIds(userId);
 	            myPermissionIdsInfo.updatePagePermissionList(followBids,pagePermission);
+				break;
+			case "hasSeeCreditBizRole":
+				//拥有查看信用贷查看角色
+                List<String>  tempCreditBizs = basicBusinessService.selectCreditBusinessIds();
+                myPermissionIdsInfo.updatePagePermissionList(tempCreditBizs,pagePermission);
+				break;
+			case "hasSeeGoodHourseBizRole":
+				//拥有优房贷业务查看角色
+                List<String>  tempGoodHourse = basicBusinessService.selectGoodHourseBusinessIds();
+                myPermissionIdsInfo.updatePagePermissionList(tempGoodHourse,pagePermission);
 				break;
 			default:
 				break;
