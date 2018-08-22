@@ -1442,11 +1442,12 @@ public class FinanceServiceImpl implements FinanceService {
 							- repaymentPlanInfoDTO.getOfflineDerateAmount();
 					double onlineLateFee = repaymentPlanInfoDTO.getOnlineLateFee()
 							- repaymentPlanInfoDTO.getOnlineDerateAmount();
+					double otherFee = repaymentPlanInfoDTO.getOtherFee();
 					double surplus = repaymentPlanInfoDTO.getSurplus(); // 结余
 
-					// 小计：本金+利息+月收分公司服务费+月收平台费
+					// 小计：本金+利息+月收分公司服务费+月收平台费 + + otherFee
 					repaymentPlanInfoDTO
-							.setSubtotal(BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge)
+							.setSubtotal(BigDecimal.valueOf(accrual + principal + serviceCharge + platformCharge + otherFee)
 									.setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
 					// 还款合计（含滞纳金）：小计+线上滞纳金+线下滞纳金+结余
