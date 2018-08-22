@@ -434,7 +434,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     logger.error("设置电催人员,同步催收设置到信贷失败， 异常，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId+"  异常："+e.getMessage());
                 }
 
-                if(!result.getCode().equals(1)){
+                if(result == null || !result.getCode().equals(1)){
                     logger.error("设置催收人员,同步催收设置到信贷失败，信息："+ JSON.toJSONString(businessVo)+"  staffUserId:"+staffUserId);
                 }
             }
@@ -921,17 +921,17 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 if (!(Boolean) result.getData()) {
                     //调用移交诉讼接口
                     transferLitigationService.sendTransferLitigationData(
-                            originalBusinessId,sendUrl,null);
+                            originalBusinessId,sendUrl,null, 1);
                 }
             }
 
             //修改状态
-            setBussinessAfterStatus(
+          /*  setBussinessAfterStatus(
                     originalBusinessId,
                     planList.getPlanListId(),
                     "自动移交法务",
                     CollectionStatusEnum.TO_LAW_WORK,
-                    CollectionSetWayEnum.AUTO_SET);
+                    CollectionSetWayEnum.AUTO_SET);*/
 
             List<StaffBusinessVo> voList = new LinkedList<>();
             StaffBusinessVo vo  = new StaffBusinessVo();

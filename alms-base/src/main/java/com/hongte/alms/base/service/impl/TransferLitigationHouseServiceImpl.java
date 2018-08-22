@@ -69,7 +69,7 @@ public class TransferLitigationHouseServiceImpl
 			Integer processResult = process.getProcessResult();
 			if (!CollectionUtils.isEmpty(houses) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
-				transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl, req.getCrpId());
+				transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl, req.getCrpId(), 2);
 				// 更新贷后状态为 移交诉讼
 //				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 //						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);

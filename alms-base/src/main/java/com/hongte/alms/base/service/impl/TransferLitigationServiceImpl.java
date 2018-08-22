@@ -264,11 +264,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {ServiceRuntimeException.class, Exception.class})
 	@Override
-	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId) {
+	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId, Integer channel) {
 		TransferOfLitigationVO transferLitigationData = null;
 		LitigationResponse litigationResponse = null;
-		if (StringUtil.isEmpty(businessId)) {
-			return litigationResponse;
+		if (StringUtil.isEmpty(businessId) || channel == null) {
+			throw new ServiceRuntimeException("业务编号和移交渠道不能为空！");
 		}
 		TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
 		try {
@@ -329,9 +329,16 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
 					transferLitigationLogService.insert(transferLitigationLog);
 					// 更新贷后状态为 移交诉讼
-					if (StringUtil.notEmpty(planListId)) {
+					if (channel.intValue() == 2) {
 						collectionStatusService.setBussinessAfterStatus(businessId, planListId, "",
 								CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
+					}else if (channel.intValue() == 1) {
+						collectionStatusService.setBussinessAfterStatus(
+								businessId,
+								planListId,
+			                    "自动移交法务",
+			                    CollectionStatusEnum.TO_LAW_WORK,
+			                    CollectionSetWayEnum.AUTO_SET);
 					}
 				}else {
 					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);

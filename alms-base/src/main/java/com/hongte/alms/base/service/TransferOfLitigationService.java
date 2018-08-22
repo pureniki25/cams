@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.hongte.alms.base.assets.car.vo.FileVo;
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.process.vo.ProcessLogReq;
@@ -37,9 +38,10 @@ public interface TransferOfLitigationService {
 	 * 发送移交诉讼相关数据
 	 * @param businessId 业务编号
 	 * @param planListId 还款计划列表ID
+	 * @param channel 移交渠道（1、自动移交，2、手动移交）
 	 * @return
 	 */
-	LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId);
+	LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId, Integer channel);
 	
 	/**
      * 保存房贷移交法务信息
