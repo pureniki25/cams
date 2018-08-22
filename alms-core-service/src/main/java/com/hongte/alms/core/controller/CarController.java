@@ -550,7 +550,6 @@ try {
     public Result<Object> addReturnReg( @RequestBody Map<String,Object> params){
     	try {
     	carService.addReturnReg(params);
-
     	return Result.build("0000", "操作成功", "");
 	}catch (Exception e) {
       	logger.error(e.getMessage());

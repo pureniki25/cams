@@ -13,6 +13,8 @@ public enum SysRoleAreaTypeEnums {
 	,SEE_CAR_BUSINESS(4,"只查看车贷业务")
 	,SEE_HOURSE_BUSINESS(5,"只查看房贷业务")
 	,SEE_FINANCE_BUSINESS(6,"财务跟单方式控制")
+	,SEE_Credit_BUSINESS(7,"只查看有房贷业务")
+	,SEE_GOODHOURSE_BUSINESS(8,"只查看信用贷业务")
 	;
 
 
