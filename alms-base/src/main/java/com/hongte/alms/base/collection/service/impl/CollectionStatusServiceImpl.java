@@ -921,7 +921,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 if (!(Boolean) result.getData()) {
                     //调用移交诉讼接口
                     transferLitigationService.sendTransferLitigationData(
-                            originalBusinessId,sendUrl);
+                            originalBusinessId,sendUrl,null);
                 }
             }
 
