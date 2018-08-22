@@ -195,7 +195,20 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 
 		return basicBusinessMapper.selectBusinessIdsByBizType(bizTypes);
 	}
-
+	
+	@Override
+	public List<String> selectCreditBusinessIds(){
+		List<Integer> bizTypes = new LinkedList<>();
+		bizTypes.add(BusinessTypeEnum.CREDIT_TYPE.value()); //信用贷
+		return basicBusinessMapper.selectBusinessIdsByBizType(bizTypes);
+	}
+	
+	@Override
+	public List<String> selectGoodHourseBusinessIds(){
+		List<Integer> bizTypes = new LinkedList<>();
+		bizTypes.add(BusinessTypeEnum.YOU_FANG_TYPE.value()); //优房贷
+		return basicBusinessMapper.selectBusinessIdsByBizType(bizTypes);
+	}
 
     /**
      * 查询所有业务ID
