@@ -2164,11 +2164,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 									}
     								feeDetails.append(factAmount.setScale(2, RoundingMode.HALF_UP));
     								if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-    									feeDetails.append("线上滞纳金").append(" ");
+    									feeDetails.append("线上滞纳金").append(",");
     								}else if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-    									feeDetails.append("线下滞纳金").append(" ");
+    									feeDetails.append("线下滞纳金").append(",");
     								}else {
-    									feeDetails.append(planListDetail.getPlanItemName()).append(" ");
+    									feeDetails.append(planListDetail.getPlanItemName()).append(",");
     								}
     								factTotalAmount = factTotalAmount.add(factAmount);
     								continue;
@@ -2179,11 +2179,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     					
     					feeDetails.append(BigDecimal.ZERO.setScale(2));
     					if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-    						feeDetails.append("线上滞纳金").append(" ");
+    						feeDetails.append("线上滞纳金").append(",");
     					}else if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-    						feeDetails.append("线下滞纳金").append(" ");
+    						feeDetails.append("线下滞纳金").append(",");
     					}else {
-    						feeDetails.append(planListDetail.getPlanItemName()).append(" ");
+    						feeDetails.append(planListDetail.getPlanItemName()).append(",");
     					}
     				}
     			
