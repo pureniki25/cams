@@ -368,7 +368,7 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<LitigationResponse> queryTransferLitigationData(@RequestParam String businessId) {
 		try {
-			LitigationResponse litigationData = transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl);
+			LitigationResponse litigationData = transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl, null);
 			if (litigationData != null) {
 				return Result.success(litigationData);
 			} else {

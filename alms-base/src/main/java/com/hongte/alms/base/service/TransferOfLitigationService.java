@@ -36,9 +36,10 @@ public interface TransferOfLitigationService {
 	/**
 	 * 发送移交诉讼相关数据
 	 * @param businessId 业务编号
+	 * @param planListId 还款计划列表ID
 	 * @return
 	 */
-	LitigationResponse sendTransferLitigationData(String businessId, String sendUrl);
+	LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId);
 	
 	/**
      * 保存房贷移交法务信息

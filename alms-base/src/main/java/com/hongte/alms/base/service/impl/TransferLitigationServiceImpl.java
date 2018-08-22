@@ -31,6 +31,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.assets.car.vo.FileVo;
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.Doc;
 import com.hongte.alms.base.entity.DocTmp;
@@ -262,7 +264,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {ServiceRuntimeException.class, Exception.class})
 	@Override
-	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl) {
+	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId) {
 		TransferOfLitigationVO transferLitigationData = null;
 		LitigationResponse litigationResponse = null;
 		if (StringUtil.isEmpty(businessId)) {
@@ -326,6 +328,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				if (litigationResponse.getCode() == 1 && litigationResponse.getData().isImportSuccess()) {
 					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
 					transferLitigationLogService.insert(transferLitigationLog);
+					// 更新贷后状态为 移交诉讼
+					if (StringUtil.notEmpty(planListId)) {
+						collectionStatusService.setBussinessAfterStatus(businessId, planListId, "",
+								CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
+					}
 				}else {
 					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
 					throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);

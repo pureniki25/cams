@@ -69,10 +69,10 @@ public class TransferLitigationCarServiceImpl extends
 			Integer processResult = process.getProcessResult();
 			if (!CollectionUtils.isEmpty(cars) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
-				transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl);
+				transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl, req.getCrpId());
 				// 更新贷后状态为 移交诉讼
-				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
-						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
+//				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
+//						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
 				// 同时更新信贷的贷后状态
 				List<StaffBusinessVo> voList = new LinkedList<>();
 				StaffBusinessVo vo = new StaffBusinessVo();
