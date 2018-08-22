@@ -2164,11 +2164,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 									}
     								feeDetails.append(factAmount.setScale(2, RoundingMode.HALF_UP));
     								if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-    									feeDetails.append("线上滞纳金").append(" ");
+    									feeDetails.append("线上滞纳金").append(",");
     								}else if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-    									feeDetails.append("线下滞纳金").append(" ");
+    									feeDetails.append("线下滞纳金").append(",");
     								}else {
-    									feeDetails.append(planListDetail.getPlanItemName()).append(" ");
+    									feeDetails.append(planListDetail.getPlanItemName()).append(",");
     								}
     								factTotalAmount = factTotalAmount.add(factAmount);
     								continue;
@@ -2179,11 +2179,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     					
     					feeDetails.append(BigDecimal.ZERO.setScale(2));
     					if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
-    						feeDetails.append("线上滞纳金").append(" ");
+    						feeDetails.append("线上滞纳金").append(",");
     					}else if (planListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
-    						feeDetails.append("线下滞纳金").append(" ");
+    						feeDetails.append("线下滞纳金").append(",");
     					}else {
-    						feeDetails.append(planListDetail.getPlanItemName()).append(" ");
+    						feeDetails.append(planListDetail.getPlanItemName()).append(",");
     					}
     				}
     			
@@ -2509,10 +2509,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						new EntityWrapper<RepaymentProjPlanList>().eq("proj_plan_id", repaymentProjPlan.getProjPlanId()).eq("plan_list_id", cuRepaymentBizPlanLists.get(0).getPlanListId()));
 
 				//如果找不到这个标的还款计划当前期
-				if(CollectionUtils.isEmpty(selectList)){
+				if(CollectionUtils.isEmpty(curprojPlanLists)){
                     logger.error("找不到这个标的还款计划当前期 RepaymentProjPlanList  proj_plan_id:"+repaymentProjPlan.getProjPlanId()+"     plan_list_id:"+cuRepaymentBizPlanLists.get(0).getPlanListId());
                     throw new SettleRepaymentExcepiton("找不到这个标的还款计划当前期", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
-                }else if(cuRepaymentBizPlanLists.size()>1){
+                }else if(curprojPlanLists.size()>1){
                     logger.error("这个标有两个以上当前期 RepaymentProjPlanList  proj_plan_id:"+repaymentProjPlan.getProjPlanId()+"     plan_list_id:"+cuRepaymentBizPlanLists.get(0).getPlanListId());
                     throw new SettleRepaymentExcepiton("这个标有两个以上当前期", ExceptionCodeEnum.NO_BIZ_PLAN_LIST.getValue().toString());
                 }

@@ -541,7 +541,7 @@ public class ApplyDerateProcessServiceImpl extends BaseServiceImpl<ApplyDeratePr
         list.forEach(e->{
         	String origBusinessId = e.getOrigBusinessId();
         	Map<String,Object> map = pepaymentBizPlanListDetailMapper.totalRepaymentFactAmount(origBusinessId);
-        	String realPayMoney = map.get("realPay")+"";
+        	String realPayMoney = map==null?"":map.get("realPay")+"";
         	e.setRealPayMoney(realPayMoney);
         });
 
