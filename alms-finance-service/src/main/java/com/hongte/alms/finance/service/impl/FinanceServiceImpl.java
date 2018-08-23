@@ -675,7 +675,7 @@ public class FinanceServiceImpl implements FinanceService {
 		}
 		for (RepaymentBizPlanList repaymentBizPlanList : exs) {
 			List<RepaymentProjFactRepay> repaymentProjFactRepays = repaymentProjFactRepayMapper.selectList(
-					new EntityWrapper<RepaymentProjFactRepay>().eq("business_id", repaymentBizPlanList.getBusinessId())
+					new EntityWrapper<RepaymentProjFactRepay>().eq("business_id", repaymentBizPlanList.getBusinessId()).eq("is_cancelled", 0)
 							.eq("after_id", repaymentBizPlanList.getAfterId()));
 			BigDecimal f = new BigDecimal(0);
 			for (RepaymentProjFactRepay repaymentProjFactRepay : repaymentProjFactRepays) {
@@ -1277,6 +1277,7 @@ public class FinanceServiceImpl implements FinanceService {
 			RepaymentProjPlanListDetail repaymentProjPlanListDetail, BigDecimal money, RepaymentProjPlan projPlan,
 			String repayRefId, Integer repaySource) {
 		RepaymentProjFactRepay repaymentProjFactRepay = new RepaymentProjFactRepay();
+		repaymentProjFactRepay.setIsCancelled(0);
 		repaymentProjFactRepay.setAfterId(repaymentProjPlanList.getAfterId());
 		repaymentProjFactRepay.setBusinessId(repaymentProjPlanList.getBusinessId());
 		repaymentProjFactRepay.setCreateDate(new Date());

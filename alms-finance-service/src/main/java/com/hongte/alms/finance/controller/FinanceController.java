@@ -878,7 +878,7 @@ public class FinanceController {
               result.success(1);
       		logger.info("@shareProfit@自动代扣核销--开始[{}{}{}]", businessId,afterId,logId);
 		} catch (Exception ex) {
-			logger.error("分润出现异常"+ex);
+			ex.printStackTrace();
 			return Result.error("-1","分润出现异常"+ex);
 		}
 		return result;
@@ -1181,7 +1181,7 @@ public class FinanceController {
 	public Result lastRepayConfirm(String businessId,String afterId) {
 		try {
 			logger.info("@lastRepayConfirm@查询上次还款来源--开始[{}]");
-			List<RepaymentConfirmLog> list = confrimLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", businessId).eq("after_id",afterId).orderBy("idx",false));
+			List<RepaymentConfirmLog> list = confrimLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", businessId).eq("is_cancelled", 0).eq("after_id",afterId).orderBy("idx",false));
 			if (list==null||list.size()==0) {
 				logger.info("@lastRepayConfirm@查询上次还款来源--结束[0]");
 				return Result.success(0);

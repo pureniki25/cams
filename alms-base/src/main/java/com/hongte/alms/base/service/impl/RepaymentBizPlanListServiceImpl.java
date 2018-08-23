@@ -205,7 +205,7 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
         List<FinanceManagerListVO> list = repaymentBizPlanListMapper.selectFinanceMangeList(req);
         for (FinanceManagerListVO financeManagerListVO : list) {
             businessSet.add(financeManagerListVO.getBusinessId());
-            RepaymentResource repaymentResource = repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("org_business_id", financeManagerListVO.getOrgBusinessId()).eq("after_id", financeManagerListVO.getAfterId()));
+            RepaymentResource repaymentResource = repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>().eq("org_business_id", financeManagerListVO.getOrgBusinessId()).eq("is_cancelled", 0).eq("after_id", financeManagerListVO.getAfterId()));
 //            if (repaymentResource != null) {
 //                if (repaymentResource.getRepaySource().equals("30") || repaymentResource.getRepaySource().equals("31")) {//银行代扣
 //                    financeManagerListVO.setBankRepay(true);
