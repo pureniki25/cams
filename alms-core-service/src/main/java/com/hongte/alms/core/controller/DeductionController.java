@@ -272,7 +272,7 @@ public class DeductionController {
     	        			}
     	        		}
 //    	        		if(list!=null&&list.size()>0) {
-    	        			deductionVo.setRepayAllAmount(factAmountSum.add(repayingAmount));
+    	        			deductionVo.setRepayAllAmount(factAmountSum.add(repayingAmount).add(repayAmount));
     	        			deductionVo.setRepayingAmount(repayingAmount);
     	        			deductionVo.setRestAmount(BigDecimal.valueOf(deductionVo.getTotal()).subtract(repayAmount));
     	        			deductionVo.setRepayAmount(deductionVo.getRestAmount());
