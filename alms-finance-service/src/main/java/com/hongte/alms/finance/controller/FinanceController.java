@@ -140,6 +140,10 @@ public class FinanceController {
 	@Autowired
 	@Qualifier("RepaymentProjPlanService")
 	RepaymentProjPlanService repaymentProjPlanService ;
+	
+	@Autowired
+	@Qualifier("RepaymentResourceService")
+	RepaymentResourceService repaymentResourceService;
 	@Autowired
 	EipRemote eipRemote ;
 	
@@ -884,6 +888,52 @@ public class FinanceController {
 		return result;
 	}
 	
+	
+	@ApiOperation(value = "批量核销")
+	@PostMapping("/batchShareProfit")
+	public Result batchShareProfit(@RequestBody String businessIds){
+		logger.info("@batchShareProfit@批量核销--开始[{}]",businessIds);
+		Result result=new Result();
+		String[]array=businessIds.split(",");
+		
+		for(int i=0;i<array.length;i++) {
+			String businessId=array[i];
+			List<WithholdingRepaymentLog> logs=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", businessId).eq("repay_status", 1));
+			
+			for(WithholdingRepaymentLog log:logs) {
+				int count=repaymentResourceService.selectCount(new EntityWrapper<RepaymentResource>().eq("repay_source_ref_id", log.getLogId()).eq("org_business_id", businessId));
+				if(count>0) {
+					continue;
+				}
+			    try {
+						ConfirmRepaymentReq req=new ConfirmRepaymentReq();
+						List<Integer> list=new ArrayList<Integer>();
+						List<Integer> logIds=new ArrayList<Integer>();
+						//调用方标志位  10：财务人员还款确认（线下转账），20：自动线下代扣，21：人工线下代扣，30：自动银行代扣，31：人工银行代扣
+						if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&log.getCreateUser().equals("auto_run")) {//自动银行代扣已还款
+							req.setCallFlage(30);
+						}else if(log.getBindPlatformId()==PlatformEnum.YH_FORM.getValue()&&(!log.getCreateUser().equals("auto_run"))) {//人工银行代扣已还款
+							req.setCallFlage(31);
+						}else if(log.getBindPlatformId()!=PlatformEnum.YH_FORM.getValue()&&log.getCreateUser().equals("auto_run")) {//20：自动线下代扣已还款
+							req.setCallFlage(20);
+						}else if(log.getBindPlatformId()!=PlatformEnum.YH_FORM.getValue()&&(!log.getCreateUser().equals("auto_run"))){//21，人工线下代扣已还款
+							req.setCallFlage(21);
+						}
+						logIds.add(log.getLogId());
+						req.setLogIds(logIds);
+						req.setAfterId(log.getAfterId());
+						req.setBusinessId(businessId);
+						shareProfitService.execute(req, true);
+				}catch (Exception ex) {
+					logger.error("分润出现异常"+ex);
+					logger.error("核销异常：businessId[{},{}]",businessId,log.getLogId());
+				}
+			}
+	  }
+		    result.success(1);
+    		logger.info("@batchShareProfit@批量核销--结束[{}]", businessIds);
+		    return result;
+	}
 	@ApiOperation(value = "网关充值快捷充值核心接口")
 	@PostMapping("/recharge")
 	public Result recharge(@RequestBody ConfirmRepaymentReq req){
