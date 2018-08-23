@@ -163,6 +163,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     @Autowired
     @Qualifier("RepaymentProjPlanService")
     private RepaymentProjPlanService repaymentProjPlanService;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanService")
+    private RepaymentBizPlanService repaymentBizPlanService ;
 
     @Autowired
     private TransferOfLitigationMapper transferOfLitigationMapper;
@@ -1898,14 +1902,18 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     	infoVO.setPenaltyFees(fees);
     	for (RepaymentBizPlanList bizPlanList : getCurrenPeroids(req)) {
     		
+    		RepaymentBizPlan bizPlan = repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", bizPlanList.getPlanId()));
+    		
+    		if (bizPlan==null || bizPlan.getPlanStatus() > 0) {
+				continue ;
+			}
+    		
     		infoVO.getPenaltyBiz().put(bizPlanList.getPlanListId(), new ArrayList<>());
     		
     		EntityWrapper<RepaymentProjPlanList> eWrapper = new EntityWrapper<RepaymentProjPlanList>();
             eWrapper.eq("period", bizPlanList.getPeriod());
             eWrapper.eq("business_id", bizPlanList.getBusinessId());
-            if (!StringUtil.isEmpty(req.getPlanId())) {
-                eWrapper.eq("plan_id", req.getPlanId());
-            }
+            eWrapper.eq("plan_id", bizPlanList.getPlanId());
             List<RepaymentProjPlanList> projPlanLists = repaymentProjPlanListMapper.selectList(eWrapper);
             Set<String> projPlanStrs = new HashSet<>();
             for (RepaymentProjPlanList projPlanList : projPlanLists) {
