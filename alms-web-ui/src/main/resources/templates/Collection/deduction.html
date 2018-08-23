@@ -164,16 +164,16 @@
 	      <td class="column">月收平台费</td>
 	      <td>{{ajax_data.platformCharge?numeral(ajax_data.platformCharge).format('0,0.00'):0  }}</td>
 
-	      <td class="column" >线上逾期费</td>
+	      <td class="column" >线上滞纳金</td>
 	      <td >{{ajax_data.onLineOverDueMoney?numeral(ajax_data.onLineOverDueMoney).format('0,0.00'):0 }}</td>
 	    </tr>
 	    
 
 	    
 	       <tr>
-	      <td class="column">线下逾期费</td>
+	      <td class="column">线下滞纳金</td>
 	      <td>{{ajax_data.planOverDueMoney?numeral(ajax_data.planOverDueMoney).format('0,0.00'):0 }}</td>
-	      <td class="column">本次代扣线下逾期费</td>
+	      <td class="column">本次代扣线下滞纳金</td>
 	      <td ><i-input v-model="ajax_data.underLineFactOverDueMoney" class="td-box" @on-blur="getTotalShouldPay()" v-if="isBankFlag" disabled> </i-input>
 	      <i-input v-model="ajax_data.underLineFactOverDueMoney" class="td-box" @on-blur="getTotalShouldPay()" v-if="!isBankFlag" > </i-input>
 	      </td>
