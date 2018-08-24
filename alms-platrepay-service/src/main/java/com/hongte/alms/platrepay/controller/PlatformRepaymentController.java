@@ -36,6 +36,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
@@ -53,6 +54,7 @@ import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.RepaymentConfirmPlatRepayLogService;
 import com.hongte.alms.base.service.RepaymentProjFactRepayService;
+import com.hongte.alms.base.service.RepaymentProjPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentProjPlanListService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.RepaymentResourceService;
@@ -160,8 +162,8 @@ public class PlatformRepaymentController {
 	private ProfitFeeSetService profitFeeSetService;
 
 	@Autowired
-	@Qualifier("RepaymentBizPlanListDetailService")
-	private RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
+	@Qualifier("RepaymentProjPlanListDetailService")
+	private RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
 
 	static {
 
@@ -787,13 +789,13 @@ public class PlatformRepaymentController {
 
 		Map<String, Integer> feeIdMap = new HashMap<>();
 
-		List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDetailService
-				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("proj_plan_list_id", projPlanListId));
-		if (CollectionUtils.isEmpty(repaymentBizPlanListDetails)) {
+		List<RepaymentProjPlanListDetail> repaymentProjPlanListDetails = repaymentProjPlanListDetailService
+				.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPlanListId));
+		if (CollectionUtils.isEmpty(repaymentProjPlanListDetails)) {
 			return feeIdMap;
 		}
 
-		for (RepaymentBizPlanListDetail detail : repaymentBizPlanListDetails) {
+		for (RepaymentProjPlanListDetail detail : repaymentProjPlanListDetails) {
 			if (StringUtil.isEmpty(detail.getFeeId()) || detail.getShareProfitIndex() == null) {
 				continue;
 			}
