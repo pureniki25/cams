@@ -2280,6 +2280,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     	List<RepaymentBizPlanList> cuRepaymentBizPlanLists = new ArrayList<>();
     	EntityWrapper<RepaymentBizPlan> ew = new EntityWrapper<RepaymentBizPlan>();
 		ew.eq("business_id", req.getBusinessId());
+		ew.eq("plan_status", 0);
 		//如果传了还款计划Id，则使用还款计划Id来查业务的还款计划
 		if (!StringUtil.isEmpty(req.getPlanId())) {
 			ew.eq("plan_id", req.getPlanId());
@@ -2355,6 +2356,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	public List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req,FinanceSettleBaseDto financeSettleBaseDto) {
 		EntityWrapper<RepaymentBizPlan> ew = new EntityWrapper<RepaymentBizPlan>();
 		ew.eq("business_id", req.getBusinessId());
+		ew.eq("plan_status", 0);
 		//如果传了还款计划Id，则使用还款计划Id来查业务的还款计划
 		if (!StringUtil.isEmpty(req.getPlanId())) {
 			ew.eq("plan_id", req.getPlanId());
