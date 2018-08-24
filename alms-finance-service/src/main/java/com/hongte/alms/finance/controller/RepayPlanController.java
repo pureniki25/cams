@@ -852,14 +852,14 @@ public class RepayPlanController {
         if(isNiwoFlag) {
         	  if(req!=null&&req.getIsSettle()!=null&&req.getIsSettle()==1) {//过滤结清数据
         		  if(req.getIsMainCustomer()!=null&&req.getIsMainCustomer()!=1) {//是共借人的话只能看自己的还款计划
-        		        TuandaiProjectInfo info= tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card",req.getIdentifyCard()));
+        		        TuandaiProjectInfo info= tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card",req.getIdentifyCard()).eq("business_id", businessId));
         	       	    projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).eq("project_id", info.getProjectId()).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("query_full_success_date"));
         		  }else {
         	            projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).ne("plan_status", 10).ne("plan_status", 20).ne("plan_status", 30).orderBy("query_full_success_date"));
         		  }
         	  }else {
         		  if(req!=null&&req.getIsMainCustomer()!=null&&req.getIsMainCustomer()!=1) {//是共借人的话只能看自己的还款计划
-	      		        TuandaiProjectInfo info= tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card",req.getIdentifyCard()));
+	      		        TuandaiProjectInfo info= tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("identity_card",req.getIdentifyCard()).eq("business_id", businessId));
 	      	            projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).eq("project_id", info.getProjectId()).orderBy("query_full_success_date"));
 	      		  }else {
      	 	            projPlans = repaymentProjPlanService.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id",businessId).orderBy("query_full_success_date"));
