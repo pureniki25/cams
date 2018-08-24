@@ -32,6 +32,7 @@ import com.hongte.alms.base.dto.compliance.TdPlatformPlanRepaymentDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.ProfitFeeSet;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
@@ -46,6 +47,7 @@ import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.service.ProfitFeeSetService;
+import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
@@ -60,6 +62,7 @@ import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.vo.compliance.TdrepayRechargeInfoVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.platrepay.dto.TdGuaranteePaymentDTO;
 import com.hongte.alms.platrepay.dto.TdProjectPaymentDTO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -155,6 +158,10 @@ public class PlatformRepaymentController {
 	@Autowired
 	@Qualifier("ProfitFeeSetService")
 	private ProfitFeeSetService profitFeeSetService;
+
+	@Autowired
+	@Qualifier("RepaymentBizPlanListDetailService")
+	private RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
 
 	static {
 
@@ -614,7 +621,7 @@ public class PlatformRepaymentController {
 					/*
 					 * 获取不需要分润的数据
 					 */
-					Set<String> notShareProfitFeeIds = getNotShareProfitFeeIds();
+					Map<String, Integer> notShaPrMap = getNotShareProfitFeeIds(projPlanListId);
 
 					for (RepaymentProjFactRepay r : projFactRepays) {
 						// 累计实还金额，包含线下和线上费用
@@ -622,9 +629,9 @@ public class PlatformRepaymentController {
 						/*
 						 * 区分分润与不分润的费用明细（线下费用不用分润）
 						 */
-						if (notShareProfitFeeIds.contains(r.getFeeId())) {
-							continue;
-						}
+						 if (notShaPrMap.containsKey(r.getFeeId())) {
+							 continue;
+						 }
 						TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();
 						// 要对费类型进行转换，押金和冲应收不用分润：
 						// 从
@@ -764,16 +771,38 @@ public class PlatformRepaymentController {
 	/**
 	 * 获取不需要分润的数据
 	 */
-	private Set<String> getNotShareProfitFeeIds() {
-		Set<String> feeIdSet = new HashSet<>();
-		List<ProfitFeeSet> profitFeeSets = profitFeeSetService
-				.selectList(new EntityWrapper<ProfitFeeSet>().ge("fee_level", 1200));
-		if (CollectionUtils.isNotEmpty(profitFeeSets)) {
-			for (ProfitFeeSet profitFeeSet : profitFeeSets) {
-				feeIdSet.add(profitFeeSet.getFeeId());
+	/*
+	 * private Set<String> getNotShareProfitFeeIds() { Set<String> feeIdSet = new
+	 * HashSet<>(); List<ProfitFeeSet> profitFeeSets = profitFeeSetService
+	 * .selectList(new EntityWrapper<ProfitFeeSet>().ge("fee_level", 1200)); if
+	 * (CollectionUtils.isNotEmpty(profitFeeSets)) { for (ProfitFeeSet profitFeeSet
+	 * : profitFeeSets) { feeIdSet.add(profitFeeSet.getFeeId()); } } return
+	 * feeIdSet; }
+	 */
+
+	/**
+	 * 获取不需要分润的数据
+	 */
+	private Map<String, Integer> getNotShareProfitFeeIds(String projPlanListId) {
+
+		Map<String, Integer> feeIdMap = new HashMap<>();
+
+		List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDetailService
+				.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("proj_plan_list_id", projPlanListId));
+		if (CollectionUtils.isEmpty(repaymentBizPlanListDetails)) {
+			return feeIdMap;
+		}
+
+		for (RepaymentBizPlanListDetail detail : repaymentBizPlanListDetails) {
+			if (StringUtil.isEmpty(detail.getFeeId()) || detail.getShareProfitIndex() == null) {
+				continue;
+			}
+			if (detail.getShareProfitIndex().intValue() >= 1200) {
+				feeIdMap.put(detail.getFeeId(), detail.getShareProfitIndex());
 			}
 		}
-		return feeIdSet;
+
+		return feeIdMap;
 	}
 
 	@SuppressWarnings("rawtypes")
