@@ -1116,4 +1116,105 @@
 		  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
 		</if> 
 	</select>
+	
+	<select id="queryTransferLitigationPersonInfo" resultType="com.hongte.alms.base.vo.litigation.TransferLitigationPersonDTO">
+		SELECT 
+		  -- 主借款人
+		  a.real_name AS "name",
+		  a.`sex`,
+		  a.`birthday`,
+		  a.identity_card identifyCard,
+		  a.`user_type_id` borrowerType,
+		  a.`address`,
+		  a.`TelNo` telNo,
+		  CASE
+		    a.user_type_id 
+		    WHEN 2 
+		    THEN b.customer_name 
+		    ELSE '' 
+		  END companyName,
+		  CASE
+		    a.user_type_id 
+		    WHEN 2 
+		    THEN b.register_province 
+		    ELSE '' 
+		  END licenseAddr,
+		  CASE
+		    a.user_type_id 
+		    WHEN 2 
+		    THEN b.company_legal_person 
+		    ELSE '' 
+		  END legalPerson,
+		  2 AS "type" 
+		FROM
+		  tb_tuandai_project_info a,
+		  `tb_basic_biz_customer` b 
+		WHERE a.master_issue_id = a.project_id 
+		  AND a.business_id = b.business_id 
+		  AND a.begin_time IS NOT NULL 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}
+		UNION
+		ALL 
+		SELECT 
+		  -- `出借人`
+		  a.lender AS "name",
+		  '' sex,
+		  NULL birthday,
+		  b.lender_identity identifyCard,
+		  b.creditor_type borrowerType,
+		  b.`creditor_or_guarantors_address` address,
+		  b.`lender_phone` telNo,
+		  CASE
+		    b.creditor_type 
+		    WHEN 2 
+		    THEN a.branch_full_name 
+		    ELSE '' 
+		  END companyName,
+		  a.branch_address licenseAddr,
+		  a.legal_person legalPerson,
+		  1 AS "type" 
+		FROM
+		  tb_biz_output_contract a,
+		  tb_creditor b 
+		WHERE a.lender_id = b.creditor_id 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR} 
+		UNION
+		ALL 
+		SELECT 
+		  -- `担保主体/担保人`
+		  a.guarantee_main AS "name",
+		  '' sex,
+		  NULL birthday,
+		  b.identify_card identifyCard,
+		  CASE
+		    b.guarante_main_type 
+		    WHEN 0 
+		    THEN 1 
+		    WHEN 1 
+		    THEN 2 
+		    ELSE NULL 
+		  END borrowerType,
+		  b.guarantee_address address,
+		  b.guarantee_phone telNo,
+		  b.guarantee_company_name companyName,
+		  CONCAT(
+		    IFNULL(b.guarante_family_province, ''),
+		    IFNULL(b.guarante_family_city, ''),
+		    IFNULL(b.guarante_family_county, ''),
+		    IFNULL(b.guarante_family_address, '')
+		  ) licenseAddr,
+		  CASE
+		    b.guarante_main_type 
+		    WHEN 1 
+		    THEN b.guarantee_name 
+		    ELSE '' 
+		  END legalPerson,
+		  3 AS "type" 
+		FROM
+		  tb_fsd_non_standard_measure a,
+		  tb_fsd_guarantee_information b 
+		WHERE a.business_id = b.business_id 
+		  AND b.operator_type = 1 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR} 
+	</select>
 </mapper>

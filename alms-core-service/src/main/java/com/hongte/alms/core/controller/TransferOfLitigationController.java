@@ -33,6 +33,7 @@ import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.feignClient.LitigationFeignClient;
+import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeService;
@@ -47,6 +48,7 @@ import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.HouseAdressVO;
 import com.hongte.alms.base.vo.litigation.LitigationResponse;
 import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
+import com.hongte.alms.base.vo.litigation.TransferLitigationPersonDTO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
@@ -67,6 +69,9 @@ public class TransferOfLitigationController {
 	@Autowired
 	@Qualifier("TransferOfLitigationService")
 	private TransferOfLitigationService transferOfLitigationService;
+
+	@Autowired
+	private TransferOfLitigationMapper transferOfLitigationMapper;
 
 	@Autowired
 	@Qualifier("TransfLitigationHouseService")
@@ -457,8 +462,15 @@ public class TransferOfLitigationController {
 			limit = limit == null || limit <= 0 ? 10 : limit;
 
 			Integer total = transferOfLitigationService.countTransferLitigationInfo(businessId, page, limit);
-			List<TransferLitigationDTO> transferLitigationDTOs = transferOfLitigationService
-					.queryTransferLitigationInfo(businessId, page, limit);
+			List<TransferLitigationDTO> transferLitigationDTOs = new ArrayList<>();
+			if (total > 0) {
+				transferLitigationDTOs = transferOfLitigationService.queryTransferLitigationInfo(businessId, page,
+						limit);
+				if (StringUtil.notEmpty(businessId)) {
+					List<TransferLitigationPersonDTO> personDTOs = transferOfLitigationMapper.queryTransferLitigationPersonInfo(businessId);
+					transferLitigationDTOs.get(0).setCustomerInfos(personDTOs == null ? new ArrayList<>() : personDTOs);
+				}
+			}
 
 			resultMap.put("total", total);
 			resultMap.put("transferLitigationDTOs", transferLitigationDTOs);

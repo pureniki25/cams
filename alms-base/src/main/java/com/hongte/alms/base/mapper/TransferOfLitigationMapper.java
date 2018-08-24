@@ -12,6 +12,7 @@ import com.hongte.alms.base.vo.billing.PreviousFeesVO;
 import com.hongte.alms.base.vo.litigation.BusinessCar;
 import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
+import com.hongte.alms.base.vo.litigation.TransferLitigationPersonDTO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -206,4 +207,12 @@ public interface TransferOfLitigationMapper {
 	 */
 	Integer countTransferLitigationInfo(@Param(value = "businessId") String businessId,
 			@Param(value = "page") Integer page, @Param(value = "limit") Integer limit);
+	
+	/**
+	 * 移交诉讼信息查询接口相关人员明细相关信息
+	 * 
+	 * @param businessId
+	 * @return
+	 */
+	List<TransferLitigationPersonDTO> queryTransferLitigationPersonInfo(@Param(value = "businessId") String businessId);
 }
