@@ -727,10 +727,15 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					if (settleFeesVO.getAmount()==null) {
 						continue;
 					}
+					RepaymentProjPlanSettleDto masterProject = getMasterProject(curPeriods);
+					if (masterProject==null) {
+						masterProject = curPeriods.get(0).getProjPlanStteleDtos().get(0);
+					}
 					
-					financeSettleBaseDto.setProjectId(projPlanSettleDtoList.get(0).getRepaymentProjPlan().getProjectId());
-					financeSettleBaseDto.setProjPlanId(projPlanSettleDtoList.get(0).getRepaymentProjPlan().getProjPlanId());
-					financeSettleBaseDto.setPlanId(projPlanSettleDtoList.get(0).getRepaymentProjPlan().getPlanId());
+					RepaymentProjPlanListDetail repaymentProjPlanListDetail = masterProject.getCurrProjPlanListDto().getProjPlanListDetails().get(0);
+					financeSettleBaseDto.setProjectId(masterProject.getRepaymentProjPlan().getProjectId());
+					financeSettleBaseDto.setProjPlanId(masterProject.getRepaymentProjPlan().getProjPlanId());
+					financeSettleBaseDto.setPlanId(masterProject.getRepaymentProjPlan().getPlanId());
 					
 					
 					PlanListDetailShowPayDto planListDetailShowPayDto = new PlanListDetailShowPayDto() ;
@@ -738,12 +743,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					planListDetailShowPayDto.setFeelName(settleFeesVO.getFeeName());
 					planListDetailShowPayDto.setShareProfitIndex(settleFeesVO.getShareProfitIndex());
 					planListDetailShowPayDto.setShowPayMoney(settleFeesVO.getAmount());
-					
-					RepaymentProjPlanSettleDto masterProject = getMasterProject(curPeriods);
-					if (masterProject==null) {
-						masterProject = curPeriods.get(0).getProjPlanStteleDtos().get(0);
-					}
-					RepaymentProjPlanListDetail repaymentProjPlanListDetail = masterProject.getCurrProjPlanListDto().getProjPlanListDetails().get(0);
 					
 					RepaymentProjPlanListDetail projPlanListDetail = new RepaymentProjPlanListDetail() ;
 					BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetail);
@@ -754,7 +753,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					projPlanListDetail.setPlanItemName(settleFeesVO.getFeeName());
 					projPlanListDetail.setPlanItemType(RepayPlanFeeTypeEnum.OTHER_FEE.getValue());
 					projPlanListDetail.setProjFactAmount(BigDecimal.ZERO);
-					projPlanListDetail.setShareProfitIndex(Constant.ONLINE_OFFLINE_FEE_BOUNDARY+1);
+					projPlanListDetail.setShareProfitIndex(settleFeesVO.getShareProfitIndex());
 					projPlanListDetail.setAccountStatus(20);
 					projPlanListDetail.setPeriod(masterProject.getCurrProjPlanListDto().getRepaymentProjPlanList().getPeriod());
 					projPlanListDetail.setPlanListId(masterProject.getCurrProjPlanListDto().getRepaymentProjPlanList().getPlanListId());
@@ -1579,6 +1578,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 repaymentResource.setConfirmLogId(financeSettleBaseDto.getUuid());
                 repaymentResources.add(repaymentResource);
                 financeSettleBaseDto.setRepayFactAmount(financeSettleBaseDto.getRepayFactAmount().add(repaymentResource.getRepayAmount()));
+                financeSettleBaseDto.getRepaymentConfirmLog().setFactAmount(financeSettleBaseDto.getRepayFactAmount());
                 
                 if (!financeSettleReq.getPreview()) {
                     repaymentResource.insert();
@@ -1650,6 +1650,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
             repaymentResources.add(repaymentResource);
             financeSettleBaseDto.setRepayFactAmount(financeSettleBaseDto.getRepayFactAmount().add(repaymentResource.getRepayAmount()));
+            financeSettleBaseDto.getRepaymentConfirmLog().setFactAmount(financeSettleBaseDto.getRepayFactAmount());
+
         }
         financeSettleBaseDto.setRepaymentResources(repaymentResources);
     }
