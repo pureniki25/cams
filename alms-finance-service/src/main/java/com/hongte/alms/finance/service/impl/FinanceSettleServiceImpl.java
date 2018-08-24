@@ -585,6 +585,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							projPlanListDetail.setProjPlanAmount(settleFeesVO.getAmount());
 							projPlanListDetail.setProjFactAmount(BigDecimal.ZERO);
 							projPlanListDetail.setFeeId(settleFeesVO.getFeeId());
+							projPlanListDetail.setShareProfitIndex(settleFeesVO.getShareProfitIndex());
 							projPlanListDetail.setPlanItemName(RepayPlanFeeTypeEnum.feeIdOf(settleFeesVO.getFeeId()).getDesc());
 							projPlanListDetail.setPlanItemType(Integer.parseInt(settleFeesVO.getPlanItemType()));
 							projPlanListDetail.setCreateDate(new Date());
@@ -738,7 +739,12 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					planListDetailShowPayDto.setShareProfitIndex(settleFeesVO.getShareProfitIndex());
 					planListDetailShowPayDto.setShowPayMoney(settleFeesVO.getAmount());
 					
-					RepaymentProjPlanListDetail repaymentProjPlanListDetail = curPeriods.get(0).getProjPlanStteleDtos().get(0).getCurrProjPlanListDto().getProjPlanListDetails().get(0);
+					RepaymentProjPlanSettleDto masterProject = getMasterProject(curPeriods);
+					if (masterProject==null) {
+						masterProject = curPeriods.get(0).getProjPlanStteleDtos().get(0);
+					}
+					RepaymentProjPlanListDetail repaymentProjPlanListDetail = masterProject.getCurrProjPlanListDto().getProjPlanListDetails().get(0);
+					
 					RepaymentProjPlanListDetail projPlanListDetail = new RepaymentProjPlanListDetail() ;
 					BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetail);
 					projPlanListDetail.setCreateDate(new Date());
@@ -748,10 +754,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					projPlanListDetail.setPlanItemName(settleFeesVO.getFeeName());
 					projPlanListDetail.setPlanItemType(RepayPlanFeeTypeEnum.OTHER_FEE.getValue());
 					projPlanListDetail.setProjFactAmount(BigDecimal.ZERO);
+					projPlanListDetail.setShareProfitIndex(Constant.ONLINE_OFFLINE_FEE_BOUNDARY+1);
 					projPlanListDetail.setAccountStatus(20);
-					projPlanListDetail.setPeriod(projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getRepaymentProjPlanList().getPeriod());
-					projPlanListDetail.setPlanListId(projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getRepaymentProjPlanList().getPlanListId());
-					projPlanListDetail.setProjPlanListId(projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getRepaymentProjPlanList().getProjPlanListId());
+					projPlanListDetail.setPeriod(masterProject.getCurrProjPlanListDto().getRepaymentProjPlanList().getPeriod());
+					projPlanListDetail.setPlanListId(masterProject.getCurrProjPlanListDto().getRepaymentProjPlanList().getPlanListId());
+					projPlanListDetail.setProjPlanListId(masterProject.getCurrProjPlanListDto().getRepaymentProjPlanList().getProjPlanListId());
 					projPlanListDetail.setProjPlanDetailId(UUID.randomUUID().toString());
 					projPlanListDetail.setPlanDetailId(UUID.randomUUID().toString());
 					
@@ -760,7 +767,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							financeSettleBaseDto.setUnderfillFees(new ArrayList<>());
 						}
 						financeSettleBaseDto.getUnderfillFees().add(planListDetailShowPayDto);
-						projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail) ;
+						masterProject.getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail) ;
 						continue;
 					}
 					
@@ -779,7 +786,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						changeRepaymentResources(planListDetailShowPayDto,projPlanListDetail, financeSettleBaseDto);
 					}
 					
-					projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail) ;
+					masterProject.getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail) ;
 				}
                 
 				/*将数据入库*/
@@ -1078,6 +1085,23 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
     }
 
+    /**
+     * 在当前期找主借标
+     * @author 王继光
+     * 2018年8月24日 上午10:33:45
+     * @param cur
+     * @return
+     */
+    private RepaymentProjPlanSettleDto getMasterProject(List<RepaymentBizPlanSettleDto> cur) {
+    	for (RepaymentBizPlanSettleDto repaymentBizPlanSettleDto : cur) {
+			for (RepaymentProjPlanSettleDto projPlanDto : repaymentBizPlanSettleDto.getProjPlanStteleDtos()) {
+				if (projPlanDto.getTuandaiProjectInfo().getMasterIssueId().equals(projPlanDto.getTuandaiProjectInfo().getProjectId())) {
+					return projPlanDto ;
+				}
+			}
+		}
+    	return null ;
+    }
     /**
      * 根据planListDetail 查找
      * @author 王继光
