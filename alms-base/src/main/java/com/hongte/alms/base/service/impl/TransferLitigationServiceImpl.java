@@ -68,6 +68,7 @@ import com.hongte.alms.base.vo.litigation.BusinessCar;
 import com.hongte.alms.base.vo.litigation.BusinessHouse;
 import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.LitigationResponse;
+import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -943,6 +944,16 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			isLast = true;
 		}
 		return isLast;
+	}
+	
+	@Override
+	public List<TransferLitigationDTO> queryTransferLitigationInfo(String businessId, Integer page, Integer limit) {
+		return transferOfLitigationMapper.queryTransferLitigationInfo(businessId, page, limit);
+	}
+	
+	@Override
+	public Integer countTransferLitigationInfo(String businessId, Integer page, Integer limit) {
+		return transferOfLitigationMapper.countTransferLitigationInfo(businessId, page, limit);
 	}
 
 	public static void main(String[] args) {

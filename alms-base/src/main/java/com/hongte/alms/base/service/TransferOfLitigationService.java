@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.hongte.alms.base.assets.car.vo.FileVo;
-import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
-import com.hongte.alms.base.process.vo.ProcessLogReq;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.LitigationResponse;
+import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 
 public interface TransferOfLitigationService {
@@ -59,5 +58,19 @@ public interface TransferOfLitigationService {
      * 车贷业务结清试算
      */
     Map<String, Object> carLoanBilling(CarLoanBilVO carLoanBilVO);
+    
+    /**
+	 * 移交诉讼信息查询接口相关信息
+	 * @param businessId
+	 * @return
+	 */
+	List<TransferLitigationDTO> queryTransferLitigationInfo(String businessId, Integer page, Integer limit);
+	
+	/**
+	 * 统计移交诉讼信息查询接口相关信息条数
+	 * @param businessId
+	 * @return
+	 */
+	Integer countTransferLitigationInfo(String businessId, Integer page, Integer limit);
     
 }
