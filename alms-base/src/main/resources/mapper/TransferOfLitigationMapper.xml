@@ -34,6 +34,38 @@
 	    </collection>
 	</resultMap>  
 	
+	<resultMap id="TransferLitigationInfoMap" type="com.hongte.alms.base.vo.litigation.TransferLitigationDTO" >  
+	    	<result property="businessId" column="businessId"/> 
+   			<result property="businessType" column="businessType"/>
+   			<result property="districtName" column="districtName"/>
+   			<result property="companyName" column="companyName"/>
+   			<result property="customerName" column="customerName"/>
+   			<result property="contractStartDate" column="contractStartDate"/>
+   			<result property="contractEndDate" column="contractEndDate"/>
+   			<result property="borrowRate" column="borrowRate"/>
+   			<result property="repaymentTypeName" column="repaymentTypeName"/>
+   			<result property="factOutputMoney" column="factOutputMoney"/>
+   			<result property="borrowMoney" column="borrowMoney"/>
+	    <collection property="factOutputDates" ofType="java.util.Date">  
+	    	<result property="factOutputDate" column="factOutputDate"/>
+	    </collection>
+	    <collection property="repaymentNames" ofType="java.lang.String">  
+	    	<result property="repaymentName" column="repaymentName"/>
+	    </collection>
+	    <collection property="carInfos" ofType="com.hongte.alms.base.vo.litigation.TransferLitigationCarDTO">  
+	    	<result property="ownerName" column="ownerName"/> 
+   			<result property="licensePlateNumber" column="licensePlateNumber"/>
+   			<result property="engineModel" column="engineModel"/>
+   			<result property="vin" column="vin"/>
+	    </collection>
+	    <collection property="houseInfos" ofType="com.hongte.alms.base.vo.litigation.TransferLitigationHouseDTO">  
+	    	<result property="houseName" column="houseName"/> 
+   			<result property="houseAddress" column="houseAddress"/>
+   			<result property="houseNo" column="houseNo"/>
+   			<result property="pledgeTypeDetail" column="pledgeTypeDetail"/>
+	    </collection>
+	</resultMap>  
+	
 	<resultMap id="HouseLoanMap" type="com.hongte.alms.base.vo.litigation.house.HouseLoanVO" >  
 	    	<result property="businessId" column="business_id"/> 
    			<result property="customerName" column="customer_name"/>
@@ -983,5 +1015,105 @@
 		  AND t1.due_date <![CDATA[ >= ]]> #{billDate,jdbcType=DATE} 
 		  AND t1.orig_business_id = #{businessId,jdbcType=VARCHAR} 
 		  ORDER BY t1.`due_date`
+	</select>
+	
+	<!-- 移交诉讼信息查询接口相关信息 -->
+	<select id="queryTransferLitigationInfo" resultMap="TransferLitigationInfoMap">
+		SELECT DISTINCT 
+		  bb.`business_id` businessId,
+		  -- 业务编号
+		  (
+		    CASE
+		      WHEN bb.`business_type` IN (1, 9) 
+		      THEN 1 
+		      WHEN bb.`business_type` IN (2, 11) 
+		      THEN 2 
+		      ELSE NULL 
+		    END
+		  ) businessType,
+		  -- 业务类型
+		  bb.`district_name` districtName,
+		  -- 片区
+		  bb.`company_name` companyName,
+		  -- 分公司
+		  bb.`customer_name` customerName,
+		  -- 主借款人姓名
+		  NULL contractStartDate,
+		  -- 借款开始时间
+		  NULL contractEndDate,
+		  -- 借款到期时间
+		  bb.`borrow_rate` borrowRate,
+		  -- 借款利率
+		  brt.`repayment_type_name` repaymentTypeName,
+		  -- 还款方式
+		  (SELECT 
+		      IFNULL(SUM(bor.fact_output_money), 0) fact_output_money
+		    FROM
+		      tb_biz_output_record bor 
+		    WHERE bor.withdraw_type IN (0, 1, 4)
+		    AND bor.business_id = bb.`business_id` 
+		    GROUP BY bor.business_id) factOutputMoney,
+		  -- 实际出款金额合计
+		  (SELECT 
+		      bor.fact_output_date
+		    FROM
+		      tb_biz_output_record bor 
+		    WHERE bor.withdraw_type IN (0, 1, 4)
+		    AND bor.business_id = bb.`business_id` 
+		    GROUP BY bor.business_id) factOutputDate ,
+		  -- 实际出款时间
+		  IFNULL(bb.`borrow_money`, 0) borrowMoney,
+		  -- 借款金额
+		  db.`repayment_name` repaymentName,
+		  -- 收款人
+		  cb.`owner_name` ownerName,
+		  -- 车主
+		  cb.`license_plate_number` licensePlateNumber,
+		  -- 车牌号
+		  cb.`engine_model` engineModel,
+		  -- 发动机号
+		  cb.`vin`,
+		  -- 车辆识别码（车架号） 
+		  fh.`house_name` houseName,
+		  -- 房产权所属人
+		  fh.`house_address` houseAddress,
+		  -- 房产地址
+		  fh.`house_no` houseNo,
+		  -- 房产证编号
+		  fh.`pledge_type_detail` pledgeTypeDetail -- 几抵
+		FROM
+		  `tb_basic_business` bb 
+		  LEFT JOIN `tb_basic_repayment_type` brt 
+		    ON bb.`repayment_type_id` = brt.`repayment_type_id` 
+		  LEFT JOIN `tb_department_bank` db 
+		    ON bb.`company_id` = db.`dept_id` 
+		  LEFT JOIN `tb_car_basic` cb 
+		    ON bb.`business_id` = cb.`business_id` 
+		  LEFT JOIN `tb_fsd_house` fh 
+		    ON bb.`business_id` = fh.`business_id` 
+		WHERE bb.`business_type` IN (1, 2, 9, 11)
+		<if test="businessId != null and businessId != ''">
+		  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
+		</if> 
+		LIMIT ${(page-1) * limit}, ${limit}
+	</select>
+	
+	<select id="countTransferLitigationInfo" resultType="java.lang.Integer">
+		SELECT  
+		  COUNT(DISTINCT bb.business_id)
+		FROM
+		  `tb_basic_business` bb 
+		  LEFT JOIN `tb_basic_repayment_type` brt 
+		    ON bb.`repayment_type_id` = brt.`repayment_type_id` 
+		  LEFT JOIN `tb_department_bank` db 
+		    ON bb.`company_id` = db.`dept_id` 
+		  LEFT JOIN `tb_car_basic` cb 
+		    ON bb.`business_id` = cb.`business_id` 
+		  LEFT JOIN `tb_fsd_house` fh 
+		    ON bb.`business_id` = fh.`business_id` 
+		WHERE bb.`business_type` IN (1, 2, 9, 11)
+		<if test="businessId != null and businessId != ''">
+		  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
+		</if> 
 	</select>
 </mapper>
