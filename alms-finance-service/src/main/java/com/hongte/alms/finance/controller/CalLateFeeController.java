@@ -38,7 +38,9 @@ import com.hongte.alms.base.entity.BasicRepaymentType;
 import com.hongte.alms.base.entity.BizOutputRecord;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.enums.AreaLevel;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
 import com.hongte.alms.base.enums.RepayRegisterState;
@@ -89,6 +91,10 @@ public class CalLateFeeController {
 	@Autowired
 	@Qualifier("RepaymentProjPlanListService")
 	RepaymentProjPlanListService repaymentProjPlanListService;
+	
+	@Autowired
+	@Qualifier("RepaymentBizPlanListService")
+	RepaymentBizPlanListService repaymentBizPlanListService;
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper ;
 
@@ -100,6 +106,30 @@ public class CalLateFeeController {
 		repaymentProjPlanListService.calLateFee();
 		logger.info("@calLateFee@计算滞纳金--结束[{}]");
 		result.success(1);
+		return result;
+	}
+	
+	@GetMapping(value = "/calLateFeeByFactRpeayDate")
+	@ApiOperation(value = "根据实还日期重新计算滞纳金")
+	public Result calLateFeeByFactRpeayDate(@RequestParam("beginDate") String beginDate,@RequestParam("endDate") String endDate) {
+		Date beginDate1=DateUtil.getDate(beginDate);
+		Date endDate1=DateUtil.getDate(endDate);
+		logger.info("@calLateFee@计算滞纳金--开始[{},{}]");
+		List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList((new EntityWrapper<RepaymentBizPlan>().eq("src_type", 2)).gt("create_time", beginDate1).lt("create_time", endDate1));
+		
+		for(RepaymentBizPlan plan:plans) {
+			List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.getPlanListForCalLateFee(plan.getPlanId());
+			    for(RepaymentBizPlanList pList:pLists) {
+			    	List<RepaymentProjPlanList> projList = repaymentProjPlanListService.getProListForCalLateFee(pList.getPlanListId());
+						for (RepaymentProjPlanList projPList : projList) {
+							// 每个表的还款计划列表对应所的标的还款计划
+							repaymentProjPlanListService.calLateFeeForPerPList(pList,null);
+				    }
+			}
+		}
+		Result result=new Result();
+		result.success(1);
+		logger.info("@calLateFee@计算滞纳金--结束[{}]");
 		return result;
 	}
 
