@@ -855,7 +855,7 @@ window.layinit(function (htConfig) {
                             if (res.data.code == '1') {
                                 app.submitLoding = false;
                                 app.$Modal.success({
-                                    content: '还款计划结清成功!', onOk() {
+                                    content: planId?'还款计划结清成功!':'业务全部结清成功!', onOk() {
                                         var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                                         parent.layer.close(index);
                                         parent.app.search()
