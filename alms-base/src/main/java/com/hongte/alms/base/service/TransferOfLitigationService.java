@@ -64,13 +64,13 @@ public interface TransferOfLitigationService {
 	 * @param businessId
 	 * @return
 	 */
-	List<TransferLitigationDTO> queryTransferLitigationInfo(String businessId, Integer page, Integer limit);
+	List<TransferLitigationDTO> queryTransferLitigationInfo(Map<String, Object> paramMap);
 	
 	/**
 	 * 统计移交诉讼信息查询接口相关信息条数
 	 * @param businessId
 	 * @return
 	 */
-	Integer countTransferLitigationInfo(String businessId, Integer page, Integer limit);
+	Integer countTransferLitigationInfo(Map<String, Object> paramMap);
     
 }
