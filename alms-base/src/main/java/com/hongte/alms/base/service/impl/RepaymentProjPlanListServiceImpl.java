@@ -31,6 +31,7 @@ import com.hongte.alms.common.util.ClassCopyUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.core.Result;
 import com.ht.ussp.util.DateUtil;
+import com.mysql.cj.core.io.BigDecimalValueFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -40,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -499,9 +501,15 @@ public class RepaymentProjPlanListServiceImpl extends
 							.eq("fee_id", feeId));
 			
 			BasicBusiness business=basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id", pList.getOrigBusinessId()));
+			//计算总的pListDetail对应费用的应还金额总和
+		
+			List<RepaymentProjPlanListDetail> list= repaymentProjPlanListDetailService.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("plan_list_id", pList.getPlanListId()));
+				List<RepaymentProjPlanListDetail> filterList= list.stream() .filter(a ->feeId.equals(a.getFeeId())).collect(Collectors.toList());
+				 BigDecimal planRepayAmount=filterList.stream().map(RepaymentProjPlanListDetail::getProjPlanAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+			
 			try {
 				if (pDetail != null) {
-					pDetail.setPlanAmount(lateFee);
+					pDetail.setPlanAmount(planRepayAmount);
 					repaymentBizPlanListDetailService.updateById(pDetail);
 				} else {
 					List<RepaymentBizPlanListDetail> pDetails = repaymentBizPlanListDetailService
@@ -513,7 +521,7 @@ public class RepaymentProjPlanListServiceImpl extends
 								RepaymentBizPlanListDetail.class); 
 						copy.setPlanDetailId(projDetail.getPlanDetailId());
 						copy.setFeeId(feeId);
-						copy.setPlanAmount(lateFee);
+						copy.setPlanAmount(planRepayAmount);
 						copy.setFactAmount(null);
 						copy.setFactRepayDate(null);
 						copy.setCreateDate(new Date());
@@ -609,7 +617,6 @@ public class RepaymentProjPlanListServiceImpl extends
 		}
 
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = Exception.class)
 	@Override
 	public RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList,Integer type) {
 		Date nowDate=new Date();
@@ -644,9 +651,17 @@ public class RepaymentProjPlanListServiceImpl extends
 				// 没有逾期,且不是你我金融生成
 				if (isOverDue(nowDate, projPList.getDueDate()) >=0&&projPList.getCreatSysType()!=3) {
 					projPList.setOverdueAmount(BigDecimal.valueOf(0));
+					projPList.setOverdueDays(BigDecimal.valueOf(0));
 					pList.setOverdueAmount(BigDecimal.valueOf(0));
+					pList.setOverdueDays(BigDecimal.valueOf(0));
 					repaymentBizPlanListService.updateById(pList);
 					this.updateById(projPList);
+					
+					updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), BigDecimal.valueOf(0));
+					updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), BigDecimal.valueOf(0));
+					updateOrInsertProjDetail(projPList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), BigDecimal.valueOf(0));
+					updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid(), underLateFeeSum,underLineProjDetail);//每个业务每期还款计划的线下收费
+					updateOrInsertPlanDetail(pList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid(), underLateFeeSum,underLineProjDetail);//每个业务每期还款计划的线下收费
 					continue;
 					// 逾期的当前期
 				} else {

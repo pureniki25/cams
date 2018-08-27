@@ -659,6 +659,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													pList.setFactRepayDate(new Date());
 												}
 												repaymentBizPlanListService.updateById(pList);
+												
+												 planDetails = repaymentBizPlanListDetailService
+														.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id",
+																pList.getPlanListId()));
 												for(RepaymentBizPlanListDetail planDetail : planDetails) {
 													planDetail.setFactRepayDate(new Date());
 													repaymentBizPlanListDetailService.updateById(planDetail);

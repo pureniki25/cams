@@ -33,6 +33,7 @@ import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.feignClient.LitigationFeignClient;
+import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
 import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.process.service.ProcessTypeService;
@@ -46,6 +47,8 @@ import com.hongte.alms.base.service.TransferOfLitigationService;
 import com.hongte.alms.base.vo.billing.CarLoanBilVO;
 import com.hongte.alms.base.vo.litigation.HouseAdressVO;
 import com.hongte.alms.base.vo.litigation.LitigationResponse;
+import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
+import com.hongte.alms.base.vo.litigation.TransferLitigationPersonDTO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
@@ -68,6 +71,9 @@ public class TransferOfLitigationController {
 	private TransferOfLitigationService transferOfLitigationService;
 
 	@Autowired
+	private TransferOfLitigationMapper transferOfLitigationMapper;
+
+	@Autowired
 	@Qualifier("TransfLitigationHouseService")
 	private TransferLitigationHouseService transferLitigationHouseService;
 
@@ -80,8 +86,8 @@ public class TransferOfLitigationController {
 	private ProcessService processService;
 
 	@Autowired
-    @Qualifier("ProcessTypeService")
-    private ProcessTypeService processTypeService;
+	@Qualifier("ProcessTypeService")
+	private ProcessTypeService processTypeService;
 
 	@Autowired
 	@Qualifier("ProcessTypeStepService")
@@ -93,7 +99,7 @@ public class TransferOfLitigationController {
 	@Autowired
 	@Qualifier("CollectionStatusService")
 	private CollectionStatusService collectionStatusService;
-	
+
 	@Autowired
 	@Qualifier("DocTypeService")
 	private DocTypeService docTypeService;
@@ -101,7 +107,7 @@ public class TransferOfLitigationController {
 	@Autowired
 	@Qualifier("DocService")
 	private DocService docService;
-	
+
 	@Autowired
 	private LitigationFeignClient litigationFeignClient;
 
@@ -122,7 +128,7 @@ public class TransferOfLitigationController {
 			if (carLoanData != null && !carLoanData.isEmpty()) {
 
 				carLoanData.put("baseInfo", JSON.toJSON(carLoanData, JsonUtil.getMapping()));
-				
+
 				Object createTime = carLoanData.get("createTime");
 				if (createTime != null) {
 					carLoanData.put("createTime", DateUtil.formatDate((Date) createTime));
@@ -142,21 +148,23 @@ public class TransferOfLitigationController {
 
 				if (processId != null) {
 					List<TransferLitigationCar> applyList = transferLitigationCarService
-							.selectList(new EntityWrapper<TransferLitigationCar>().eq("process_id", processId).eq("business_id", businessId));
+							.selectList(new EntityWrapper<TransferLitigationCar>().eq("process_id", processId)
+									.eq("business_id", businessId));
 
 					String houseAddr = applyList.get(0).getHouseAddress();
 					if (StringUtil.notEmpty(houseAddr)) {
 						String[] houseArrs = houseAddr.split("--\\[#separator#\\]--");
-						
+
 						if (houseArrs != null && houseArrs.length > 0) {
-							
+
 							List<HouseAdressVO> houseAdressVOs = new ArrayList<>();
 							for (String houseArr : houseArrs) {
 								String[] subHouseArrs = houseArr.split("--#separator#--");
-								
+
 								if (subHouseArrs != null && subHouseArrs.length == 3) {
 									HouseAdressVO vo = new HouseAdressVO();
-									String replace = subHouseArrs[0].replace("[", "").replace("]", "").replaceAll(" ","");
+									String replace = subHouseArrs[0].replace("[", "").replace("]", "").replaceAll(" ",
+											"");
 									vo.setHouseArea(Arrays.asList(replace.split(",")));
 									vo.setDetailAddress(subHouseArrs[1]);
 									vo.setMortgageSituation(subHouseArrs[2]);
@@ -208,16 +216,17 @@ public class TransferOfLitigationController {
 			}
 			resultMap.put("baseInfo", JSON.toJSON(houseLoanData, JsonUtil.getMapping()));
 			processService.getProcessShowInfo(resultMap, processId, ProcessTypeEnums.HOUSE_LOAN_LITIGATION);
-			
+
 			// 查询附件
 			List<DocType> docTypes = docTypeService
 					.selectList(new EntityWrapper<DocType>().eq("type_code", "AfterLoan_Material_Litigation"));
 			if (docTypes != null && docTypes.size() == 1) {
-				List<Doc> fileList = docService.selectList(new EntityWrapper<Doc>()
-						.eq("doc_type_id", docTypes.get(0).getDocTypeId()).eq("business_id", businessId).orderBy("doc_id"));
+				List<Doc> fileList = docService
+						.selectList(new EntityWrapper<Doc>().eq("doc_type_id", docTypes.get(0).getDocTypeId())
+								.eq("business_id", businessId).orderBy("doc_id"));
 				resultMap.put("returnRegFiles", fileList);
 			}
-			
+
 			return Result.success(resultMap);
 		} catch (Exception e) {
 			LOG.error("-- queryTransferLitigationData -- 获取房贷诉讼相关数据异常！！！", e);
@@ -228,21 +237,22 @@ public class TransferOfLitigationController {
 	@ApiOperation(value = "存储房贷移交诉讼信息")
 	@PostMapping("/saveTransferLitigationHouse")
 	@ResponseBody
-	public Result<String> saveTransferLitigationHouse(@RequestBody  Map<String, Object> req) {
+	public Result<String> saveTransferLitigationHouse(@RequestBody Map<String, Object> req) {
 		try {
-			
+
 			List<FileVo> files = JsonUtil.map2objList(req.get("reqRegFiles"), FileVo.class);
-			List<TransferLitigationHouse> house = JsonUtil.map2objList(req.get("houseData"), TransferLitigationHouse.class);
+			List<TransferLitigationHouse> house = JsonUtil.map2objList(req.get("houseData"),
+					TransferLitigationHouse.class);
 			if (CollectionUtils.isEmpty(house)) {
 				return Result.error("500", "参数不能为空");
 			}
-			
+
 			TransferLitigationHouse transferLitigationHouse = house.get(0);
 			Result result = litigationFeignClient.isImportLitigation(transferLitigationHouse.getBusinessId());
 			if (result != null && "1".equals(result.getCode()) && (Boolean) result.getData()) {
 				return Result.error("-99", "该业务编号已移交诉讼系统！");
 			}
-			
+
 			transferOfLitigationService.saveTransferLitigationHouse(transferLitigationHouse, sendUrl, files);
 			return Result.success();
 		} catch (Exception ex) {
@@ -273,15 +283,18 @@ public class TransferOfLitigationController {
 			if (!CollectionUtils.isEmpty(componentOptions)) {
 				for (LinkedHashMap<String, Object> componentOption : componentOptions) {
 					List<String> houseAreas = (List<String>) componentOption.get("houseArea");
-					String detailAddress = StringUtil.isEmpty((String) componentOption.get("detailAddress")) ? " " : (String) componentOption.get("detailAddress");
-					String mortgageSituation = StringUtil.isEmpty((String) componentOption.get("mortgageSituation")) ? " " : (String) componentOption.get("mortgageSituation");
-					
+					String detailAddress = StringUtil.isEmpty((String) componentOption.get("detailAddress")) ? " "
+							: (String) componentOption.get("detailAddress");
+					String mortgageSituation = StringUtil.isEmpty((String) componentOption.get("mortgageSituation"))
+							? " "
+							: (String) componentOption.get("mortgageSituation");
+
 					if (componentOptions.indexOf(componentOption) < (componentOptions.size() - 1)) {
-						houseAddress.append(houseAreas).append("--#separator#--").append(detailAddress).append("--#separator#--")
-						.append(mortgageSituation).append("--[#separator#]--");
-					}else {
-						houseAddress.append(houseAreas).append("--#separator#--").append(detailAddress).append("--#separator#--")
-						.append(mortgageSituation);
+						houseAddress.append(houseAreas).append("--#separator#--").append(detailAddress)
+								.append("--#separator#--").append(mortgageSituation).append("--[#separator#]--");
+					} else {
+						houseAddress.append(houseAreas).append("--#separator#--").append(detailAddress)
+								.append("--#separator#--").append(mortgageSituation);
 					}
 				}
 			}
@@ -368,7 +381,8 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<LitigationResponse> queryTransferLitigationData(@RequestParam String businessId) {
 		try {
-			LitigationResponse litigationData = transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl);
+			LitigationResponse litigationData = transferOfLitigationService.sendTransferLitigationData(businessId,
+					sendUrl, null, 2);
 			if (litigationData != null) {
 				return Result.success(litigationData);
 			} else {
@@ -425,6 +439,47 @@ public class TransferOfLitigationController {
 		} catch (Exception e) {
 			LOG.error("-- carLoanBilling -- 车贷结清试算失败！！！", e);
 			return Result.error("500", e.getMessage());
+		}
+	}
+
+	@ApiOperation(value = "移交诉讼信息查询接口")
+	@PostMapping("/queryTransferLitigationInfo")
+	@ResponseBody
+	public Result<Map<String, Object>> queryTransferLitigationInfo(@RequestBody Map<String, Object> paramMap) {
+
+		try {
+			if (paramMap == null) {
+				LOG.info("-- queryTransferLitigationInfo -- 参数不能为空！！！");
+				return Result.error("参数不能为空！");
+			}
+
+			Map<String, Object> resultMap = new HashMap<>();
+			String businessId = (String) paramMap.get("businessId");
+			Integer page = (Integer) paramMap.get("page");
+			Integer limit = (Integer) paramMap.get("limit");
+
+			page = page == null || page <= 0 ? 1 : page;
+			limit = limit == null || limit <= 0 ? 10 : limit;
+			paramMap.put("page", page);
+			paramMap.put("limit", limit);
+
+			Integer total = transferOfLitigationService.countTransferLitigationInfo(paramMap);
+			List<TransferLitigationDTO> transferLitigationDTOs = new ArrayList<>();
+			if (total > 0) {
+				transferLitigationDTOs = transferOfLitigationService.queryTransferLitigationInfo(paramMap);
+				if (StringUtil.notEmpty(businessId)) {
+					List<TransferLitigationPersonDTO> personDTOs = transferOfLitigationMapper.queryTransferLitigationPersonInfo(businessId);
+					transferLitigationDTOs.get(0).setCustomerInfos(personDTOs == null ? new ArrayList<>() : personDTOs);
+				}
+			}
+
+			resultMap.put("total", total);
+			resultMap.put("transferLitigationDTOs", transferLitigationDTOs);
+
+			return Result.success(resultMap);
+		} catch (Exception e) {
+			LOG.error("-- queryTransferLitigationInfo -- 移交诉讼信息查询接口调用异常！！！", e);
+			return Result.error(e.getMessage());
 		}
 	}
 

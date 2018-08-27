@@ -346,6 +346,18 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
 	            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.ONLY_SELF.getKey())){
 	            	pagePermissionJSONObject.getJSONObject("hasMyFollowUp").put(jsonKey, true);
 	            }
+	            
+	            //查看信用贷
+	            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.SEE_Credit_BUSINESS.getKey())){
+	            	pagePermissionJSONObject.getJSONObject("hasSeeCreditBizRole").put(jsonKey, true);
+	            }
+	            
+	            //查看优房贷
+	            if(role.getRoleAreaType().equals(SysRoleAreaTypeEnums.SEE_GOODHOURSE_BUSINESS.getKey())){
+	            	pagePermissionJSONObject.getJSONObject("hasSeeGoodHourseBizRole").put(jsonKey, true);
+	            }
+	            
+	          
             }
 
         }

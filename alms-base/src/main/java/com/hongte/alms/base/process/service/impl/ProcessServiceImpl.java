@@ -285,6 +285,7 @@ public class ProcessServiceImpl extends BaseServiceImpl<ProcessMapper, Process> 
         }
         if(isFinish==true) {
         	currentStep.setNextStep(null);
+        	nextStep=null;
         }
 
 

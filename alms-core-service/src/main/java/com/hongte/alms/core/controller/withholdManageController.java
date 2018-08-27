@@ -211,8 +211,8 @@ public class withholdManageController {
     public Result addOrEditWithholdLimit(SysBankLimit sysBankLimit) {
         LOGGER.info("====>>>>>新增/编辑代扣额度信息开始[{}]", sysBankLimit);
         Result result = null;
-        try {
-        	  if(sysBankLimit.getPlatformId()==PlatformEnum.YH_FORM.getValue()) {
+        try { 
+        	  if(!(sysBankLimit.getPlatformId()==PlatformEnum.YH_FORM.getValue())) {
               	sysBankLimit.setSubPlatformId("");
               }
             sysBankLimitService.addOrEditWithholdChannel(sysBankLimit);

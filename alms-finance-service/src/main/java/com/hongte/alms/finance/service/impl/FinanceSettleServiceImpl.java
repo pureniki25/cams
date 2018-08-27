@@ -163,6 +163,10 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     @Autowired
     @Qualifier("RepaymentProjPlanService")
     private RepaymentProjPlanService repaymentProjPlanService;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanService")
+    private RepaymentBizPlanService repaymentBizPlanService ;
 
     @Autowired
     private TransferOfLitigationMapper transferOfLitigationMapper;
@@ -581,6 +585,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							projPlanListDetail.setProjPlanAmount(settleFeesVO.getAmount());
 							projPlanListDetail.setProjFactAmount(BigDecimal.ZERO);
 							projPlanListDetail.setFeeId(settleFeesVO.getFeeId());
+							projPlanListDetail.setShareProfitIndex(settleFeesVO.getShareProfitIndex());
 							projPlanListDetail.setPlanItemName(RepayPlanFeeTypeEnum.feeIdOf(settleFeesVO.getFeeId()).getDesc());
 							projPlanListDetail.setPlanItemType(Integer.parseInt(settleFeesVO.getPlanItemType()));
 							projPlanListDetail.setCreateDate(new Date());
@@ -722,10 +727,15 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					if (settleFeesVO.getAmount()==null) {
 						continue;
 					}
+					RepaymentProjPlanSettleDto masterProject = getMasterProject(curPeriods);
+					if (masterProject==null) {
+						masterProject = curPeriods.get(0).getProjPlanStteleDtos().get(0);
+					}
 					
-					financeSettleBaseDto.setProjectId(projPlanSettleDtoList.get(0).getRepaymentProjPlan().getProjectId());
-					financeSettleBaseDto.setProjPlanId(projPlanSettleDtoList.get(0).getRepaymentProjPlan().getProjPlanId());
-					financeSettleBaseDto.setPlanId(projPlanSettleDtoList.get(0).getRepaymentProjPlan().getPlanId());
+					RepaymentProjPlanListDetail repaymentProjPlanListDetail = masterProject.getCurrProjPlanListDto().getProjPlanListDetails().get(0);
+					financeSettleBaseDto.setProjectId(masterProject.getRepaymentProjPlan().getProjectId());
+					financeSettleBaseDto.setProjPlanId(masterProject.getRepaymentProjPlan().getProjPlanId());
+					financeSettleBaseDto.setPlanId(masterProject.getRepaymentProjPlan().getPlanId());
 					
 					
 					PlanListDetailShowPayDto planListDetailShowPayDto = new PlanListDetailShowPayDto() ;
@@ -734,7 +744,6 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					planListDetailShowPayDto.setShareProfitIndex(settleFeesVO.getShareProfitIndex());
 					planListDetailShowPayDto.setShowPayMoney(settleFeesVO.getAmount());
 					
-					RepaymentProjPlanListDetail repaymentProjPlanListDetail = curPeriods.get(0).getProjPlanStteleDtos().get(0).getCurrProjPlanListDto().getProjPlanListDetails().get(0);
 					RepaymentProjPlanListDetail projPlanListDetail = new RepaymentProjPlanListDetail() ;
 					BeanUtils.copyProperties(repaymentProjPlanListDetail, projPlanListDetail);
 					projPlanListDetail.setCreateDate(new Date());
@@ -744,10 +753,11 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					projPlanListDetail.setPlanItemName(settleFeesVO.getFeeName());
 					projPlanListDetail.setPlanItemType(RepayPlanFeeTypeEnum.OTHER_FEE.getValue());
 					projPlanListDetail.setProjFactAmount(BigDecimal.ZERO);
+					projPlanListDetail.setShareProfitIndex(settleFeesVO.getShareProfitIndex());
 					projPlanListDetail.setAccountStatus(20);
-					projPlanListDetail.setPeriod(projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getRepaymentProjPlanList().getPeriod());
-					projPlanListDetail.setPlanListId(projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getRepaymentProjPlanList().getPlanListId());
-					projPlanListDetail.setProjPlanListId(projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getRepaymentProjPlanList().getProjPlanListId());
+					projPlanListDetail.setPeriod(masterProject.getCurrProjPlanListDto().getRepaymentProjPlanList().getPeriod());
+					projPlanListDetail.setPlanListId(masterProject.getCurrProjPlanListDto().getRepaymentProjPlanList().getPlanListId());
+					projPlanListDetail.setProjPlanListId(masterProject.getCurrProjPlanListDto().getRepaymentProjPlanList().getProjPlanListId());
 					projPlanListDetail.setProjPlanDetailId(UUID.randomUUID().toString());
 					projPlanListDetail.setPlanDetailId(UUID.randomUUID().toString());
 					
@@ -756,7 +766,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							financeSettleBaseDto.setUnderfillFees(new ArrayList<>());
 						}
 						financeSettleBaseDto.getUnderfillFees().add(planListDetailShowPayDto);
-						projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail) ;
+						masterProject.getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail) ;
 						continue;
 					}
 					
@@ -775,7 +785,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 						changeRepaymentResources(planListDetailShowPayDto,projPlanListDetail, financeSettleBaseDto);
 					}
 					
-					projPlanSettleDtoList.get(0).getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail) ;
+					masterProject.getCurrProjPlanListDto().getProjPlanListDetails().add(projPlanListDetail) ;
 				}
                 
 				/*将数据入库*/
@@ -1074,6 +1084,23 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
     }
 
+    /**
+     * 在当前期找主借标
+     * @author 王继光
+     * 2018年8月24日 上午10:33:45
+     * @param cur
+     * @return
+     */
+    private RepaymentProjPlanSettleDto getMasterProject(List<RepaymentBizPlanSettleDto> cur) {
+    	for (RepaymentBizPlanSettleDto repaymentBizPlanSettleDto : cur) {
+			for (RepaymentProjPlanSettleDto projPlanDto : repaymentBizPlanSettleDto.getProjPlanStteleDtos()) {
+				if (projPlanDto.getTuandaiProjectInfo().getMasterIssueId().equals(projPlanDto.getTuandaiProjectInfo().getProjectId())) {
+					return projPlanDto ;
+				}
+			}
+		}
+    	return null ;
+    }
     /**
      * 根据planListDetail 查找
      * @author 王继光
@@ -1551,6 +1578,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 repaymentResource.setConfirmLogId(financeSettleBaseDto.getUuid());
                 repaymentResources.add(repaymentResource);
                 financeSettleBaseDto.setRepayFactAmount(financeSettleBaseDto.getRepayFactAmount().add(repaymentResource.getRepayAmount()));
+                financeSettleBaseDto.getRepaymentConfirmLog().setFactAmount(financeSettleBaseDto.getRepayFactAmount());
                 
                 if (!financeSettleReq.getPreview()) {
                     repaymentResource.insert();
@@ -1622,6 +1650,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
             repaymentResources.add(repaymentResource);
             financeSettleBaseDto.setRepayFactAmount(financeSettleBaseDto.getRepayFactAmount().add(repaymentResource.getRepayAmount()));
+            financeSettleBaseDto.getRepaymentConfirmLog().setFactAmount(financeSettleBaseDto.getRepayFactAmount());
+
         }
         financeSettleBaseDto.setRepaymentResources(repaymentResources);
     }
@@ -1898,14 +1928,18 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     	infoVO.setPenaltyFees(fees);
     	for (RepaymentBizPlanList bizPlanList : getCurrenPeroids(req)) {
     		
+    		RepaymentBizPlan bizPlan = repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", bizPlanList.getPlanId()));
+    		
+    		if (bizPlan==null || bizPlan.getPlanStatus() > 0) {
+				continue ;
+			}
+    		
     		infoVO.getPenaltyBiz().put(bizPlanList.getPlanListId(), new ArrayList<>());
     		
     		EntityWrapper<RepaymentProjPlanList> eWrapper = new EntityWrapper<RepaymentProjPlanList>();
             eWrapper.eq("period", bizPlanList.getPeriod());
             eWrapper.eq("business_id", bizPlanList.getBusinessId());
-            if (!StringUtil.isEmpty(req.getPlanId())) {
-                eWrapper.eq("plan_id", req.getPlanId());
-            }
+            eWrapper.eq("plan_id", bizPlanList.getPlanId());
             List<RepaymentProjPlanList> projPlanLists = repaymentProjPlanListMapper.selectList(eWrapper);
             Set<String> projPlanStrs = new HashSet<>();
             for (RepaymentProjPlanList projPlanList : projPlanLists) {
@@ -2246,6 +2280,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     	List<RepaymentBizPlanList> cuRepaymentBizPlanLists = new ArrayList<>();
     	EntityWrapper<RepaymentBizPlan> ew = new EntityWrapper<RepaymentBizPlan>();
 		ew.eq("business_id", req.getBusinessId());
+		ew.eq("plan_status", 0);
 		//如果传了还款计划Id，则使用还款计划Id来查业务的还款计划
 		if (!StringUtil.isEmpty(req.getPlanId())) {
 			ew.eq("plan_id", req.getPlanId());
@@ -2321,6 +2356,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	public List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req,FinanceSettleBaseDto financeSettleBaseDto) {
 		EntityWrapper<RepaymentBizPlan> ew = new EntityWrapper<RepaymentBizPlan>();
 		ew.eq("business_id", req.getBusinessId());
+		ew.eq("plan_status", 0);
 		//如果传了还款计划Id，则使用还款计划Id来查业务的还款计划
 		if (!StringUtil.isEmpty(req.getPlanId())) {
 			ew.eq("plan_id", req.getPlanId());

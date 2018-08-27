@@ -9,19 +9,39 @@ public class ReportController {
 
 	/**
 	 * 应收实收台账表
+	 * 
 	 * @return
 	 */
 	@RequestMapping("/receivableAccountReport")
 	public String receivableAccountReport() {
 		return "/report/receivableAccountReport";
 	}
-	
+
 	/**
 	 * 逾期业务汇总表
+	 * 
 	 * @return
 	 */
 	@RequestMapping("/overdueBusinessReport")
 	public String overdueBusinessReport() {
 		return "/report/overdueBusinessReport";
+	}
+
+	/**
+	 * 贷后逾期明细表
+	 * @return
+	 */
+	@RequestMapping("/dhOverDueDetail")
+	public String dhOverDueDetail() {
+		return "/report/dhOverDueDetail" ;
+	}
+
+	/**
+	 * 贷后逾期汇总表
+	 * @return
+	 */
+	@RequestMapping("/dhOverDueCollection")
+	public String dhOverDueCollection() {
+		return "/report/dhOverDueCollection" ;
 	}
 }

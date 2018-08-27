@@ -31,6 +31,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.assets.car.vo.FileVo;
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.collection.service.CollectionStatusService;
 import com.hongte.alms.base.entity.Doc;
 import com.hongte.alms.base.entity.DocTmp;
@@ -66,6 +68,7 @@ import com.hongte.alms.base.vo.litigation.BusinessCar;
 import com.hongte.alms.base.vo.litigation.BusinessHouse;
 import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.LitigationResponse;
+import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -262,11 +265,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {ServiceRuntimeException.class, Exception.class})
 	@Override
-	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl) {
+	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId, Integer channel) {
 		TransferOfLitigationVO transferLitigationData = null;
 		LitigationResponse litigationResponse = null;
-		if (StringUtil.isEmpty(businessId)) {
-			return litigationResponse;
+		if (StringUtil.isEmpty(businessId) || channel == null) {
+			throw new ServiceRuntimeException("业务编号和移交渠道不能为空！");
 		}
 		TransferLitigationLog transferLitigationLog = new TransferLitigationLog();
 		try {
@@ -326,6 +329,18 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				if (litigationResponse.getCode() == 1 && litigationResponse.getData().isImportSuccess()) {
 					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
 					transferLitigationLogService.insert(transferLitigationLog);
+					// 更新贷后状态为 移交诉讼
+					if (channel.intValue() == 2) {
+						collectionStatusService.setBussinessAfterStatus(businessId, planListId, "",
+								CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
+					}else if (channel.intValue() == 1) {
+						collectionStatusService.setBussinessAfterStatus(
+								businessId,
+								planListId,
+			                    "自动移交法务",
+			                    CollectionStatusEnum.TO_LAW_WORK,
+			                    CollectionSetWayEnum.AUTO_SET);
+					}
 				}else {
 					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
 					throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);
@@ -929,6 +944,16 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			isLast = true;
 		}
 		return isLast;
+	}
+	
+	@Override
+	public List<TransferLitigationDTO> queryTransferLitigationInfo(Map<String, Object> paramMap) {
+		return transferOfLitigationMapper.queryTransferLitigationInfo(paramMap);
+	}
+	
+	@Override
+	public Integer countTransferLitigationInfo(Map<String, Object> paramMap) {
+		return transferOfLitigationMapper.countTransferLitigationInfo(paramMap);
 	}
 
 	public static void main(String[] args) {
