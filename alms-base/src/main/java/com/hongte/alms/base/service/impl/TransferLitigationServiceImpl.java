@@ -947,13 +947,13 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	}
 	
 	@Override
-	public List<TransferLitigationDTO> queryTransferLitigationInfo(String businessId, Integer page, Integer limit) {
-		return transferOfLitigationMapper.queryTransferLitigationInfo(businessId, page, limit);
+	public List<TransferLitigationDTO> queryTransferLitigationInfo(Map<String, Object> paramMap) {
+		return transferOfLitigationMapper.queryTransferLitigationInfo(paramMap);
 	}
 	
 	@Override
-	public Integer countTransferLitigationInfo(String businessId, Integer page, Integer limit) {
-		return transferOfLitigationMapper.countTransferLitigationInfo(businessId, page, limit);
+	public Integer countTransferLitigationInfo(Map<String, Object> paramMap) {
+		return transferOfLitigationMapper.countTransferLitigationInfo(paramMap);
 	}
 
 	public static void main(String[] args) {

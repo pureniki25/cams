@@ -460,12 +460,13 @@ public class TransferOfLitigationController {
 
 			page = page == null || page <= 0 ? 1 : page;
 			limit = limit == null || limit <= 0 ? 10 : limit;
+			paramMap.put("page", page);
+			paramMap.put("limit", limit);
 
-			Integer total = transferOfLitigationService.countTransferLitigationInfo(businessId, page, limit);
+			Integer total = transferOfLitigationService.countTransferLitigationInfo(paramMap);
 			List<TransferLitigationDTO> transferLitigationDTOs = new ArrayList<>();
 			if (total > 0) {
-				transferLitigationDTOs = transferOfLitigationService.queryTransferLitigationInfo(businessId, page,
-						limit);
+				transferLitigationDTOs = transferOfLitigationService.queryTransferLitigationInfo(paramMap);
 				if (StringUtil.notEmpty(businessId)) {
 					List<TransferLitigationPersonDTO> personDTOs = transferOfLitigationMapper.queryTransferLitigationPersonInfo(businessId);
 					transferLitigationDTOs.get(0).setCustomerInfos(personDTOs == null ? new ArrayList<>() : personDTOs);

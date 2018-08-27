@@ -1091,9 +1091,26 @@
 		    ON bb.`business_id` = cb.`business_id` 
 		  LEFT JOIN `tb_fsd_house` fh 
 		    ON bb.`business_id` = fh.`business_id` 
-		WHERE bb.`business_type` IN (1, 2, 9, 11)
+		WHERE 
+		<choose>
+			<when test="businessType == 1">
+				bb.businessType IN (2, 11)
+			</when>
+			<when test="businessType == 2">
+				bb.businessType IN (1, 9)
+			</when>
+			<otherwise>
+				bb.`business_type` IN (1, 2, 9, 11)
+			</otherwise>
+		</choose>
 		<if test="businessId != null and businessId != ''">
 		  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
+		</if> 
+		<if test="districtName != null and districtName != ''">
+		  AND bb.`district_name` = #{districtName,jdbcType=VARCHAR}
+		</if> 
+		<if test="companyName != null and companyName != ''">
+		  AND bb.`company_name` = #{companyName,jdbcType=VARCHAR}
 		</if> 
 		LIMIT ${(page-1) * limit}, ${limit}
 	</select>
@@ -1111,9 +1128,26 @@
 		    ON bb.`business_id` = cb.`business_id` 
 		  LEFT JOIN `tb_fsd_house` fh 
 		    ON bb.`business_id` = fh.`business_id` 
-		WHERE bb.`business_type` IN (1, 2, 9, 11)
+		WHERE 
+		<choose>
+			<when test="businessType == 1">
+				bb.businessType IN (2, 11)
+			</when>
+			<when test="businessType == 2">
+				bb.businessType IN (1, 9)
+			</when>
+			<otherwise>
+				bb.`business_type` IN (1, 2, 9, 11)
+			</otherwise>
+		</choose>
 		<if test="businessId != null and businessId != ''">
 		  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
+		</if> 
+		<if test="districtName != null and districtName != ''">
+		  AND bb.`district_name` = #{districtName,jdbcType=VARCHAR}
+		</if> 
+		<if test="companyName != null and companyName != ''">
+		  AND bb.`company_name` = #{companyName,jdbcType=VARCHAR}
 		</if> 
 	</select>
 	

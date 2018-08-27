@@ -196,8 +196,7 @@ public interface TransferOfLitigationMapper {
 	 * @param businessId
 	 * @return
 	 */
-	List<TransferLitigationDTO> queryTransferLitigationInfo(@Param(value = "businessId") String businessId,
-			@Param(value = "page") Integer page, @Param(value = "limit") Integer limit);
+	List<TransferLitigationDTO> queryTransferLitigationInfo(Map<String, Object> paramMap);
 
 	/**
 	 * 统计移交诉讼信息查询接口相关信息条数
@@ -205,8 +204,7 @@ public interface TransferOfLitigationMapper {
 	 * @param businessId
 	 * @return
 	 */
-	Integer countTransferLitigationInfo(@Param(value = "businessId") String businessId,
-			@Param(value = "page") Integer page, @Param(value = "limit") Integer limit);
+	Integer countTransferLitigationInfo(Map<String, Object> paramMap);
 	
 	/**
 	 * 移交诉讼信息查询接口相关人员明细相关信息
