@@ -286,7 +286,7 @@ var layer;
 	 	                    		times=times+1
 	 	                    	}
 	 	                    	var todayTimes=parseInt(dayLimit/oneLimit);
-	 	                    	var todayRest=dayLimi%oneLimit;
+	 	                    	var todayRest=dayLimit%oneLimit;
 	 	                    	if(todayRest>0){
 	 	                    		todayTimes=todayTimes+1
 	 	                    	}
