@@ -6,6 +6,7 @@ package com.hongte.alms.core.controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RenewalBusiness;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RenewalBusinessService;
 import com.hongte.alms.common.result.Result;
@@ -207,6 +208,52 @@ public class ApiController {
             return Result.error("500", ex.getMessage());
         }
     }
+
+    @RequestMapping("getXindaiOutPutInfo")
+    @ApiOperation(value = "获取信贷出款详情")
+    public Result<String> getXindaiOutPutInfo(String businessId) throws Exception {
+        if(businessId==null||businessId.isEmpty())
+        {
+            return Result.error("500", "业务信息不存在");
+        }
+        try {
+            BasicBusiness business = basicBusinessService.selectOne(new EntityWrapper<BasicBusiness>().eq("business_id",businessId));
+
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            String appKey = this.afterLoanKey;
+            String appSecret = this.afterLoanSecret;
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("businessId", businessId);
+            params.put("timestamp", timestamp);
+            String sign = SignUtil.signTopRequest(params, appSecret, "MD5");
+
+            if (business.getBusinessType() == BusinessTypeEnum.FSDZQ_TYPE.getValue()
+                    || business.getBusinessType() == BusinessTypeEnum.FSD_TYPE.getValue()
+                    || business.getBusinessType() == BusinessTypeEnum.YOU_FANG_TYPE.getValue()) {
+                //房速贷、房速贷展期、优房贷  使用这个链接
+                String xindaiCarAfterViewUrl = xindaiDomain + "Operation/OpenHouseView/LentOutDetail?" + "businessId=" + businessId  + "&appKey=" + appKey + "&timestamp=" + timestamp + "&sign=" + sign;
+                return Result.success(xindaiCarAfterViewUrl);
+            }
+            if (business.getBusinessType() == BusinessTypeEnum.CYD_TYPE.getValue()
+                    || business.getBusinessType() == BusinessTypeEnum.CYDZQ_TYPE.getValue()) {
+                //车易贷、车易贷展期   使用这个链接
+                String xindaiHouseAfterViewUrl = xindaiDomain + "Operation/OpenCarView/LentOutDetail?" + "businessId=" + businessId +  "&appKey=" + appKey + "&timestamp=" + timestamp + "&sign=" + sign;
+                return Result.success(xindaiHouseAfterViewUrl);
+            }
+            if (business.getBusinessType() == BusinessTypeEnum.CREDIT_TYPE.getValue()
+                    ) {
+                //信用贷   使用这个链接
+                String xindaiHouseAfterViewUrl = xindaiDomain + "CreditLoan/OpenCreditBusinessView/CreditOutDetails?" + "businessId=" + businessId +  "&appKey=" + appKey + "&timestamp=" + timestamp + "&sign=" + sign;
+                return Result.success(xindaiHouseAfterViewUrl);
+            }
+            throw new UnsupportedOperationException();
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+            return Result.error("500", ex.getMessage());
+        }
+
+    }
+
 
 
 }

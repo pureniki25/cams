@@ -143,6 +143,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //            collectionStatus =CollectionStatusEnum.CLOSED.getKey();
 //        }
 
+        //需要设置的其他期数
+        List<StaffBusinessVo> needSetOtherPlanLists = new LinkedList<>();
+
         //如果是移交法务、关闭、拖车登记
         //需要更新此业务所有的历史记录为移交法务/关闭 /拖车登记
         if(staffType.equals(CollectionStatusEnum.TO_LAW_WORK.getPageStr())
@@ -152,11 +155,22 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             for(StaffBusinessVo vo:voList){
                 List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()));
                 List<CollectionLog> logs = new ArrayList<>() ;
+                List<RepaymentBizPlanList> bizPlanLists = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id",vo.getBusinessId()));
+                Map<String,RepaymentBizPlanList> bizPlanListMap = new HashMap<>();
+                for(RepaymentBizPlanList repaymentBizPlanList: bizPlanLists){
+                    bizPlanListMap.put(repaymentBizPlanList.getPlanListId(),repaymentBizPlanList);
+                }
+                //去除这次需要设置催收信息的还款计划
+                bizPlanListMap.remove(vo.getCrpId());
                 for(CollectionStatus status:list){
+
                     //跳过crpId一致的记录
                     if(status.getCrpId().equals(vo.getCrpId())) {
                         continue;
                     }
+                    //去除已存在催收记录的还款计划
+                    bizPlanListMap.remove(status.getCrpId());
+
                     status.setSetWay(setWayEnum.getKey());
                     status.setUpdateTime(new Date());
                     switch (setWayEnum){
@@ -180,17 +194,31 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     log.setDescribe(setWayEnum.getName());
                     log.setSetWay(setWayEnum.getKey());
                     log.setBeforeStatus(status.getCollectionStatus());
-                    status.setCollectionStatus(CollectionStatusEnum.getByPageStr(staffType).getKey());
+                    Integer afterStatus = getCurrentColStatu(status, CollectionStatusEnum.getByPageStr(staffType).getKey());
+                    status.setCollectionStatus(afterStatus);
+                    String crpId= status.getCrpId();
+                    status.setCrpId(null);
+                    update(status, new EntityWrapper<CollectionStatus>().eq("business_id", status.getBusinessId()).eq("crp_id",crpId));
                     logs.add(log);
                 }
-                if(list.size()>0){
-//                	update(entity, wrapper)
-//                    updateBatchById(list);
-                    for (CollectionStatus status : list) {
-                        status.setCrpId(null);
-                    	update(status, new EntityWrapper<CollectionStatus>().eq("business_id", status.getBusinessId()).eq("crp_id", status.getCrpId()));
-					}
+
+                //如果有未设置催收状态的期数，则新建这一期的催收状态
+                if(bizPlanListMap.size()>0){
+                    for(String planListId: bizPlanListMap.keySet()){
+                        RepaymentBizPlanList rbPlanList = bizPlanListMap.get(planListId);
+                        StaffBusinessVo staffBizVO = new StaffBusinessVo();
+                        staffBizVO.setCrpId(rbPlanList.getPlanListId());
+                        staffBizVO.setBusinessId(rbPlanList.getBusinessId());
+                        needSetOtherPlanLists.add(staffBizVO);
+                    }
                 }
+
+//                if(list.size()>0){
+////                	update(entity, wrapper)
+////                    updateBatchById(list);
+//                    for (CollectionStatus status : list) {
+// 					}
+//                }
                 if(logs.size()>0){
                     collectionLogService.insertBatch(logs);
                 }
@@ -213,7 +241,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //            }
 //        }
 
-
+        //将其他需要设置状态的期数加到voList中
+        voList.addAll(needSetOtherPlanLists);
         Integer setTypeStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
         for(StaffBusinessVo vo:voList){
             String oldStaffUserId = "";
@@ -228,10 +257,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     oldStaffUserId = status.getVisitStaff();
                 }
             }else{
-                //如果是设置关闭状态，又没有写过催收的状态记录则跳过，不增加催收状态记录
-                if(CollectionStatusEnum.getByPageStr(staffType).equals(CollectionStatusEnum.CLOSED)){
-                    continue;
-                }
+//                //如果是设置关闭状态，又没有写过催收的状态记录则跳过，不增加催收状态记录
+//                if(CollectionStatusEnum.getByPageStr(staffType).equals(CollectionStatusEnum.CLOSED)){
+//                    continue;
+//                }
             }
             Integer beforeStatus = status.getCollectionStatus();
             Integer afterStatus = getCurrentColStatu(status,setTypeStatus);
@@ -511,14 +540,14 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
             return setTypeStatus;
         }else if(bizStauts.equals(CollectionStatusEnum.CLOSED.getKey())){
             //当前状态已经是已关闭的，则不刷新状态
-            return  status.getCollectionStatus();
+            return  bizStauts;//status.getCollectionStatus();
         }else if(bizStauts.equals(CollectionStatusEnum.TO_LAW_WORK.getKey())){
             //当前状态是已移交诉讼
             if(setTypeStatus.equals(CollectionStatusEnum.CLOSED.getKey())){
                 //设置的状态为 关闭 才刷新状态
                 return setTypeStatus;
             }else{
-                return status.getCollectionStatus();
+                return bizStauts;//status.getCollectionStatus();
             }
         }else if (bizStauts.equals(CollectionStatusEnum.TRAILER_REG.getKey())){
             //当前状态为已拖车登记
@@ -527,7 +556,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 //设置的状态为 关闭  移交法务 才刷新状态
                 return setTypeStatus;
             }else{
-                return status.getCollectionStatus();
+                return bizStauts;//status.getCollectionStatus();
             }
         }else if (bizStauts.equals(CollectionStatusEnum.COLLECTING.getKey())){
             //当前状态为催收中
