@@ -63,7 +63,7 @@ public class RepaymentProjFactRepayServiceImpl extends BaseServiceImpl<Repayment
 				//标实还明细列表
 				List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper.selectList(
 						new EntityWrapper<RepaymentProjFactRepay>()
-						.eq("proj_plan_list_id", projPlanListId));
+						.eq("proj_plan_list_id", projPlanListId).eq("is_cancelled", 0));
 				for (RepaymentProjFactRepay repaymentProjFactRepay : factRepays) {
 
 					//减去实还列表里面每个标，每一项费用的实还金额

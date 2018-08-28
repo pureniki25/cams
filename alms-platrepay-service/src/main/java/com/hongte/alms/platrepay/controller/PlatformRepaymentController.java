@@ -322,7 +322,7 @@ public class PlatformRepaymentController {
 			 * 根据 projPlanListId 获取实还明细 ；
 			 */
 			List<RepaymentProjFactRepay> projFactRepayList = repaymentProjFactRepayService
-					.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", projPlanListId)
+					.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", projPlanListId).eq("is_cancelled", 0)
 							.orderBy("create_date", false));
 			if (projFactRepayList == null || projFactRepayList.isEmpty()) {
 				LOGGER.info("@对接合规还款接口@ 查询实还流水为空 输入参数projPlanListId:[{}]", projPlanListId);
@@ -597,7 +597,7 @@ public class PlatformRepaymentController {
 				 */
 				List<RepaymentProjFactRepay> projFactRepays = repaymentProjFactRepayService
 						.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id",
-								projPlanList.getProjPlanListId()));
+								projPlanList.getProjPlanListId()).eq("is_cancelled", 0));
 
 				Map<Object, RepaymentProjFactRepay> projFactRepayMap = Maps.newHashMap();
 				// 按费用项大类plan_item_type把重复的费用项进行合并累加
