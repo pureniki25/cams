@@ -329,7 +329,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			transferLitigationLog.setBusinessId(businessId);
 			transferLitigationLog.setCreateTime(new Date());
 			transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
-			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
 
 			List<LitigationBorrowerDetailed> litigationBorrowerDetaileds = transferOfLitigationMapper
 					.queryLitigationBorrowerDetailed(businessId);
@@ -362,6 +361,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			}
 
 			LOG.info("移交法务诉讼系统地址：{}", sendUrl);
+			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
 			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
 			String returnJson = JSONObject.toJSONString(litigationResponse);
 			transferLitigationLog.setResultJson(returnJson);
