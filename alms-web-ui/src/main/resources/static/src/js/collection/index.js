@@ -676,6 +676,27 @@ window.layinit(function(htConfig){
                                 }
                                 }
                             )
+                            if (e.businessTypeId == 1 || e.businessTypeId == 9
+                                || e.businessTypeId == 2 || e.businessTypeId == 11
+                            || e.businessTypeId == 35 || e.businessTypeId == 25  ) {
+                                    buttons.push(
+                                        {
+                                            "name": "出款详情", click: function (e, currentItem) {
+                                            axios.get(basePath + 'api/getXindaiOutPutInfo?businessId='+currentItem.businessId)
+                                                .then(function (res) {
+                                                    if (res.data.code == "1") {
+                                                        showOneLineOprLayer(res.data.data,"出款详情");
+                                                    } else {
+                                                        vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                                                    }
+                                                })
+                                                .catch(function (error) {
+                                                    vm.$Modal.error({content: '接口调用异常!'});
+                                                });
+                                        }
+                                        }
+                                    )
+                            }
                             return buttons;
                         }
                     });
