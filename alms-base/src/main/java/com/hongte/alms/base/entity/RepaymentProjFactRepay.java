@@ -4,12 +4,11 @@ import java.io.Serializable;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -17,8 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 标实还明细表
  * </p>
  *
- * @author 曾坤
- * @since 2018-05-03
+ * @author 王继光
+ * @since 2018-08-23
  */
 @ApiModel
 @TableName("tb_repayment_proj_fact_repay")
@@ -29,7 +28,7 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
     /**
      * 标的实还项目明细ID（主键）
      */
-	@TableField("proj_plan_detail_repay_id")
+    @TableId("proj_plan_detail_repay_id")
 	@ApiModelProperty(required= true,value = "标的实还项目明细ID（主键）")
 	private String projPlanDetailRepayId;
     /**
@@ -38,21 +37,18 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	@TableField("proj_plan_detail_id")
 	@ApiModelProperty(required= true,value = "标的应还项目明细ID(外键  对应 tb_repayment_proj_plan_list_detail. proj_plan_detail_id)")
 	private String projPlanDetailId;
-	
-	 /**
-     * 业务还款计划列表ID
-     */
-	@TableField("plan_list_id")
-	@ApiModelProperty(required= true,value = "业务还款计划列表ID")
-	private String planListId;
-	
-	/**
+    /**
      * 标的还款计划列表ID
      */
 	@TableField("proj_plan_list_id")
 	@ApiModelProperty(required= true,value = "标的还款计划列表ID")
 	private String projPlanListId;
-	
+    /**
+     * 业务还款计划列表ID
+     */
+	@TableField("plan_list_id")
+	@ApiModelProperty(required= true,value = "业务还款计划列表ID")
+	private String planListId;
     /**
      * 上标项目编号
      */
@@ -107,30 +103,17 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	@ApiModelProperty(required= true,value = "实还金额(元)")
 	private BigDecimal factAmount;
     /**
-     * 还款来源，10：线下转账，20：线下代扣，30：银行代扣
+     * 还款来源，10：线下转账，11:用往期结余还款,20：线下代扣，30：银行代扣
      */
 	@TableField("repay_source")
-	@ApiModelProperty(required= true,value = "还款来源，10：线下转账，20：线下代扣，30：银行代扣")
+	@ApiModelProperty(required= true,value = "还款来源，10：线下转账，11:用往期结余还款,20：线下代扣，30：银行代扣")
 	private Integer repaySource;
     /**
      * 实还日期
      */
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date factRepayDate;
-	/**
-     * 还款确认日志id
-     */
-	@TableField("confirm_log_id")
-	@ApiModelProperty(required= true,value = "还款确认日志id")
-	private String confirmLogId;
-	/**
-     * 还款来源id
-     */
-	@TableField("repay_source_id")
-	@ApiModelProperty(required= true,value = "还款来源id")
-	private String repaySourceId;
     /**
      * 还款来源关联的相关记录ID
      */
@@ -138,11 +121,28 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	@ApiModelProperty(required= true,value = "还款来源关联的相关记录ID")
 	private String repayRefId;
     /**
+     * 还款确认日志id
+     */
+	@TableField("confirm_log_id")
+	@ApiModelProperty(required= true,value = "还款确认日志id")
+	private String confirmLogId;
+    /**
+     * 还款来源id
+     */
+	@TableField("repay_source_id")
+	@ApiModelProperty(required= true,value = "还款来源id")
+	private String repaySourceId;
+    /**
+     * 是否已被撤销,0=未被撤销,1=已被撤销
+     */
+	@TableField("is_cancelled")
+	@ApiModelProperty(required= true,value = "是否已被撤销,0=未被撤销,1=已被撤销")
+	private Integer isCancelled;
+    /**
      * 创建日期
      */
 	@TableField("create_date")
 	@ApiModelProperty(required= true,value = "创建日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createDate;
     /**
      * 创建用户
@@ -155,23 +155,20 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
      */
 	@TableField("update_date")
 	@ApiModelProperty(required= true,value = "更新日期")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateDate;
     /**
      * 更新用户
      */
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private String updateUser;
-
-
-	/**
-	 * 结清确认日志id
-	 */
+    /**
+     * 结清关联id
+     */
 	@TableField("settle_log_id")
-	@ApiModelProperty(required= false,value = "结清还款确认日志id")
+	@ApiModelProperty(required= true,value = "结清关联id")
 	private String settleLogId;
+
 
 	public String getProjPlanDetailRepayId() {
 		return projPlanDetailRepayId;
@@ -187,6 +184,22 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 
 	public void setProjPlanDetailId(String projPlanDetailId) {
 		this.projPlanDetailId = projPlanDetailId;
+	}
+
+	public String getProjPlanListId() {
+		return projPlanListId;
+	}
+
+	public void setProjPlanListId(String projPlanListId) {
+		this.projPlanListId = projPlanListId;
+	}
+
+	public String getPlanListId() {
+		return planListId;
+	}
+
+	public void setPlanListId(String planListId) {
+		this.planListId = planListId;
 	}
 
 	public String getProjectId() {
@@ -285,6 +298,30 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 		this.repayRefId = repayRefId;
 	}
 
+	public String getConfirmLogId() {
+		return confirmLogId;
+	}
+
+	public void setConfirmLogId(String confirmLogId) {
+		this.confirmLogId = confirmLogId;
+	}
+
+	public String getRepaySourceId() {
+		return repaySourceId;
+	}
+
+	public void setRepaySourceId(String repaySourceId) {
+		this.repaySourceId = repaySourceId;
+	}
+
+	public Integer getIsCancelled() {
+		return isCancelled;
+	}
+
+	public void setIsCancelled(Integer isCancelled) {
+		this.isCancelled = isCancelled;
+	}
+
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -317,11 +354,6 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 		this.updateUser = updateUser;
 	}
 
-	@Override
-	protected Serializable pkVal() {
-		return this.projPlanDetailRepayId;
-	}
-
 	public String getSettleLogId() {
 		return settleLogId;
 	}
@@ -331,10 +363,17 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 	}
 
 	@Override
+	protected Serializable pkVal() {
+		return this.projPlanDetailRepayId;
+	}
+
+	@Override
 	public String toString() {
 		return "RepaymentProjFactRepay{" +
 			", projPlanDetailRepayId=" + projPlanDetailRepayId +
 			", projPlanDetailId=" + projPlanDetailId +
+			", projPlanListId=" + projPlanListId +
+			", planListId=" + planListId +
 			", projectId=" + projectId +
 			", businessId=" + businessId +
 			", origBusinessId=" + origBusinessId +
@@ -347,66 +386,14 @@ public class RepaymentProjFactRepay extends Model<RepaymentProjFactRepay> {
 			", repaySource=" + repaySource +
 			", factRepayDate=" + factRepayDate +
 			", repayRefId=" + repayRefId +
+			", confirmLogId=" + confirmLogId +
+			", repaySourceId=" + repaySourceId +
+			", isCancelled=" + isCancelled +
 			", createDate=" + createDate +
 			", createUser=" + createUser +
 			", updateDate=" + updateDate +
 			", updateUser=" + updateUser +
+			", settleLogId=" + settleLogId +
 			"}";
-	}
-
-	/**
-	 * @return the projPlanListId
-	 */
-	public String getProjPlanListId() {
-		return projPlanListId;
-	}
-
-	/**
-	 * @param projPlanListId the projPlanListId to set
-	 */
-	public void setProjPlanListId(String projPlanListId) {
-		this.projPlanListId = projPlanListId;
-	}
-
-	/**
-	 * @return the planListId
-	 */
-	public String getPlanListId() {
-		return planListId;
-	}
-
-	/**
-	 * @param planListId the planListId to set
-	 */
-	public void setPlanListId(String planListId) {
-		this.planListId = planListId;
-	}
-
-	/**
-	 * @return the confirmLogId
-	 */
-	public String getConfirmLogId() {
-		return confirmLogId;
-	}
-
-	/**
-	 * @param confirmLogId the confirmLogId to set
-	 */
-	public void setConfirmLogId(String confirmLogId) {
-		this.confirmLogId = confirmLogId;
-	}
-
-	/**
-	 * @return the repaySourceId
-	 */
-	public String getRepaySourceId() {
-		return repaySourceId;
-	}
-
-	/**
-	 * @param repaySourceId the repaySourceId to set
-	 */
-	public void setRepaySourceId(String repaySourceId) {
-		this.repaySourceId = repaySourceId;
 	}
 }

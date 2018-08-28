@@ -195,7 +195,7 @@ public class DeductionController {
         		boolean isHaveUnderRepay=false;//是否含有线下
         		boolean isRepaying=isRepaying(planList);//判断是否有代扣中的记录
         		deductionVo.setRepaying(isRepaying);
-                List<RepaymentConfirmLog> comfirmLogs=repaymentConfirmLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("org_business_id", planList.getOrigBusinessId()).eq("after_id", planList.getAfterId()));
+                List<RepaymentConfirmLog> comfirmLogs=repaymentConfirmLogService.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("is_cancelled", 0).eq("org_business_id", planList.getOrigBusinessId()).eq("after_id", planList.getAfterId()));
         		for(RepaymentConfirmLog log:comfirmLogs) {
         			factAmountSum=factAmountSum.add(log.getFactAmount());
         			if(log.getRepaySource()==31||log.getRepaySource()==30) {

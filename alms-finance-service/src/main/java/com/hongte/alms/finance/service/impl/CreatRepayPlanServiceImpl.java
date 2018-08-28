@@ -2329,7 +2329,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 					 * 5、根据 proj_plan_detail_id 查询标实还明细
 					 */
 					List<RepaymentProjFactRepay> repaymentProjFactRepays = repaymentProjFactRepayService.selectList(
-							new EntityWrapper<RepaymentProjFactRepay>().in("proj_plan_detail_id", projPlanDetailIds));
+							new EntityWrapper<RepaymentProjFactRepay>().in("proj_plan_detail_id", projPlanDetailIds).eq("is_cancelled", 0));
 					// 若产生任意实还金额, 则不允许删除还款计划
 					if (CollectionUtils.isNotEmpty(repaymentProjFactRepays)) {
 						throw new ServiceRuntimeException("此还款计划已产生实还项目，不允许删除");

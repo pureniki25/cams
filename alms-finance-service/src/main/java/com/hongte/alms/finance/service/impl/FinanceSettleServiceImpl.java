@@ -326,6 +326,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
      */
     private void createConfirmLog(FinanceSettleBaseDto financeSettleBaseDto ) {
     	RepaymentConfirmLog repaymentConfirmLog = new RepaymentConfirmLog();
+    	repaymentConfirmLog.setIsCancelled(0);
         repaymentConfirmLog.setConfirmLogId(financeSettleBaseDto.getUuid());
         repaymentConfirmLog.setRepayDate(new Date());
         repaymentConfirmLog.setBusinessId(financeSettleBaseDto.getBusinessId());
@@ -1438,6 +1439,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     public void createSettleLogDetail(BigDecimal amount, RepaymentSettleMoneyDto moneyDto, RepaymentResource resource, FinanceSettleBaseDto financeSettleBaseDto) {
 
         RepaymentProjFactRepay fact = new RepaymentProjFactRepay();
+        fact.setIsCancelled(0);
         fact.setAfterId(moneyDto.getAfterId());
         fact.setBusinessId(moneyDto.getBusinessId());
         fact.setCreateDate(new Date());
@@ -1538,6 +1540,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		for (SettleFeesVO settleFeesVO : financeSettleBaseDto.getDerates()) {
 			RepaymentResource repaymentResource = new RepaymentResource();
 			UUID uuid = UUID.randomUUID();
+			repaymentResource.setIsCancelled(0);
 			repaymentResource.setResourceId(String.valueOf(uuid));
 			repaymentResource.setAfterId(financeSettleBaseDto.getAfterId());
 			repaymentResource.setBusinessId(financeSettleBaseDto.getBusinessId());
@@ -1625,6 +1628,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
 
             RepaymentResource repaymentResource = new RepaymentResource();
+            repaymentResource.setIsCancelled(0);
             repaymentResource.setAfterId(financeSettleReq.getAfterId());
             repaymentResource.setBusinessId(financeSettleReq.getBusinessId());
             repaymentResource.setOrgBusinessId(financeSettleReq.getBusinessId());
@@ -1677,6 +1681,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         //填充实还记录
         RepaymentProjFactRepay fact = new RepaymentProjFactRepay();
+        fact.setIsCancelled(0);
         fact.setAfterId(financeSettleBaseDto.getAfterId());
         fact.setBusinessId(financeSettleBaseDto.getBusinessId());
         fact.setCreateDate(new Date());
@@ -2750,7 +2755,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             projPlanListDetailDto.setRepaymentProjPlanListDetail(projPlanListDetail);
 
             List<RepaymentProjFactRepay>  factRepayList = repaymentProjFactRepayMapper.selectList(
-                    new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_id",projPlanListDetail.getProjPlanDetailId())
+                    new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_id",projPlanListDetail.getProjPlanDetailId()).eq("is_cancelled", 0)
             );
             projPlanListDetailDto.setRepaymentProjFactRepays(factRepayList);
         }
