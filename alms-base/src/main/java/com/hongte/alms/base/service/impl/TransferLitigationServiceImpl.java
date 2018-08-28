@@ -40,9 +40,11 @@ import com.hongte.alms.base.entity.DocType;
 import com.hongte.alms.base.entity.FsdHouse;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
+import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TransferLitigationCar;
 import com.hongte.alms.base.entity.TransferLitigationHouse;
 import com.hongte.alms.base.entity.TransferLitigationLog;
+import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
@@ -57,6 +59,7 @@ import com.hongte.alms.base.service.DocTmpService;
 import com.hongte.alms.base.service.DocTypeService;
 import com.hongte.alms.base.service.FsdHouseService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.SysProvinceService;
 import com.hongte.alms.base.service.TransferLitigationCarService;
 import com.hongte.alms.base.service.TransferLitigationHouseService;
@@ -143,7 +146,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Autowired
 	@Qualifier("RepaymentBizPlanListService")
-	RepaymentBizPlanListService repaymentBizPlanListService;
+	private RepaymentBizPlanListService repaymentBizPlanListService;
+
+	@Autowired
+	@Qualifier("SysParameterService")
+	private SysParameterService sysParameterService;
 
 	@Value("${ht.billing.west.part.business:''}")
 	private String westPartBusiness;
@@ -263,9 +270,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		return houseLoanData;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {ServiceRuntimeException.class, Exception.class})
+	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = { ServiceRuntimeException.class,
+			Exception.class })
 	@Override
-	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId, Integer channel) {
+	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId,
+			Integer channel) {
 		TransferOfLitigationVO transferLitigationData = null;
 		LitigationResponse litigationResponse = null;
 		if (StringUtil.isEmpty(businessId) || channel == null) {
@@ -282,6 +291,41 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				throw new ServiceRuntimeException("没有找到相关数据，发送诉讼系统失败！");
 			}
 
+			// 催收级别
+			List<SysParameter> sysParameters = sysParameterService.selectList(new EntityWrapper<SysParameter>()
+					.eq("param_type", SysParameterTypeEnums.COLLECTION_LEVERS.getKey()).orderBy("row_Index"));
+			if (CollectionUtils.isNotEmpty(sysParameters)) {
+				for (SysParameter sysParameter : sysParameters) {
+					int overDueDays = transferLitigationData.getOverdueDays().intValue();
+					String remark = sysParameter.getRemark();
+					String paramType = sysParameter.getParamType();
+					String paramName = sysParameter.getParamName();
+					String collectLevel1 = "";
+					String collectLevel2 = "";
+					if (remark.contains("-")) {
+						String[] arrStr = remark.split("-");
+						collectLevel1 = arrStr[0];
+						collectLevel2 = arrStr[1];
+					} else {
+						collectLevel1 = remark;
+					}
+					if ("1".equals(paramType) && (overDueDays < str2Integer(collectLevel1).intValue())) {
+						transferLitigationData.setCollectLevel(paramName);
+						break;
+					}
+					if ("2".equals(paramType) && (overDueDays >= str2Integer(collectLevel1).intValue())
+							&& (overDueDays < str2Integer(collectLevel2).intValue())) {
+						transferLitigationData.setCollectLevel(paramName);
+						break;
+					}
+					if ("3".equals(paramType) && (overDueDays >= str2Integer(collectLevel1).intValue())
+							&& (overDueDays < str2Integer(collectLevel2).intValue())) {
+						transferLitigationData.setCollectLevel(paramName);
+						break;
+					}
+				}
+			}
+
 			transferLitigationLog.setBusinessId(businessId);
 			transferLitigationLog.setCreateTime(new Date());
 			transferLitigationLog.setCreateUser(transferLitigationData.getCreateUserId());
@@ -292,9 +336,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			/*
 			 * 跟喻尊龙确认后，去掉借款人明细校验，2018-08-16.
 			 */
-//			if (CollectionUtils.isEmpty(litigationBorrowerDetaileds)) {
-//				throw new ServiceRuntimeException("没有找到借款人明细，发送诉讼系统失败！");
-//			}
+			// if (CollectionUtils.isEmpty(litigationBorrowerDetaileds)) {
+			// throw new ServiceRuntimeException("没有找到借款人明细，发送诉讼系统失败！");
+			// }
 			transferLitigationData.setLitigationBorrowerDetailedList(litigationBorrowerDetaileds);
 
 			transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
@@ -322,10 +366,10 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			String returnJson = JSONObject.toJSONString(litigationResponse);
 			transferLitigationLog.setResultJson(returnJson);
 			if (litigationResponse != null) {
-				
+
 				transferLitigationLog.setResultCode(litigationResponse.getCode());
 				transferLitigationLog.setResultMsg(litigationResponse.getMsg());
-				
+
 				if (litigationResponse.getCode() == 1 && litigationResponse.getData().isImportSuccess()) {
 					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
 					transferLitigationLogService.insert(transferLitigationLog);
@@ -333,15 +377,11 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					if (channel.intValue() == 2) {
 						collectionStatusService.setBussinessAfterStatus(businessId, planListId, "",
 								CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);
-					}else if (channel.intValue() == 1) {
-						collectionStatusService.setBussinessAfterStatus(
-								businessId,
-								planListId,
-			                    "自动移交法务",
-			                    CollectionStatusEnum.TO_LAW_WORK,
-			                    CollectionSetWayEnum.AUTO_SET);
+					} else if (channel.intValue() == 1) {
+						collectionStatusService.setBussinessAfterStatus(businessId, planListId, "自动移交法务",
+								CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.AUTO_SET);
 					}
-				}else {
+				} else {
 					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
 					throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);
 				}
@@ -945,28 +985,18 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 		}
 		return isLast;
 	}
-	
+
 	@Override
 	public List<TransferLitigationDTO> queryTransferLitigationInfo(Map<String, Object> paramMap) {
 		return transferOfLitigationMapper.queryTransferLitigationInfo(paramMap);
 	}
-	
+
 	@Override
 	public Integer countTransferLitigationInfo(Map<String, Object> paramMap) {
 		return transferOfLitigationMapper.countTransferLitigationInfo(paramMap);
 	}
 
 	public static void main(String[] args) {
-		int i = 1;
-		int j = 0;
-		try {
-			if (i == 1) {
-				throw new ServiceRuntimeException("i == 1");
-			}
-		} catch (ServiceRuntimeException e) {
-			System.out.println("1");
-		} catch (Exception e2) {
-			System.out.println("2");
-		}
+		System.out.println(Integer.valueOf(""));
 	}
 }
