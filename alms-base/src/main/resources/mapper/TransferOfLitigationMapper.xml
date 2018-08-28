@@ -1094,10 +1094,10 @@
 		WHERE 
 		<choose>
 			<when test="businessType == 1">
-				bb.businessType IN (2, 11)
+				bb.business_type IN (2, 11)
 			</when>
 			<when test="businessType == 2">
-				bb.businessType IN (1, 9)
+				bb.business_type IN (1, 9)
 			</when>
 			<otherwise>
 				bb.`business_type` IN (1, 2, 9, 11)
@@ -1131,10 +1131,10 @@
 		WHERE 
 		<choose>
 			<when test="businessType == 1">
-				bb.businessType IN (2, 11)
+				bb.business_type IN (2, 11)
 			</when>
 			<when test="businessType == 2">
-				bb.businessType IN (1, 9)
+				bb.business_type IN (1, 9)
 			</when>
 			<otherwise>
 				bb.`business_type` IN (1, 2, 9, 11)
