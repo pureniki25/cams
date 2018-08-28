@@ -79,6 +79,17 @@ public interface EipRemote {
 	@RequestMapping(value = "/eip/td/assetside/queryRechargeOrder", headers = { "app=ALMS",
 			"content-type=application/json" }, method = RequestMethod.POST)
 	public Result queryRechargeOrder(@RequestBody Map<String, Object> paramMap);
+	
+	/**
+	 * 新查询充值订单
+	 * 
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "/eip/td/assetside/queryRechargeNew", headers = { "app=ALMS",
+			"content-type=application/json" }, method = RequestMethod.POST)
+	public Result queryRechargeNew(@RequestBody Map<String, Object> paramMap);
+
 
 	/**
 	 * 银行代扣
@@ -86,6 +97,13 @@ public interface EipRemote {
 	@RequestMapping(value = "/eip/td/assetside/autoRecharge", headers = { "app=ALMS",
 			"content-type=application/json" }, method = RequestMethod.POST)
 	Result bankRecharge(@RequestBody BankRechargeReqDto dto);
+	
+	/**
+	 * 银行批量代扣
+	 */
+	@RequestMapping(value = "/eip/td/assetside/batchAutoRecharge", headers = { "app=ALMS",
+			"content-type=application/json" }, method = RequestMethod.POST)
+	Result batchBankRecharge(@RequestBody Map<String, Object> paramMap);
 
 	/**
 	 * 宝付代扣
