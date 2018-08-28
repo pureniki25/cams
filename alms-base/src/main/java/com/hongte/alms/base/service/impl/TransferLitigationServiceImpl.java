@@ -296,7 +296,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					.eq("param_type", SysParameterTypeEnums.COLLECTION_LEVERS.getKey()).orderBy("row_Index"));
 			if (CollectionUtils.isNotEmpty(sysParameters)) {
 				for (SysParameter sysParameter : sysParameters) {
-					int overDueDays = transferLitigationData.getOverdueDays().intValue();
+					int overdueDays = transferLitigationData.getOverdueDays() == null ? 0 : transferLitigationData.getOverdueDays().intValue();
 					String remark = sysParameter.getRemark();
 					String paramType = sysParameter.getParamType();
 					String paramName = sysParameter.getParamName();
@@ -309,17 +309,17 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 					} else {
 						collectLevel1 = remark;
 					}
-					if ("1".equals(paramType) && (overDueDays < str2Integer(collectLevel1).intValue())) {
+					if ("1".equals(paramType) && (overdueDays < str2Integer(collectLevel1).intValue())) {
 						transferLitigationData.setCollectLevel(paramName);
 						break;
 					}
-					if ("2".equals(paramType) && (overDueDays >= str2Integer(collectLevel1).intValue())
-							&& (overDueDays < str2Integer(collectLevel2).intValue())) {
+					if ("2".equals(paramType) && (overdueDays >= str2Integer(collectLevel1).intValue())
+							&& (overdueDays < str2Integer(collectLevel2).intValue())) {
 						transferLitigationData.setCollectLevel(paramName);
 						break;
 					}
-					if ("3".equals(paramType) && (overDueDays >= str2Integer(collectLevel1).intValue())
-							&& (overDueDays < str2Integer(collectLevel2).intValue())) {
+					if ("3".equals(paramType) && (overdueDays >= str2Integer(collectLevel1).intValue())
+							&& (overdueDays < str2Integer(collectLevel2).intValue())) {
 						transferLitigationData.setCollectLevel(paramName);
 						break;
 					}

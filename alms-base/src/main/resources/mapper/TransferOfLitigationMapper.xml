@@ -348,7 +348,7 @@
 		  WHERE lst.`plan_id` = p.`plan_id` 
 		    AND bb.`business_id` = p.original_business_id) totalPeriods,
 			(SELECT 
-			    IFNULL(TO_DAYS(NOW()) - TO_DAYS(t.`due_date`), 0)
+			    TO_DAYS(NOW()) - TO_DAYS(t.`due_date`)
 			  FROM
 			    `tb_repayment_biz_plan_list` t 
 			  WHERE t.`orig_business_id` = bb.`business_id`
