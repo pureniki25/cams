@@ -17,6 +17,7 @@ import com.hongte.alms.base.entity.CarBusinessAfter;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.SysUserPermission;
+import com.hongte.alms.base.feignClient.AlmsCoreServiceFeignClient;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.LitigationFeignClient;
 import com.hongte.alms.base.service.*;
@@ -107,6 +108,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     
     @Autowired
     private Executor cunshouThreadAsync;
+    
+    @Autowired
+    private AlmsCoreServiceFeignClient almsCoreServiceFeignClient;
 
     /**
      * 设置电催/人员(界面手动设置)
@@ -949,8 +953,12 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 // 若调用成功，且状态是true，说明移交过法务
                 if (!(Boolean) result.getData()) {
                     //调用移交诉讼接口
-                    transferLitigationService.sendTransferLitigationData(
-                            originalBusinessId,sendUrl,null, 1);
+//                    transferLitigationService.sendTransferLitigationData(
+//                            originalBusinessId,sendUrl,null, 1);
+                	Map<String, Object> paramMap = new HashMap<>();
+                	paramMap.put("businessId", originalBusinessId);
+                	paramMap.put("channel", 1);
+                	almsCoreServiceFeignClient.sendTransferLitigation(paramMap);
                 }
             }
 

@@ -461,7 +461,7 @@ public class RechargeServiceImpl implements RechargeService {
 					logger.info("============================银行代扣，调用的子渠道是:"+dto.getChannelType()+"=====================================");
 				  	Map<String, Object> paramMap = new HashMap<>();
 					paramMap.put("batchId", guid);
-					paramMap.put("oidPartner", "171014");
+					paramMap.put("oidPartner", oIdPartner);
 					paramMap.put("userIP", "172.0.0.1");
 					paramMap.put("details",list);
 					com.ht.ussp.core.Result remoteResult = null;
@@ -1042,7 +1042,7 @@ public class RechargeServiceImpl implements RechargeService {
 //				// msg = "下一期还款时间开始停止自动代扣上一期";
 //				return false;
 //			}
-
+//
 //		}
 		return result;
 	}
@@ -1058,16 +1058,47 @@ public class RechargeServiceImpl implements RechargeService {
 		List<RepaymentBizPlanList> dueDateLists=repaymentBizPlanLists.stream().filter(a->a.getDueDate().compareTo(new Date())<=1).collect(Collectors.toList());
 		//还没有还款的到了应该还日期的期数集合
 		List<RepaymentBizPlanList> notRepayLists=repaymentBizPlanLists.stream().filter(a->(!a.getCurrentStatus().equals("已还款"))).collect(Collectors.toList());
-		notRepayLists=repaymentBizPlanLists.stream().filter(a->(a.getRepayStatus()!=SectionRepayStatusEnum.ONLINE_REPAID.getKey())).collect(Collectors.toList());
 		notRepayLists=repaymentBizPlanLists.stream().filter(a->(a.getRepayStatus()!=SectionRepayStatusEnum.ALL_REPAID.getKey())).collect(Collectors.toList());
 		
 		//期数从小到大排序
 		Optional<RepaymentBizPlanList> min=notRepayLists.stream().min((a1,a2)->a1.getPeriod().compareTo(a2.getPeriod()));
 		RepaymentBizPlanList minRepayBizPlanList=min.get();
-		return minRepayBizPlanList;
 		
-	}
-	
+		RepaymentBizPlanList pList=null;
+		   if(minRepayBizPlanList.getRepayStatus()==SectionRepayStatusEnum.ONLINE_REPAID.getKey()) {	//判断是否在线上已还款
+			    pList=getNext(minRepayBizPlanList);
+			}else {
+				pList=minRepayBizPlanList;
+			}
+		return pList;
+		
+	 }
+	public  RepaymentBizPlanList getNext(RepaymentBizPlanList current) {
+		RepaymentBizPlanList next = repaymentBizPlanListService
+				.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", current.getBusinessId())
+						.eq("plan_id", current.getPlanId()).eq("period", current.getPeriod() + 1).eq("confirm_flag", 1));
+		if (next != null) {
+			Date nowDate = new Date();
+			int days = 0 - 30;
+			Date before30Days = DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, nowDate)));
+			if (next.getDueDate().compareTo(before30Days) >= 0 && next.getDueDate().compareTo(nowDate) <= 0) {
+				RepaymentBizPlanList nextNext = repaymentBizPlanListService
+						.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", next.getBusinessId())
+								.eq("plan_id", next.getPlanId()).eq("period", next.getPeriod() + 1).eq("confirm_flag", 1));
+				if(nextNext==null) {
+					return next;
+				}else {
+					return getNext(next);
+				}
+			}else {
+				return current;
+			}
+		}else {
+			return current;
+		}
+		
+	   }
+		   
 	/**
 	 * 判断是否发起过减免申请
 	 */
@@ -1278,7 +1309,7 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setRemark("充值成功");
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
-			
+			shareProfit(pList, log);
 			try {
 				//sms
 				sendMessageService.sendAfterRepayFailSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod());

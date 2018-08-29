@@ -370,27 +370,27 @@ public class TransferOfLitigationController {
 	}
 
 	/**
-	 * 获取移交诉讼相关数据
+	 * 移交诉讼
 	 * 
 	 * @author huweiqian
 	 * @date 2018/02/27
-	 * @return 车贷诉讼相关数据
+	 * @return 诉讼返回数据
 	 */
+	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "移交诉讼API")
-	@GetMapping("/queryTransferLitigationData")
+	@PostMapping("/sendTransferLitigation")
 	@ResponseBody
-	public Result<LitigationResponse> queryTransferLitigationData(@RequestParam String businessId) {
+	public Result sendTransferLitigation(@RequestBody Map<String, Object> paramMap) {
 		try {
-			LitigationResponse litigationData = transferOfLitigationService.sendTransferLitigationData(businessId,
-					sendUrl, null, 2);
-			if (litigationData != null) {
-				return Result.success(litigationData);
-			} else {
-				return Result.error("0", "没有找到数据");
+			if (paramMap == null || paramMap.isEmpty()) {
+				return Result.error("参数不能为空");
 			}
+			transferOfLitigationService.sendTransferLitigationData((String) paramMap.get("businessId"), sendUrl, null,
+					(Integer) paramMap.get("channel"));
+			return Result.success();
 		} catch (Exception e) {
 			LOG.error("-- queryTransferLitigationData -- 移交诉讼失败！！！", e);
-			return Result.error("500", e.getMessage());
+			return Result.error(e.getMessage());
 		}
 	}
 
@@ -468,7 +468,8 @@ public class TransferOfLitigationController {
 			if (total > 0) {
 				transferLitigationDTOs = transferOfLitigationService.queryTransferLitigationInfo(paramMap);
 				if (StringUtil.notEmpty(businessId)) {
-					List<TransferLitigationPersonDTO> personDTOs = transferOfLitigationMapper.queryTransferLitigationPersonInfo(businessId);
+					List<TransferLitigationPersonDTO> personDTOs = transferOfLitigationMapper
+							.queryTransferLitigationPersonInfo(businessId);
 					transferLitigationDTOs.get(0).setCustomerInfos(personDTOs == null ? new ArrayList<>() : personDTOs);
 				}
 			}
