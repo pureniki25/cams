@@ -16,7 +16,6 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
 public class CreateBatchFlowCommand extends MessageCommand {
@@ -24,6 +23,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
     @NotBlank
     @JsonProperty("batchId")
     private String thirdBatchId;
+    private String batchId;
 
     private Integer actionId;
 
@@ -41,25 +41,22 @@ public class CreateBatchFlowCommand extends MessageCommand {
 
     private List<FlowAccountIdentifier> accountIdentifiers=new ArrayList<>();
 
-    public boolean allAccountExist(){
-    	return this.allAccountExist();
-    }
-
     public FlowAccountIdentifier getFlowAccountIdentifier(String accountIdentifierId){
-    	if(StringUtils.isBlank(accountIdentifierId)) {
-    		return null;
-    	}
         return accountIdentifiers.stream().filter(m->accountIdentifierId.compareToIgnoreCase(m.getIdentifierId())==0).findFirst().get();
     }
 
     public String getThirdBatchId() {
         return thirdBatchId;
     }
+    
+    public void setBatchId(String batchId) {
+		this.batchId = batchId;
+	}
 
-    public void setThirdBatchId(String thirdBatchId) {
+	public void setThirdBatchId(String thirdBatchId) {
         this.thirdBatchId = thirdBatchId;
     }
-
+    
     @JsonIgnore
     public String getBatchId() {
         return this.clientId+"-"+this.thirdBatchId;
