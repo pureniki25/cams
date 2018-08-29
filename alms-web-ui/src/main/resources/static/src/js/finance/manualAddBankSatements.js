@@ -140,10 +140,13 @@ window.layinit(function (htConfig) {
                     app.$Message.error({content:app.acceptAccountLabel+'不能为空'})
                     return ;
                 }
-                if(!params.factRepaymentUser){
-                    app.$Message.error({content:(params.tradeType=='转账'?'实际转款人':'支付人')+'不能为空'})
-                    return ;
-                }
+
+                // 2018-08-29 根据肖莹环需求贷后管理系统二期-财务管理_20180828_V1.0.xlsx update
+                // if(!params.factRepaymentUser){
+                //     app.$Message.error({content:(params.tradeType=='转账'?'实际转款人':'支付人')+'不能为空'})
+                //     return ;
+                // }
+                // 2018-08-29 根据肖莹环需求贷后管理系统二期-财务管理_20180828_V1.0.xlsx update
                 let msg = mprid?"确认编辑此流水?":"确认新增此流水?"
                 let url = mprid?"确认编辑此流水?":"确认新增此流水?"
                 app.$Modal.confirm({
