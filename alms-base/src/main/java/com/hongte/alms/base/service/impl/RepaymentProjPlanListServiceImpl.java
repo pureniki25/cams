@@ -625,6 +625,8 @@ public class RepaymentProjPlanListServiceImpl extends
 			nowDate=pList.getFactRepayDate();
 		}
 		
+		RepaymentBizPlanList org = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", pList.getPlanListId())) ;
+		
     	// 每个业务的还款计划列表对应所有标的还款计划列表
 		List<RepaymentProjPlanList> projList = getProListForCalLateFee(pList.getPlanListId());
 		BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
@@ -655,6 +657,7 @@ public class RepaymentProjPlanListServiceImpl extends
 					projPList.setOverdueDays(BigDecimal.valueOf(0));
 					pList.setOverdueAmount(BigDecimal.valueOf(0));
 					pList.setOverdueDays(BigDecimal.valueOf(0));
+					pList.setFactRepayDate(org.getFactRepayDate());
 					repaymentBizPlanListService.updateById(pList);
 					this.updateById(projPList);
 					
@@ -719,6 +722,7 @@ public class RepaymentProjPlanListServiceImpl extends
 				pList.setOverdueDays(days);
 				pList.setOverdueAmount(getPlanListOverAmountSum(pList));
 				pList.setCurrentStatus(RepayCurrentStatusEnums.逾期.name());
+				pList.setFactRepayDate(org.getFactRepayDate());
 				repaymentBizPlanListService.updateById(pList);
 				logger.info("===============：planListid:"+pList.getPlanListId()+"逾期费用计算结束===============");
 			}

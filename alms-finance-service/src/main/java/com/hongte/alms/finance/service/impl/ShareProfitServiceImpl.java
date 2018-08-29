@@ -29,6 +29,7 @@ import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.req.FinanceBaseDto;
+import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
@@ -153,6 +154,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Qualifier("MoneyPoolService")
 	MoneyPoolService moneyPoolService ;
     
+    @Autowired
+    @Qualifier("FinanceService")
+	FinanceService financeService;
 
     private FinanceBaseDto initFinanceBase(ConfirmRepaymentReq req) {
         FinanceBaseDto financeBaseDto = new FinanceBaseDto();
@@ -224,7 +228,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
         String businessId = financeBaseDto.getBusinessId();
         String afterId = financeBaseDto.getAfterId();
-
+        financeService.getCurrPeriodRepaymentInfoVO(businessId, afterId);
 
         BigDecimal unpaid = repaymentProjFactRepayService.caluUnpaid(businessId, afterId);
         if (unpaid.compareTo(new BigDecimal("0")) <= 0) {
@@ -534,6 +538,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             throw new ServiceRuntimeException(ss);
         }
 
+//        repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanLists.get(0), 1) ;
+        
+        
         RepaymentBizPlanDto repaymentBizPlanDto = new RepaymentBizPlanDto();
         RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
 
@@ -1631,7 +1638,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         repaymentConfirmLog.setCreateTime(new Date());
         repaymentConfirmLog.setCreateUser(loginUserInfoHelper.getUserId());
         List<RepaymentConfirmLog> repaymentConfirmLogs = repaymentConfirmLog.selectList(new EntityWrapper<>()
-                .eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`", false));
+                .eq("business_id", businessId).eq("after_id", afterId).eq("type", 1).orderBy("`idx`", false));
         if (repaymentConfirmLogs == null) {
             repaymentConfirmLog.setIdx(1);
         } else {

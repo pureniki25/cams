@@ -40,6 +40,11 @@ public class ConfirmRepaymentReq {
 	//网关充值/快捷充值必填项,充值记录ids
 	private List<String> rechargeIds;
 
+	/**
+	 * 手动选择的实还日期
+	 */
+	private String repayDate ;
+	
 	/*审批调用专用设置*/
 	/**
 	 * 客户还款登记流水-审批标志位
