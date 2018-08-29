@@ -701,6 +701,7 @@ window.layinit(function (htConfig) {
                 let param = p||{}
                 param.businessId = businessId ;
                 param.afterId = afterId ;
+                param.preview = true ;
                 if(planId){
                     param.planId = planId
                 }
