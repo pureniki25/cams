@@ -176,7 +176,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     public Result revokeConfirm(String businessId, String afterId,boolean isRevokeSettle) throws Exception{
 //    	如果撤销还款,需要判断覆盖其上方的还款记录是否相同的还款计划;
 //    	如果撤销结清,按倒叙撤销
-    	
+    	Date now = new Date() ;
     	RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
     	RepaymentBizPlan bizPlan = repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", bizPlanList.getPlanId()));
     	
@@ -265,7 +265,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 BeanUtils.copyProperties(accountantOverRepayLog, cAccountantOverRepayLog);
                 cAccountantOverRepayLog.setMoneyType(0);
                 cAccountantOverRepayLog.setRemark("创建于"+(isRevokeSettle?"撤销结清":"撤销还款"));
-                cAccountantOverRepayLog.setCreateTime(new Date());
+                cAccountantOverRepayLog.setCreateTime(now);
                 cAccountantOverRepayLog.setCreateUser(loginUserInfoHelper.getUserId());
                 cAccountantOverRepayLog.setId(null);
                 cAccountantOverRepayLog.insert();
@@ -282,7 +282,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 BeanUtils.copyProperties(accountantOverRepayLog, cAccountantOverRepayLog);
                 cAccountantOverRepayLog.setMoneyType(1);
                 cAccountantOverRepayLog.setRemark("创建于"+(isRevokeSettle?"撤销结清":"撤销还款"));
-                cAccountantOverRepayLog.setCreateTime(new Date());
+                cAccountantOverRepayLog.setCreateTime(now);
                 cAccountantOverRepayLog.setCreateUser(loginUserInfoHelper.getUserId());
                 cAccountantOverRepayLog.setId(null);
                 cAccountantOverRepayLog.insert();
@@ -300,6 +300,8 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			/*删除实还明细记录*/
 //			factRepay.deleteById();
             factRepay.setIsCancelled(1);
+            factRepay.setUpdateDate(now);
+            factRepay.setUpdateUser(loginUserInfoHelper.getUserId());
             repaymentProjFactRepayMapper.update(factRepay, new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_repay_id", factRepay.getProjPlanDetailRepayId()));
         }
 
@@ -314,6 +316,8 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 
                 /*不删除,改为置位为撤销*/
                 resource.setIsCancelled(1);
+                resource.setUpdateUser(loginUserInfoHelper.getUserId());
+                resource.setUdpateTime(now);
                 resource.updateAllColumnById();
             }
         }
@@ -437,6 +441,8 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         /*删除合规化还款调用记录 结束*/
 //        log.deleteById();
         log.setIsCancelled(1);
+        log.setUpdateTime(new Date());
+        log.setUpdateUser(loginUserInfoHelper.getUserId());
         log.updateAllColumnById();
         /*更新财务管理列表*/
         
