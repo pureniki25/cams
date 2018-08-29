@@ -47,6 +47,7 @@ import com.hongte.alms.base.entity.TransferLitigationLog;
 import com.hongte.alms.base.enums.SysParameterTypeEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.LitigationFeignClient;
 import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.enums.ProcessTypeEnums;
@@ -76,6 +77,7 @@ import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
 import com.hongte.alms.base.vo.litigation.house.MortgageInfo;
+import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -151,6 +153,9 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Autowired
 	@Qualifier("SysParameterService")
 	private SysParameterService sysParameterService;
+	
+	@Autowired
+	private LitigationFeignClient litigationFeignClient;
 
 	@Value("${ht.billing.west.part.business:''}")
 	private String westPartBusiness;
@@ -362,7 +367,8 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			LOG.info("移交法务诉讼系统地址：{}", sendUrl);
 			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
-			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
+//			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
+			litigationResponse = litigationFeignClient.importLitigation(transferLitigationData);
 			String returnJson = JSONObject.toJSONString(litigationResponse);
 			transferLitigationLog.setResultJson(returnJson);
 			if (litigationResponse != null) {
