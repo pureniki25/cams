@@ -524,6 +524,7 @@ public class RechargeServiceImpl implements RechargeService {
 						log.setUpdateTime(new Date());
 						withholdingRepaymentLogService.updateById(log);
 					}else if(!remoteResult.getReturnCode().equals("0000")){
+						result.setCode("-1");
 						result.setMsg(resultData.getResultMsg());
 						log.setRepayStatus(0);//失败
 						log.setRemark(resultData.getResultMsg());
