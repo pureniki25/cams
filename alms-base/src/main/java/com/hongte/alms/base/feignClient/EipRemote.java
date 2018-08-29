@@ -233,7 +233,7 @@ public interface EipRemote {
 	 * @param orderNo  标ID
 	 * @return
 	 */
-	@RequestMapping(value = "/eip//niiwoo/org/queryApplyOrder", headers = { "app=ALMS",
+	@RequestMapping(value = "/eip/niiwoo/org/queryApplyOrder", headers = { "app=ALMS",
 	"content-type=application/json" }, method = RequestMethod.POST)
 	Result queryApplyOrder(@RequestBody Map<String, Object> paramMap);
 
