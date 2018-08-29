@@ -180,7 +180,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     	RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
     	RepaymentBizPlan bizPlan = repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", bizPlanList.getPlanId()));
     	
-    	
+    	List<RepaymentConfirmLog> logs = null ;
         /*找还款确认记录*/
     	Wrapper<RepaymentConfirmLog> wrapper = new EntityWrapper<RepaymentConfirmLog>()
     			.eq("business_id", businessId).eq("is_cancelled", 0)
@@ -192,10 +192,19 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			}
     		wrapper.eq("after_id", afterId);
 			wrapper.eq("type", 1);
+			logs = confirmLogMapper.selectList(wrapper);
 		}else {
 			wrapper.eq("type", 2);
+			wrapper.and(" plan_id = {0} ", bizPlan.getPlanId());
+			logs = confirmLogMapper.selectList(wrapper);
+			if (CollectionUtils.isEmpty(logs)) {
+				wrapper = new EntityWrapper<RepaymentConfirmLog>()
+		    			.eq("business_id", businessId).eq("is_cancelled", 0).eq("type", 2).and(" plan_id is null ")
+		    			.orderBy("create_time", false);
+				logs = confirmLogMapper.selectList(wrapper);
+			}
+			
 		}
-        List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(wrapper);
         
         if (logs == null || logs.size() == 0) {
             return Result.error("500", "找不到任何一条相关的确认还款记录");
