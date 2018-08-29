@@ -1034,9 +1034,9 @@
 		  (
 		    CASE
 		      WHEN bb.`business_type` IN (1, 9) 
-		      THEN 1 
-		      WHEN bb.`business_type` IN (2, 11) 
 		      THEN 2 
+		      WHEN bb.`business_type` IN (2, 11) 
+		      THEN 1 
 		      ELSE NULL 
 		    END
 		  ) businessType,

@@ -953,12 +953,12 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 // 若调用成功，且状态是true，说明移交过法务
                 if (!(Boolean) result.getData()) {
                     //调用移交诉讼接口
-//                    transferLitigationService.sendTransferLitigationData(
-//                            originalBusinessId,sendUrl,null, 1);
-                	Map<String, Object> paramMap = new HashMap<>();
-                	paramMap.put("businessId", originalBusinessId);
-                	paramMap.put("channel", 1);
-                	almsCoreServiceFeignClient.sendTransferLitigation(paramMap);
+                    transferLitigationService.sendTransferLitigationData(
+                            originalBusinessId,sendUrl,null, 1);
+//                	Map<String, Object> paramMap = new HashMap<>();
+//                	paramMap.put("businessId", originalBusinessId);
+//                	paramMap.put("channel", 1);
+//                	almsCoreServiceFeignClient.sendTransferLitigation(paramMap);
                 }
             }
 
