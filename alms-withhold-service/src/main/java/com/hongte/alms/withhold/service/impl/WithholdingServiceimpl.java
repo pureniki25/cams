@@ -85,7 +85,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 //		for (RepaymentBizPlanList pList : pLists) {
-//			if(pList.getPlanListId().equals("55483e6d-da95-46a7-b3bf-8699a47cae9d")) {
+//			if(pList.getPlanListId().equals("c212774e-93d8-483b-847f-33012e4e2f9e")) {
 //				System.out.println("STOP");
 //			}
 //			//获取该还款计划最早一期没有还的代扣
@@ -254,7 +254,7 @@ public class WithholdingServiceimpl implements WithholdingService {
     							rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), "银行卡余额不足");
     							return result;
     						} else {
-    							if(j==channels.size()) {//说明是已经扣完最后一个渠道了
+    							if(j==channels.size()-1) {//说明是已经扣完最后一个渠道了
     								isUseThirdRepay = true;
     								break outerloop;
     							}else {
@@ -267,7 +267,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 
     					// 分多笔代扣
     				} else {
-    					if(j==channels.size()) {//说明是已经扣完最后一个渠道了
+    					if(j==channels.size()-1) {//说明是已经扣完最后一个渠道了
 							isUseThirdRepay = true;
 							break outerloop;
 						}else {
@@ -348,7 +348,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 			}
 
 			if (thirtyCardInfo != null) {// 绑定了第三方平台
-				ThirdRepaymentCharge(basic, thirtyCardInfo, pList, null,appType);
+				 result=ThirdRepaymentCharge(basic, thirtyCardInfo, pList, null,appType);
 
 			} else { // 没有绑定第三方平台直接跳出
 				result.setCode("-1");
@@ -361,17 +361,18 @@ public class WithholdingServiceimpl implements WithholdingService {
 		} else {
 
 			if (thirtyCardInfo != null) {// 绑定了第三方平台
-				if(!rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
-					underAmount=BigDecimal.valueOf(0);
-					result.setCode("-1");
-					result.setMsg("在宽限期内,不代扣线下滞纳金");
-					rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
-					return result;
-				}else {
-					if (underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
-						ThirdRepaymentCharge(basic, thirtyCardInfo, pList, underAmount,appType);
+				if (underAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
+					if(!rechargeService.isForgiveDayOutside(pList)) {//判断是否在宽限期内，如果是则不代扣线下滞纳金,
+						underAmount=BigDecimal.valueOf(0);
+						result.setCode("-1");
+						result.setMsg("在宽限期内,不代扣线下滞纳金");
+						rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), result.getMsg());
+						return result;
+					}else {
+						result=ThirdRepaymentCharge(basic, thirtyCardInfo, pList, underAmount,appType);
 					}
 				}
+			
 			} else { // 没有绑定第三方平台直接跳出
 				result.setCode("-1");
 				result.setMsg("没有绑定第三方平台");
