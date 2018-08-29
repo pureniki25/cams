@@ -54,14 +54,14 @@
                 </form-item>
 
                 <form-item prop="acceptBank" :label="acceptAccountLabel"  required>
-                    <i-select v-if="form.tradeType=='转账'||form.tradeType=='刷卡'" v-model="form.acceptBank">
+                    <i-select v-if="form.tradeType=='转账'||form.tradeType=='刷卡'" v-model="form.acceptBank" filterable >
                         <i-option v-for="item in bankAccountList" :value="item.financeName">{{item.financeName}}</i-option>
                     </i-select>
                     <i-input v-if="form.tradeType=='转账'||form.tradeType=='刷卡'" :value="curBankAccount" readonly></i-input>
                     <i-input v-if="form.tradeType=='现金'" v-model="form.acceptBank"></i-input>
                 </form-item>
 
-                <form-item prop="factRepaymentUser" :label="form.tradeType=='转账'?'实际转款人':'支付人'" required>
+                <form-item prop="factRepaymentUser" :label="form.tradeType=='转账'?'实际转款人':'支付人'" >
                     <i-input v-model="form.factRepaymentUser"></i-input>
                 </form-item>
                 <form-item prop="tradePlace" label="交易场所" >
