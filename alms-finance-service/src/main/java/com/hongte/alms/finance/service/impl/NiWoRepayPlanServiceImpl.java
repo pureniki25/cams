@@ -97,6 +97,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	TuandaiProjectInfoService tuandaiProjectInfoService;
 	
 	@Autowired
+	@Qualifier("RepaymentBizPlanListSynchService")
+	RepaymentBizPlanListSynchService repaymentBizPlanListSynchService;
+	
+	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper;
 	
 	@Autowired
@@ -209,6 +213,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 						pList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 						if(pList.getFactRepayDate()==null) {
 							pList.setFactRepayDate(new Date());
+							repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
 						}
 					
 					}
@@ -657,6 +662,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												pList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 												if(pList.getFactRepayDate()==null) {
 													pList.setFactRepayDate(new Date());
+													repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
 												}
 												repaymentBizPlanListService.updateById(pList);
 												
