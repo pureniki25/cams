@@ -223,7 +223,24 @@ public class BasicBusiness extends Model<BasicBusiness> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户ID")
 	private String updateUser;
-
+	/**
+	 * 最后推送状态
+	 */
+	@TableField("last_push_status")
+	@ApiModelProperty(required= true,value = "最后推送状态")
+	private Integer lastPushStatus;
+	/**
+	 * 最后推送时间
+	 */
+	@TableField("last_push_datetime")
+	@ApiModelProperty(required= true,value = "最后推送时间")
+	private Date lastPushDatetime;
+	/**
+	 * 最后推送备注
+	 */
+	@TableField("last_push_remark")
+	@ApiModelProperty(required= true,value = "最后推送备注")
+	private String lastPushRemark;
 
 	public String getBusinessId() {
 		return businessId;
@@ -487,6 +504,30 @@ public class BasicBusiness extends Model<BasicBusiness> {
 
 	public void setUpdateUser(String updateUser) {
 		this.updateUser = updateUser;
+	}
+	
+	public Integer getLastPushStatus() {
+		return lastPushStatus;
+	}
+
+	public void setLastPushStatus(Integer lastPushStatus) {
+		this.lastPushStatus = lastPushStatus;
+	}
+
+	public Date getLastPushDatetime() {
+		return lastPushDatetime;
+	}
+
+	public void setLastPushDatetime(Date lastPushDatetime) {
+		this.lastPushDatetime = lastPushDatetime;
+	}
+
+	public String getLastPushRemark() {
+		return lastPushRemark;
+	}
+
+	public void setLastPushRemark(String lastPushRemark) {
+		this.lastPushRemark = lastPushRemark;
 	}
 
 	@Override

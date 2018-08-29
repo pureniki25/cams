@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -213,7 +212,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 						pList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 						if(pList.getFactRepayDate()==null) {
 							pList.setFactRepayDate(new Date());
-							repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
+							
 						}
 					
 					}
@@ -224,6 +223,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					
 					pList.setUpdateTime(new Date());
 					repaymentBizPlanListService.updateById(pList);
+					updatePListSync(pList);
 				}
 				
 			    
@@ -662,9 +662,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 												pList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 												if(pList.getFactRepayDate()==null) {
 													pList.setFactRepayDate(new Date());
-													repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
 												}
 												repaymentBizPlanListService.updateById(pList);
+												updatePListSync(pList);
+												
 												
 												 planDetails = repaymentBizPlanListDetailService
 														.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id",
@@ -732,7 +733,11 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	 */
 	private BigDecimal getPlanAllFactRepayAmount(RepaymentBizPlanList list) {
 		List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails= repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", list.getPlanListId()));
-		BigDecimal factRepayAmount=repaymentBizPlanListDetails.stream().map(RepaymentBizPlanListDetail::getFactAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
+//		BigDecimal factRepayAmount=repaymentBizPlanListDetails.stream().map(RepaymentBizPlanListDetail::getFactAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
+		BigDecimal factRepayAmount=BigDecimal.valueOf(0);
+		for(RepaymentBizPlanListDetail detail:repaymentBizPlanListDetails) {
+			factRepayAmount=factRepayAmount.add(detail.getFactAmount()==null?BigDecimal.valueOf(0):detail.getFactAmount());
+		}
 		 return factRepayAmount;
 	}
 	
@@ -1226,5 +1231,15 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					   
 					}
 		
+	}
+	
+	private void updatePListSync(RepaymentBizPlanList pList) {
+		RepaymentBizPlanListSynch sync=repaymentBizPlanListSynchService.selectOne(new EntityWrapper<RepaymentBizPlanListSynch>().eq("plan_list_id", pList.getPlanListId()).eq("orig_business_id", pList.getOrigBusinessId()));
+		sync.setCurrentStatus(pList.getCurrentStatus());
+		sync.setCurrentSubStatus(pList.getCurrentSubStatus());
+		sync.setRepayStatus(pList.getRepayStatus());
+		sync.setRepayFlag(pList.getRepayFlag());
+		sync.setFactRepayDate(pList.getFactRepayDate());
+		repaymentBizPlanListSynchService.updateById(sync);
 	}
 }

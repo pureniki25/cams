@@ -16,6 +16,7 @@ import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.CarBusinessAfter;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.entity.SysUserPermission;
 import com.hongte.alms.base.feignClient.AlmsCoreServiceFeignClient;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
@@ -111,6 +112,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     
     @Autowired
     private AlmsCoreServiceFeignClient almsCoreServiceFeignClient;
+    
+    @Autowired
+    @Qualifier("SysUserService")
+    SysUserService sysUserService;
 
     /**
      * 设置电催/人员(界面手动设置)
@@ -330,9 +335,17 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 		                		List<StaffBusinessVo> voTempList = new ArrayList<>();
 		                		voTempList.add(vo);
         						sysUserPermissionService.setUserPermissonsInBusinessList(oldStaffUserIds,voTempList);
+        						
+        						
 //        					}
 //        	        	});
                 		
+                	}else {
+                		SysUser sysUser = sysUserService.selectById(oldStaffUserId);
+						if(null != sysUser) {
+							sysUser.setLastPermissionStatus(1);
+							sysUserService.updateById(sysUser);
+						}
                 	}
                 }
 
@@ -348,7 +361,13 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         						sysUserPermissionService.setUserPermissonsInBusinessList(staffUserId,voTempList);
 //        					}
 //        	        	});
-                	
+                	}
+                	else {
+                		SysUser sysUser = sysUserService.selectById(staffUserId);
+						if(null != sysUser) {
+							sysUser.setLastPermissionStatus(1);
+							sysUserService.updateById(sysUser);
+						}
                 	}
                     /*List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",staffUserId));
                     if(lsys == null || lsys.size()==0){

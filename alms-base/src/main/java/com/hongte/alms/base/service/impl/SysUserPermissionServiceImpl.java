@@ -250,7 +250,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
     	listSysUserPermissionDel.removeAll(listSysUserPermissionleft);
     	if(!listSysUserPermissionDel.isEmpty()) {
     		for(SysUserPermission sysUserPermissionDel: listSysUserPermissionDel) {
-    			sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id", sysUserPermissionDel.getBusinessId()).eq("page_type", sysUserPermissionDel.getPageType()));
+    			sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id", sysUserPermissionDel.getBusinessId()).eq("page_type", sysUserPermissionDel.getPageType()).eq("user_id", userId));
     		}
     	}
     	//2对比旧权限与新权限》找出要添加的
@@ -674,7 +674,7 @@ public class SysUserPermissionServiceImpl extends BaseServiceImpl<SysUserPermiss
         	listSysUserPermissionDel.removeAll(listSysUserPermissionleft);
         	if(!listSysUserPermissionDel.isEmpty()) {
         		for(SysUserPermission sysUserPermissionDel: listSysUserPermissionDel) {
-        			sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id", sysUserPermissionDel.getBusinessId()).eq("page_type", sysUserPermissionDel.getPageType()));
+        			sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id", sysUserPermissionDel.getBusinessId()).eq("page_type", sysUserPermissionDel.getPageType()).eq("user_id", userId));
         		}
         	}
         	//2对比旧权限与新权限》找出要添加的
