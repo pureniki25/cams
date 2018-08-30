@@ -43,6 +43,7 @@ public class ToPlatRepayController {
 	        if (sysParameter != null) {
 	        	resultMap.put("oIdPartner", sysParameter.getParamValue2());
 	        	resultMap.put("tdUserName", sysParameter.getParamValue3());
+                resultMap.put("orgType", BusinessTypeEnum.getOrgTypeByValue(businessType));
 			}
 	        
 			return Result.success(resultMap);
