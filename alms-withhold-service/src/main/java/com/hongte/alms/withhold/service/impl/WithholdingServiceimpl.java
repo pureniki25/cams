@@ -222,8 +222,12 @@ public class WithholdingServiceimpl implements WithholdingService {
         	SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
     				new EntityWrapper<SysBankLimit>().eq("platform_id", channels.get(j).getPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("status", 1));
     		if (sysBankLimit == null) {
-    			logger.debug("银行代扣限额信息platformId:" + channels.get(j).getPlatformId() + "无效/不存在");
-    			rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), "银行代扣限额信息platformId:\" + channel.getPlatformId() + \"无效/不存在\"");
+    			if(j==channels.size()-1) {//说明是已经扣完最后一个渠道了
+        			logger.debug("银行代扣限额信息platformId:" + channels.get(j).getPlatformId() + "无效/不存在");
+        			rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), "银行代扣限额信息platformId:\" + channel.getPlatformId() + \"无效/不存在\"");
+				}else {
+					continue;
+				}
     		} else {
     			// 本期线上剩余应还金额,剩余应还金额减去线下金额
     			BigDecimal repayMoney = rechargeService.getRestAmount(pList).subtract(underAmount);
@@ -571,10 +575,14 @@ public class WithholdingServiceimpl implements WithholdingService {
 		        	SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
 							new EntityWrapper<SysBankLimit>().eq("platform_id", channels.get(j).getPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("sub_platform_id", channels.get(j).getSubPlatformId()).eq("status", 1));
 					if (sysBankLimit == null) {
-						logger.info("银行代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channels.get(j).getPlatformId(),bankCardInfo.getBankName());
-						result.setCode("-1");
-				    	result.setMsg("银行代扣限额信息platformId:"+channels.get(j).getPlatformId()+",bankCode:"+bankCardInfo.getBankName()+",无效/不存在");
-						return result;
+						if(j==channels.size()-1) {//说明是已经扣完最后一个渠道了
+							logger.info("银行代扣限额信息platformId:{0},bankCode:{1},无效/不存在",channels.get(j).getPlatformId(),bankCardInfo.getBankName());
+							result.setCode("-1");
+					    	result.setMsg("银行代扣限额信息platformId:"+channels.get(j).getPlatformId()+",bankCode:"+bankCardInfo.getBankName()+",无效/不存在");
+							return result;
+						}else {
+							continue;
+						}
 					} else {
 						// 本期线上剩余应还金额,剩余应还金额减去线下金额
 						BigDecimal repayMoney = rechargeService.getRestAmount(pList).subtract(underAmount);
