@@ -2002,8 +2002,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         IssueSendOutsideLog issueSendOutsideLog = issueSendOutsideLogService.createIssueSendOutsideLog(
     			loginUserInfoHelper.getUserId(), 
     			JSON.toJSONString(paramMap), 
-    			Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT, 
-    			Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT, 
+    			Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS, 
+    			Constant.INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS, 
     			Constant.SYSTEM_CODE_EIP) ;
         issueSendOutsideLog.setBusinessId(businessId);
         try {
@@ -2015,8 +2015,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             	issueSendOutsideLogService.save(issueSendOutsideLog);
                 sysApiCallFailureRecordService.save(
                         AlmsServiceNameEnums.FINANCE,
-                        Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-                        Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+                        Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
+                        Constant.INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
                         businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
             }
         } catch (Exception e) {
@@ -2025,8 +2025,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         	issueSendOutsideLogService.save(issueSendOutsideLog);
             sysApiCallFailureRecordService.save(
                     AlmsServiceNameEnums.FINANCE,
-                    Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-                    Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+                    Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
+                    Constant.INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
                     businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
         }
     }
