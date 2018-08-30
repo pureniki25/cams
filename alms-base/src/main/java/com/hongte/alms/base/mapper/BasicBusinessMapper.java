@@ -145,7 +145,7 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 	 */
 	List<String> selectBusinessIdsByBizType(@Param("bizTypes") List<Integer> bizTypes);
 
-	List<Map<String, Object>> selectlPushBusiness();
+	List<Map<String, Object>> selectlPushBusiness(Map<String, Object> paramBusinessMap);
 
 	List<Map<String, Object>> selectlPushBusinessOnlineFlow(Map<String, Object> paramOnlineFlowMap);
 

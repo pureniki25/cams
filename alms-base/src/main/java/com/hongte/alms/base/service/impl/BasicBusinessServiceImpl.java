@@ -868,8 +868,8 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		}
 
 		@Override
-		public List<Map<String, Object>> selectlPushBusiness() {
-			return basicBusinessMapper.selectlPushBusiness();
+		public List<Map<String, Object>> selectlPushBusiness(Map<String, Object> paramBusinessMap) {
+			return basicBusinessMapper.selectlPushBusiness(paramBusinessMap);
 		}
 
 		@Override

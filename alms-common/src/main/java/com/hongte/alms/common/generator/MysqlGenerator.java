@@ -34,11 +34,11 @@ public class MysqlGenerator {
 //        String tableName="tb_basic_company";//本次需要生成的表名
 //        String tableName="tb_collection_status";//本次需要生成的表名
        // String tableName="tb_withholding_flow_record";//本次需要生成的表名
-        String tableName="";//本次需要生成的表名
+        String tableName="tb_basic_business_flow_push";//本次需要生成的表名
         //1 设定生成配置
         GeneratorConfig inputConfig = new GeneratorConfig(
 //                "黄咏康",
-                "张贵宏",
+                "刘正全",
                 //{自定义}包模块名
                 "com.hongte.alms.",
                 //父类包路径(指SuperMapper，BaseService的包路径)

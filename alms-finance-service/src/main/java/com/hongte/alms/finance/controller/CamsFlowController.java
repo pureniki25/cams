@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.feignClient.AccountListHandlerClient;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.vo.cams.CancelBizAccountListCommand;
@@ -58,11 +55,47 @@ public class CamsFlowController {
     public Result<Object> addBatchFlow() {
     	//核心流程推送流程
     	//1# step1 查出未推送和推送失败的业务 list    tb_basic_business加3列 最后推送时间 最后推送状态 最后推送备注   另增加推送流水表
-//    	Map<String,Object> paramMap = new HashMap<>();
-    	List<Map<String,Object>> listMap = basicBusinessService.selectlPushBusiness();
+    	Map<String,Object> paramBusinessMap = new HashMap<>();
+    	List<Map<String,Object>> listMap = basicBusinessService.selectlPushBusiness(paramBusinessMap);
     	addBusinessFlow(listMap);
     	return Result.buildSuccess();
     }
+    
+    /**
+     * 指定业务ID推送账户流水
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "指定业务ID新增账户流水")
+    @GetMapping("/addFlowByBusinessId")
+    @ResponseBody
+    public Result<Object> addFlowByBusinessId() {
+    	//核心流程推送流程
+    	//1# step1 查出未推送和推送失败的业务 list    tb_basic_business加3列 最后推送时间 最后推送状态 最后推送备注   另增加推送流水表
+//    	Map<String,Object> paramMap = new HashMap<>();
+    	Map<String,Object> paramBusinessMap = new HashMap<>();
+    	List<Map<String,Object>> listMap = basicBusinessService.selectlPushBusiness(paramBusinessMap);
+    	addBusinessFlow(listMap);
+    	return Result.buildSuccess();
+    }
+    
+    /**
+     * 指定confireLogID推送账户流水
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "指定业务ID新增账户流水")
+    @GetMapping("/addFlowByConfireLogID")
+    @ResponseBody
+    public Result<Object> addFlowByConfireLogID() {
+    	//核心流程推送流程
+    	//1# step1 查出未推送和推送失败的业务 list    tb_basic_business加3列 最后推送时间 最后推送状态 最后推送备注   另增加推送流水表
+    	Map<String,Object> paramBusinessMap = new HashMap<>();
+    	List<Map<String,Object>> listMap = basicBusinessService.selectlPushBusiness(paramBusinessMap);
+    	addBusinessFlow(listMap);
+    	return Result.buildSuccess();
+    }
+    
 
 	private void addBusinessFlow(List<Map<String, Object>> listMap) {
 		//2# step2 循环业务list，去除每一条业务的流水list

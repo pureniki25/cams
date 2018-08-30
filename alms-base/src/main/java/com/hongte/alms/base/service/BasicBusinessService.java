@@ -194,7 +194,7 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	 */
 	List<String> selectGoodHourseBusinessIds();
 
-	List<Map<String, Object>> selectlPushBusiness();
+	List<Map<String, Object>> selectlPushBusiness(Map<String, Object> paramBusinessMap);
 
 	List<Map<String, Object>> selectlPushBusinessOnlineFlow(Map<String, Object> paramOnlineFlowMap);
 
