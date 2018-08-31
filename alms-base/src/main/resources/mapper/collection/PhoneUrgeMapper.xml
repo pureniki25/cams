@@ -498,7 +498,8 @@
             </if>
             <!--   /*//客户名称*/ -->
             <if test="customerName !=null  and customerName !=''  ">
-                and pList.customer_name_ext  LIKE '%${customerName}%'
+               <!--  and pList.customer_name_ext  LIKE '%${customerName}%' -->
+               AND EXISTS (SELECT 1 FROM `tb_tuandai_project_info` tpii WHERE tpii.`real_name` LIKE '%${customerName}%' AND tpii.`business_id` = pList.business_id)
             </if>
             <!--   /*//身份证号*/ -->
             <if test="identifyCard !=null  and identifyCard !=''  ">
@@ -666,7 +667,7 @@
             </if>
             <!--   /*//客户名称*/ -->
             <if test="customerName !=null  and customerName !=''  ">
-                and business.customer_name  LIKE '%${customerName}%'
+               and business.customer_name  LIKE '%${customerName}%' 
             </if>
      		
      		<if test="userId !=null and userId != '' and needPermission == 1">

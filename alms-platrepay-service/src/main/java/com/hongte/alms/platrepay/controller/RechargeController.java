@@ -47,7 +47,7 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping("/recharge")
 public class RechargeController {
@@ -220,7 +220,7 @@ public class RechargeController {
 		dto.setCmOrderNo(cmOrderNo);
 		dto.setOIdPartner(oIdPartner);
 		dto.setRechargeUserId(vo.getRechargeUserId());
-		
+		dto.setOrgType(BusinessTypeEnum.getOrgTypeByName(vo.getRechargeAccountType()));
 
 		AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, cmOrderNo, dto, oIdPartner);
 
@@ -288,6 +288,7 @@ public class RechargeController {
 		dto.setCmOrderNo(cmOrderNo);
 		dto.setOIdPartner(oIdPartner);
 		dto.setRechargeUserId(vo.getRechargeUserId());
+		dto.setOrgType(BusinessTypeEnum.getOrgTypeByName(vo.getRechargeAccountType()));
 
 		AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, cmOrderNo, dto, oIdPartner);
 

@@ -359,6 +359,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	private Result sendDistributeFund(List<TdrepayRechargeInfoVO> rechargeInfoVOs, Integer businessType,
 			String userId) {
 		DistributeFundDTO dto = new DistributeFundDTO();
+		dto.setOrgType(BusinessTypeEnum.getOrgTypeByValue(businessType));
 		String batchId = UUID.randomUUID().toString();
 		dto.setBatchId(batchId);
 		String rechargeAccountType = BusinessTypeEnum.getRechargeAccountName(businessType);
