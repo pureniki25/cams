@@ -43,6 +43,6 @@ public class RechargeModalDTO implements Serializable {
 	/**
 	 * 机构编号
 	 */
-	private BigDecimal orgType;
+	private Integer orgType;
 
 }
