@@ -201,7 +201,7 @@ public enum BusinessTypeEnum implements IEnum {
     public static int getOrgTypeByName(String name) {  
     	BusinessTypeEnum[] businessTypeEnums = values();  
     	for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {  
-    		if (businessTypeEnum.name().equals(name)) {  
+    		if (businessTypeEnum.getName().equals(name)) {  
     			return businessTypeEnum.orgType;
     		}  
     	}  
