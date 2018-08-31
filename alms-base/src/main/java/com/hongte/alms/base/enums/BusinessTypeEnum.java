@@ -175,4 +175,20 @@ public enum BusinessTypeEnum implements IEnum {
     	}  
     	return -1;  
     }
+    
+    /**
+     * 根据充值账户类型ID获取orgType
+     * @param rechargeAccountId
+     * @return
+     * @author huweiqian
+     */
+    public static int getOrgTypeByRechargeAccountId(int rechargeAccountId) {  
+    	BusinessTypeEnum[] businessTypeEnums = values();  
+    	for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {  
+    		if (businessTypeEnum.rechargeAccountId() == rechargeAccountId) {  
+    			return businessTypeEnum.orgType;
+    		}  
+    	}  
+    	return -1;  
+    }
 }
