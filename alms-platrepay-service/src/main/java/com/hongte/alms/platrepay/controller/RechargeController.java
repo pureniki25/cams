@@ -47,7 +47,7 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
 
-//@CrossOrigin
+@CrossOrigin
 @RestController
 @RequestMapping("/recharge")
 public class RechargeController {
@@ -218,8 +218,9 @@ public class RechargeController {
 		dto.setClientIp(vo.getClientIp());
 		dto.setChargeType(vo.getChargeType()); // 1：网关、2：快捷、3：代充值
 		dto.setCmOrderNo(cmOrderNo);
-		dto.setoIdPartner(oIdPartner);
+		dto.setOIdPartner(oIdPartner);
 		dto.setRechargeUserId(vo.getRechargeUserId());
+		
 
 		AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, cmOrderNo, dto, oIdPartner);
 
@@ -285,7 +286,7 @@ public class RechargeController {
 		dto.setClientIp(vo.getClientIp());
 		dto.setChargeType(vo.getChargeType()); // 1：网关、2：快捷、3：代充值
 		dto.setCmOrderNo(cmOrderNo);
-		dto.setoIdPartner(oIdPartner);
+		dto.setOIdPartner(oIdPartner);
 		dto.setRechargeUserId(vo.getRechargeUserId());
 
 		AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, cmOrderNo, dto, oIdPartner);
@@ -349,7 +350,7 @@ public class RechargeController {
 		agencyRechargeLog.setBankCode(vo.getBankCode());
 		agencyRechargeLog.setChargeType(dto.getChargeType());
 		agencyRechargeLog.setClientIp(vo.getClientIp());
-		agencyRechargeLog.setoIdPartner(dto.getoIdPartner());
+		agencyRechargeLog.setoIdPartner(dto.getOIdPartner());
 		agencyRechargeLog.setRechargeAccountBalance(
 				BigDecimal.valueOf(vo.getRechargeAccountBalance() == null ? 0 : vo.getRechargeAccountBalance())
 						.setScale(2, BigDecimal.ROUND_HALF_UP));
