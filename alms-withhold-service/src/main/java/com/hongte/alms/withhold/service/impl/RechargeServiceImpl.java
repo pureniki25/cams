@@ -857,8 +857,8 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setUpdateTime(new Date());
 		if(StringUtil.isEmpty(appType)) {
 			if (loginUserInfoHelper != null && !StringUtil.isEmpty(loginUserInfoHelper.getUserId())) {
-				log.setUpdateUser(loginUserInfoHelper.getUserId());
-				log.setCreateUser(loginUserInfoHelper.getUserId());
+				log.setUpdateUser(StringUtil.isEmpty(loginUserInfoHelper.getUserId())?"0111130000":loginUserInfoHelper.getUserId());
+				log.setCreateUser(StringUtil.isEmpty(loginUserInfoHelper.getUserId())?"0111130000":loginUserInfoHelper.getUserId());
 			} else {
 				log.setCreateUser(appType);
 				log.setUpdateUser(appType);
