@@ -1036,9 +1036,46 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 for (RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto : repaymentProjPlanListDetailDtos) {
                     RepaymentProjPlanListDetail detail = repaymentProjPlanListDetailDto
                             .getRepaymentProjPlanListDetail();
-                    if(detail.getShareProfitIndex().compareTo(1200)>=0){
+                    /*线上滞纳金的核销优先级调整为先核销其他标的的本金利息服务费后在核销线上滞纳金 2018-08-31 update 贷后二期优化问题 肖莹环*/
+                    if(detail.getShareProfitIndex().compareTo(1200)>=0 || detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())){
                         continue;
                     }
+                    /*线上滞纳金的核销优先级调整为先核销其他标的的本金利息服务费后在核销线上滞纳金 2018-08-31 update 贷后二期优化问题 肖莹环*/
+                    boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, null, financeBaseDto);
+                    if (!bl && financeBaseDto.getRealPayedAmount() != null) {
+                        lastPaySuc = false;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        for (int i = 0; i < dto.getProjPlanDtos().size(); i++) {
+            if (lastPaySuc == false)
+                return;
+            RepaymentProjPlanDto repaymentProjPlanDto = dto.getProjPlanDtos().get(i);
+            String projectId = repaymentProjPlanDto.getTuandaiProjectInfo().getProjectId();
+            lastProjectId = projectId;
+            List<CurrPeriodProjDetailVO> projListDetails = financeBaseDto.getProjListDetails();
+            CurrPeriodProjDetailVO currPeriodProjDetailVO = getCurrPeriodProjDetailVO(projectId, projListDetails);
+
+            List<RepaymentProjPlanListDto> repaymentProjPlanListDtos = repaymentProjPlanDto.getProjPlanListDtos();
+            // 遍历标的还款计划
+            for (RepaymentProjPlanListDto repaymentProjPlanListDto : repaymentProjPlanListDtos) {
+                List<RepaymentProjPlanListDetailDto> repaymentProjPlanListDetailDtos = repaymentProjPlanListDto
+                        .getRepaymentProjPlanListDetailDtos();
+                // //遍历这个标的每一期还款计划，费用细项
+                for (RepaymentProjPlanListDetailDto repaymentProjPlanListDetailDto : repaymentProjPlanListDetailDtos) {
+                    RepaymentProjPlanListDetail detail = repaymentProjPlanListDetailDto
+                            .getRepaymentProjPlanListDetail();
+//                    if(detail.getShareProfitIndex().compareTo(1200)>=0 && !detail){
+//                        continue;
+//                    }
+                    /*线上滞纳金的核销优先级调整为先核销其他标的的本金利息服务费后在核销线上滞纳金 2018-08-31 update 贷后二期优化问题 肖莹环*/
+                    if (!detail.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+						continue;
+					}
+                    /*线上滞纳金的核销优先级调整为先核销其他标的的本金利息服务费后在核销线上滞纳金 2018-08-31 update 贷后二期优化问题 肖莹环*/
                     boolean bl = payOneFeeDetail(detail, currPeriodProjDetailVO, null, financeBaseDto);
                     if (!bl && financeBaseDto.getRealPayedAmount() != null) {
                         lastPaySuc = false;

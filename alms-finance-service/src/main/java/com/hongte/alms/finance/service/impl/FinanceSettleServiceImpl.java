@@ -432,7 +432,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 /*如果有减免,先处理减免*/
                 
                 for(RepaymentProjPlanSettleDto repaymentProjPlanSettleDto:projPlanSettleDtoList){
-                	//先还线上部分
+                	//先还线上部分,除线上滞纳金
                 	financeSettleBaseDto.setProjPlanId(repaymentProjPlanSettleDto.getRepaymentProjPlan().getProjPlanId());
                 	financeSettleBaseDto.setProjectId(repaymentProjPlanSettleDto.getRepaymentProjPlan().getProjectId());
                 	financeSettleBaseDto.setPlanId(repaymentProjPlanSettleDto.getRepaymentProjPlan().getPlanId());
@@ -440,10 +440,59 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 	
                 	for (PlanListDetailShowPayDto planListDetailShowPayDto : planListDetailShowPayDtos) {
                 		RepaymentProjPlanListDetail repaymentProjPlanListDetail = repaymentProjPlanSettleDto.getCurProjListDetailMap().get(planListDetailShowPayDto.getFeelId());
-						if (planListDetailShowPayDto.getShareProfitIndex() >= Constant.ONLINE_OFFLINE_FEE_BOUNDARY || repaymentProjPlanListDetail == null ) {
+                		/*线上滞纳金的核销优先级调整为先核销其他标的的本金利息服务费后在核销线上滞纳金 2018-08-31 update 贷后二期优化问题 肖莹环*/
+						if (planListDetailShowPayDto.getShareProfitIndex() >= Constant.ONLINE_OFFLINE_FEE_BOUNDARY 
+								|| planListDetailShowPayDto.getFeelId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid()) 
+								|| repaymentProjPlanListDetail == null ) {
+							continue;
+						}
+						/*线上滞纳金的核销优先级调整为先核销其他标的的本金利息服务费后在核销线上滞纳金 2018-08-31 update 贷后二期优化问题 肖莹环*/
+						
+						
+						if (financeSettleBaseDto.isNoMoney()) {
+							if (CollectionUtils.isEmpty(financeSettleBaseDto.getUnderfillFees())) {
+								financeSettleBaseDto.setUnderfillFees(new ArrayList<>());
+							}
+							
+							financeSettleBaseDto.getUnderfillFees().add(planListDetailShowPayDto);
+							
 							continue;
 						}
 						
+						if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())>0) {
+							/*足够还掉某一个费用项*/
+							financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(planListDetailShowPayDto.getShowPayMoney()));
+							createProjFactRepay(planListDetailShowPayDto.getShowPayMoney(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+						}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())==0) {
+							financeSettleBaseDto.setCuralDivideAmount(financeSettleBaseDto.getCuralDivideAmount().subtract(planListDetailShowPayDto.getShowPayMoney()));
+							createProjFactRepay(planListDetailShowPayDto.getShowPayMoney(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+						}else if (financeSettleBaseDto.getCuralDivideAmount().compareTo(planListDetailShowPayDto.getShowPayMoney())<0) {
+							if (financeSettleBaseDto.getCuralDivideAmount().compareTo(BigDecimal.ZERO) > 0 ) {
+								createProjFactRepay(financeSettleBaseDto.getCuralDivideAmount(), repaymentProjPlanListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+							}
+							financeSettleBaseDto.setCuralDivideAmount(BigDecimal.ZERO) ;
+							changeRepaymentResources(planListDetailShowPayDto,repaymentProjPlanListDetail, financeSettleBaseDto);
+						}
+					}
+                } 
+                
+                for(RepaymentProjPlanSettleDto repaymentProjPlanSettleDto:projPlanSettleDtoList){
+                	//再还线上滞纳金
+                	financeSettleBaseDto.setProjPlanId(repaymentProjPlanSettleDto.getRepaymentProjPlan().getProjPlanId());
+                	financeSettleBaseDto.setProjectId(repaymentProjPlanSettleDto.getRepaymentProjPlan().getProjectId());
+                	financeSettleBaseDto.setPlanId(repaymentProjPlanSettleDto.getRepaymentProjPlan().getPlanId());
+                	List<PlanListDetailShowPayDto> planListDetailShowPayDtos = sortFeeByShareProfitIndex(repaymentProjPlanSettleDto);
+                	
+                	for (PlanListDetailShowPayDto planListDetailShowPayDto : planListDetailShowPayDtos) {
+                		RepaymentProjPlanListDetail repaymentProjPlanListDetail = repaymentProjPlanSettleDto.getCurProjListDetailMap().get(planListDetailShowPayDto.getFeelId());
+//						if (planListDetailShowPayDto.getShareProfitIndex() >= Constant.ONLINE_OFFLINE_FEE_BOUNDARY || repaymentProjPlanListDetail == null ) {
+//							continue;
+//						}
+                		/*线上滞纳金的核销优先级调整为先核销其他标的的本金利息服务费后在核销线上滞纳金 2018-08-31 update 贷后二期优化问题 肖莹环*/
+						if(!planListDetailShowPayDto.getFeelId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+							continue;
+						}
+						/*线上滞纳金的核销优先级调整为先核销其他标的的本金利息服务费后在核销线上滞纳金 2018-08-31 update 贷后二期优化问题 肖莹环*/
 						
 						if (financeSettleBaseDto.isNoMoney()) {
 							if (CollectionUtils.isEmpty(financeSettleBaseDto.getUnderfillFees())) {
