@@ -220,7 +220,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 		outerloop: for(int j=0;j<channels.size();j++) {
         	SysBankLimit sysBankLimit = sysBankLimitService.selectOne(
-    				new EntityWrapper<SysBankLimit>().eq("platform_id", channels.get(j).getPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("status", 1));
+    				new EntityWrapper<SysBankLimit>().eq("platform_id", channels.get(j).getPlatformId()).eq("sub_platform_id", channels.get(j).getSubPlatformId()).eq("bank_code", bankCardInfo.getBankCode().trim()).eq("status", 1));
     		if (sysBankLimit == null) {
     			if(j==channels.size()-1) {//说明是已经扣完最后一个渠道了
         			logger.debug("银行代扣限额信息platformId:" + channels.get(j).getPlatformId() + "无效/不存在");
