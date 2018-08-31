@@ -60,7 +60,7 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 			 * 查找资金分发表中platStatus字段不为 1：已还款 的数据
 			 */
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("status", 1).eq("is_valid", 1));
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().ne("status", 1).eq("is_valid", 1));
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 				Map<String, Object> paramMap = new HashMap<>();
 				List<TdrepayRechargeLog> list = new ArrayList<>();
