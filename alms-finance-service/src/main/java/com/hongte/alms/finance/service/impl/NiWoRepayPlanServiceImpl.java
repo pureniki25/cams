@@ -176,7 +176,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					projPlanList.setCurrentStatus("已还款");
 					projPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 					projPlanList.setOverdueAmount(getProjListDetaiPlanRepayAmount(projPlanList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT));
-					projPlanList.setRepayFlag(80);// 1：已还款 你我金融的单，还款后标志为80
+					projPlanList.setRepayFlag(90);// 1：已还款 你我金融的单，还款后标志为90
 					projPlanList.setUpdateTime(new Date());
 					if(projPlanList.getFactRepayDate()==null) {
 						projPlanList.setFactRepayDate(new Date());
@@ -208,7 +208,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				    
 					if(factRepayAmountSum.compareTo(pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()))>=0) {
 						pList.setCurrentStatus("已还款");
-						pList.setRepayFlag(80);// 1：已还款 你我金融的单，还款后标志为80
+						pList.setRepayFlag(90);// 1：已还款 你我金融的单，还款后标志为90
 						pList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 						if(pList.getFactRepayDate()==null) {
 							pList.setFactRepayDate(new Date());
