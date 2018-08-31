@@ -220,7 +220,7 @@ public class RechargeController {
 		dto.setCmOrderNo(cmOrderNo);
 		dto.setOIdPartner(oIdPartner);
 		dto.setRechargeUserId(vo.getRechargeUserId());
-		dto.setOrgType(BusinessTypeEnum.getOrgTypeByRechargeAccountId(Integer.valueOf(vo.getRechargeAccountType())));
+		dto.setOrgType(BusinessTypeEnum.getOrgTypeByName(vo.getRechargeAccountType()));
 
 		AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, cmOrderNo, dto, oIdPartner);
 
@@ -288,7 +288,7 @@ public class RechargeController {
 		dto.setCmOrderNo(cmOrderNo);
 		dto.setOIdPartner(oIdPartner);
 		dto.setRechargeUserId(vo.getRechargeUserId());
-		dto.setOrgType(Integer.valueOf(vo.getRechargeAccountType()));
+		dto.setOrgType(BusinessTypeEnum.getOrgTypeByName(vo.getRechargeAccountType()));
 
 		AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, cmOrderNo, dto, oIdPartner);
 

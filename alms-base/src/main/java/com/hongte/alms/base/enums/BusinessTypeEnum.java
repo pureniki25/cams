@@ -191,4 +191,20 @@ public enum BusinessTypeEnum implements IEnum {
     	}  
     	return -1;  
     }
+    
+    /**
+     * 根据name获取orgType
+     * @param rechargeAccountId
+     * @return
+     * @author huweiqian
+     */
+    public static int getOrgTypeByName(String name) {  
+    	BusinessTypeEnum[] businessTypeEnums = values();  
+    	for (BusinessTypeEnum businessTypeEnum : businessTypeEnums) {  
+    		if (businessTypeEnum.name().equals(name)) {  
+    			return businessTypeEnum.orgType;
+    		}  
+    	}  
+    	return -1;  
+    }
 }
