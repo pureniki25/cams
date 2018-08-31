@@ -85,7 +85,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 //		for (RepaymentBizPlanList pList : pLists) {
-//			if(pList.getPlanListId().equals("c212774e-93d8-483b-847f-33012e4e2f9e")) {
+//			if(pList.getPlanListId().equals("06b25fbb-cd0f-4cc5-9129-fdf34a214fe3")) {
 //				System.out.println("STOP");
 //			}
 //			//获取该还款计划最早一期没有还的代扣
@@ -250,7 +250,12 @@ public class WithholdingServiceimpl implements WithholdingService {
     						// bankCardInfo,platformId, 1, boolPartRepay, merchOrderId, 0,
     						// repayMoney);
     						break;
-    					} else {
+    					} else if(result.getCode().equals("2")){
+    						result.setCode("-1");
+							result.setMsg("银行代扣处理中");
+							rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), "银行代扣处理中");
+							return result;
+    					}else {
     						// 如果是余额不足，则跳出循环
     						if (IsNoEnoughMoney(result.getMsg())) {
     							result.setCode("-1");

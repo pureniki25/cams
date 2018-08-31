@@ -515,7 +515,7 @@ public class RechargeServiceImpl implements RechargeService {
 						withholdingRepaymentLogService.updateById(log);
 						try {
 							Thread.sleep(5000);
-							getBankResult(log,oIdPartner);
+							getBankResult(log,oIdPartner,result);
 						} catch (Exception e) {
 							logger.debug("查询银行代扣结果出错"+e);
 						}
@@ -1225,7 +1225,7 @@ public class RechargeServiceImpl implements RechargeService {
 		for (WithholdingRepaymentLog log : losgs) {
 			try {
 				if (log.getBindPlatformId() == PlatformEnum.YH_FORM.getValue()) {
-					getBankResult(log,log.getMerchantAccount());
+					getBankResult(log,log.getMerchantAccount(),null);
 				}
 				if (log.getBindPlatformId() == PlatformEnum.BF_FORM.getValue()) {
 					getBFResult(log);
@@ -1240,7 +1240,7 @@ public class RechargeServiceImpl implements RechargeService {
 	}
 
 	@Override
-	public void getBankResult(WithholdingRepaymentLog log,String oidPartner) {
+	public void getBankResult(WithholdingRepaymentLog log,String oidPartner,Result outsideResult) {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("oidPartner", oidPartner);
 		paramMap.put("requestNo", log.getMerchOrderId());
@@ -1269,6 +1269,7 @@ public class RechargeServiceImpl implements RechargeService {
 	
 		if(bankRepayTestResult!=null) {
 			if(bankRepayTestResult.getParamValue().equals("0000")) {
+				outsideResult.setCode("1");
 				String resultMsg="充值成功";
 				result.setReturnCode("0000");
 				result.msg(resultMsg);
@@ -1282,6 +1283,7 @@ public class RechargeServiceImpl implements RechargeService {
 				result.setReturnCode("1111");
 				result.msg(resultMsg);
 			}else if(bankRepayTestResult.getParamValue().equals("2222")){
+				outsideResult.setCode("2");
 				String resultMsg="处理中";
 				result.msg(resultMsg);
 				result.setReturnCode("EIP_TD_HANDLER_EXECEPTION");
@@ -1311,6 +1313,7 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("2")) {
+			outsideResult.setCode("1");
 			log.setRepayStatus(1);
 			log.setRemark("充值成功");
 			log.setUpdateTime(new Date());
@@ -1323,6 +1326,7 @@ public class RechargeServiceImpl implements RechargeService {
 					logger.error("银行代扣失败短信发送错误,logId:{0}",log.getLogId());
 				}
 		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("3")) {
+			outsideResult.setCode("2");
 			log.setRepayStatus(2);
 			log.setRemark("待付款");
 			log.setUpdateTime(new Date());
