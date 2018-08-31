@@ -1849,13 +1849,25 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
         List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", cur.getPlanListId()).eq("is_finance_match", 1).orderBy("trade_date", false));
         SettleInfoVO infoVO = new SettleInfoVO();
-        Date settleDate = null;
-        if (CollectionUtils.isEmpty(moneyPoolRepayments)) {
-            settleDate = new Date();
-        } else {
-            settleDate = moneyPoolRepayments.get(0).getTradeDate();
-        }
+        infoVO.setMoneyPoolRepayDates(new LinkedHashSet<>());
+        
+        for (MoneyPoolRepayment moneyPoolRepayment : moneyPoolRepayments) {
+        	infoVO.getMoneyPoolRepayDates().add(DateUtil.formatDate(moneyPoolRepayment.getTradeDate()));
+		}
+        infoVO.getMoneyPoolRepayDates().add(DateUtil.formatDate(new Date()));
+        
+        
+        Date settleDate = new Date();
+//        if (CollectionUtils.isEmpty(moneyPoolRepayments)) {
+//            settleDate = new Date();
+//        } else {
+//            settleDate = moneyPoolRepayments.get(0).getTradeDate();
+//        }
 
+        if (!StringUtil.isEmpty(req.getRepayDate())) {
+			settleDate = DateUtil.getDate(req.getRepayDate());
+		}
+        
         int diff = DateUtil.getDiffDays(cur.getDueDate(), settleDate);
         if (diff > 0 ) {
         	//&& cur.getCurrentStatus().equals(RepayPlanStatus.OVERDUE.getName())

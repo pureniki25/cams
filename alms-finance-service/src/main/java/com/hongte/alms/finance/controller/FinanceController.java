@@ -504,10 +504,10 @@ public class FinanceController {
 	
 	@GetMapping(value="/thisTimeRepayment")
 	@ApiOperation(value="本次还款信息")
-	public Result thisTimeRepayment(String businessId,String afterId) {
+	public Result thisTimeRepayment(String businessId,String afterId,String repayDate) {
 		Result result ;
 		logger.info("@thisTimeRepayment@本次还款信息--开始[{}{}]",businessId,afterId);
-		CurrPeriodRepaymentInfoVO infoVO  = financeService.getCurrPeriodRepaymentInfoVO(businessId, afterId);
+		CurrPeriodRepaymentInfoVO infoVO  = financeService.getCurrPeriodRepaymentInfoVO(businessId, afterId ,repayDate);
 		if (infoVO==null) {
 			result = Result.error("500", "找不到本次还款信息");
 		}

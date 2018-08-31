@@ -228,7 +228,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
         String businessId = financeBaseDto.getBusinessId();
         String afterId = financeBaseDto.getAfterId();
-        financeService.getCurrPeriodRepaymentInfoVO(businessId, afterId);
+//        financeService.getCurrPeriodRepaymentInfoVO(businessId, afterId);
 
         BigDecimal unpaid = repaymentProjFactRepayService.caluUnpaid(businessId, afterId);
         if (unpaid.compareTo(new BigDecimal("0")) <= 0) {

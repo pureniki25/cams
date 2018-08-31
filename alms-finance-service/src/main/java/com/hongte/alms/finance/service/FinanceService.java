@@ -38,7 +38,7 @@ public interface FinanceService {
 	 * @param afterId
 	 * @return
 	 */
-	public CurrPeriodRepaymentInfoVO getCurrPeriodRepaymentInfoVO(String businessId, String afterId);
+	public CurrPeriodRepaymentInfoVO getCurrPeriodRepaymentInfoVO(String businessId, String afterId , String repayDate);
 
 	/**
 	 * 获取当前期减免明细
