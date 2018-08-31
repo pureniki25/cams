@@ -89,7 +89,7 @@
 	</select>
 
 
-    <!-- 每个标的实还金额总和-->
+    <!-- 每个标的本金实还金额总和-->
     <select id="getFactAmountSum" resultType="java.lang.Double">
 			select 
 					sum(ifnull(projDetail.proj_fact_amount,0)) 
@@ -105,7 +105,7 @@
 					on projList.proj_plan_list_id=projDetail.proj_plan_list_id
 
 		
-				where projPlan.proj_plan_id=#{projPlanId}
+				where projPlan.proj_plan_id=#{projPlanId} and projDetail.plan_item_type=10
 	</select>
 
 
