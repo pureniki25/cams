@@ -123,7 +123,7 @@ public class CalLateFeeController {
 			    	List<RepaymentProjPlanList> projList = repaymentProjPlanListService.getProListForCalLateFee(pList.getPlanListId());
 						for (RepaymentProjPlanList projPList : projList) {
 							// 每个表的还款计划列表对应所的标的还款计划
-							repaymentProjPlanListService.calLateFeeForPerPList(pList,null);
+							repaymentProjPlanListService.calLateFeeForPerPList(pList,1);
 				    }
 			}
 		}
