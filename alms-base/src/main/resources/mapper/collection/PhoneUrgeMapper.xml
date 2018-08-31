@@ -376,7 +376,11 @@
 			  FROM
 			    `tb_tuandai_project_info` tpi 
 			  WHERE tpi.business_id = pList.business_id 
-			  LIMIT 1) plateType
+			  LIMIT 1) plateType,
+		(
+		select brt.repayment_type_name from tb_basic_repayment_type brt where brt.repayment_type_id = pList.repayment_type_id_ext
+		) repaymentType,
+		pList.phone_number_ext phoneNumber
         from tb_repayment_biz_plan_list_synch  as pList
         <if test="paymentPlatformCode!=null">
         JOIN tb_tuandai_project_info as ttpi ON pList.business_id = ttpi.business_id
