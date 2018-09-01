@@ -653,6 +653,8 @@ public class PlatformRepaymentController {
 							if (!interestAmountFlag) {
 								detailFee.setFeeValue(interestAmount);
 								interestAmountFlag = true;
+							}else {
+								detailFee.setFeeValue(BigDecimal.ZERO);
 							}
 							break;
 						case 30:
@@ -694,10 +696,13 @@ public class PlatformRepaymentController {
 							return Result.error("还款方式不能为空");
 						}
 						
+						
 						if (isUsedMap.containsKey(detailFee.getFeeType())) {
 							TdrepayRechargeDetail detail = isUsedMap.get(detailFee.getFeeType());
 							detail.setFeeValue(detail.getFeeValue().add(detailFee.getFeeValue() == null ? BigDecimal.ZERO : detailFee.getFeeValue()));
 							continue;
+						}else {
+							isUsedMap.put(detailFee.getFeeType(), detailFee);
 						}
 
 						// 费用
