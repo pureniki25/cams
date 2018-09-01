@@ -694,6 +694,8 @@ public class PlatformRepaymentController {
 							return Result.error("还款方式不能为空");
 						}
 						
+						isUsedMap.put(detailFee.getFeeType(), detailFee);
+						
 						if (isUsedMap.containsKey(detailFee.getFeeType())) {
 							TdrepayRechargeDetail detail = isUsedMap.get(detailFee.getFeeType());
 							detail.setFeeValue(detail.getFeeValue().add(detailFee.getFeeValue() == null ? BigDecimal.ZERO : detailFee.getFeeValue()));
