@@ -273,7 +273,7 @@ var layer;
 	 	                    	vm.limitTips='所绑定的银行卡单笔代扣额度为'+oneLimit+'元，单日限额为'+dayLimit+'元，该期可以一笔代扣'
 	 	                    }else if(vm.ajax_data.planAllAmount>oneLimit&&vm.ajax_data.planAllAmount<dayLimit){//本期代扣额度>单笔代扣额度，但是小于单日限额：
 	 	                    	var times=parseInt(vm.ajax_data.planAllAmount/oneLimit);
-	 	                    	var rest=vm.ajax_data.planAllAmount%voneLimit;
+	 	                    	var rest=vm.ajax_data.planAllAmount%oneLimit;
 	 	                    	if(rest>0){
 	 	                    		times=times+1
 	 	                    	}
