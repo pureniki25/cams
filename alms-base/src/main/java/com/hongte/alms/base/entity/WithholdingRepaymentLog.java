@@ -136,9 +136,9 @@ public class WithholdingRepaymentLog extends Model<WithholdingRepaymentLog> {
 	  /**
      * 银行代扣需要传的业务类型字段
      */
-//	@TableField("org_type")
-//	@ApiModelProperty(required= true,value = "银行代扣需要传的业务类型字段")
-//	private String orgType;
+	@TableField("org_type")
+	@ApiModelProperty(required= true,value = "银行代扣需要传的业务类型字段")
+	private String orgType;
     /**
      * 创建时间
      */
@@ -182,13 +182,13 @@ public class WithholdingRepaymentLog extends Model<WithholdingRepaymentLog> {
 
    
    
-//	public String getOrgType() {
-//		return orgType;
-//	}
-//
-//	public void setOrgType(String orgType) {
-//		this.orgType = orgType;
-//	}
+	public String getOrgType() {
+		return orgType;
+	}
+
+	public void setOrgType(String orgType) {
+		this.orgType = orgType;
+	}
 
 	public String getBankCode() {
 		return bankCode;
