@@ -653,6 +653,8 @@ public class PlatformRepaymentController {
 							if (!interestAmountFlag) {
 								detailFee.setFeeValue(interestAmount);
 								interestAmountFlag = true;
+							}else {
+								detailFee.setFeeValue(BigDecimal.ZERO);
 							}
 							break;
 						case 30:
