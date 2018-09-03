@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -544,8 +545,9 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Override
-	public CurrPeriodRepaymentInfoVO getCurrPeriodRepaymentInfoVO(String businessId, String afterId) {
+	public CurrPeriodRepaymentInfoVO getCurrPeriodRepaymentInfoVO(String businessId, String afterId , String repayDate) {
 		CurrPeriodRepaymentInfoVO c = new CurrPeriodRepaymentInfoVO();
+		c.setMoneyPoolRepayDates(new LinkedHashSet<>());
 		
 		RepaymentBizPlanList rpl = new RepaymentBizPlanList();
 		rpl.setBusinessId(businessId);
@@ -555,9 +557,22 @@ public class FinanceServiceImpl implements FinanceService {
 		/*根据最后一条实还流水的时间重新计算滞纳金*/
 		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(
 				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", rpl.getPlanListId()).isNotNull("money_pool_id").andNew("state",RepayRegisterFinanceStatus.未关联银行流水.toString()).or().eq("state", RepayRegisterFinanceStatus.财务指定银行流水.toString()).orderBy("trade_date",false));
+		/*将流水时间收集,返回前端*/
+		for (MoneyPoolRepayment moneyPoolRepayment : moneyPoolRepayments) {
+			c.getMoneyPoolRepayDates().add(DateUtil.formatDate(moneyPoolRepayment.getTradeDate()));
+		}
+		/*将流水时间收集,返回前端*/
+		/*别少当天*/
+		c.getMoneyPoolRepayDates().add(DateUtil.formatDate(new Date()));
+		/*别少当天*/
+		
+		
 		Date factRepayDate = new Date() ;
 		if (!CollectionUtils.isEmpty(moneyPoolRepayments)) {
 			factRepayDate = moneyPoolRepayments.get(0).getTradeDate() ;
+		}
+		if (!StringUtil.isEmpty(repayDate)) {
+			factRepayDate = DateUtil.getDate(repayDate);
 		}
 		rpl.setFactRepayDate(factRepayDate);
 		rpl = repaymentProjPlanListService.calLateFeeForPerPList(rpl, 1);
