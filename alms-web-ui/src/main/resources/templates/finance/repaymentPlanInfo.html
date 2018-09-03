@@ -20,6 +20,18 @@
 		.layui-table th, .layui-table td .receive-inner-div:last-child {
 			border-bottom:none;
 		}
+		.ivu-table .demo-table-info-row-ying td{
+	        background-color: #2db7f52e;
+	    }
+	    .ivu-table .demo-table-info-row-shi td{
+	        background-color: #19be6b1f;
+	    }
+	    .ivu-table .demo-table-info-row-cha td{
+	        background-color: #2db7f52e;
+	    }
+	    .ivu-table td.demo-table-info-column-yuqi{
+	        color: #FF0000;
+	    }
 	</style>
 </head>
 
@@ -40,7 +52,7 @@
 		<Card>
 			<tabs value="repaymentPlan" :animated="true" @on-click="initFunction($event)">
 		        <tab-pane label="还款计划" name="repaymentPlan">
-		        	<i-table height="580" highlight-row border :columns="repayBizPlanColumns" :data="bizRepaymentPlanList"></i-table>
+		        	<i-table height="550" highlight-row border :columns="repayBizPlanColumns" :data="bizRepaymentPlanList" :row-class-name="rowClassName"></i-table>
 		        	
 		        	<Modal v-model="repayPlanFlag" title="计划还款" width="100%">
 		        		<i-table highlight-row border :columns="repayPlanColumns" :data="repayPlanColumnsData"></i-table>
