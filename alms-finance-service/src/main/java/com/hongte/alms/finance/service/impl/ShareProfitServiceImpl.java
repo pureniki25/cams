@@ -29,6 +29,7 @@ import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.req.FinanceBaseDto;
+import com.hongte.alms.finance.service.FinanceService;
 import com.hongte.alms.finance.service.ShareProfitService;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.ht.ussp.client.dto.LoginInfoDto;
@@ -153,6 +154,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Qualifier("MoneyPoolService")
 	MoneyPoolService moneyPoolService ;
     
+    @Autowired
+    @Qualifier("FinanceService")
+	FinanceService financeService;
 
     private FinanceBaseDto initFinanceBase(ConfirmRepaymentReq req) {
         FinanceBaseDto financeBaseDto = new FinanceBaseDto();
@@ -224,7 +228,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
         String businessId = financeBaseDto.getBusinessId();
         String afterId = financeBaseDto.getAfterId();
-
+        financeService.getCurrPeriodRepaymentInfoVO(businessId, afterId);
 
         BigDecimal unpaid = repaymentProjFactRepayService.caluUnpaid(businessId, afterId);
         if (unpaid.compareTo(new BigDecimal("0")) <= 0) {
@@ -337,6 +341,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 financeBaseDto.setMoneyPoolAmount(moneyPoolAmount);
 //                moneyPoolAmount.set();
                 RepaymentResource repaymentResource = new RepaymentResource();
+                repaymentResource.setIsCancelled(0);
                 repaymentResource.setAfterId(moneyPoolRepayment.getAfterId());
                 repaymentResource.setBusinessId(moneyPoolRepayment.getOriginalBusinessId());
                 repaymentResource.setOrgBusinessId(moneyPoolRepayment.getOriginalBusinessId());
@@ -379,13 +384,14 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 repaySource = RepayPlanRepaySrcEnum.OFFLINE_WITHHOLD_MAN.getValue().toString();
             }
             RepaymentResource temp = repaymentResourceService.selectOne(new EntityWrapper<RepaymentResource>()
-                    .eq("business_id", log.getOriginalBusinessId()).eq("after_id", log.getAfterId())
+                    .eq("business_id", log.getOriginalBusinessId()).eq("after_id", log.getAfterId()).eq("is_cancelled", 0)
                     .eq("repay_source_ref_id", log.getLogId()).eq("repay_source", repaySource));
             if (temp != null) {// 已经核销过
                 return;
             }
 
             RepaymentResource repaymentResource = new RepaymentResource();
+            repaymentResource.setIsCancelled(0);
             repaymentResource.setAfterId(log.getAfterId());
             repaymentResource.setBusinessId(log.getOriginalBusinessId());
             repaymentResource.setOrgBusinessId(log.getOriginalBusinessId());
@@ -437,6 +443,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             }
 
             RepaymentResource repaymentResource = new RepaymentResource();
+            repaymentResource.setIsCancelled(0);
             repaymentResource.setAfterId(req.getAfterId());
             repaymentResource.setBusinessId(req.getBusinessId());
             repaymentResource.setOrgBusinessId(req.getBusinessId());
@@ -485,6 +492,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		
 		for (AgencyRechargeLog agencyRechargeLog : agencyRechargeLogs) {
 			RepaymentResource repaymentResource = new RepaymentResource();
+			repaymentResource.setIsCancelled(0);
             repaymentResource.setAfterId(agencyRechargeLog.getAfterId());
             repaymentResource.setBusinessId(agencyRechargeLog.getOrigBusinessId());
             repaymentResource.setOrgBusinessId(agencyRechargeLog.getOrigBusinessId());
@@ -530,6 +538,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             throw new ServiceRuntimeException(ss);
         }
 
+//        repaymentProjPlanListService.calLateFeeForPerPList(repaymentBizPlanLists.get(0), 1) ;
+        
+        
         RepaymentBizPlanDto repaymentBizPlanDto = new RepaymentBizPlanDto();
         RepaymentBizPlan repaymentBizPlan = new RepaymentBizPlan();
 
@@ -622,7 +633,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                     repaymentProjPlanListDetailDto.setRepaymentProjPlanListDetail(repaymentProjPlanListDetail);
                     List<RepaymentProjFactRepay> repaymentProjFactRepays = repaymentProjFactRepayMapper
                             .selectList(new EntityWrapper<RepaymentProjFactRepay>()
-                                    .eq("proj_plan_detail_id", repaymentProjPlanListDetail.getProjPlanDetailId())
+                                    .eq("proj_plan_detail_id", repaymentProjPlanListDetail.getProjPlanDetailId()).eq("is_cancelled", 0)
                                     .orderBy("plan_item_type").orderBy("fee_id"));
                     repaymentProjPlanListDetailDto.setRepaymentProjFactRepays(repaymentProjFactRepays);
                     repaymentProjPlanListDetailDtos.add(repaymentProjPlanListDetailDto);
@@ -1267,6 +1278,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                                                        CurrPeriodProjDetailVO vo, RepaymentResource resource, FinanceBaseDto financeBaseDto) {
         RepaymentProjFactRepay fact = new RepaymentProjFactRepay();
         fact.setAfterId(financeBaseDto.getAfterId());
+        fact.setIsCancelled(0);
         fact.setBusinessId(financeBaseDto.getBusinessId());
         fact.setCreateDate(new Date());
         fact.setCreateUser(financeBaseDto.getUserId());
@@ -1289,6 +1301,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         rendCurrPeriodProjDetailVO(divideAmount, detail, vo);
         if (financeBaseDto.getSave()) {
             fact.setProjPlanDetailRepayId(UUID.randomUUID().toString());
+            fact.setIsCancelled(0);
             fact.insert();
             addProjFactRepays(financeBaseDto,detail.getPlanDetailId(),fact);
             
@@ -1615,6 +1628,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         String orgBusinessId = financeBaseDto.getOrgBusinessId();
 
         RepaymentConfirmLog repaymentConfirmLog = new RepaymentConfirmLog();
+        repaymentConfirmLog.setIsCancelled(0);
         repaymentConfirmLog.setAfterId(afterId);
         repaymentConfirmLog.setBusinessId(businessId);
         repaymentConfirmLog.setCanRevoke(1);
@@ -1624,7 +1638,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         repaymentConfirmLog.setCreateTime(new Date());
         repaymentConfirmLog.setCreateUser(loginUserInfoHelper.getUserId());
         List<RepaymentConfirmLog> repaymentConfirmLogs = repaymentConfirmLog.selectList(new EntityWrapper<>()
-                .eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`", false));
+                .eq("business_id", businessId).eq("after_id", afterId).eq("type", 1).orderBy("`idx`", false));
         if (repaymentConfirmLogs == null) {
             repaymentConfirmLog.setIdx(1);
         } else {
@@ -1854,6 +1868,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         // confirmLog.get().setRepayDate(planList.getFactRepayDate());
         confirmLog.setProjPlanJson(JSON.toJSONString(financeBaseDto.getProjListDetails()));
         confirmLog.setPeriod(financeBaseDto.getPlanDto().getBizPlanListDtos().get(0).getRepaymentBizPlanList().getPeriod());
+        confirmLog.setIsCancelled(0);
         confirmLog.insert();
 
         String confirmLogId = confirmLog.getConfirmLogId();
@@ -1987,8 +2002,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         IssueSendOutsideLog issueSendOutsideLog = issueSendOutsideLogService.createIssueSendOutsideLog(
     			loginUserInfoHelper.getUserId(), 
     			JSON.toJSONString(paramMap), 
-    			Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT, 
-    			Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT, 
+    			Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS, 
+    			Constant.INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS, 
     			Constant.SYSTEM_CODE_EIP) ;
         issueSendOutsideLog.setBusinessId(businessId);
         try {
@@ -2000,8 +2015,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             	issueSendOutsideLogService.save(issueSendOutsideLog);
                 sysApiCallFailureRecordService.save(
                         AlmsServiceNameEnums.FINANCE,
-                        Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-                        Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+                        Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
+                        Constant.INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
                         businessId, JSON.toJSONString(paramMap), null, JSON.toJSONString(result), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
             }
         } catch (Exception e) {
@@ -2010,8 +2025,8 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         	issueSendOutsideLogService.save(issueSendOutsideLog);
             sysApiCallFailureRecordService.save(
                     AlmsServiceNameEnums.FINANCE,
-                    Constant.INTERFACE_CODE_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
-                    Constant.INTERFACE_NAME_FINANCE_FINANCE_PREVIEWCONFIRMREPAYMENT,
+                    Constant.INTERFACE_CODE_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
+                    Constant.INTERFACE_NAME_OPEN_REPAYPLAN_UPDATEREPAYPLANTOLMS,
                     businessId, JSON.toJSONString(paramMap), null, e.getMessage(), null, loginUserInfoHelper.getUserId() == null ? "null" : loginUserInfoHelper.getUserId());
         }
     }

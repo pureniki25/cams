@@ -193,6 +193,14 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	 * @return List<String>    返回类型  
 	 */
 	List<String> selectGoodHourseBusinessIds();
+
+	List<Map<String, Object>> selectlPushBusiness();
+
+	List<Map<String, Object>> selectlPushBusinessOnlineFlow(Map<String, Object> paramOnlineFlowMap);
+
+	List<Map<String, Object>> selectlPushBusinessOfflineFlow(Map<String, Object> paramOnlineFlowMap);
+
+	List<Map<String, Object>> selectlPushBusinessFlowItem(Map<String, Object> paramFlowItemMap);
 	 
 
 }

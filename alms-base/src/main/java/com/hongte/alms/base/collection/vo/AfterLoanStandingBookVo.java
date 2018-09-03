@@ -110,6 +110,16 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
      */
     private Integer plateType;
     
+    /**
+     * 电话号码
+     */
+    private String phoneNumber;
+    
+    /**
+     * 还款方式名称
+     */
+    private String repaymentType;
+    
     public String getPlateTypeText() {
     	if(plateType == null) {
     		plateTypeText = "";
@@ -438,4 +448,26 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
 		}
 		this.peroidStatus = res;
 	}
+
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+
+	public String getRepaymentType() {
+		return repaymentType;
+	}
+
+
+	public void setRepaymentType(String repaymentType) {
+		this.repaymentType = repaymentType;
+	}
+	
+	
 }

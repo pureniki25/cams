@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -95,6 +94,10 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	@Autowired
 	@Qualifier("TuandaiProjectInfoService")
 	TuandaiProjectInfoService tuandaiProjectInfoService;
+	
+	@Autowired
+	@Qualifier("RepaymentBizPlanListSynchService")
+	RepaymentBizPlanListSynchService repaymentBizPlanListSynchService;
 	
 	@Autowired
 	LoginUserInfoHelper loginUserInfoHelper;
@@ -173,7 +176,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					projPlanList.setCurrentStatus("已还款");
 					projPlanList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 					projPlanList.setOverdueAmount(getProjListDetaiPlanRepayAmount(projPlanList, RepayPlanFeeTypeEnum.OVER_DUE_AMONT));
-					projPlanList.setRepayFlag(1);// 1：已还款 你我金融的单，还款后标志为1
+					projPlanList.setRepayFlag(90);// 1：已还款 你我金融的单，还款后标志为90
 					projPlanList.setUpdateTime(new Date());
 					if(projPlanList.getFactRepayDate()==null) {
 						projPlanList.setFactRepayDate(new Date());
@@ -205,10 +208,11 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 				    
 					if(factRepayAmountSum.compareTo(pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()))>=0) {
 						pList.setCurrentStatus("已还款");
-						pList.setRepayFlag(1);// 1：已还款 你我金融的单，还款后标志为1
+						pList.setRepayFlag(90);// 1：已还款 你我金融的单，还款后标志为90
 						pList.setRepayStatus(SectionRepayStatusEnum.ALL_REPAID.getKey());
 						if(pList.getFactRepayDate()==null) {
 							pList.setFactRepayDate(new Date());
+							
 						}
 					
 					}
@@ -219,6 +223,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					
 					pList.setUpdateTime(new Date());
 					repaymentBizPlanListService.updateById(pList);
+					updatePListSync(pList);
 				}
 				
 			    
@@ -659,6 +664,8 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													pList.setFactRepayDate(new Date());
 												}
 												repaymentBizPlanListService.updateById(pList);
+												updatePListSync(pList);
+												
 												
 												 planDetails = repaymentBizPlanListDetailService
 														.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id",
@@ -726,7 +733,11 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 	 */
 	private BigDecimal getPlanAllFactRepayAmount(RepaymentBizPlanList list) {
 		List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails= repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", list.getPlanListId()));
-		BigDecimal factRepayAmount=repaymentBizPlanListDetails.stream().map(RepaymentBizPlanListDetail::getFactAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
+//		BigDecimal factRepayAmount=repaymentBizPlanListDetails.stream().map(RepaymentBizPlanListDetail::getFactAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
+		BigDecimal factRepayAmount=BigDecimal.valueOf(0);
+		for(RepaymentBizPlanListDetail detail:repaymentBizPlanListDetails) {
+			factRepayAmount=factRepayAmount.add(detail.getFactAmount()==null?BigDecimal.valueOf(0):detail.getFactAmount());
+		}
 		 return factRepayAmount;
 	}
 	
@@ -1220,5 +1231,15 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 					   
 					}
 		
+	}
+	
+	private void updatePListSync(RepaymentBizPlanList pList) {
+		RepaymentBizPlanListSynch sync=repaymentBizPlanListSynchService.selectOne(new EntityWrapper<RepaymentBizPlanListSynch>().eq("plan_list_id", pList.getPlanListId()).eq("orig_business_id", pList.getOrigBusinessId()));
+		sync.setCurrentStatus(pList.getCurrentStatus());
+		sync.setCurrentSubStatus(pList.getCurrentSubStatus());
+		sync.setRepayStatus(pList.getRepayStatus());
+		sync.setRepayFlag(pList.getRepayFlag());
+		sync.setFactRepayDate(pList.getFactRepayDate());
+		repaymentBizPlanListSynchService.updateById(sync);
 	}
 }

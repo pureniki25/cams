@@ -44,7 +44,7 @@
                         <i-input v-model="accountMoney"></i-input>
                     </form-item>
                     <form-item label="转入账号">
-                        <i-select v-model="acceptBank" style="width:150px;text-align: left;">
+                        <i-select v-model="acceptBank" style="width:150px;text-align: left;" filterable>
                             <i-option value="所有账户">所有账户</i-option>
                             <i-option v-for="(item,index) in bankAccounts" :value="item.financeName" :key="item.financeName+index">{{item.financeName}}</i-option>
                         </i-select>

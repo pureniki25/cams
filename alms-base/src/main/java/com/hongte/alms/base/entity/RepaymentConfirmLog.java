@@ -136,6 +136,12 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	 */
 	@TableField("plan_id")
 	private String planId ;
+	
+	/**
+     * 是否已撤销,1=已撤销,0=正常
+     */
+	@TableField("is_cancelled")
+	private Integer isCancelled;
 
 	public String getConfirmLogId() {
 		return confirmLogId;
@@ -386,5 +392,13 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 
 	public void setPlanId(String planId) {
 		this.planId = planId;
+	}
+
+	public Integer getIsCancelled() {
+		return isCancelled;
+	}
+
+	public void setIsCancelled(Integer isCancelled) {
+		this.isCancelled = isCancelled;
 	}
 }

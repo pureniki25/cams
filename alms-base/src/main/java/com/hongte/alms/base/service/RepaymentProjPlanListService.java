@@ -2,6 +2,7 @@ package com.hongte.alms.base.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentSettleMoneyDto;
@@ -41,6 +42,17 @@ public interface RepaymentProjPlanListService extends BaseService<RepaymentProjP
 
 	RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList,Integer type);
 
+	/**
+	 * 预览计算每期pList得滞纳金(计算后的数据不保存进数据库)
+	 * @author 王继光
+	 * 2018年8月28日 下午4:12:36
+	 * @param pList
+	 * @param type
+	 * @return
+	 */
+	Map<String, Object> previewCalLateFeeForPerPList(RepaymentBizPlanList pList,Integer type);
+
+	
 
 
     /**

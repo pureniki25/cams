@@ -322,7 +322,7 @@ public class PlatformRepaymentController {
 			 * 根据 projPlanListId 获取实还明细 ；
 			 */
 			List<RepaymentProjFactRepay> projFactRepayList = repaymentProjFactRepayService
-					.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", projPlanListId)
+					.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", projPlanListId).eq("is_cancelled", 0)
 							.orderBy("create_date", false));
 			if (projFactRepayList == null || projFactRepayList.isEmpty()) {
 				LOGGER.info("@对接合规还款接口@ 查询实还流水为空 输入参数projPlanListId:[{}]", projPlanListId);
@@ -597,7 +597,7 @@ public class PlatformRepaymentController {
 				 */
 				List<RepaymentProjFactRepay> projFactRepays = repaymentProjFactRepayService
 						.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id",
-								projPlanList.getProjPlanListId()));
+								projPlanList.getProjPlanListId()).eq("is_cancelled", 0));
 
 				Map<Object, RepaymentProjFactRepay> projFactRepayMap = Maps.newHashMap();
 				// 按费用项大类plan_item_type把重复的费用项进行合并累加
@@ -624,14 +624,17 @@ public class PlatformRepaymentController {
 					 * 获取不需要分润的数据
 					 */
 					Map<String, Integer> notShaPrMap = getNotShareProfitFeeIds(projPlanListId);
-
+					boolean interestAmountFlag = false;
+					
+					Map<Integer, TdrepayRechargeDetail> isUsedMap = new HashMap<>();
+					
 					for (RepaymentProjFactRepay r : projFactRepays) {
 						// 累计实还金额，包含线下和线上费用
 						factRepayAmount = factRepayAmount.add(r.getFactAmount());
 						/*
 						 * 区分分润与不分润的费用明细（线下费用不用分润）
 						 */
-						 if (notShaPrMap.containsKey(r.getFeeId())) {
+						 if (notShaPrMap.containsKey(r.getFeeId()) || r.getFactAmount().equals(BigDecimal.ZERO)) {
 							 continue;
 						 }
 						TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();
@@ -647,7 +650,12 @@ public class PlatformRepaymentController {
 							break;
 						case 20:
 							feeType = 20;
-							detailFee.setFeeValue(interestAmount);
+							if (!interestAmountFlag) {
+								detailFee.setFeeValue(interestAmount);
+								interestAmountFlag = true;
+							}else {
+								detailFee.setFeeValue(BigDecimal.ZERO);
+							}
 							break;
 						case 30:
 							feeType = 40;
@@ -686,6 +694,15 @@ public class PlatformRepaymentController {
 						} else {
 							LOGGER.info("@对接合规还款接口@ 还款方式不能为空 projPlanListId:[{}]", projPlanListId);
 							return Result.error("还款方式不能为空");
+						}
+						
+						
+						if (isUsedMap.containsKey(detailFee.getFeeType())) {
+							TdrepayRechargeDetail detail = isUsedMap.get(detailFee.getFeeType());
+							detail.setFeeValue(detail.getFeeValue().add(detailFee.getFeeValue() == null ? BigDecimal.ZERO : detailFee.getFeeValue()));
+							continue;
+						}else {
+							isUsedMap.put(detailFee.getFeeType(), detailFee);
 						}
 
 						// 费用

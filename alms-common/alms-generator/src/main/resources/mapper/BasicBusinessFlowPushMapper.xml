@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.BasicBusinessFlowPushMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.BasicBusinessFlowPush">
+        <id column="id" property="id" />
+        <result column="business_id" property="businessId" />
+        <result column="push_to" property="pushTo" />
+        <result column="push_starttime" property="pushStarttime" />
+        <result column="push_endtime" property="pushEndtime" />
+        <result column="push_status" property="pushStatus" />
+        <result column="push_remark" property="pushRemark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, business_id AS businessId, push_to AS pushTo, push_starttime AS pushStarttime, push_endtime AS pushEndtime, push_status AS pushStatus, push_remark AS pushRemark
+    </sql>
+
+</mapper>

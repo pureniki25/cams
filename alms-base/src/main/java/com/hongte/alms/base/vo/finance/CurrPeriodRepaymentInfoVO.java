@@ -6,6 +6,7 @@ package com.hongte.alms.base.vo.finance;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -63,6 +64,13 @@ public class CurrPeriodRepaymentInfoVO {
 	private BigDecimal total = new BigDecimal(0);
 	
 	private List<JSONObject> derateDetails  ;
+	
+	/**
+	 * 已匹配银行流水的实还日期,若无匹配,则只有一个当前日期<br>
+	 * 若多个流水是同一天,则选用其中一个
+	 */
+	private Set<String> moneyPoolRepayDates ;
+	
 	public Date getRepayDate() {
 		return repayDate;
 	}
@@ -134,16 +142,16 @@ public class CurrPeriodRepaymentInfoVO {
 	public void setTotal(BigDecimal total) {
 		this.total = total;
 	}
-	/**
-	 * @return the derateDetails
-	 */
 	public List<JSONObject> getDerateDetails() {
 		return derateDetails;
 	}
-	/**
-	 * @param derateDetails the derateDetails to set
-	 */
 	public void setDerateDetails(List<JSONObject> derateDetails) {
 		this.derateDetails = derateDetails;
+	}
+	public Set<String> getMoneyPoolRepayDates() {
+		return moneyPoolRepayDates;
+	}
+	public void setMoneyPoolRepayDates(Set<String> moneyPoolRepayDates) {
+		this.moneyPoolRepayDates = moneyPoolRepayDates;
 	}
 }

@@ -866,4 +866,24 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		public List<LitigationVO> selectLitigationCarVO(String crpId) {
 			return basicBusinessMapper.selectLitigationCarVO(crpId);
 		}
+
+		@Override
+		public List<Map<String, Object>> selectlPushBusiness() {
+			return basicBusinessMapper.selectlPushBusiness();
+		}
+
+		@Override
+		public List<Map<String, Object>> selectlPushBusinessOnlineFlow(Map<String, Object> paramOnlineFlowMap) {
+			return basicBusinessMapper.selectlPushBusinessOnlineFlow(paramOnlineFlowMap);
+		}
+
+		@Override
+		public List<Map<String, Object>> selectlPushBusinessOfflineFlow(Map<String, Object> paramOnlineFlowMap) {
+			return basicBusinessMapper.selectlPushBusinessOfflineFlow(paramOnlineFlowMap);
+		}
+
+		@Override
+		public List<Map<String, Object>> selectlPushBusinessFlowItem(Map<String, Object> paramFlowItemMap) {
+			return basicBusinessMapper.selectlPushBusinessFlowItem(paramFlowItemMap);
+		}
 }

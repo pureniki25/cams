@@ -35,6 +35,7 @@ import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TdrepayAdvanceLog;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.entity.TdrepayRechargeRecord;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
@@ -46,6 +47,7 @@ import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.TdrepayAdvanceLogService;
 import com.hongte.alms.base.service.TdrepayRechargeDetailService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
+import com.hongte.alms.base.service.TdrepayRechargeRecordService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
@@ -84,6 +86,10 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	private TdrepayRechargeLogService tdrepayRechargeLogService;
 
 	@Autowired
+	@Qualifier("TdrepayRechargeRecordService")
+	private TdrepayRechargeRecordService tdrepayRechargeRecordService;
+
+	@Autowired
 	@Qualifier("TdrepayRechargeDetailService")
 	private TdrepayRechargeDetailService tdrepayRechargeDetailService;
 
@@ -117,17 +123,17 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		if (FLAG_MAP.containsKey(projectId)) {
 			return FLAG_MAP;
 		}
-		
+
 		TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService
 				.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", projectId));
 		Date beginTime = tuandaiProjectInfo.getBeginTime();
 		if (beginTime == null) {
 			throw new ServiceRuntimeException("找不到上标时间，标的ID：" + projectId);
 		}
-		
+
 		if (beginTime.before(DateUtil.getDate("2018-06-28"))) {
 			FLAG_MAP.put(projectId, true);
-		}else {
+		} else {
 			FLAG_MAP.put(projectId, false);
 		}
 		return FLAG_MAP;
@@ -178,7 +184,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					tdrepayRechargeDetailService.insert(tdrepayRechargeDetail);
 				}
 			}
+			TdrepayRechargeRecord rechargeRecord = BeanUtils.deepCopy(rechargeLog, TdrepayRechargeRecord.class);
 			tdrepayRechargeLogService.insert(rechargeLog);
+			tdrepayRechargeRecordService.insert(rechargeRecord);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
@@ -359,6 +367,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	private Result sendDistributeFund(List<TdrepayRechargeInfoVO> rechargeInfoVOs, Integer businessType,
 			String userId) {
 		DistributeFundDTO dto = new DistributeFundDTO();
+		dto.setOrgType(BusinessTypeEnum.getOrgTypeByValue(businessType));
 		String batchId = UUID.randomUUID().toString();
 		dto.setBatchId(batchId);
 		String rechargeAccountType = BusinessTypeEnum.getRechargeAccountName(businessType);
@@ -1844,5 +1853,22 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	@Override
 	public int countRechargeRecord(RechargeRecordReq req) {
 		return agencyRechargeLogMapper.countRechargeRecord(req);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void revokeTdrepayRecharge(List<TdrepayRechargeLog> tdrepayRechargeLogs) {
+		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+			List<TdrepayRechargeRecord> records = new ArrayList<>();
+			
+			for (TdrepayRechargeLog rechargeLog : tdrepayRechargeLogs) {
+				rechargeLog.setIsValid(2);
+				TdrepayRechargeRecord record = BeanUtils.deepCopy(rechargeLog, TdrepayRechargeRecord.class);
+				records.add(record);
+			}
+			
+			tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
+			tdrepayRechargeRecordService.insertBatch(records);
+		}
 	}
 }

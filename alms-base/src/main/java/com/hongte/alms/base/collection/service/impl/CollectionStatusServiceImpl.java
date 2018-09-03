@@ -16,7 +16,9 @@ import com.hongte.alms.base.collection.vo.StaffBusinessVo;
 import com.hongte.alms.base.entity.CarBusinessAfter;
 import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.entity.SysUserPermission;
+import com.hongte.alms.base.feignClient.AlmsCoreServiceFeignClient;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.LitigationFeignClient;
 import com.hongte.alms.base.service.*;
@@ -107,6 +109,13 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     
     @Autowired
     private Executor cunshouThreadAsync;
+    
+    @Autowired
+    private AlmsCoreServiceFeignClient almsCoreServiceFeignClient;
+    
+    @Autowired
+    @Qualifier("SysUserService")
+    SysUserService sysUserService;
 
     /**
      * 设置电催/人员(界面手动设置)
@@ -326,9 +335,17 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 		                		List<StaffBusinessVo> voTempList = new ArrayList<>();
 		                		voTempList.add(vo);
         						sysUserPermissionService.setUserPermissonsInBusinessList(oldStaffUserIds,voTempList);
+        						
+        						
 //        					}
 //        	        	});
                 		
+                	}else {
+                		SysUser sysUser = sysUserService.selectById(oldStaffUserId);
+						if(null != sysUser) {
+							sysUser.setLastPermissionStatus(1);
+							sysUserService.updateById(sysUser);
+						}
                 	}
                 }
 
@@ -344,7 +361,13 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         						sysUserPermissionService.setUserPermissonsInBusinessList(staffUserId,voTempList);
 //        					}
 //        	        	});
-                	
+                	}
+                	else {
+                		SysUser sysUser = sysUserService.selectById(staffUserId);
+						if(null != sysUser) {
+							sysUser.setLastPermissionStatus(1);
+							sysUserService.updateById(sysUser);
+						}
                 	}
                     /*List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",staffUserId));
                     if(lsys == null || lsys.size()==0){
@@ -951,6 +974,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                     //调用移交诉讼接口
                     transferLitigationService.sendTransferLitigationData(
                             originalBusinessId,sendUrl,null, 1);
+//                	Map<String, Object> paramMap = new HashMap<>();
+//                	paramMap.put("businessId", originalBusinessId);
+//                	paramMap.put("channel", 1);
+//                	almsCoreServiceFeignClient.sendTransferLitigation(paramMap);
                 }
             }
 

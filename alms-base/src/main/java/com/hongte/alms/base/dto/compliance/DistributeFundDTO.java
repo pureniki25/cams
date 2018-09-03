@@ -3,11 +3,16 @@ package com.hongte.alms.base.dto.compliance;
 import java.io.Serializable;
 import java.util.List;
 
+import lombok.Data;
+import lombok.ToString;
+
 /**
  * 调用 eip 平台资金分发接口参数DTO
  * @author 胡伟骞
  *
  */
+@Data
+@ToString
 public class DistributeFundDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -33,62 +38,12 @@ public class DistributeFundDTO implements Serializable {
 	 */
 	private Double totalAmount;
 	/**
+	 * 机构类型ID
+	 */
+	private int orgType;
+	/**
 	 * 用户分发列表
 	 */
 	private List<DistributeFundDetailDTO> detailList;
-
-	public String getOidPartner() {
-		return oidPartner;
-	}
-
-	public void setOidPartner(String oidPartner) {
-		this.oidPartner = oidPartner;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getBatchId() {
-		return batchId;
-	}
-
-	public void setBatchId(String batchId) {
-		this.batchId = batchId;
-	}
-
-	public String getUserIP() {
-		return userIP;
-	}
-
-	public void setUserIP(String userIP) {
-		this.userIP = userIP;
-	}
-
-	public Double getTotalAmount() {
-		return totalAmount;
-	}
-
-	public void setTotalAmount(Double totalAmount) {
-		this.totalAmount = totalAmount;
-	}
-
-	public List<DistributeFundDetailDTO> getDetailList() {
-		return detailList;
-	}
-
-	public void setDetailList(List<DistributeFundDetailDTO> detailList) {
-		this.detailList = detailList;
-	}
-
-	@Override
-	public String toString() {
-		return "DistributeFundDTO [oidPartner=" + oidPartner + ", userId=" + userId + ", batchId=" + batchId
-				+ ", userIP=" + userIP + ", totalAmount=" + totalAmount + ", detailList=" + detailList + "]";
-	}
 
 }

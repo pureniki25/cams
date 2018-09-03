@@ -44,4 +44,25 @@ public class ReportController {
 	public String dhOverDueCollection() {
 		return "/report/dhOverDueCollection" ;
 	}
+	/**
+	 * 一点车贷逾期汇总表
+	 * @author 王继光
+	 * 2018年8月30日 下午3:13:19
+	 * @return
+	 */
+	@RequestMapping("/ydOverDueCollection")
+	public String ydOverDueCollection() {
+		return "/report/ydOverDueCollection" ;
+	}
+	
+	/**
+	 * 一点车贷应实收报表
+	 * @author 王继光
+	 * 2018年8月30日 下午3:16:10
+	 * @return
+	 */
+	@RequestMapping("/ydPFReport")
+	public String ydPFReport() {
+		return "/report/ydPFReport" ;
+	}
 }

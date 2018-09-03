@@ -96,9 +96,10 @@ public interface RechargeService {
 	 * 插入代扣记录
 	 * boolLastRepay：表示本期是否分多笔代扣,0:一次性代扣，1:分多笔代扣
 	 * boolPartRepay：表示本期是否分多笔代扣中的最后一笔代扣，若非多笔代扣，本字段存1。  0:非最后一笔代扣，1:最后一笔代扣
+	 * 
 	 */
 		
-	 WithholdingRepaymentLog recordRepaymentLog(String resultMsg,Integer status,RepaymentBizPlanList list,BasicBusiness business,BankCardInfo dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,String merchantAccount,Integer settlementType,BigDecimal currentAmount,String appType);
+	 WithholdingRepaymentLog recordRepaymentLog(String resultMsg,Integer status,RepaymentBizPlanList list,BasicBusiness business,BankCardInfo dto,Integer platformId,Integer boolLastRepay,Integer boolPartRepay,String merchOrderId,String merchantAccount,Integer settlementType,BigDecimal currentAmount,String appType,String orgType);
 		
      /**
 	  * 查询每期扣除处理中和成功代扣的金额，得出剩余未还金额
@@ -159,7 +160,7 @@ public interface RechargeService {
 	/**
 	 * 银行代扣结果查询
 	 */
-	 void getBankResult(WithholdingRepaymentLog log,String oidPartner);
+	 void getBankResult(WithholdingRepaymentLog log,String oidPartner,Result result);
 	 
 	 
 	 

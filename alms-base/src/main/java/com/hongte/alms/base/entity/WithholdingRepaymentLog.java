@@ -133,6 +133,12 @@ public class WithholdingRepaymentLog extends Model<WithholdingRepaymentLog> {
 	@TableField("plan_total_repay_money")
 	@ApiModelProperty(required= true,value = "表示本期代扣总金额(若财务选择不含违约金代扣，则此字段不含违约金)，若本期为多笔代扣，此字段存本次多笔代扣的总金额，若非多笔代扣，则此字段存本次代扣总金额")
 	private BigDecimal planTotalRepayMoney;
+	  /**
+     * 银行代扣需要传的业务类型字段
+     */
+//	@TableField("org_type")
+//	@ApiModelProperty(required= true,value = "银行代扣需要传的业务类型字段")
+//	private String orgType;
     /**
      * 创建时间
      */
@@ -176,6 +182,14 @@ public class WithholdingRepaymentLog extends Model<WithholdingRepaymentLog> {
 
    
    
+//	public String getOrgType() {
+//		return orgType;
+//	}
+//
+//	public void setOrgType(String orgType) {
+//		this.orgType = orgType;
+//	}
+
 	public String getBankCode() {
 		return bankCode;
 	}

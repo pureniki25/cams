@@ -68,6 +68,7 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -175,14 +176,14 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
     public Result revokeConfirm(String businessId, String afterId,boolean isRevokeSettle) throws Exception{
 //    	如果撤销还款,需要判断覆盖其上方的还款记录是否相同的还款计划;
 //    	如果撤销结清,按倒叙撤销
-    	
+    	Date now = new Date() ;
     	RepaymentBizPlanList bizPlanList = repaymentBizPlanListService.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).eq("after_id", afterId));
     	RepaymentBizPlan bizPlan = repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("plan_id", bizPlanList.getPlanId()));
     	
-    	
+    	List<RepaymentConfirmLog> logs = null ;
         /*找还款确认记录*/
     	Wrapper<RepaymentConfirmLog> wrapper = new EntityWrapper<RepaymentConfirmLog>()
-    			.eq("business_id", businessId)
+    			.eq("business_id", businessId).eq("is_cancelled", 0)
     			.orderBy("create_time", false);
     	
     	if (!isRevokeSettle) {
@@ -191,16 +192,25 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			}
     		wrapper.eq("after_id", afterId);
 			wrapper.eq("type", 1);
+			logs = confirmLogMapper.selectList(wrapper);
 		}else {
 			wrapper.eq("type", 2);
+			wrapper.and(" plan_id = {0} ", bizPlan.getPlanId());
+			logs = confirmLogMapper.selectList(wrapper);
+			if (CollectionUtils.isEmpty(logs)) {
+				wrapper = new EntityWrapper<RepaymentConfirmLog>()
+		    			.eq("business_id", businessId).eq("is_cancelled", 0).eq("type", 2).and(" plan_id is null ")
+		    			.orderBy("create_time", false);
+				logs = confirmLogMapper.selectList(wrapper);
+			}
+			
 		}
-        List<RepaymentConfirmLog> logs = confirmLogMapper.selectList(wrapper);
         
         if (logs == null || logs.size() == 0) {
             return Result.error("500", "找不到任何一条相关的确认还款记录");
         }
         RepaymentConfirmLog log = logs.get(0);
-        
+        log.updateAllColumnById();
         if(!loginUserInfoHelper.getUserId().equals("0111130000")) {
      	   if(log.getRepaySource()!=10) {//如果不是线下转账的不能撤销
                 return Result.error("500", "最后一次还款不是线下转账不能被撤销");
@@ -214,7 +224,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
 		/*找实还明细记录*/
         List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayMapper
-                .selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("confirm_log_id", log.getConfirmLogId())
+                .selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("confirm_log_id", log.getConfirmLogId()).eq("is_cancelled", 0)
                         .orderBy("proj_plan_list_id"));
 
             PlatformRepaymentReq platformRepaymentReq=new PlatformRepaymentReq();
@@ -258,7 +268,16 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             AccountantOverRepayLog accountantOverRepayLog = accountantOverRepayLogMapper
                     .selectById(log.getSurplusRefId());
             if (accountantOverRepayLog != null) {
-                accountantOverRepayLog.deleteById();
+            	/*新增一条结余支出记录,使用beanUtil复制原来的,去掉id,备注改为撤销还款*/
+            	/*accountantOverRepayLog.deleteById();*/
+                AccountantOverRepayLog cAccountantOverRepayLog = new AccountantOverRepayLog() ;
+                BeanUtils.copyProperties(accountantOverRepayLog, cAccountantOverRepayLog);
+                cAccountantOverRepayLog.setMoneyType(0);
+                cAccountantOverRepayLog.setRemark("创建于"+(isRevokeSettle?"撤销结清":"撤销还款"));
+                cAccountantOverRepayLog.setCreateTime(now);
+                cAccountantOverRepayLog.setCreateUser(loginUserInfoHelper.getUserId());
+                cAccountantOverRepayLog.setId(null);
+                cAccountantOverRepayLog.insert();
             }
         }
 
@@ -266,7 +285,16 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             AccountantOverRepayLog accountantOverRepayLog = accountantOverRepayLogMapper
                     .selectById(log.getSurplusUseRefId());
             if (accountantOverRepayLog != null) {
-                accountantOverRepayLog.deleteById();
+                /*新增一条结余收入记录,使用beanUtil复制原来的,去掉id,备注改为撤销还款*/
+            	/*accountantOverRepayLog.deleteById();*/                
+                AccountantOverRepayLog cAccountantOverRepayLog = new AccountantOverRepayLog() ;
+                BeanUtils.copyProperties(accountantOverRepayLog, cAccountantOverRepayLog);
+                cAccountantOverRepayLog.setMoneyType(1);
+                cAccountantOverRepayLog.setRemark("创建于"+(isRevokeSettle?"撤销结清":"撤销还款"));
+                cAccountantOverRepayLog.setCreateTime(now);
+                cAccountantOverRepayLog.setCreateUser(loginUserInfoHelper.getUserId());
+                cAccountantOverRepayLog.setId(null);
+                cAccountantOverRepayLog.insert();
             }
         }
 
@@ -280,7 +308,10 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 			
 			/*删除实还明细记录*/
 //			factRepay.deleteById();
-            repaymentProjFactRepayMapper.delete(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_repay_id", factRepay.getProjPlanDetailRepayId()));
+            factRepay.setIsCancelled(1);
+            factRepay.setUpdateDate(now);
+            factRepay.setUpdateUser(loginUserInfoHelper.getUserId());
+            repaymentProjFactRepayMapper.update(factRepay, new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_detail_repay_id", factRepay.getProjPlanDetailRepayId()));
         }
 
         for (RepaymentProjFactRepay factRepay : factRepays) {
@@ -290,7 +321,13 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             resource = repaymentResourceMapper.selectOne(resource);
             if (resource != null) {
 				/*删除还款来源记录*/
-                resource.deleteById();
+//              resource.deleteById();
+                
+                /*不删除,改为置位为撤销*/
+                resource.setIsCancelled(1);
+                resource.setUpdateUser(loginUserInfoHelper.getUserId());
+                resource.setUdpateTime(now);
+                resource.updateAllColumnById();
             }
         }
 		/*根据 confirm_log_id 找还款计划6张表相关的备份记录*/
@@ -306,53 +343,59 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
             RepaymentProjPlanListDetail detail = new RepaymentProjPlanListDetail();
             BeanUtils.copyProperties(repaymentProjPlanListDetailBak, detail);
             repaymentProjPlanListDetailMapper.updateAllColumnById(detail);
-            repaymentProjPlanListDetailBak.delete(new EntityWrapper<>()
+            /*由于撤销逻辑变化,不删除备份数据*/
+            /*repaymentProjPlanListDetailBak.delete(new EntityWrapper<>()
                     .eq("proj_plan_detail_id", repaymentProjPlanListDetailBak.getProjPlanDetailId())
-                    .eq("confirm_log_id", repaymentProjPlanListDetailBak.getConfirmLogId()));
+                    .eq("confirm_log_id", repaymentProjPlanListDetailBak.getConfirmLogId()));*/
         }
         
         for (RepaymentProjPlanListBak repaymentProjPlanListBak : selectList5) {
             RepaymentProjPlanList list = new RepaymentProjPlanList();
             BeanUtils.copyProperties(repaymentProjPlanListBak, list);
             repaymentProjPlanListMapper.updateAllColumnById(list);
-            repaymentProjPlanListBak.delete(new EntityWrapper<>()
+            /*由于撤销逻辑变化,不删除备份数据*/
+            /*repaymentProjPlanListBak.delete(new EntityWrapper<>()
                     .eq("proj_plan_list_id", repaymentProjPlanListBak.getProjPlanListId())
-                    .eq("confirm_log_id", repaymentProjPlanListBak.getConfirmLogId()));
+                    .eq("confirm_log_id", repaymentProjPlanListBak.getConfirmLogId()));*/
         }
 
         for (RepaymentProjPlanBak repaymentProjPlanBak : selectList4) {
             RepaymentProjPlan plan = new RepaymentProjPlan();
             BeanUtils.copyProperties(repaymentProjPlanBak, plan);
             repaymentProjPlanMapper.updateAllColumnById(plan);
-            repaymentProjPlanBak.delete(new EntityWrapper<>()
+            /*由于撤销逻辑变化,不删除备份数据*/
+            /*repaymentProjPlanBak.delete(new EntityWrapper<>()
                     .eq("proj_plan_id", repaymentProjPlanBak.getProjPlanId())
-                    .eq("confirm_log_id", repaymentProjPlanBak.getConfirmLogId()));
+                    .eq("confirm_log_id", repaymentProjPlanBak.getConfirmLogId()));*/
         }
         for (RepaymentBizPlanListDetailBak repaymentBizPlanListDetailBak : selectList3) {
             RepaymentBizPlanListDetail detail = new RepaymentBizPlanListDetail();
             BeanUtils.copyProperties(repaymentBizPlanListDetailBak, detail);
             repaymentBizPlanListDetailMapper.updateAllColumnById(detail);
-            repaymentBizPlanListDetailBak.delete(new EntityWrapper<>()
+            /*由于撤销逻辑变化,不删除备份数据*/
+            /*repaymentBizPlanListDetailBak.delete(new EntityWrapper<>()
                     .eq("plan_detail_id", repaymentBizPlanListDetailBak.getPlanDetailId())
-                    .eq("confirm_log_id", repaymentBizPlanListDetailBak.getConfirmLogId()));
+                    .eq("confirm_log_id", repaymentBizPlanListDetailBak.getConfirmLogId()));*/
         }
 
         for (RepaymentBizPlanListBak repaymentBizPlanListBak : selectList2) {
             RepaymentBizPlanList list = new RepaymentBizPlanList();
             BeanUtils.copyProperties(repaymentBizPlanListBak, list);
             repaymentBizPlanListMapper.updateAllColumnById(list);
-            repaymentBizPlanListBak.delete(new EntityWrapper<>()
+            /*由于撤销逻辑变化,不删除备份数据*/
+            /*repaymentBizPlanListBak.delete(new EntityWrapper<>()
                     .eq("plan_list_id", repaymentBizPlanListBak.getPlanListId())
-                    .eq("confirm_log_id", repaymentBizPlanListBak.getConfirmLogId()));
+                    .eq("confirm_log_id", repaymentBizPlanListBak.getConfirmLogId()));*/
         }
 
         for (RepaymentBizPlanBak repaymentBizPlanBak : selectList) {
             RepaymentBizPlan plan = new RepaymentBizPlan();
             BeanUtils.copyProperties(repaymentBizPlanBak, plan);
             repaymentBizPlanMapper.updateAllColumnById(plan);
-            repaymentBizPlanBak.delete(new EntityWrapper<>()
+            /*由于撤销逻辑变化,不删除备份数据*/
+            /*repaymentBizPlanBak.delete(new EntityWrapper<>()
                     .eq("plan_id", repaymentBizPlanBak.getPlanId())
-                    .eq("confirm_log_id", repaymentBizPlanBak.getConfirmLogId()));
+                    .eq("confirm_log_id", repaymentBizPlanBak.getConfirmLogId()));*/
         }
         
         if (log.getType().equals(2)) {
@@ -405,7 +448,11 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
         	repaymentConfirmPlatRepayLog.deleteById();
 		}
         /*删除合规化还款调用记录 结束*/
-        log.deleteById();
+//        log.deleteById();
+        log.setIsCancelled(1);
+        log.setUpdateTime(new Date());
+        log.setUpdateUser(loginUserInfoHelper.getUserId());
+        log.updateAllColumnById();
         /*更新财务管理列表*/
         
         repaymentBizPlanListSynchService.updateRepaymentBizPlan();
@@ -453,7 +500,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
 
     @Override
     public List<JSONObject> selectCurrentPeriodConfirmedProjInfo(String businessId, String afterId) {
-        List<RepaymentConfirmLog> list = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`", false));
+        List<RepaymentConfirmLog> list = confirmLogMapper.selectList(new EntityWrapper<RepaymentConfirmLog>().eq("is_cancelled", 0).eq("business_id", businessId).eq("after_id", afterId).orderBy("`idx`", false));
         List<JSONObject> res = new ArrayList<>();
         for (RepaymentConfirmLog repaymentConfirmLog : list) {
             String json = repaymentConfirmLog.getProjPlanJson();
