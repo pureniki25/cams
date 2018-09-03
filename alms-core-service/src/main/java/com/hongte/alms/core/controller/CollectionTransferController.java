@@ -101,6 +101,10 @@ public class CollectionTransferController {
 	@Qualifier("RepaymentBizPlanListService")
 	private RepaymentBizPlanListService repaymentBizPlanListService;
 
+	@Autowired
+	@Qualifier("RepaymentBizPlanService")
+	private RepaymentBizPlanService repaymentBizPlanService;
+
 
 	@Autowired
 	@Qualifier("CarBusinessAfterService")
@@ -933,8 +937,20 @@ public class CollectionTransferController {
 			if (mapInfo == null) {
 				return false;
 			}
+			List<RepaymentBizPlan> planList = repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",collection.getBusinessId()).eq("after_id",collection.getAfterId()));
+
+			if(planList==null|| planList.size()==0){
+				return false;
+			}
+
 
 			String staffType = mapInfo.get("staffType");
+
+			//未还完的还款计划不置位催收状态（已关闭）
+			if(staffType.equals(CollectionStatusEnum.CLOSED.getPageStr())
+					&& (planList.get(0).getPlanStatus().equals(0)|| planList.get(0).getPlanStatus()==null)){
+				return false;
+			}
 
 			//移交法务、拖车登记、关闭  需要设置整个业务的催收状态
 			if(staffType.equals(CollectionStatusEnum.TRAILER_REG.getPageStr())

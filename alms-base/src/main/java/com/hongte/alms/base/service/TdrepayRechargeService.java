@@ -90,4 +90,10 @@ public interface TdrepayRechargeService {
 	 */
 	int countRechargeRecord(RechargeRecordReq req);
 	
+	/**
+	 * 撤销资金分发
+	 * @param tdrepayRechargeLogs
+	 */
+	void revokeTdrepayRecharge(List<TdrepayRechargeLog> tdrepayRechargeLogs);
+	
 }
