@@ -124,7 +124,12 @@ public class CalLateFeeController {
 		for(RepaymentBizPlan plan:plans) {
 			List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.getPlanListForCalLateFee(plan.getPlanId());
 			    for(RepaymentBizPlanList pList:pLists) {
+			    	executor.execute(new Runnable() {
+						@Override
+						public void run() {
 							repaymentProjPlanListService.calLateFeeForPerPList(pList,1);
+						}
+					});
 							
 			}
 		}
