@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,9 @@ public class CalLateFeeController {
 	RepaymentBizPlanListService repaymentBizPlanListService;
 	@Autowired
 	private LoginUserInfoHelper loginUserInfoHelper ;
+	
+	@Autowired
+	Executor executor;
 
 	@GetMapping(value = "/calLateFee")
 	@ApiOperation(value = "计算滞纳金")
@@ -120,11 +124,8 @@ public class CalLateFeeController {
 		for(RepaymentBizPlan plan:plans) {
 			List<RepaymentBizPlanList> pLists=repaymentBizPlanListService.getPlanListForCalLateFee(plan.getPlanId());
 			    for(RepaymentBizPlanList pList:pLists) {
-			    	List<RepaymentProjPlanList> projList = repaymentProjPlanListService.getProListForCalLateFee(pList.getPlanListId());
-						for (RepaymentProjPlanList projPList : projList) {
-							// 每个表的还款计划列表对应所的标的还款计划
 							repaymentProjPlanListService.calLateFeeForPerPList(pList,1);
-				    }
+							
 			}
 		}
 		Result result=new Result();
