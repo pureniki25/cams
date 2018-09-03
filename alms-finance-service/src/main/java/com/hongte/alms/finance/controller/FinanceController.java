@@ -901,7 +901,7 @@ public class FinanceController {
 			List<WithholdingRepaymentLog> logs=withholdingRepaymentLogService.selectList(new EntityWrapper<WithholdingRepaymentLog>().eq("original_business_id", businessId).eq("repay_status", 1));
 			
 			for(WithholdingRepaymentLog log:logs) {
-				int count=repaymentResourceService.selectCount(new EntityWrapper<RepaymentResource>().eq("repay_source_ref_id", log.getLogId()).eq("org_business_id", businessId));
+				int count=repaymentResourceService.selectCount(new EntityWrapper<RepaymentResource>().eq("repay_source_ref_id", log.getLogId()).eq("org_business_id", businessId).eq("is_cancelled", 0));
 				if(count>0) {
 					continue;
 				}
