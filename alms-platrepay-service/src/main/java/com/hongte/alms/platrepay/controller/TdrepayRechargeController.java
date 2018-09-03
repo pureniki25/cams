@@ -1035,12 +1035,9 @@ public class TdrepayRechargeController {
 							.in("process_status", processStatus).eq("is_valid", 1));
 
 			if (!CollectionUtils.isEmpty(tdrepayRechargeLogs)) {
-
-				for (TdrepayRechargeLog rechargeLog : tdrepayRechargeLogs) {
-					rechargeLog.setIsValid(2);
-				}
-
-				tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
+				
+				tdrepayRechargeService.revokeTdrepayRecharge(tdrepayRechargeLogs);
+				
 				return Result.success();
 			} else {
 				return Result.error("-99", "没有找到对应的数据，撤销资金分发失败");
