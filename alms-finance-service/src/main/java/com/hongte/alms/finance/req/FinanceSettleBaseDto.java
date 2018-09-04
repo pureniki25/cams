@@ -73,6 +73,7 @@ public class FinanceSettleBaseDto {
 	 */
 	private Map<String, Map<String, List<RepaymentProjFactRepay>>> projFactRepays = new HashMap<>();
 
+	private List<RepaymentProjFactRepay> projFactRepayArray = new ArrayList<>();
 	private Map<String, CurrPeriodProjDetailVO> webFactRepays = new HashMap<>();
 
 	// 调用来源的标志位

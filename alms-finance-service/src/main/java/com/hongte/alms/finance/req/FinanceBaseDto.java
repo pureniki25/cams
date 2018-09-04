@@ -6,6 +6,7 @@ import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +62,11 @@ public class FinanceBaseDto {
      * Map<plan_list_detail_id, List<RepaymentProjFactRepay>>
      */
     private Map<String, List<RepaymentProjFactRepay>> projFactRepays ;
+    
+    /**
+     * 实还金额list,和projFactRepays意义一样,只是在内存存储方式不一样
+     */
+    private List<RepaymentProjFactRepay> projFactRepayArray = new ArrayList<>() ;
     
     ///////// 还款过程中相关变量（payOneFeeDetail 函数中赋值） 开始 zk ///////////////////////
 

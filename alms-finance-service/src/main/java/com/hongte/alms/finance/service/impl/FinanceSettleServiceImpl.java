@@ -202,6 +202,17 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	@Qualifier("RepaymentBizPlanListSynchService")
 	RepaymentBizPlanListSynchService repaymentBizPlanListSynchService;
     
+    @Autowired
+    @Qualifier("RepaymentConfirmLogService")
+    RepaymentConfirmLogService repaymentConfirmLogService ;
+    
+    @Autowired
+    @Qualifier("RepaymentResourceService")
+    RepaymentResourceService repaymentResourceService ;
+    
+    @Autowired
+    @Qualifier("RepaymentProjFactRepayService")
+    RepaymentProjFactRepayService repaymentProjFactRepayService ;
 	/**
 	 * 线上部分费用feeid集合
 	 */
@@ -1085,7 +1096,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 					}
 	                
 	                //更新结清期备注
-	                updateRemark(financeSettleBaseDto);
+//	                updateRemark(financeSettleBaseDto);
+	                updateRemarkNew(financeSettleBaseDto);
 	                
 	                /*将调用合规化还款的projPlanList保存到数据库*/
 	                for(RepaymentProjPlanList repaymentProjPlanList: projPlanList){
@@ -1856,6 +1868,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         stringListMap.put(bizPlanListDetailId, list);
 
         financeSettleBaseDto.getProjFactRepays().put(planId, stringListMap);
+        financeSettleBaseDto.getProjFactRepayArray().add(fact);
         setCurFactRepayAmount(financeSettleBaseDto,fact);
 
     }
@@ -2301,6 +2314,95 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         	bizPlanList.updateAllColumnById();
 		}
     	
+    }
+    
+    private void updateRemarkNew(FinanceSettleBaseDto financeBaseDto) {
+    	for (RepaymentBizPlanSettleDto bizPlanSettleDto : financeBaseDto.getCurrentPeriods()) {
+    		RepaymentBizPlanList  bizPlanList = bizPlanSettleDto.getCurrBizPlanListDto().getRepaymentBizPlanList();
+        	List<RepaymentConfirmLog> repayLogs = repaymentConfirmLogService.selectList(
+        			new EntityWrapper<RepaymentConfirmLog>()
+        			.eq("business_id", bizPlanList.getBusinessId())
+        			.eq("after_id", bizPlanList.getAfterId()).eq("is_cancelled",0).eq("type", 1).orderBy("create_time")) ;
+        	BigDecimal count = BigDecimal.ZERO;
+        	List<RepaymentResource> allResource = new ArrayList<>() ;
+        	List<RepaymentProjFactRepay> allFactRepay = new ArrayList<>() ;
+        	for (RepaymentConfirmLog repaymentConfirmLog : repayLogs) {
+    			count = repaymentConfirmLog.getFactAmount().add(count);
+    			
+    			List<RepaymentResource> repaymentResources = repaymentResourceService.selectList(
+    					new EntityWrapper<RepaymentResource>()
+    					.eq("confirm_log_id", repaymentConfirmLog.getConfirmLogId())
+    					.eq("is_cancelled", 0)
+    					.orderBy("repay_date"));
+    			
+    			if (!CollectionUtils.isEmpty(repaymentResources)) {
+    				allResource.addAll(repaymentResources);
+    			}
+    			
+    			List<RepaymentProjFactRepay> factRepays = repaymentProjFactRepayService.selectList(new EntityWrapper<RepaymentProjFactRepay>()
+    					.eq("confirm_log_id", repaymentConfirmLog.getConfirmLogId())
+    					.eq("is_cancelled", 0));
+    			
+    			if (!CollectionUtils.isEmpty(factRepays)) {
+    				allFactRepay.addAll(factRepays);
+    			}
+    		}
+        	
+        	for (RepaymentResource resource : financeBaseDto.getRepaymentResources()) {
+        		allResource.add(resource);
+        		count = resource.getRepayAmount().add(count);
+			}
+        	allFactRepay.addAll(financeBaseDto.getProjFactRepayArray());
+        	
+        	StringBuffer remark = new StringBuffer() ;
+        	remark.append("备注:\r\n");
+        	for (RepaymentResource repaymentResource : allResource) {
+    			remark.append(DateUtil.formatDate(repaymentResource.getRepayDate()));
+    			remark.append("  ");
+    			remark.append(RepayPlanRepaySrcEnum.descOf(Integer.valueOf(repaymentResource.getRepaySource()))) ;
+    			remark.append("收到  ").append(repaymentResource.getRepayAmount()).append("元").append("\r\n") ;
+    		}
+        	remark.append("合计:  ").append(count.setScale(2, RoundingMode.HALF_UP)).append("元").append("\r\n");
+        	remark.append("明细:\r\n");
+        	
+        	List<SettleFeesVO> feesVOs = new ArrayList<>() ;
+        	for (RepaymentProjFactRepay factRepay : allFactRepay) {
+        		if (factRepay.getFactAmount().compareTo(BigDecimal.ZERO) == 0) {
+    				continue;
+    			}
+        		boolean contain = false ;
+        		for (SettleFeesVO settleFeesVO : feesVOs) {
+    				if (settleFeesVO.getFeeId().equals(factRepay.getFeeId())) {
+    					contain = true ;
+    					settleFeesVO.setAmount(settleFeesVO.getAmount().add(factRepay.getFactAmount()));
+    					break ;
+    				}
+    			}
+        		if (!contain) {
+    				SettleFeesVO feesVO = new SettleFeesVO() ;
+    				feesVO.setFeeId(factRepay.getFeeId());
+    				feesVO.setAmount(factRepay.getFactAmount());
+    				feesVO.setPlanItemName(factRepay.getPlanItemName());
+    				feesVOs.add(feesVO);
+    			}
+    		}
+        	
+        	for (SettleFeesVO settleFeesVO : feesVOs) {
+    			remark.append(settleFeesVO.getAmount().setScale(2, RoundingMode.HALF_UP)).append("元").append(settleFeesVO.getPlanItemName()).append(",") ;
+    		}
+        	
+        	BigDecimal balance = accountantOverRepayLogService.caluCanUse(bizPlanList.getBusinessId(), bizPlanList.getAfterId());
+        	if (financeBaseDto.getRepaymentConfirmLog().getSurplusAmount()!=null) {
+    			balance = balance.add(financeBaseDto.getRepaymentConfirmLog().getSurplusAmount());
+    		}
+        	if (balance.compareTo(BigDecimal.ZERO)>0) {
+    			remark.append(balance.setScale(2, RoundingMode.HALF_UP)).append("元").append("结余");
+    		}
+        	remark.append(DateUtil.formatDate("yyyy-MM-dd HH:mm:ss", financeBaseDto.getRepaymentConfirmLog().getCreateTime())) ;
+        	
+        	bizPlanList.setRemark(remark.toString());
+        	bizPlanList.updateAllColumnById();
+    	}
     }
 
     /**
