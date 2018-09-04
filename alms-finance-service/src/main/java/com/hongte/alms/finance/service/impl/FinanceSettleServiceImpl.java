@@ -8,6 +8,7 @@ import com.hongte.alms.base.RepayPlan.dto.*;
 import com.hongte.alms.base.baseException.SettleRepaymentExcepiton;
 import com.hongte.alms.base.entity.*;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
+import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.ProjPlatTypeEnum;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
@@ -2359,6 +2360,30 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         	for (RepaymentResource repaymentResource : allResource) {
     			remark.append(DateUtil.formatDate(repaymentResource.getRepayDate()));
     			remark.append("  ");
+    			if (repaymentResource.getRepaySource().equals("10")) {
+    				MoneyPoolRepayment moneyPoolRepayment = moneyPoolRepaymentMapper.selectById(repaymentResource.getRepaySourceRefId());
+    				remark.append(moneyPoolRepayment.getBankAccount());
+    			}
+    			if (repaymentResource.getRepaySource().equals("20")
+    					||repaymentResource.getRepaySource().equals("21")
+    					||repaymentResource.getRepaySource().equals("30")
+    					||repaymentResource.getRepaySource().equals("31")) {
+    				WithholdingRepaymentLog log=withholdingRepaymentLogService.selectById(repaymentResource.getRepaySourceRefId());
+    				if (repaymentResource.getRepaySource().equals("20")
+    					||repaymentResource.getRepaySource().equals("21")) {
+    					if (log.getBindPlatformId().equals(PlatformEnum.YB_FORM.getValue())) {
+    						remark.append("易宝代扣");
+    					}
+    					if (log.getBindPlatformId().equals(PlatformEnum.BF_FORM.getValue())) {
+    						remark.append("宝付代扣");
+    					}
+    				}
+    				if (repaymentResource.getRepaySource().equals("30")
+    					||repaymentResource.getRepaySource().equals("31")) {
+    					remark.append("银行代扣");
+    				}
+    				
+    			}
     			remark.append(RepayPlanRepaySrcEnum.descOf(Integer.valueOf(repaymentResource.getRepaySource()))) ;
     			remark.append("收到  ").append(repaymentResource.getRepayAmount()).append("元").append("\r\n") ;
     		}
