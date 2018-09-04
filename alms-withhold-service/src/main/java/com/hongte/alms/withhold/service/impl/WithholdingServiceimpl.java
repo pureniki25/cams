@@ -617,7 +617,12 @@ public class WithholdingServiceimpl implements WithholdingService {
 									// bankCardInfo,platformId, 1, boolPartRepay, merchOrderId, 0,
 									// repayMoney);
 									return result;
-								} else {
+								} else if(result.getCode().equals("2")){
+		    						result.setCode("1");
+									result.setMsg("银行代扣处理中");
+									rechargeService.RecordExceptionLog(pList.getOrigBusinessId(), pList.getAfterId(), "银行代扣处理中");
+									return result;
+		    					}else {
 									// 如果是余额不足，则跳出
 									if (IsNoEnoughMoney(result.getMsg())) {
 										return result;

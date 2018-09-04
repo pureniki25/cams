@@ -896,6 +896,47 @@ public class FinanceController {
 		return result;
 	}
 	
+	@ApiOperation(value = "批量线下转账核销")
+	@PostMapping("/underBatchShareProfit")
+	public Result underBatchShareProfit(@RequestBody String businessIds){
+		logger.info("@underBatchShareProfit@批量线下核销--开始[{}]",businessIds);
+		Result result=new Result();
+		String[]array=businessIds.split(",");
+		for(int i=0;i<array.length;i++) {
+			String businessId=array[i];
+			 Wrapper<MoneyPoolRepayment> wrapperMoneyPoolRepayment = new EntityWrapper<>();
+			 wrapperMoneyPoolRepayment.eq("original_business_id",businessId).eq("state", RepayRegisterFinanceStatus.财务确认已还款.toString());
+			 wrapperMoneyPoolRepayment.and(" (is_deleted !=1 or is_deleted is null) ");
+			List<MoneyPoolRepayment> repaymentPools=moneyPoolRepaymentService.selectList(wrapperMoneyPoolRepayment);
+			ConfirmRepaymentReq req=new ConfirmRepaymentReq();
+			List<String> mprIds=new ArrayList<String>();
+			for(MoneyPoolRepayment repaymentPool:repaymentPools) {
+					MoneyPool moneyPool=moneyPoolService.selectOne(new EntityWrapper<MoneyPool>().eq("money_pool_id", repaymentPool.getMoneyPoolId()));
+					moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
+					moneyPool.setStatus(RepayRegisterState.待领取.toString());
+					moneyPoolService.updateById(moneyPool);
+					repaymentPool.setState(RepayRegisterFinanceStatus.还款待确认.toString());
+					moneyPoolRepaymentService.updateById(repaymentPool);
+					mprIds.add(repaymentPool.getMoneyPoolId());
+					req.setMprIds(mprIds);
+					req.setCallFlage(10);
+					req.setAfterId(repaymentPool.getAfterId());
+					req.setBusinessId(repaymentPool.getOriginalBusinessId());
+				    try {
+						shareProfitService.execute(req, true);
+				}catch (Exception ex) {
+					logger.error("分润出现异常"+ex);
+					logger.error("批量线下核销异常：businessId[{},{}]",businessId,repaymentPool.getMoneyPoolId());
+					continue;
+				}
+			}
+		
+	  }
+		    result.success(1);
+    		logger.info("@batchShareProfit@批量核销--结束[{}]", businessIds);
+		    return result;
+	}
+	
 	
 	@ApiOperation(value = "批量核销")
 	@PostMapping("/batchShareProfit")
