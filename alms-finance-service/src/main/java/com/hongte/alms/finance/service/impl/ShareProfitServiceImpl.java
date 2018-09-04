@@ -11,6 +11,7 @@ import com.hongte.alms.base.enums.AlmsServiceNameEnums;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.RepayRegisterFinanceStatus;
+import com.hongte.alms.base.enums.RepayRegisterState;
 import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
@@ -89,7 +90,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
     @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
 
-
+    @Autowired
+    @Qualifier("MoneyPoolRepaymentService")
+    MoneyPoolRepaymentService moneyPoolRepaymentService;
     @Autowired
     @Qualifier("RepaymentConfirmPlatRepayLogService")
     RepaymentConfirmPlatRepayLogService repaymentConfirmPlatRepayLogService;
@@ -2278,4 +2281,25 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
     }
     // public static
+
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateMoneyPoolState(MoneyPoolRepayment repaymentPool) {
+		ConfirmRepaymentReq req = new ConfirmRepaymentReq();
+		List<String> mprIds = new ArrayList<String>();
+		MoneyPool moneyPool = moneyPoolService
+				.selectOne(new EntityWrapper<MoneyPool>().eq("money_pool_id", repaymentPool.getMoneyPoolId()));
+		moneyPool.setFinanceStatus(RepayRegisterFinanceStatus.未关联银行流水.toString());
+		moneyPool.setStatus(RepayRegisterState.待领取.toString());
+		moneyPoolService.updateById(moneyPool);
+		repaymentPool.setState(RepayRegisterFinanceStatus.还款待确认.toString());
+		moneyPoolRepaymentService.updateById(repaymentPool);
+		mprIds.add(repaymentPool.getMoneyPoolId());
+		req.setMprIds(mprIds);
+		req.setCallFlage(10);
+		req.setAfterId(repaymentPool.getAfterId());
+		req.setBusinessId(repaymentPool.getOriginalBusinessId());
+		execute(req, true);
+	}
 }
