@@ -182,8 +182,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         financeBaseDto.setCurTimeRepaidProjPlanList(new ArrayList<>());
         LoginInfoDto loginInfo = loginUserInfoHelper.getLoginInfo();
         if (loginInfo != null) {
-            financeBaseDto.setUserId(loginInfo.getUserId());
+            financeBaseDto.setUserId(loginInfo.getUserId()==null?"0111130000":loginInfo.getUserId());
             financeBaseDto.setUserName(loginInfo.getUserName());
+        }else {
+        	  financeBaseDto.setUserId("0111130000");
+              financeBaseDto.setUserName("admin");
         }
         financeBaseDto.setConfirmLog(createConfirmLog(financeBaseDto));
         return financeBaseDto;
@@ -2306,9 +2309,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 
     }
     // public static
+ 
 
-
-	@Override
+	@Override 
 	@Transactional(rollbackFor = Exception.class)
 	public void updateMoneyPoolState(MoneyPoolRepayment repaymentPool) {
 		ConfirmRepaymentReq req = new ConfirmRepaymentReq();
@@ -2320,7 +2323,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		moneyPoolService.updateById(moneyPool);
 		repaymentPool.setState(RepayRegisterFinanceStatus.还款待确认.toString());
 		moneyPoolRepaymentService.updateById(repaymentPool);
-		mprIds.add(repaymentPool.getMoneyPoolId());
+		mprIds.add(repaymentPool.getId().toString());
 		req.setMprIds(mprIds);
 		req.setCallFlage(10);
 		req.setAfterId(repaymentPool.getAfterId());
