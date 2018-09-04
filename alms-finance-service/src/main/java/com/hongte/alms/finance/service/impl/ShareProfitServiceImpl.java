@@ -241,8 +241,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         financeBaseDto.setPlanDto(initRepaymentBizPlanDto(req, financeBaseDto));
         sortRepaymentResource(req, financeBaseDto);
 
-//        financeBaseDto.setResourceIndex(0);
-//        financeBaseDto.setCuralResource(financeBaseDto.getRepaymentResources().get(0));
+        financeBaseDto.setResourceIndex(0);
+        financeBaseDto.setCuralResource(financeBaseDto.getRepaymentResources().get(0));
+        financeBaseDto.setCuralDivideAmount(financeBaseDto.getCuralResource().getRepayAmount());
         /*List<ApplyDerateType> listBizPlanListUnusedDerates = applyDerateTypeMapper.listBizPlanListUnusedDerate(financeBaseDto.getPlanDto().getBizPlanListDtos().get(0).getRepaymentBizPlanList().getPlanListId());
         if (!CollectionUtils.isEmpty(listBizPlanListUnusedDerates)) {
         	List<DerateUseLog> list = new ArrayList<>() ;
