@@ -524,7 +524,15 @@ public class FinanceController {
 		try {
 			List<CurrPeriodProjDetailVO> detailVOs = shareService.execute(req, false);
 			result = Result.success(detailVOs);
-		} catch (Exception e) {
+		}
+		catch (ServiceRuntimeException e) {
+			if (e.getErrorCode().equals("NO_RESOURCE")) {
+				result = Result.success();
+			}else {
+				result = Result.error("500", e.getMessage());
+			}
+		}
+		catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 			result = Result.error("500", e.getMessage());

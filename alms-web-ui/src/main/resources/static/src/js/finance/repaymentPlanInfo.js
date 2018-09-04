@@ -275,7 +275,17 @@ window.layinit(function (htConfig) {
         		{
         			title: '状态',
         			key: 'confirmFlagStr',
-        			width: 800,
+					width: 800,
+					render:(h,p)=>{
+						return h('pre',{
+							style:{
+								overflow:'hidden',
+							},
+							attrs:{
+								title:p.row.confirmFlagStr,
+							}
+						},p.row.confirmFlagStr)
+					}
         		},
         		],
         		// 还款计划表头  -- end --
