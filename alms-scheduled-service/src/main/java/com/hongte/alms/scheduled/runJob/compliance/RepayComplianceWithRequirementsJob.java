@@ -58,6 +58,8 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 			/*
 			 * 查找资金分发表中platStatus字段不为 1：已还款 的数据
 			 */
+			LOG.info("更新platStatus字段 ---- 开始");
+			long start = System.currentTimeMillis();
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
 					.selectList(new EntityWrapper<TdrepayRechargeLog>().ne("plat_status", 1).eq("is_valid", 1));
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
@@ -75,6 +77,8 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 					tdrepayRechargeLogService.updateBatchById(list);
 				}
 			}
+			long end = System.currentTimeMillis();
+			LOG.info("更新platStatus字段 ---- 结束，耗时：{}", (end - start));
 			return SUCCESS;
 			
 		} catch (Exception e) {
