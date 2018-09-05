@@ -116,6 +116,7 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 							default:
 								break;
 							}
+							list.add(tdrepayRechargeLog);
 							break;
 						}
 					}
