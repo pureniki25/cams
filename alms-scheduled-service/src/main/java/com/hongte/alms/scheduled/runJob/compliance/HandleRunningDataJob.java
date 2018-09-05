@@ -27,7 +27,7 @@ public class HandleRunningDataJob extends IJobHandler {
 			platformRepaymentFeignClient.handleRunningData();
 
 			long end = System.currentTimeMillis();
-			LOG.info("平台还款调度任务------结束，耗时：{}", (end - start));
+			LOG.info("处理合规化还款处理中的数据------结束，耗时：{}", (end - start));
 			return SUCCESS;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
