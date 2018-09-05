@@ -1878,7 +1878,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		 * 查询合规化还款处理中的数据
 		 */
 		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-				.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("status", 1));
+				.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("status", 1).eq("is_valid", 1));
 		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 			Map<String, Object> paramMap = new HashMap<>();
 			for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
