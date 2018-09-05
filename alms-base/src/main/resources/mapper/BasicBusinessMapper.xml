@@ -654,13 +654,17 @@
     
     <select id="selectlPushBusiness" resultType="map">
 		SELECT t1.confirm_log_id,t2.business_id,t2.source_business_id,t4.repayment_batch_id,t2.asset_id,t2.create_time,t2.create_user,t2.company_id,t2.company_name,
-		t2.business_type,t3.business_type_name,t2.customer_name,t2.asset_id FROM tb_repayment_confirm_log t1
+		t2.business_type,t3.business_type_name,t2.customer_name,t2.asset_id,
+		CASE WHEN t1.type= 2 THEN '3' ELSE '2' END  AS 'account_id',
+		'1' as businessFlag,
+		'2' as businessFrom
+		FROM tb_repayment_confirm_log t1
 		LEFT JOIN tb_basic_business t2 ON t1.business_id = t2.business_id
 		LEFT JOIN tb_basic_business_type t3 ON t3.business_type_id = t2.business_type
 		LEFT JOIN tb_repayment_biz_plan_list t5 ON t5.business_id = t1.business_id AND t5.after_id = t1.after_id
 		LEFT JOIN tb_repayment_biz_plan t4 ON t5.plan_id = t4.plan_id 
 		<where> 
-		t1.type = 1 AND
+		-- t1.type = 1 AND
 		t2.src_type = 2
 		<if test="businessId != null">
            <![CDATA[ and t1.business_id = #{businessId}]]>
@@ -674,7 +678,7 @@
     <select id="selectlPushBusinessOnlineFlow" resultType="map">
 		SELECT 
 		t1.resource_id AS 'list_id',
-		'' AS 'account_id',
+		CASE WHEN t2.type= 2 THEN '3' ELSE '2' END  AS 'account_id',
 		t2.create_time AS 'account_time',
 		t2.business_id AS 'business_id',
 		t6.project_id AS 'issue_id',
@@ -690,8 +694,8 @@
 		t8.accountant_confirm_user_name AS 'operator',
 		t1.is_cancelled AS 'status_flag',
 		'贷后手动导入' AS 'remark',
-		'是' AS 'business_flag',
-		t1.repay_source AS 'repay_type',   -- 10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款   t4.bind_platform_id 代扣平台ID 5:银行代扣 3:宝付代扣 0或者null:易宝代扣
+		'1' AS 'business_flag',
+		CASE WHEN t1.repay_source = 20 && t4.bind_platform_id = 3 THEN '2' WHEN t1.repay_source = 20 && IFNULL(t4.bind_platform_id,0) = 0 THEN '3' WHEN t1.repay_source = 30 THEN '4' ELSE '1' END  AS 'repay_type', 
 		'' AS 'target_account_id',
 		'' AS 'target_bank_card_no',
 		t8.customer_name_ext AS 'customer_name',
@@ -725,7 +729,7 @@
     <select id="selectlPushBusinessOfflineFlow" resultType="map">
 		SELECT
 		t1.resource_id AS 'list_id',
-		'' AS 'account_id',
+		CASE WHEN t2.type= 2 THEN '3' ELSE '2' END  AS 'account_id',
 		t2.create_time AS 'account_time',
 		t2.org_business_id AS 'business_id',
 		t6.project_id AS 'issue_id',
@@ -741,8 +745,8 @@
 		t8.accountant_confirm_user_name AS 'operator',
 		t1.is_cancelled AS 'status_flag',
 		'贷后手动导入' AS 'remark',
-		'是' AS 'business_flag',
-		t1.repay_source AS 'repay_type',  -- 10：线下转账，20：线下代扣，30：银行代扣,11:用往期结余还款
+		'1' AS 'business_flag',
+		CASE WHEN t1.repay_source = 10 THEN '1' ELSE '1' END  AS 'repay_type',
 		t10.repayment_name AS 'target_account_id',
 		t10.repayment_id AS 'target_bank_card_no',
 		t8.customer_name_ext AS 'customer_name',

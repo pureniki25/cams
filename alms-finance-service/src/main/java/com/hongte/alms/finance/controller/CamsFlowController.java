@@ -21,9 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.hongte.alms.base.entity.FlowPushLog;
+import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.feignClient.AccountListHandlerClient;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.service.BasicBusinessService;
+import com.hongte.alms.base.service.FlowPushLogService;
+import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.vo.cams.CamsMessage;
 import com.hongte.alms.base.vo.cams.CancelBizAccountListCommand;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand;
@@ -52,8 +56,17 @@ public class CamsFlowController {
     private AccountListHandlerMsgClient accountListHandlerMsgClient;
     
     @Autowired
+    @Qualifier("RepaymentConfirmLogService")
+    private RepaymentConfirmLogService repaymentConfirmLogService;
+    
+    @Autowired
     @Qualifier("BasicBusinessService")
     BasicBusinessService basicBusinessService;
+    
+    @Autowired
+    @Qualifier("FlowPushLogService")
+    FlowPushLogService flowPushLogService;
+    
     /**
      * 批量新增账户流水
      * @param bankWithholdFlowReq
@@ -114,12 +127,19 @@ public class CamsFlowController {
     		CreateBatchFlowCommand command = new CreateBatchFlowCommand();
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
-        	int actionId = 2;
+        	int actionId = Integer.parseInt(businessMapInfo.get("account_id").toString());
         	String batchId = businessMapInfo.get("repayment_batch_id")+"";
+        	RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(batchId);
+        	FlowPushLog flowPushLog = new FlowPushLog();
+        	flowPushLog.setPushKey(batchId);
+        	flowPushLog.setPushLogType(1);
+        	flowPushLog.setPushTo(1);
+        	flowPushLog.setPushStarttime(new Date());
+        	flowPushLog.setPushStatus(0);
         	//是否业务交易明细,1是,0否
-        	int businessFlag = 1;
+        	int businessFlag = Integer.parseInt(businessMapInfo.get("businessFlag").toString());
         	//所属资产端
-        	int businessFrom = 2;
+        	int businessFrom = Integer.parseInt(businessMapInfo.get("businessFrom").toString());
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
         	Date createTime = (Date) businessMapInfo.get("create_time");
         	String createUser = businessMapInfo.get("create_user")+"";
@@ -186,13 +206,14 @@ public class CamsFlowController {
             	String afterId = flowMap.get("after_id")+"";
             	BigDecimal amount = new BigDecimal(flowMap.get("amount")==null?"0":flowMap.get("amount").toString());
             	String externalId = "";
-            	int inOut = 1;
+            	int inOut = Integer.parseInt(flowMap.get("in_out").toString());
             	String issueId = flowMap.get("issue_id")+"";
             	String memo = "";
             	String remark = flowMap.get("remark")+"";
             	Date segmentationDate = (Date) flowMap.get("segmentation_date");
             	String sourceAccountIdentifierId = flowMap.get("target_account_id")+"";
             	String targetAccountIdentifierId = flowMap.get("target_bank_card_no")+"";
+            	int repayType = Integer.parseInt(flowMap.get("repayType").toString());
             	String listId = flowMap.get("list_id")+"";
         		flow.setAccountTime(accountTime);
             	flow.setAfterId(afterId);
@@ -202,7 +223,7 @@ public class CamsFlowController {
             	flow.setIssueId(issueId);
             	flow.setMemo(memo);
             	flow.setRemark(remark);
-            	flow.getRepayType();
+            	flow.setRepayType(repayType);
             	flow.setSegmentationDate(segmentationDate);
             	flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
             	flow.setTargetAccountIdentifierId(targetAccountIdentifierId);
@@ -283,11 +304,20 @@ public class CamsFlowController {
     				}
             	}
             	
-            	if(retStr.contains("执行成功")) {
-            		
+            	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
+            		repaymentConfirmLog.setLastPushStatus(1);
+            		flowPushLog.setPushStatus(1);
             	}else {
-            		
+            		repaymentConfirmLog.setLastPushStatus(2);
+            		flowPushLog.setPushStatus(2);
             	}
+            	//更新推送状态
+            	repaymentConfirmLog.setLastPushDatetime(new Date());
+            	repaymentConfirmLogService.updateById(repaymentConfirmLog);
+            	
+            	//记录推送日志
+            	flowPushLog.setPushEndtime(new Date());
+            	flowPushLogService.insert(flowPushLog);
         	}
     	}
 	}
