@@ -102,10 +102,10 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 						if (tdProjectPaymentDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
 							switch (tdProjectPaymentDTO.getStatus()) {
 							case 1:
-								tdrepayRechargeLog.setPlatStatus("已结清");
+								tdrepayRechargeLog.setPlatStatus("1");
 								break;
 							case 0:
-								tdrepayRechargeLog.setPlatStatus("逾期");
+								tdrepayRechargeLog.setPlatStatus("2");
 								break;
 
 							default:
