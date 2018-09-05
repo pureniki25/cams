@@ -17,8 +17,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.feignClient.EipRemote;
-import com.hongte.alms.base.feignClient.dto.TdrepayProjectInfoDTO;
-import com.hongte.alms.base.feignClient.dto.TdrepayProjectPeriodInfoDTO;
+import com.hongte.alms.base.feignClient.dto.TdProjectPaymentDTO;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.scheduled.client.TdrepayRechargeFeignClient;
@@ -67,7 +66,7 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 				
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					paramMap.put("projectId", tdrepayRechargeLog.getProjectId());
-					Result result = eipRemote.getProjectPayment(paramMap);
+					Result result = eipRemote.queryProjectPayment(paramMap);
 					
 					updatePlatStatus(tdrepayRechargeLog, result, list);
 				}
@@ -86,30 +85,39 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 	}
 
 	private void updatePlatStatus(TdrepayRechargeLog tdrepayRechargeLog, Result result, List<TdrepayRechargeLog> list) {
-			
-		if (result != null && result.getData() != null
-				&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
-			TdrepayProjectInfoDTO tdrepayProjectInfoDTO = JSONObject
-					.parseObject(JSONObject.toJSONString(result.getData()), TdrepayProjectInfoDTO.class);
-			List<TdrepayProjectPeriodInfoDTO> periodsList = tdrepayProjectInfoDTO.getPeriodsList();
-			if (CollectionUtils.isNotEmpty(periodsList)) {
-				
-				TdrepayRechargeLog rechargeLog = new TdrepayRechargeLog();
-				rechargeLog.setLogId(tdrepayRechargeLog.getLogId());
+		
+		List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
+		
+		if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+				&& result.getData() != null) {
+			JSONObject parseObject = (JSONObject) JSONObject.toJSON(result.getData());
+			if (parseObject.get("projectPayments") != null) {
+				tdProjectPaymentDTOs = JSONObject.parseArray(
+						JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
+				if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
+					for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
+						/*
+						 * 匹配当期
+						 */
+						if (tdProjectPaymentDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
+							switch (tdProjectPaymentDTO.getStatus()) {
+							case 1:
+								tdrepayRechargeLog.setPlatStatus("已结清");
+								break;
+							case 0:
+								tdrepayRechargeLog.setPlatStatus("逾期");
+								break;
 
-				for (TdrepayProjectPeriodInfoDTO tdrepayProjectPeriodInfoDTO : periodsList) {
-					int periods = tdrepayProjectPeriodInfoDTO.getPeriods();
-					int peroidVO = tdrepayRechargeLog.getPeriod().intValue();
-					if (peroidVO == periods) {
-						rechargeLog.setPlatStatus(String.valueOf(tdrepayProjectPeriodInfoDTO.getStatus()));
-						rechargeLog.setUpdateTime(new Date());
-						rechargeLog.setUpdateUser("定时任务repayComplianceWithRequirements");
-						list.add(rechargeLog);
+							default:
+								break;
+							}
+							break;
+						}
 					}
 				}
 			}
 		}
-		
+			
 	}
 
 }
