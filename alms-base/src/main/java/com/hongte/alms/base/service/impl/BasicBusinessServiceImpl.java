@@ -886,4 +886,24 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		public List<Map<String, Object>> selectlPushBusinessFlowItem(Map<String, Object> paramFlowItemMap) {
 			return basicBusinessMapper.selectlPushBusinessFlowItem(paramFlowItemMap);
 		}
+
+		@Override
+		public void addLastDayFlow(Map<String, Object> paramLastDayFlowMap) {
+			basicBusinessMapper.addLastDayFlow(paramLastDayFlowMap);
+		}
+
+		@Override
+		public void addLastDayFlowItem(Map<String, Object> paramLastDayFlowItemMap) {
+			basicBusinessMapper.addLastDayFlowItem(paramLastDayFlowItemMap);
+		}
+
+		@Override
+		public void deleteLastDayFlow(Map<String, Object> paramLastDayMap) {
+			basicBusinessMapper.deleteLastDayFlow(paramLastDayMap);
+		}
+
+		@Override
+		public void deleteLastDayFlowItem(Map<String, Object> paramLastDayFlowItemMap) {
+			basicBusinessMapper.deleteLastDayFlowItem(paramLastDayFlowItemMap);
+		}
 }
