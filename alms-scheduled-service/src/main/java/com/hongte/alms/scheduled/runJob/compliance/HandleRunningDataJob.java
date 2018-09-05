@@ -10,7 +10,7 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
 
-@JobHandler(value = "platformRepayment")
+@JobHandler(value = "handleRunningData")
 @Component
 public class HandleRunningDataJob extends IJobHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(HandleRunningDataJob.class);
