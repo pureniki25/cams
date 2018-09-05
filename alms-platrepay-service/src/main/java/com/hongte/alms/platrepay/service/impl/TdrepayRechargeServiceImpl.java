@@ -1912,8 +1912,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 								/*
 								 * 匹配当期，且平台为结清状态，则更新贷后合规化表状态为处理成功
 								 */
-								if (tdProjectPaymentDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue() && tdProjectPaymentDTO.getStatus() == 1) {
-									tdrepayRechargeLog.setStatus(2);
+								if (tdProjectPaymentDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
+									if (tdProjectPaymentDTO.getStatus() == 1) {
+										tdrepayRechargeLog.setStatus(2);
+									}else {
+										tdrepayRechargeLog.setStatus(3);
+									}
 									tdrepayRechargeLog.setUpdateTime(new Date());
 									tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
 									tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
