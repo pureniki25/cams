@@ -68,8 +68,9 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 				
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					paramMap.put("projectId", tdrepayRechargeLog.getProjectId());
+					LOG.info("更新platStatus字段，projectId：{}", tdrepayRechargeLog.getProjectId());
 					Result result = eipRemote.queryProjectPayment(paramMap);
-					
+					LOG.info("更新platStatus字段，返回信息：{}", JSONObject.toJSONString(result));
 					updatePlatStatus(tdrepayRechargeLog, result, list);
 				}
 				
