@@ -480,7 +480,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 						// 获取代扣每次最高额
 						BigDecimal eachMax = sysBankLimit.getOnceLimit();
 						// 代扣次数
-						Integer repayCount = repayMoney.divide(eachMax, RoundingMode.CEILING).intValue();
+						Integer repayCount = repayMoney.divide(eachMax, RoundingMode.FLOOR).intValue();
 						// 余数
 						
 						BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
@@ -777,7 +777,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 								// 获取代扣每次最高额
 								BigDecimal eachMax = sysBankLimit.getOnceLimit();
 								// 代扣次数
-								Integer repayCount = repayMoney.divide(eachMax, RoundingMode.CEILING).intValue();
+								Integer repayCount = repayMoney.divide(eachMax, RoundingMode.FLOOR).intValue();
 								// 余数
 								BigDecimal remainder = repayMoney.divideAndRemainder(eachMax)[1];
 								if(remainder.compareTo(BigDecimal.valueOf(0)) > 0) {
