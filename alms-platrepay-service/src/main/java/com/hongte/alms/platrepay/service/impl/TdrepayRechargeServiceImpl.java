@@ -1908,6 +1908,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						tdProjectPaymentDTOs = JSONObject.parseArray(
 								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
 						if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
+							
+							boolean paymentFlag = false; // 是否有实还记录
+							
 							for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
 								/*
 								 * 匹配当期，且平台为结清状态，则更新贷后合规化表状态为处理成功
@@ -1922,8 +1925,18 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 									tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
 									tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
 									issueSendOutsideLogService.insert(issueSendOutsideLog);
+									paymentFlag = true;
 									break;
 								}
+							}
+							
+							if (!paymentFlag) {
+								tdrepayRechargeLog.setStatus(0);
+								tdrepayRechargeLog.setUpdateTime(new Date());
+								tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+								tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+								issueSendOutsideLogService.insert(issueSendOutsideLog);
+								break;
 							}
 						}
 					}
