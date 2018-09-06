@@ -50,5 +50,13 @@ public interface PlatformRepaymentFeignClient {
 	 */
 	@RequestMapping(value = "/toPlatRepay/getOIdPartner", headers = { "app=ALMS","content-type=application/json" })
 	public Result<Map<String, Object>> getOIdPartner(@RequestParam("businessType") Integer businessType);
-
+	
+	/**
+	 * 合规化还款处理中的数据
+	 *
+	 * @return
+	 */
+	@RequestMapping(value = "/tdrepayRecharge/handleRunningData", headers = { "app=ALMS","content-type=application/json" })
+	Result<Map<String, Object>> handleRunningData();
+	
 }

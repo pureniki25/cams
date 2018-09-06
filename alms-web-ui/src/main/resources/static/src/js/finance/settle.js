@@ -46,7 +46,8 @@ window.layinit(function (htConfig) {
                 derate: '',
                 planRepayBalance: '',
                 total: '',
-                otherFees:[]
+                otherFees:[],
+                moneyPoolRepayDates:[]
             },
             table: {
                 reg: {
@@ -692,6 +693,9 @@ window.layinit(function (htConfig) {
                 if(app.thisTimeRepaymentInfo.otherFees){
                     param.otherFees = app.thisTimeRepaymentInfo.otherFees
                 }
+                if(app.factRepaymentInfo.repayDate){
+                    param.repayDate = app.factRepaymentInfo.repayDate
+                }
                 app.getSettleInfo(param)
                 if(app.factRepaymentInfo.repayAccount&&app.factRepaymentInfo.repayAccount>0){
                     app.previewSettle()
@@ -727,6 +731,10 @@ window.layinit(function (htConfig) {
                             app.thisTimeRepaymentInfo.penaltyFeesBiz = data.penaltyFeesBiz
                             app.thisTimeRepaymentInfo.other = data.other
                             app.thisTimeRepaymentInfo.lackFees = data.lackFees 
+                            if( app.thisTimeRepaymentInfo.moneyPoolRepayDates.length==0){
+                                app.thisTimeRepaymentInfo.moneyPoolRepayDates = data.moneyPoolRepayDates
+                                app.factRepaymentInfo.repayDate = data.moneyPoolRepayDates[0] 
+                            }
 
                             if(param.otherFees){
                                 app.thisTimeRepaymentInfo.otherFees = data.otherFees

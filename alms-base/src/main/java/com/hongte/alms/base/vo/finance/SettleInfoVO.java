@@ -93,6 +93,12 @@ public class SettleInfoVO {
 	 */
 	private List<SettleFeesVO> derates ;
 	
+	/**
+	 * 已匹配银行流水的实还日期,若无匹配,则只有一个当前日期<br>
+	 * 若多个流水是同一天,则选用其中一个
+	 */
+	private Set<String> moneyPoolRepayDates ;
+	
 	public void setDerates(List<SettleFeesVO> list) {
 		this.derates = list ;
 		for (SettleFeesVO settleFeesVO : list) {

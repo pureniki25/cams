@@ -241,7 +241,7 @@ public class RechargeServiceImpl implements RechargeService {
 				Integer status = 2;
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
 						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,merchantaccount, 0,
-						BigDecimal.valueOf(amount),appType);
+						BigDecimal.valueOf(amount),appType,"");
 				com.ht.ussp.core.Result remoteResult=null;
 			
 				try {
@@ -336,7 +336,7 @@ public class RechargeServiceImpl implements RechargeService {
 				Integer status = 2;
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
 						channel.getPlatformId(), boolLastRepay, boolPartRepay, merchOrderId,"", 0,
-						BigDecimal.valueOf(amount),appType);
+						BigDecimal.valueOf(amount),appType,"");
 				com.ht.ussp.core.Result remoteResult = null;
 				try {
 					logger.info("========调用外联平台宝付代扣开始========");
@@ -433,10 +433,12 @@ public class RechargeServiceImpl implements RechargeService {
 				com.hongte.alms.common.result.Result merchAccountResult=platformRepaymentFeignClient.getOIdPartner(getBankSubBusinessType(business));
 				String oIdPartner="";
 				String tdUserName="";
+				String orgType="";//
 				if(merchAccountResult.getCode().equals("1")) {
 					Map map= (Map) merchAccountResult.getData();
 					oIdPartner=map.get("oIdPartner").toString();
 					tdUserName=map.get("tdUserName").toString();
+					orgType=map.get("orgType").toString();
 					
 				}else {
 					logger.error("获取资产端唯一编号失败,pListId:{0}",pList.getPlanListId());
@@ -448,7 +450,7 @@ public class RechargeServiceImpl implements RechargeService {
 			  	String guid=UUID.randomUUID().toString();//商户订单号 ，银行代扣需要guid格式
 				WithholdingRepaymentLog log = recordRepaymentLog("", status, pList, business, bankCardInfo,
 						channel.getPlatformId(), boolLastRepay, boolPartRepay, guid,oIdPartner, 0,
-						BigDecimal.valueOf(amount),appType);
+						BigDecimal.valueOf(amount),appType,orgType);
 
 				    BatchBankRechargeReqDto dto = new BatchBankRechargeReqDto();
 				    List<BatchBankRechargeReqDto> list=new ArrayList<BatchBankRechargeReqDto>();
@@ -462,6 +464,7 @@ public class RechargeServiceImpl implements RechargeService {
 				  	Map<String, Object> paramMap = new HashMap<>();
 					paramMap.put("batchId", guid);
 					paramMap.put("oidPartner", oIdPartner);
+					paramMap.put("orgType", orgType);
 					paramMap.put("userIP", "172.0.0.1");
 					paramMap.put("details",list);
 					com.ht.ussp.core.Result remoteResult = null;
@@ -512,7 +515,7 @@ public class RechargeServiceImpl implements RechargeService {
 						withholdingRepaymentLogService.updateById(log);
 						try {
 							Thread.sleep(5000);
-							getBankResult(log,oIdPartner);
+							getBankResult(log,oIdPartner,result);
 						} catch (Exception e) {
 							logger.debug("查询银行代扣结果出错"+e);
 						}
@@ -824,7 +827,7 @@ public class RechargeServiceImpl implements RechargeService {
 
 	public WithholdingRepaymentLog recordRepaymentLog(String msg, Integer status, RepaymentBizPlanList list,
 			BasicBusiness business, BankCardInfo dto, Integer platformId, Integer boolLastRepay, Integer boolPartRepay,
-			String merchOrderId,String PlatformUserID ,Integer settlementType, BigDecimal currentAmount,String appType) {
+			String merchOrderId,String PlatformUserID ,Integer settlementType, BigDecimal currentAmount,String appType,String orgType) {
 		WithholdingRepaymentLog log = new WithholdingRepaymentLog();
 		log.setAfterId(list.getAfterId());
 		log.setBankCard(dto.getBankCardNumber());
@@ -844,6 +847,7 @@ public class RechargeServiceImpl implements RechargeService {
 		log.setSettlementType(settlementType);
 		log.setBankCode(dto.getBankCode());
 		log.setBankName(dto.getBankName());
+		log.setOrgType(orgType);
 		if(list.getOverdueAmount()!=null) {
 			log.setPlanTotalRepayMoney(list.getTotalBorrowAmount().add(list.getOverdueAmount()));
 		}else {
@@ -852,13 +856,9 @@ public class RechargeServiceImpl implements RechargeService {
 
 		log.setUpdateTime(new Date());
 		if(StringUtil.isEmpty(appType)) {
-			if (loginUserInfoHelper != null && !StringUtil.isEmpty(loginUserInfoHelper.getUserId())) {
-				log.setUpdateUser(loginUserInfoHelper.getUserId());
-				log.setCreateUser(loginUserInfoHelper.getUserId());
-			} else {
-				log.setCreateUser(appType);
-				log.setUpdateUser(appType);
-			}
+				log.setUpdateUser(StringUtil.isEmpty(loginUserInfoHelper.getUserId())?"0111130000":loginUserInfoHelper.getUserId());
+				log.setCreateUser(StringUtil.isEmpty(loginUserInfoHelper.getUserId())?"0111130000":loginUserInfoHelper.getUserId());
+
 		}else {
 			log.setCreateUser(appType);
 			log.setUpdateUser(appType);
@@ -1221,7 +1221,7 @@ public class RechargeServiceImpl implements RechargeService {
 		for (WithholdingRepaymentLog log : losgs) {
 			try {
 				if (log.getBindPlatformId() == PlatformEnum.YH_FORM.getValue()) {
-					getBankResult(log,log.getMerchantAccount());
+					getBankResult(log,log.getMerchantAccount(),null);
 				}
 				if (log.getBindPlatformId() == PlatformEnum.BF_FORM.getValue()) {
 					getBFResult(log);
@@ -1236,10 +1236,11 @@ public class RechargeServiceImpl implements RechargeService {
 	}
 
 	@Override
-	public void getBankResult(WithholdingRepaymentLog log,String oidPartner) {
+	public void getBankResult(WithholdingRepaymentLog log,String oidPartner,Result outsideResult) {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("oidPartner", oidPartner);
 		paramMap.put("requestNo", log.getMerchOrderId());
+		paramMap.put("orgType", log.getOrgType());
 		
 	
 		logger.info("========调用外联银行代扣订单查询开始========");
@@ -1264,6 +1265,7 @@ public class RechargeServiceImpl implements RechargeService {
 	
 		if(bankRepayTestResult!=null) {
 			if(bankRepayTestResult.getParamValue().equals("0000")) {
+				outsideResult.setCode("1");
 				String resultMsg="充值成功";
 				result.setReturnCode("0000");
 				result.msg(resultMsg);
@@ -1277,6 +1279,7 @@ public class RechargeServiceImpl implements RechargeService {
 				result.setReturnCode("1111");
 				result.msg(resultMsg);
 			}else if(bankRepayTestResult.getParamValue().equals("2222")){
+				outsideResult.setCode("2");
 				String resultMsg="处理中";
 				result.msg(resultMsg);
 				result.setReturnCode("EIP_TD_HANDLER_EXECEPTION");
@@ -1306,6 +1309,7 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("2")) {
+			outsideResult.setCode("1");
 			log.setRepayStatus(1);
 			log.setRemark("充值成功");
 			log.setUpdateTime(new Date());
@@ -1318,6 +1322,7 @@ public class RechargeServiceImpl implements RechargeService {
 					logger.error("银行代扣失败短信发送错误,logId:{0}",log.getLogId());
 				}
 		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("3")) {
+			outsideResult.setCode("2");
 			log.setRepayStatus(2);
 			log.setRemark("待付款");
 			log.setUpdateTime(new Date());

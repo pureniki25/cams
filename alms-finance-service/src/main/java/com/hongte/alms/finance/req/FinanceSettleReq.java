@@ -21,7 +21,7 @@ public class FinanceSettleReq {
 
     private String planId;
 
-    private String settleDate ;
+    private String repayDate ;
     
     //线下转账必填项,匹配的流水ID
     private List<String> mprIds;

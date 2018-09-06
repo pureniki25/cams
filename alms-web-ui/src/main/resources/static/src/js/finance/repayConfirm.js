@@ -419,7 +419,8 @@ window.layinit(function (htConfig) {
                 repayDate: '',
                 subtotal: '',
                 total: '',
-                derateDetails: []
+                derateDetails: [],
+                moneyPoolRepayDates:[]
             },
             factRepaymentInfo: {
                 repayDate: '',
@@ -543,11 +544,51 @@ window.layinit(function (htConfig) {
                     }
                 })
             },
+            onRepayDateChange(repayDate){
+                app.factRepaymentInfo.repayDate = repayDate
+
+                $.ajax({
+                    type: "GET",
+                    url: fpath + 'finance/thisTimeRepayment?businessId=' + businessId + "&afterId=" + afterId +'&repayDate='+repayDate,
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        if (data.code == '1') {
+                            app.thisTimeRepaymentInfo = Object.assign(app.thisTimeRepaymentInfo, data.data);
+                        } else {
+                            app.$Message.error({
+                                content: data.msg
+                            })
+                        }
+                    }
+
+                });
+
+                // axios.get()
+                //     .then(function (res) {
+                //         if (res.data.code == '1') {
+                //             app.thisTimeRepaymentInfo = Object.assign(app.thisTimeRepaymentInfo, res.data.data);
+                //         } else {
+                //             app.$Message.error({
+                //                 content: res.data.msg
+                //             })
+                //         }
+                //     })
+                //     .catch(function (err) {
+                //         app.$Message.error({
+                //             content: '获取本次还款信息失败'
+                //         })
+                //     })
+                app.previewConfirmRepayment()
+            },
             getThisTimeRepayment() {
                 axios.get(fpath + 'finance/thisTimeRepayment?businessId=' + businessId + "&afterId=" + afterId)
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.thisTimeRepaymentInfo = Object.assign(app.thisTimeRepaymentInfo, res.data.data);
+                            app.factRepaymentInfo.repayDate = res.data.data.moneyPoolRepayDates[0]
                         } else {
                             app.$Message.error({
                                 content: res.data.msg

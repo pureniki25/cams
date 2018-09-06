@@ -82,8 +82,10 @@
 		  `tb_withholding_repayment_log` wrl 
 		  LEFT JOIN `tb_withholding_platform` wp 
 		    ON wrl.`bind_platform_id` = wp.`platform_id` 
+		  left join tb_repayment_resource rr on rr.repay_source_ref_id = wrl.log_id
 		  WHERE wrl.`repay_status` = 1 
 		    AND wrl.original_business_id = #{businessId,jdbcType=VARCHAR}
+		  and rr.is_cancelled = 0 
 		UNION
 		ALL 
 		SELECT 
@@ -100,12 +102,15 @@
 		  mpr.bank_account accountName 
 		FROM
 		  `tb_money_pool_repayment` mpr,
-		  `tb_repayment_biz_plan_list` lst 
+		  `tb_repayment_biz_plan_list` lst ,
+		 tb_repayment_resource rr 
 		WHERE mpr.plan_list_id = lst.plan_list_id 
+		  AND rr.repay_source_ref_id = mpr.id 
 		  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
 		  AND mpr.income_type IN (1, 2)
 		  AND mpr.is_finance_match = 1
-		  AND mpr.state = '财务确认已还款'
+		  AND mpr.state = '财务确认已还款' 
+		  and rr.is_cancelled = 0 
 		ORDER BY 1, 4
 	</select>
 

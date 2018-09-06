@@ -1035,12 +1035,9 @@ public class TdrepayRechargeController {
 							.in("process_status", processStatus).eq("is_valid", 1));
 
 			if (!CollectionUtils.isEmpty(tdrepayRechargeLogs)) {
-
-				for (TdrepayRechargeLog rechargeLog : tdrepayRechargeLogs) {
-					rechargeLog.setIsValid(2);
-				}
-
-				tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
+				
+				tdrepayRechargeService.revokeTdrepayRecharge(tdrepayRechargeLogs);
+				
 				return Result.success();
 			} else {
 				return Result.error("-99", "没有找到对应的数据，撤销资金分发失败");
@@ -1074,6 +1071,21 @@ public class TdrepayRechargeController {
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());
+		}
+	}
+	
+	@ApiOperation(value = "处理合规化还款处理中的数据")
+	@GetMapping("/handleRunningData")
+	@ResponseBody
+	public Result handleRunningData() {
+		try {
+			
+			tdrepayRechargeService.handleRunningData();
+			
+			return Result.success();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error(e.getMessage());
 		}
 	}
 

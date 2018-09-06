@@ -35,6 +35,7 @@ import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TdrepayAdvanceLog;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.entity.TdrepayRechargeRecord;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
@@ -46,6 +47,7 @@ import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.service.TdrepayAdvanceLogService;
 import com.hongte.alms.base.service.TdrepayRechargeDetailService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
+import com.hongte.alms.base.service.TdrepayRechargeRecordService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
@@ -84,6 +86,10 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	private TdrepayRechargeLogService tdrepayRechargeLogService;
 
 	@Autowired
+	@Qualifier("TdrepayRechargeRecordService")
+	private TdrepayRechargeRecordService tdrepayRechargeRecordService;
+
+	@Autowired
 	@Qualifier("TdrepayRechargeDetailService")
 	private TdrepayRechargeDetailService tdrepayRechargeDetailService;
 
@@ -117,17 +123,17 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		if (FLAG_MAP.containsKey(projectId)) {
 			return FLAG_MAP;
 		}
-		
+
 		TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService
 				.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", projectId));
 		Date beginTime = tuandaiProjectInfo.getBeginTime();
 		if (beginTime == null) {
 			throw new ServiceRuntimeException("找不到上标时间，标的ID：" + projectId);
 		}
-		
+
 		if (beginTime.before(DateUtil.getDate("2018-06-28"))) {
 			FLAG_MAP.put(projectId, true);
-		}else {
+		} else {
 			FLAG_MAP.put(projectId, false);
 		}
 		return FLAG_MAP;
@@ -178,7 +184,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					tdrepayRechargeDetailService.insert(tdrepayRechargeDetail);
 				}
 			}
+			TdrepayRechargeRecord rechargeRecord = BeanUtils.deepCopy(rechargeLog, TdrepayRechargeRecord.class);
 			tdrepayRechargeLogService.insert(rechargeLog);
+			tdrepayRechargeRecordService.insert(rechargeRecord);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
@@ -359,6 +367,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	private Result sendDistributeFund(List<TdrepayRechargeInfoVO> rechargeInfoVOs, Integer businessType,
 			String userId) {
 		DistributeFundDTO dto = new DistributeFundDTO();
+		dto.setOrgType(BusinessTypeEnum.getOrgTypeByValue(businessType));
 		String batchId = UUID.randomUUID().toString();
 		dto.setBatchId(batchId);
 		String rechargeAccountType = BusinessTypeEnum.getRechargeAccountName(businessType);
@@ -1844,5 +1853,96 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	@Override
 	public int countRechargeRecord(RechargeRecordReq req) {
 		return agencyRechargeLogMapper.countRechargeRecord(req);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void revokeTdrepayRecharge(List<TdrepayRechargeLog> tdrepayRechargeLogs) {
+		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+			List<TdrepayRechargeRecord> records = new ArrayList<>();
+
+			for (TdrepayRechargeLog rechargeLog : tdrepayRechargeLogs) {
+				rechargeLog.setIsValid(2);
+				TdrepayRechargeRecord record = BeanUtils.deepCopy(rechargeLog, TdrepayRechargeRecord.class);
+				records.add(record);
+			}
+
+			tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
+			tdrepayRechargeRecordService.insertBatch(records);
+		}
+	}
+
+	@Override
+	public void handleRunningData() {
+		/*
+		 * 查询合规化还款处理中的数据
+		 */
+		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
+				.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("status", 1).eq("is_valid", 1));
+		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+			Map<String, Object> paramMap = new HashMap<>();
+			for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
+				paramMap.put("projectId", tdrepayRechargeLog.getProjectId());
+				List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
+
+				String sendJson = JSONObject.toJSONString(paramMap);
+				IssueSendOutsideLog issueSendOutsideLog = issueSendOutsideLogService.createIssueSendOutsideLog(
+						loginUserInfoHelper.getUserId(), sendJson, Constant.INTERFACE_CODE_QUERY_PROJECT_PAYMENT,
+						Constant.INTERFACE_NAME_QUERY_PROJECT_PAYMENT, Constant.SYSTEM_CODE_EIP);
+				Result result = null;
+				try {
+					LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment参数信息，{}", sendJson);
+					result = eipRemote.queryProjectPayment(paramMap);
+					String resultJson = JSONObject.toJSONString(result);
+					LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", resultJson);
+					issueSendOutsideLog.setReturnJson(resultJson);
+				} catch (Exception e) {
+					LOG.error(e.getMessage(), e);
+					issueSendOutsideLog.setReturnJson(e.getMessage());
+				}
+
+				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+						&& result.getData() != null) {
+					JSONObject parseObject = (JSONObject) JSONObject.toJSON(result.getData());
+					if (parseObject.get("projectPayments") != null) {
+						tdProjectPaymentDTOs = JSONObject.parseArray(
+								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
+						if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
+							
+							boolean paymentFlag = false; // 是否有实还记录
+							
+							for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
+								/*
+								 * 匹配当期，且平台为结清状态，则更新贷后合规化表状态为处理成功
+								 */
+								if (tdProjectPaymentDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
+									if (tdProjectPaymentDTO.getStatus() == 1) {
+										tdrepayRechargeLog.setStatus(2);
+									}else {
+										tdrepayRechargeLog.setStatus(3);
+									}
+									tdrepayRechargeLog.setUpdateTime(new Date());
+									tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+									tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+									issueSendOutsideLogService.insert(issueSendOutsideLog);
+									paymentFlag = true;
+									break;
+								}
+							}
+							
+							if (!paymentFlag) {
+								tdrepayRechargeLog.setStatus(0);
+								tdrepayRechargeLog.setUpdateTime(new Date());
+								tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+								tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+								issueSendOutsideLogService.insert(issueSendOutsideLog);
+								break;
+							}
+						}
+					}
+				}
+
+			}
+		}
 	}
 }

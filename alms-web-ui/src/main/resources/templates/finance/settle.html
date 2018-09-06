@@ -332,7 +332,12 @@
                                 <td>还款金额来源</td>
                                 <td>实还日期:</td>
                                 <td>
-                                    <i-input disabled v-model="factRepaymentInfo.repayDate"></i-input>
+                                    <i-select v-model="factRepaymentInfo.repayDate" @on-change="reGetSttleInfo" >
+                                        <i-option v-for="item in thisTimeRepaymentInfo.moneyPoolRepayDates" :key="item" :value="item" >
+                                            {{item}}
+                                        </i-option>
+                                    </i-select>
+                                    <!-- <i-input disabled v-model="factRepaymentInfo.repayDate"></i-input> -->
                                 </td>
                                 <td></td>
                             </tr>

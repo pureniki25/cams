@@ -104,6 +104,7 @@ window.layinit(function (htConfig) {
                 {
                     title: '逾期天数',
                     key: 'overdueDays',
+                    className: 'demo-table-info-column-yuqi',
                     align: 'center',
                     render:(h,p)=>{
                     	if(p.row.repayment=='差额'){
@@ -237,6 +238,7 @@ window.layinit(function (htConfig) {
         		{
         			title: '逾期天数',
         			key: 'overdueDays',
+        			className: 'demo-table-info-column-yuqi',
         			align: 'center',
         			width: 100,
         			render:(h,p)=>{
@@ -275,7 +277,17 @@ window.layinit(function (htConfig) {
         		{
         			title: '状态',
         			key: 'confirmFlagStr',
-        			width: 800,
+					width: 800,
+					render:(h,p)=>{
+						return h('pre',{
+							style:{
+								overflow:'hidden',
+							},
+							attrs:{
+								title:p.row.confirmFlagStr,
+							}
+						},p.row.confirmFlagStr)
+					}
         		},
         		],
         		// 还款计划表头  -- end --
@@ -851,6 +863,20 @@ window.layinit(function (htConfig) {
     	        	app.$Modal.error({content: '接口调用异常!'});
     	        });
 			},
+			/*
+			 * 定义背景颜色
+			 */
+			rowClassName (row) {
+                if (row.repayment === '差额') {
+                    return 'demo-table-info-row-cha';
+                } 
+                /*else if (row.repayment === '实际还款') {
+                    return 'demo-table-info-row-shi';
+                } else if (row.repayment === '计划还款') {
+                    return 'demo-table-info-row-ying';
+                }*/
+                return '';
+            },
         },
         created: function () {
         	this.initBaseInfo();

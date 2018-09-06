@@ -579,8 +579,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 			MoneyPool moneyPool = moneyPoolMapper.selectById(mpr.getMoneyPoolId()); 
 			mpr.setState(mpr.getLastState());
 			mpr.setLastState(null);
-			mpr.setUpdateTime(null);
-			mpr.setUpdateUser(null);
+			mpr.setUpdateTime(new Date());
+			mpr.setUpdateUser(loginUserInfoHelper.getUserId());
 //			mpr.setIsFinanceMatch(0);
 			mpr.updateById();
 			if (moneyPool!=null) {
@@ -588,8 +588,8 @@ public class MoneyPoolServiceImpl extends BaseServiceImpl<MoneyPoolMapper, Money
 				moneyPool.setFinanceStatus(moneyPool.getLastFinanceStatus());
 				moneyPool.setLastFinanceStatus(null);
 				moneyPool.setLastStatus(null);
-				moneyPool.setUpdateTime(null);
-				moneyPool.setUpdateUser(null);
+				moneyPool.setUpdateTime(new Date());
+				moneyPool.setUpdateUser(loginUserInfoHelper.getUserId());
 				moneyPool.updateById();
 			}
 		}

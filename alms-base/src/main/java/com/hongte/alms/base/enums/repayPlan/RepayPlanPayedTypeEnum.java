@@ -24,9 +24,13 @@ public enum RepayPlanPayedTypeEnum implements IEnum {
     OFFLINE_CHECK_SETTLE(50,"线下财务确认全部结清",1),
     OFFLINE_WITH_HOLD_SETTLE(60,"线下代扣全部结清",2),
     BANK_WITH_HOLD_SETTLE(70,"银行代扣全部结清",3),
-    GET_MONEY_PAY(80,"提款时已还款",0);
+    GET_MONEY_PAY(80,"提款时已还款",0),
+	NIWO_PAY(90,"你我金融已还款",0);
 
-//1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
+/*
+ * classifyId ： 1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
+ * 若没有对应的还款方式，则填 0
+ */
     private Integer value;
     private String desc;
     private  Integer  classifyId;

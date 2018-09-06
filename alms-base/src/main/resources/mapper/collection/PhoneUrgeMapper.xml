@@ -376,7 +376,11 @@
 			  FROM
 			    `tb_tuandai_project_info` tpi 
 			  WHERE tpi.business_id = pList.business_id 
-			  LIMIT 1) plateType
+			  LIMIT 1) plateType,
+		(
+		select brt.repayment_type_name from tb_basic_repayment_type brt where brt.repayment_type_id = pList.repayment_type_id_ext
+		) repaymentType,
+		pList.phone_number_ext phoneNumber
         from tb_repayment_biz_plan_list_synch  as pList
         <if test="paymentPlatformCode!=null">
         JOIN tb_tuandai_project_info as ttpi ON pList.business_id = ttpi.business_id
@@ -494,7 +498,8 @@
             </if>
             <!--   /*//客户名称*/ -->
             <if test="customerName !=null  and customerName !=''  ">
-                and pList.customer_name_ext  LIKE '%${customerName}%'
+               <!--  and pList.customer_name_ext  LIKE '%${customerName}%' -->
+               AND EXISTS (SELECT 1 FROM `tb_tuandai_project_info` tpii WHERE tpii.`real_name` LIKE '%${customerName}%' AND tpii.`business_id` = pList.business_id)
             </if>
             <!--   /*//身份证号*/ -->
             <if test="identifyCard !=null  and identifyCard !=''  ">
@@ -662,7 +667,7 @@
             </if>
             <!--   /*//客户名称*/ -->
             <if test="customerName !=null  and customerName !=''  ">
-                and business.customer_name  LIKE '%${customerName}%'
+               and business.customer_name  LIKE '%${customerName}%' 
             </if>
      		
      		<if test="userId !=null and userId != '' and needPermission == 1">

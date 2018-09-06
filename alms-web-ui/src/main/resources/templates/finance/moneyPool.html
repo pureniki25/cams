@@ -15,7 +15,7 @@
         <card title="搜索条件">
             <i-form ref="form" :model="form" :label-width="100" inline>
                 <form-item prop="acceptBank" label="转入账号">
-                    <i-select v-model="form.acceptBank" style="width: 10rem" clearable>
+                    <i-select v-model="form.acceptBank" style="width: 10rem" clearable filterable>
                         <i-option v-for="item in bankList" :value="item.financeName" :key="item.financeName">{{item.financeName}}</i-option>
                     </i-select>
                 </form-item>

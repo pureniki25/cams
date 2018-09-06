@@ -1392,6 +1392,10 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         Map<String,List<ProjInfoReq>>  projInfoReqMap = new HashMap<>();
         for (ProjInfoReq projInfoReq:tuandaiProjReqInfos){
             Date fullTime = projInfoReq.getBeginTime();
+            if(fullTime==null) {//add by czs 如果是试算的话，Fulltime为默认今天时间
+            	fullTime=new Date();
+            	projInfoReq.setBeginTime(fullTime);
+            }
             //业务的还款计划还是按每日满标的标合并
             String fullTimeStr =  DateUtil.formatDate(fullTime);//UUID.randomUUID().toString();
             List<ProjInfoReq>  batchProj =projInfoReqMap.get(fullTimeStr);
