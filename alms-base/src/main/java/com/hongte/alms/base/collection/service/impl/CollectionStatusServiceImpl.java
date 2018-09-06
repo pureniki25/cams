@@ -676,6 +676,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         StaffBusinessVo vo = new StaffBusinessVo();
         vo.setBusinessId(busnessId);
         vo.setCrpId(planListId);
+        if(planListId.equals("0d9c3396-0131-4271-af05-317b623e6f41")) {
+        	System.out.println("stop");
+        }
         // 将StaffBusinessVo 放入list
         voList.add(vo);
         boolean bl= setBusinessStaff(
@@ -771,7 +774,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
             CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()).eq("collection_status",CollectionStatusEnum.PHONE_STAFF.getKey()));
-            if(collectionStatus!=null){
+          
+            if(collectionStatus!=null&&phonePersons.contains(collectionStatus.getPhoneStaff())){
                 try{
                     setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
                             collectionStatus.getPhoneStaff(),StaffPersonType.PHONE_STAFF.getKey());
