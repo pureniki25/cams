@@ -499,7 +499,7 @@
             <!--   /*//客户名称*/ -->
             <if test="customerName !=null  and customerName !=''  ">
                <!--  and pList.customer_name_ext  LIKE '%${customerName}%' -->
-               AND EXISTS (SELECT 1 FROM `tb_tuandai_project_info` tpii WHERE tpii.`real_name` LIKE '%${customerName}%' AND tpii.`business_id` = pList.business_id)
+               AND EXISTS (SELECT 1 FROM `tb_basic_biz_customer` tpii WHERE tpii.`customer_name` LIKE '%${customerName}%' AND tpii.`business_id` = pList.business_id)
             </if>
             <!--   /*//身份证号*/ -->
             <if test="identifyCard !=null  and identifyCard !=''  ">
