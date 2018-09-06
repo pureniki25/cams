@@ -144,7 +144,7 @@ public class CamsFlowController {
     	return Result.buildSuccess();
     }
 
-	private void addBusinessFlow(List<Map<String, Object>> listMap) {
+	private void addBusinessFenFaFlow(List<Map<String, Object>> listMap) {
 		//2# step2 循环业务list，去除每一条业务的流水list
     	for(Map<String,Object> businessMapInfo : listMap) {
     		CreateBatchFlowCommand command = new CreateBatchFlowCommand();
@@ -339,7 +339,7 @@ public class CamsFlowController {
     	}
 	}
 	
-	private void addBusinessFenFaFlow(List<Map<String, Object>> listMap) {
+	private void addBusinessFlow(List<Map<String, Object>> listMap) {
 		//2# step2 循环业务list，去除每一条业务的流水list
     	for(Map<String,Object> businessMapInfo : listMap) {
     		CreateBatchFlowCommand command = new CreateBatchFlowCommand();
