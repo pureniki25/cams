@@ -21,15 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
+import com.hongte.alms.base.entity.TdrepayRechargeRecord;
 import com.hongte.alms.base.feignClient.AccountListHandlerClient;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.FlowPushLogService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
-import com.hongte.alms.base.service.TdrepayRechargeDetailService;
-import com.hongte.alms.base.service.TdrepayRechargeService;
+import com.hongte.alms.base.service.TdrepayRechargeRecordService;
 import com.hongte.alms.base.vo.cams.CamsMessage;
 import com.hongte.alms.base.vo.cams.CancelBizAccountListCommand;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand;
@@ -65,9 +66,9 @@ public class CamsFlowController {
     @Qualifier("BasicBusinessService")
     BasicBusinessService basicBusinessService;
     
-//    @Autowired
-//    @Qualifier("TdrepayRechargeService")
-//    TdrepayRechargeService tdrepayRechargeService;
+    @Autowired
+    @Qualifier("TdrepayRechargeRecordService")
+    TdrepayRechargeRecordService tdrepayRechargeRecordService;
     
     @Autowired
     @Qualifier("FlowPushLogService")
@@ -151,8 +152,8 @@ public class CamsFlowController {
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
         	int actionId = Integer.parseInt(businessMapInfo.get("action_id").toString());
-        	String batchId = businessMapInfo.get("repayment_batch_id")+"";
-        	RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(batchId);
+        	String batchId = confirmLogId;//businessMapInfo.get("repayment_batch_id")+"";
+        	TdrepayRechargeRecord tdrepayRechargeRecord = tdrepayRechargeRecordService.selectOne(new EntityWrapper<TdrepayRechargeRecord>().eq("log_id", batchId).eq("is_valid", 1));
         	FlowPushLog flowPushLog = new FlowPushLog();
         	flowPushLog.setPushKey(batchId);
         	flowPushLog.setPushLogType(1);
@@ -230,7 +231,7 @@ public class CamsFlowController {
             	Date segmentationDate = (Date) flowMap.get("segmentation_date");
             	String sourceAccountIdentifierId = flowMap.get("target_account_id")+"";
             	String targetAccountIdentifierId = flowMap.get("target_bank_card_no")+"";
-            	int repayType = Integer.parseInt(flowMap.get("repayType").toString());
+            	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
             	String listId = flowMap.get("list_id")+"";
         		flow.setAccountTime(accountTime);
             	flow.setAfterId(afterId);
@@ -322,15 +323,15 @@ public class CamsFlowController {
             	}
             	
             	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
-            		repaymentConfirmLog.setLastPushStatus(1);
+            		tdrepayRechargeRecord.setLastPushStatus(1);
             		flowPushLog.setPushStatus(1);
             	}else {
-            		repaymentConfirmLog.setLastPushStatus(2);
+            		tdrepayRechargeRecord.setLastPushStatus(2);
             		flowPushLog.setPushStatus(2);
             	}
             	//更新推送状态
-            	repaymentConfirmLog.setLastPushDatetime(new Date());
-            	repaymentConfirmLogService.updateById(repaymentConfirmLog);
+            	tdrepayRechargeRecord.setLastPushDatetime(new Date());
+            	tdrepayRechargeRecordService.update(tdrepayRechargeRecord,new EntityWrapper<TdrepayRechargeRecord>().eq("log_id", confirmLogId).eq("is_valid", 1));
             	
             	//记录推送日志
             	flowPushLog.setPushEndtime(new Date());
@@ -346,8 +347,8 @@ public class CamsFlowController {
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
         	int actionId = Integer.parseInt(businessMapInfo.get("action_id").toString());
-        	String batchId = businessMapInfo.get("log_id")+"";
-//        	tdrepayRechargeService
+        	String batchId = confirmLogId;
+        	RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(batchId);
         	FlowPushLog flowPushLog = new FlowPushLog();
         	flowPushLog.setPushKey(batchId);
         	flowPushLog.setPushLogType(2);
@@ -522,16 +523,16 @@ public class CamsFlowController {
     				}
             	}
             	
-//            	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
-//            		repaymentConfirmLog.setLastPushStatus(1);
-//            		flowPushLog.setPushStatus(1);
-//            	}else {
-//            		repaymentConfirmLog.setLastPushStatus(2);
-//            		flowPushLog.setPushStatus(2);
-//            	}
-//            	//更新推送状态
-//            	repaymentConfirmLog.setLastPushDatetime(new Date());
-//            	repaymentConfirmLogService.updateById(repaymentConfirmLog);
+            	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
+            		repaymentConfirmLog.setLastPushStatus(1);
+            		flowPushLog.setPushStatus(1);
+            	}else {
+            		repaymentConfirmLog.setLastPushStatus(2);
+            		flowPushLog.setPushStatus(2);
+            	}
+            	//更新推送状态
+            	repaymentConfirmLog.setLastPushDatetime(new Date());
+            	repaymentConfirmLogService.updateById(repaymentConfirmLog);
             	
             	//记录推送日志
             	flowPushLog.setPushEndtime(new Date());
@@ -573,6 +574,45 @@ public class CamsFlowController {
     @ResponseBody
     public Result<Object> cancelFlow() {
     	CancelBizAccountListCommand command = new CancelBizAccountListCommand();
-    	return accountListHandlerClient.cancelFlow(command);
+
+    	
+    	CamsMessage camsMessage = new CamsMessage();
+    	camsMessage.setClientId("ALMS");
+    	camsMessage.setExchangeName("cams.account.ms.exchange");
+    	camsMessage.setHostPort(0);
+    	camsMessage.setHostUrl("192.168.14.245");
+    	camsMessage.setMessageId(UUID.randomUUID().toString());
+    	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
+    	camsMessage.setMessage(command);
+    	
+    	int retryTimes = 0;
+    	String retStr = "";
+    	while(retryTimes < 3) {
+    		try {
+        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+        		System.err.println(JSON.toJSONString(camsMessage));
+            	System.err.println(JSONObject.toJSONString(ret));
+            	retStr = JSON.toJSONString(camsMessage);
+        		break;//跳出循环
+    		} catch (Exception e) {
+    			System.err.println(e.getMessage());
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+    			retryTimes++;
+			}
+    	}
+    	
+//    	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
+//    		repaymentConfirmLog.setLastPushStatus(1);
+//    		flowPushLog.setPushStatus(1);
+//    	}else {
+//    		repaymentConfirmLog.setLastPushStatus(2);
+//    		flowPushLog.setPushStatus(2);
+//    	}
+    	
+    	return Result.buildSuccess();
     }
 }
