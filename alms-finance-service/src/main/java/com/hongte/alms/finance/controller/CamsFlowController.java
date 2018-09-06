@@ -431,7 +431,7 @@ public class CamsFlowController {
             	Date segmentationDate = (Date) flowMap.get("segmentation_date");
             	String sourceAccountIdentifierId = flowMap.get("target_account_id")+"";
             	String targetAccountIdentifierId = flowMap.get("target_bank_card_no")+"";
-            	int repayType = Integer.parseInt(flowMap.get("repayType").toString());
+            	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
             	String listId = flowMap.get("list_id")+"";
         		flow.setAccountTime(accountTime);
             	flow.setAfterId(afterId);
