@@ -209,6 +209,11 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	void deleteLastDayFlow(Map<String, Object> paramLastDayMap);
 
 	void deleteLastDayFlowItem(Map<String, Object> paramLastDayFlowItemMap);
-	 
+
+	List<Map<String, Object>> selectlPushFenFaBusiness(Map<String, Object> paramBusinessMap);
+
+	List<Map<String, Object>> selectlPushBusinessFenFaFlow(Map<String, Object> paramOnlineFlowMap);
+
+	List<Map<String, Object>> selectlPushBusinessFenFaFlowItem(Map<String, Object> paramFlowItemMap);
 
 }
