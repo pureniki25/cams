@@ -23,7 +23,7 @@ import com.xxl.job.core.log.XxlJobLogger;
  * @author liuzq
  * 自动设置用户可访问的业务关系
  */
-@JobHandler(value = "setUserPermissionHandler")
+@JobHandler(value = "CamsFlowSyncJob")
 @Component
 public class CamsFlowSyncJob extends IJobHandler  {
 
