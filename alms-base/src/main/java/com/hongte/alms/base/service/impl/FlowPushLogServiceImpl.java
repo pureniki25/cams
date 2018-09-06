@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author 刘正全
  * @since 2018-09-05
  */
-@Service
+@Service("FlowPushLogService")
 public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, FlowPushLog> implements FlowPushLogService {
 
 }
