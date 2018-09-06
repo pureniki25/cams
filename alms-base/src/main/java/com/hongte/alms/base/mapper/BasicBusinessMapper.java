@@ -153,6 +153,20 @@ public interface BasicBusinessMapper extends SuperMapper<BasicBusiness> {
 
 	List<Map<String, Object>> selectlPushBusinessFlowItem(Map<String, Object> paramFlowItemMap);
 
+	void addLastDayFlow(@Param("ew") Map<String, Object> paramLastDayFlowMap);
+
+	void addLastDayFlowItem(@Param("ew") Map<String, Object> paramLastDayFlowItemMap);
+
+	void deleteLastDayFlow(Map<String, Object> paramLastDayMap);
+
+	void deleteLastDayFlowItem(Map<String, Object> paramLastDayFlowItemMap);
+
+	List<Map<String, Object>> selectlPushFenFaBusiness(Map<String, Object> paramBusinessMap);
+
+	List<Map<String, Object>> selectlPushBusinessFenFaFlow(Map<String, Object> paramFenFaFlowMap);
+
+	List<Map<String, Object>> selectlPushBusinessFenFaFlowItem(Map<String, Object> paramFlowItemMap);
+
 }
 
 

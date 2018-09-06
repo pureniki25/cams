@@ -1,5 +1,6 @@
 package com.hongte.alms.base.vo.cams;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,14 +16,12 @@ import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.ws.rs.ext.Provider;
 
 import org.hibernate.validator.constraints.Length;
 
 public class CreateBatchFlowCommand extends MessageCommand {
 
-    @NotBlank
-    @JsonProperty("batchId")
-    private String thirdBatchId;
     private String batchId;
 
     private Integer actionId;
@@ -44,22 +43,14 @@ public class CreateBatchFlowCommand extends MessageCommand {
     public FlowAccountIdentifier getFlowAccountIdentifier(String accountIdentifierId){
         return accountIdentifiers.stream().filter(m->accountIdentifierId.compareToIgnoreCase(m.getIdentifierId())==0).findFirst().get();
     }
-
-    public String getThirdBatchId() {
-        return thirdBatchId;
-    }
     
     public void setBatchId(String batchId) {
 		this.batchId = batchId;
 	}
 
-	public void setThirdBatchId(String thirdBatchId) {
-        this.thirdBatchId = thirdBatchId;
-    }
-    
-    @JsonIgnore
+//    @JsonIgnore
     public String getBatchId() {
-        return this.clientId+"-"+this.thirdBatchId;
+        return this.batchId;
     }
 
     public Integer getActionId() {
@@ -207,6 +198,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
         private String targetAccountIdentifierId;
 
         @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+        @JSONField(format="yyyy-MM-dd HH:mm:ss")
         private Date accountTime;
 
         private BigDecimal amount;
@@ -218,6 +210,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
         private String externalId;
 
         @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+        @JSONField(format="yyyy-MM-dd")
         private Date segmentationDate;
 
         private String afterId;
@@ -328,6 +321,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
 
     public static class FlowDetail{
         @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+        @JSONField(format="yyyy-MM-dd HH:mm:ss")
         private Date accountTime;
 
         private BigDecimal amount;
@@ -337,6 +331,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
         private String feeName;
 
         @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+        @JSONField(format="yyyy-MM-dd")
         private Date segmentationDate;
 
         private String afterId;

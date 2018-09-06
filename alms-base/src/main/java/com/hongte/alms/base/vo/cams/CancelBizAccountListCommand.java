@@ -19,7 +19,6 @@ public class CancelBizAccountListCommand extends MessageCommand {
 
     private String externalId;
 
-
     public String getBusinessId() {
         return businessId;
     }
