@@ -96,4 +96,8 @@ public interface TdrepayRechargeService {
 	 */
 	void revokeTdrepayRecharge(List<TdrepayRechargeLog> tdrepayRechargeLogs);
 	
+	/**
+	 * 处理合规化还款处理中的数据
+	 */
+	void handleRunningData();
 }

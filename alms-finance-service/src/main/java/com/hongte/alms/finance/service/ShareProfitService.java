@@ -6,6 +6,7 @@ package com.hongte.alms.finance.service;
 import java.util.List;
 
 import com.hongte.alms.base.dto.ConfirmRepaymentReq;
+import com.hongte.alms.base.entity.MoneyPoolRepayment;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.vo.finance.CurrPeriodProjDetailVO;
 
@@ -33,4 +34,9 @@ public interface ShareProfitService {
 
 
 	public void tdrepayRechargeThread(List<RepaymentProjPlanList> ptojPlanList, String confirmLogId);
+	  /**
+     * 
+     * 数据迁移，线下还款流水批量核销
+     */
+    public void updateMoneyPoolState(MoneyPoolRepayment moneyPoolRepayment);
 }

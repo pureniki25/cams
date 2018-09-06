@@ -1073,5 +1073,20 @@ public class TdrepayRechargeController {
 			return Result.error("-99", e.getMessage());
 		}
 	}
+	
+	@ApiOperation(value = "处理合规化还款处理中的数据")
+	@GetMapping("/handleRunningData")
+	@ResponseBody
+	public Result handleRunningData() {
+		try {
+			
+			tdrepayRechargeService.handleRunningData();
+			
+			return Result.success();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error(e.getMessage());
+		}
+	}
 
 }
