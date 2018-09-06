@@ -16,7 +16,6 @@ import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import javax.ws.rs.ext.Provider;
 
 import org.hibernate.validator.constraints.Length;
 
