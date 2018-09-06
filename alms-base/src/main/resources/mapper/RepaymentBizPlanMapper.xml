@@ -93,6 +93,7 @@
 		t.onlineOverDue,
 		t.planAmount,
 		t.factAmount,
+		t.repayStatus,
 		(t.factAmount-t.planAmount) as lack
 		FROM (
 		
@@ -103,6 +104,7 @@
 			pl.after_id AS afterId,
 			pl.due_date AS repayDate,
 			pl.current_status as status,
+			pl.repay_status as repayStatus,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 10 ) AS item10,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 20 ) AS item20,
 			( SELECT IFNULL( sum( plan_amount ), 0 ) FROM tb_repayment_biz_plan_list_detail WHERE plan_list_id = pl.plan_list_id AND plan_item_type = 30 ) AS item30,

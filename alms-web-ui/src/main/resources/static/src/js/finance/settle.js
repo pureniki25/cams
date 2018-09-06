@@ -424,13 +424,20 @@ window.layinit(function (htConfig) {
                         render: (h, p) => {
                             let s = p.row.status;
                             let color = 'blue'
-                            let content = s
+                            let content = p.row.status
                             if (!s) {
                                 return h('span', '')
                             }
                             //还款中，逾期，已还款
                             if(content=='还款中'){
                                 color='green'
+                                if(p.row.repayStatus==1){
+                                    content = '部分已还款'
+                                }
+                                if(p.row.repayStatus==2){
+                                    color='blue'
+                                    content = '线上已还款'
+                                }
                             }
                             if(content=='逾期'){
                                 color='#ed3f14'
