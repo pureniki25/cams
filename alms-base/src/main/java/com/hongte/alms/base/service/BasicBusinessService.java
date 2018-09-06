@@ -194,13 +194,26 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 	 */
 	List<String> selectGoodHourseBusinessIds();
 
-	List<Map<String, Object>> selectlPushBusiness();
+	List<Map<String, Object>> selectlPushBusiness(Map<String, Object> paramBusinessMap);
 
 	List<Map<String, Object>> selectlPushBusinessOnlineFlow(Map<String, Object> paramOnlineFlowMap);
 
 	List<Map<String, Object>> selectlPushBusinessOfflineFlow(Map<String, Object> paramOnlineFlowMap);
 
 	List<Map<String, Object>> selectlPushBusinessFlowItem(Map<String, Object> paramFlowItemMap);
-	 
+
+	void addLastDayFlow(Map<String, Object> paramLastDayMap);
+
+	void addLastDayFlowItem(Map<String, Object> paramLastDayFlowItemMap);
+
+	void deleteLastDayFlow(Map<String, Object> paramLastDayMap);
+
+	void deleteLastDayFlowItem(Map<String, Object> paramLastDayFlowItemMap);
+
+	List<Map<String, Object>> selectlPushFenFaBusiness(Map<String, Object> paramBusinessMap);
+
+	List<Map<String, Object>> selectlPushBusinessFenFaFlow(Map<String, Object> paramOnlineFlowMap);
+
+	List<Map<String, Object>> selectlPushBusinessFenFaFlowItem(Map<String, Object> paramFlowItemMap);
 
 }
