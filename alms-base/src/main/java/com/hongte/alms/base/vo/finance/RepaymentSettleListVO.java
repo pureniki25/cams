@@ -37,6 +37,7 @@ public class RepaymentSettleListVO implements Serializable{
 	private BigDecimal penalty ;
 	private String remark ;
 	private String status ;
+	private String repayStatus ;
 	public Integer getRepayYear() {
 		if (repayDate==null) {
 			return null;
@@ -173,5 +174,11 @@ public class RepaymentSettleListVO implements Serializable{
 		}
 			
 		return true;
+	}
+	public String getRepayStatus() {
+		return repayStatus;
+	}
+	public void setRepayStatus(String repayStatus) {
+		this.repayStatus = repayStatus;
 	}
 }
