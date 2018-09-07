@@ -216,4 +216,8 @@ public interface BasicBusinessService extends BaseService<BasicBusiness> {
 
 	List<Map<String, Object>> selectlPushBusinessFenFaFlowItem(Map<String, Object> paramFlowItemMap);
 
+	List<Map<String, Object>> selectlCancelRepayFlow(Map<String, Object> paramRepayFlowMap);
+
+	List<Map<String, Object>> selectlCancelFenFaFlow(Map<String, Object> paramFenFaFlowMap);
+
 }

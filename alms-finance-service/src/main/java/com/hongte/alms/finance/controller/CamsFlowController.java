@@ -25,7 +25,6 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
-import com.hongte.alms.base.feignClient.AccountListHandlerClient;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.FlowPushLogService;
@@ -38,7 +37,6 @@ import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Business;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Flow;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowAccountIdentifier;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowDetail;
-import com.hongte.alms.common.util.DateUtil;
 import com.ht.ussp.core.Result;
 
 import io.swagger.annotations.Api;
@@ -52,8 +50,8 @@ public class CamsFlowController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CamsFlowController.class);
 
-    @Autowired
-    private AccountListHandlerClient accountListHandlerClient;
+//    @Autowired
+//    private AccountListHandlerClient accountListHandlerClient;
     
     @Autowired
     private AccountListHandlerMsgClient accountListHandlerMsgClient;
@@ -88,7 +86,7 @@ public class CamsFlowController {
     	Map<String,Object> paramBusinessMap = new HashMap<>();
     	List<Map<String,Object>> listMap = basicBusinessService.selectlPushBusiness(paramBusinessMap);
     	addBusinessFlow(listMap);
-    	return Result.buildSuccess();
+    	return Result.buildSuccess("还款结清流水同步完成");
     }
     
     /**
@@ -105,7 +103,7 @@ public class CamsFlowController {
     	Map<String,Object> paramBusinessMap = new HashMap<>();
     	List<Map<String,Object>> listMap = basicBusinessService.selectlPushFenFaBusiness(paramBusinessMap);
     	addBusinessFenFaFlow(listMap);
-    	return Result.buildSuccess();
+    	return Result.buildSuccess(0);
     }
 
 	/**
@@ -124,7 +122,7 @@ public class CamsFlowController {
     	paramBusinessMap.put("businessId",businessId);
     	List<Map<String,Object>> listMap = basicBusinessService.selectlPushBusiness(paramBusinessMap);
     	addBusinessFlow(listMap);
-    	return Result.buildSuccess();
+    	return Result.buildSuccess("指定业务ID新增账户流水成功");
     }
     
     /**
@@ -132,7 +130,7 @@ public class CamsFlowController {
      * @param bankWithholdFlowReq
      * @return
      */
-    @ApiOperation(value = "指定业务ID新增账户流水")
+    @ApiOperation(value = "指定confirmLogId同步账户流水到核心")
     @GetMapping("/addFlowByConfireLogID")
     @ResponseBody
     public Result<Object> addFlowByConfireLogID(String confirmLogId) {
@@ -142,7 +140,7 @@ public class CamsFlowController {
     	paramBusinessMap.put("confirmLogId", confirmLogId);
     	List<Map<String,Object>> listMap = basicBusinessService.selectlPushBusiness(paramBusinessMap);
     	addBusinessFlow(listMap);
-    	return Result.buildSuccess();
+    	return Result.buildSuccess("指定confirmLogId同步账户流水到核心成功");
     }
 
 	private void addBusinessFenFaFlow(List<Map<String, Object>> listMap) {
@@ -324,9 +322,11 @@ public class CamsFlowController {
             	
             	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
             		tdrepayRechargeRecord.setLastPushStatus(1);
+            		tdrepayRechargeRecord.setLastPushRemark(retStr);
             		flowPushLog.setPushStatus(1);
             	}else {
             		tdrepayRechargeRecord.setLastPushStatus(2);
+            		tdrepayRechargeRecord.setLastPushRemark(retStr);
             		flowPushLog.setPushStatus(2);
             	}
             	//更新推送状态
@@ -510,9 +510,10 @@ public class CamsFlowController {
                 		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
                 		System.err.println(JSON.toJSONString(camsMessage));
                     	System.err.println(JSONObject.toJSONString(ret));
-                    	retStr = JSON.toJSONString(camsMessage);
+                    	retStr = JSON.toJSONString(ret);
                 		break;//跳出循环
             		} catch (Exception e) {
+            			retStr = e.getMessage();
             			System.err.println(e.getMessage());
 						try {
 							Thread.sleep(100);
@@ -525,9 +526,11 @@ public class CamsFlowController {
             	
             	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
             		repaymentConfirmLog.setLastPushStatus(1);
+            		repaymentConfirmLog.setLastPushRemark(retStr);
             		flowPushLog.setPushStatus(1);
             	}else {
             		repaymentConfirmLog.setLastPushStatus(2);
+            		repaymentConfirmLog.setLastPushRemark(retStr);
             		flowPushLog.setPushStatus(2);
             	}
             	//更新推送状态
@@ -552,7 +555,7 @@ public class CamsFlowController {
     	
     	//插入临时流水表
     	Map<String,Object> paramLastDayMap = new HashMap<>();
-    	Date preDate = DateUtil.addDay2Date(-1, new Date());
+    	//Date preDate = DateUtil.addDay2Date(-1, new Date());
     	paramLastDayMap.put("syncDay1","2018-09-03");//DateUtil.getThatDayBegin(preDate)
     	paramLastDayMap.put("syncDay2","2018-09-03");//DateUtil.getThatDayEnd(preDate)
     	//paramLastDayMap.put("syncDay", DateUtil.toDateString(preDate, DateUtil.DEFAULT_FORMAT_DATE));
@@ -561,7 +564,7 @@ public class CamsFlowController {
         //插入临时流水明细表
     	basicBusinessService.deleteLastDayFlowItem(paramLastDayMap);
         basicBusinessService.addLastDayFlowItem(paramLastDayMap);
-    	return Result.buildSuccess();
+    	return Result.buildSuccess("同步还款流水到临时表成功");
 	}
 	
     /**
@@ -569,50 +572,184 @@ public class CamsFlowController {
      * @param bankWithholdFlowReq
      * @return
      */
-    @ApiOperation(value = "撤销业务流水")
-    @GetMapping("/cancelFlow")
+    @ApiOperation(value = "撤销业务还款流水")
+    @GetMapping("/cancelRepayFlow")
     @ResponseBody
-    public Result<Object> cancelFlow() {
-    	CancelBizAccountListCommand command = new CancelBizAccountListCommand();
-
+    public Result<Object> cancelRepayFlow() {
     	
-    	CamsMessage camsMessage = new CamsMessage();
-    	camsMessage.setClientId("ALMS");
-    	camsMessage.setExchangeName("cams.account.ms.exchange");
-    	camsMessage.setHostPort(0);
-    	camsMessage.setHostUrl("192.168.14.245");
-    	camsMessage.setMessageId(UUID.randomUUID().toString());
-    	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
-    	camsMessage.setMessage(command);
+    	// 还款 结清撤销
+    	Map<String,Object> paramRepayFlowMap = new HashMap<>();
+    	List<Map<String,Object>> listRepayFlow = basicBusinessService.selectlCancelRepayFlow(paramRepayFlowMap);
     	
-    	int retryTimes = 0;
-    	String retStr = "";
-    	while(retryTimes < 3) {
-    		try {
-        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
-        		System.err.println(JSON.toJSONString(camsMessage));
-            	System.err.println(JSONObject.toJSONString(ret));
-            	retStr = JSON.toJSONString(camsMessage);
-        		break;//跳出循环
-    		} catch (Exception e) {
-    			System.err.println(e.getMessage());
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+    	for (Map<String, Object> mapFlow : listRepayFlow) {
+			String businessId = mapFlow.get("business_id").toString();
+			String afterId = mapFlow.get("after_id").toString();
+			Date queryFullsuccessDate = (Date) mapFlow.get("queryFullsuccessDate");
+			String logId = mapFlow.get("confirm_log_id").toString();
+			//String flowType = mapFlow.get("flowType").toString();
+			String clientId = "ALMS";
+			
+			//记录日志
+			RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(logId);
+	    	FlowPushLog flowPushLog = new FlowPushLog();
+	    	flowPushLog.setPushKey(logId);
+	    	flowPushLog.setPushLogType(1);
+	    	flowPushLog.setPushTo(1);
+	    	flowPushLog.setPushStarttime(new Date());
+	    	flowPushLog.setPushStatus(0);
+			
+	    	CancelBizAccountListCommand command = new CancelBizAccountListCommand();
+	    	command.setAfterId(afterId);
+	    	command.setBusinessId(businessId);
+	    	command.setClientId(clientId);
+	    	command.setCreateTime(queryFullsuccessDate);
+	    	command.setTriggerEventSystem("1");
+	    	command.setEventType("FlowCanceled");
+	    	command.setTriggerEventType("CanceledFlow");
+	    	command.setSegmentationDate(queryFullsuccessDate);
+	    	command.setMessageId(logId);
+	    	
+	    	CamsMessage camsMessage = new CamsMessage();
+	    	camsMessage.setClientId(clientId);
+	    	camsMessage.setExchangeName("cams.account.ms.exchange");
+	    	camsMessage.setHostPort(0);
+	    	camsMessage.setHostUrl("192.168.14.245");
+	    	camsMessage.setMessageId(UUID.randomUUID().toString());
+	    	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
+	    	camsMessage.setMessage(command);
+	    	
+	    	int retryTimes = 0;
+	    	String retStr = "";
+	    	while(retryTimes < 3) {
+	    		try {
+	    			// 撤销已推送
+	        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+	        		System.err.println(JSON.toJSONString(camsMessage));
+	            	System.err.println(JSONObject.toJSONString(ret));
+	            	retStr = JSON.toJSONString(ret);
+	        		break;//跳出循环
+	    		} catch (Exception e) {
+	    			retStr = e.getMessage();
+	    			System.err.println(e.getMessage());
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+	    			retryTimes++;
 				}
-    			retryTimes++;
+	    	}
+	    	
+	    	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
+	    		repaymentConfirmLog.setLastPushStatus(4);
+	    		repaymentConfirmLog.setLastPushRemark(retStr);
+				flowPushLog.setPushStatus(4);
+			}else {
+				repaymentConfirmLog.setLastPushStatus(5);
+				repaymentConfirmLog.setLastPushRemark(retStr);
+				flowPushLog.setPushStatus(5);
 			}
-    	}
+	    	
+	    	//更新推送状态
+	    	repaymentConfirmLog.setLastPushDatetime(new Date());
+	    	repaymentConfirmLogService.updateById(repaymentConfirmLog);
+	    	
+	    	//记录推送日志
+	    	flowPushLog.setPushEndtime(new Date());
+	    	flowPushLogService.insert(flowPushLog);
+		}
     	
-//    	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
-//    		repaymentConfirmLog.setLastPushStatus(1);
-//    		flowPushLog.setPushStatus(1);
-//    	}else {
-//    		repaymentConfirmLog.setLastPushStatus(2);
-//    		flowPushLog.setPushStatus(2);
-//    	}
+    	return Result.buildSuccess("撤销业务还款流水成功");
+    }
+    
+    
+    @ApiOperation(value = "撤销资金分发还款流水")
+    @GetMapping("/cancelFenFaFlow")
+    @ResponseBody
+    public Result<Object> cancelFenFaFlow() {
+  
+    	// 资金分发撤销
+    	Map<String,Object> paramFenFaFlowMap = new HashMap<>();
+    	List<Map<String,Object>> listFenFaFlow = basicBusinessService.selectlCancelFenFaFlow(paramFenFaFlowMap);
     	
-    	return Result.buildSuccess();
+    	for (Map<String, Object> mapFlow : listFenFaFlow) {
+			String businessId = mapFlow.get("business_id").toString();
+			String afterId = mapFlow.get("after_id").toString();
+			Date queryFullsuccessDate = (Date) mapFlow.get("queryFullsuccessDate");
+			String logId = mapFlow.get("confirm_log_id").toString();
+			//String flowType = mapFlow.get("flowType").toString();
+			String clientId = "ALMS";
+			
+			//记录日志
+			TdrepayRechargeRecord tdrepayRechargeRecord = tdrepayRechargeRecordService.selectOne(new EntityWrapper<TdrepayRechargeRecord>().eq("log_id", logId).eq("is_valid", 2));
+			FlowPushLog flowPushLog = new FlowPushLog();
+	    	flowPushLog.setPushKey(logId);
+	    	flowPushLog.setPushLogType(1);
+	    	flowPushLog.setPushTo(1);
+	    	flowPushLog.setPushStarttime(new Date());
+	    	flowPushLog.setPushStatus(0);
+			
+	    	CancelBizAccountListCommand command = new CancelBizAccountListCommand();
+	    	command.setAfterId(afterId);
+	    	command.setBusinessId(businessId);
+	    	command.setClientId(clientId);
+	    	command.setCreateTime(queryFullsuccessDate);
+	    	command.setTriggerEventSystem("1");
+	    	command.setEventType("FlowCanceled");
+	    	command.setTriggerEventType("CanceledFlow");
+	    	command.setSegmentationDate(queryFullsuccessDate);
+	    	command.setMessageId(logId);
+	    	
+	    	CamsMessage camsMessage = new CamsMessage();
+	    	camsMessage.setClientId(clientId);
+	    	camsMessage.setExchangeName("cams.account.ms.exchange");
+	    	camsMessage.setHostPort(0);
+	    	camsMessage.setHostUrl("192.168.14.245");
+	    	camsMessage.setMessageId(UUID.randomUUID().toString());
+	    	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
+	    	camsMessage.setMessage(command);
+	    	
+	    	int retryTimes = 0;
+	    	String retStr = "";
+	    	while(retryTimes < 3) {
+	    		try {
+	    			// 撤销已推送
+	        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+	        		System.err.println(JSON.toJSONString(camsMessage));
+	            	System.err.println(JSONObject.toJSONString(ret));
+	            	retStr = JSON.toJSONString(ret);
+	        		break;//跳出循环
+	    		} catch (Exception e) {
+	    			retStr = e.getMessage();
+	    			System.err.println(e.getMessage());
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+	    			retryTimes++;
+				}
+	    	}
+	    	
+	    	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
+	    		tdrepayRechargeRecord.setLastPushStatus(4);
+	    		tdrepayRechargeRecord.setLastPushRemark(retStr);
+				flowPushLog.setPushStatus(4);
+			}else {
+				tdrepayRechargeRecord.setLastPushStatus(5);
+				tdrepayRechargeRecord.setLastPushRemark(retStr);
+				flowPushLog.setPushStatus(5);
+			}
+	    	
+        	//更新推送状态
+	    	tdrepayRechargeRecord.setLastPushDatetime(new Date());
+	    	tdrepayRechargeRecordService.update(tdrepayRechargeRecord,new EntityWrapper<TdrepayRechargeRecord>().eq("log_id", logId).eq("is_valid", 2));
+        	
+        	//记录推送日志
+        	flowPushLog.setPushEndtime(new Date());
+        	flowPushLogService.insert(flowPushLog);
+		}
+    	
+    	return Result.buildSuccess(0);
     }
 }

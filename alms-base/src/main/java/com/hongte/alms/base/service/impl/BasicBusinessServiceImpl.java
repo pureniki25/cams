@@ -921,4 +921,14 @@ public class BasicBusinessServiceImpl extends BaseServiceImpl<BasicBusinessMappe
 		public List<Map<String, Object>> selectlPushBusinessFenFaFlowItem(Map<String, Object> paramFlowItemMap) {
 			return basicBusinessMapper.selectlPushBusinessFenFaFlowItem(paramFlowItemMap);
 		}
+
+		@Override
+		public List<Map<String, Object>> selectlCancelRepayFlow(Map<String, Object> paramRepayFlowMap) {
+			return basicBusinessMapper.selectlCancelRepayFlow(paramRepayFlowMap);
+		}
+
+		@Override
+		public List<Map<String, Object>> selectlCancelFenFaFlow(Map<String, Object> paramFenFaFlowMap) {
+			return basicBusinessMapper.selectlCancelFenFaFlow(paramFenFaFlowMap);
+		}
 }
