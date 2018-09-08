@@ -1307,9 +1307,9 @@
 		  b.creditor_type borrowerType,
 		  b.`creditor_or_guarantors_address` address,
 		  b.`lender_phone` telNo,
-		  a.`branch_full_name` companyName,
-		  a.`branch_address` licenseAddr,
-		  a.`legal_person` legalPerson,
+		  b.`TuanDai_Guarantee_Company` companyName,
+		  b.`creditor_or_guarantors_address` licenseAddr,
+		  b.`guarantors_legal_person` legalPerson,
 		  5 AS "type" 
 		FROM
 		  tb_biz_output_contract a,
