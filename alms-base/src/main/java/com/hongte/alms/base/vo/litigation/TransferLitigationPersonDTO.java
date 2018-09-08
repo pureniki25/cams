@@ -55,7 +55,7 @@ public class TransferLitigationPersonDTO implements Serializable {
 	 */
 	private String legalPerson;
 	/**
-	 * 人员类别(1:出借人、债权人; 2：借款人; 3:担保人 )
+	 * 人员类别(1:出借人、债权人; 2：借款人; 3:担保人; 4:共借人; 5:抵押权人/反担保人)
 	 */
 	private Integer type;
 

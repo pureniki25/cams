@@ -1199,6 +1199,43 @@
 		UNION
 		ALL 
 		SELECT 
+		  -- 共借人
+		  a.real_name AS "name",
+		  a.`sex`,
+		  a.`birthday`,
+		  a.identity_card identifyCard,
+		  a.`user_type_id` borrowerType,
+		  a.`address`,
+		  a.`TelNo` telNo,
+		  CASE
+		    a.user_type_id 
+		    WHEN 2 
+		    THEN b.customer_name 
+		    ELSE '' 
+		  END companyName,
+		  CASE
+		    a.user_type_id 
+		    WHEN 2 
+		    THEN b.register_province 
+		    ELSE '' 
+		  END licenseAddr,
+		  CASE
+		    a.user_type_id 
+		    WHEN 2 
+		    THEN b.company_legal_person 
+		    ELSE '' 
+		  END legalPerson,
+		  4 AS "type" 
+		FROM
+		  tb_tuandai_project_info a,
+		  `tb_basic_biz_customer` b 
+		WHERE a.master_issue_id != a.project_id 
+		  AND a.business_id = b.business_id 
+		  AND a.begin_time IS NOT NULL 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
+		UNION
+		ALL 
+		SELECT 
 		  -- `出借人`
 		  a.lender AS "name",
 		  '' sex,
@@ -1259,5 +1296,25 @@
 		WHERE a.business_id = b.business_id 
 		  AND b.operator_type = 1 
 		  AND a.business_id = #{businessId,jdbcType=VARCHAR} 
+		UNION
+		ALL 
+		SELECT 
+		  -- `抵押权人/反担保人`
+		  a.pledee AS "name",
+		  '' sex,
+		  NULL birthday,
+		  b.lender_identity identifyCard,
+		  b.creditor_type borrowerType,
+		  b.`creditor_or_guarantors_address` address,
+		  b.`lender_phone` telNo,
+		  a.`branch_full_name` companyName,
+		  a.`branch_address` licenseAddr,
+		  a.`legal_person` legalPerson,
+		  5 AS "type" 
+		FROM
+		  tb_biz_output_contract a,
+		  tb_creditor b 
+		WHERE a.pledee_id = b.creditor_id 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}      
 	</select>
 </mapper>
