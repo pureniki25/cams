@@ -407,33 +407,4 @@ public class BusinessParameterController {
 			return Result.error("系统异常：" + e.getMessage());
 		}
 	}
-	
-	@ApiOperation("根据时间段查询业务五级分类信息")
-	@PostMapping("/queryBusinessFiveLevelClassify1")
-	@ResponseBody
-	public Result<Map<String, Object>> queryBusinessFiveLevelClassify1(@RequestBody Map<String, Object> paramMap) {
-		try {
-			if (paramMap == null || paramMap.isEmpty() || !paramMap.containsKey("startDate")
-					|| !paramMap.containsKey("endDate")) {
-				return Result.error("参数不能为空！");
-			}
-
-			Date startDate = DateUtil.getDate((String) paramMap.get("startDate"));
-			Date endDate = DateUtil.addDay2Date(1, DateUtil.getDate((String) paramMap.get("endDate")));
-
-			Map<String, Object> map = new HashMap<>();
-			map.put("startDate", startDate);
-			map.put("endDate", endDate);
-			Result<Map<String, Object>> re = queryBusinessFiveLevelClassify(map);
-			return Result.success(re.getData());
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return Result.error("系统异常：" + e.getMessage());
-		}
-	}
-
-	public static void main(String[] args) {
-		String d = "2018-09-08";
-		System.out.println(DateUtil.addDay2Date(1, DateUtil.getDate(d)));
-	}
 }
