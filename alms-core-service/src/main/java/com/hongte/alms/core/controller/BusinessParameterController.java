@@ -3,7 +3,9 @@ package com.hongte.alms.core.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +27,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.BasicBusinessType;
 import com.hongte.alms.base.entity.FiveLevelClassify;
+import com.hongte.alms.base.entity.FiveLevelClassifyBusinessChangeLog;
 import com.hongte.alms.base.entity.FiveLevelClassifyCondition;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.service.BasicBusinessTypeService;
@@ -36,8 +39,11 @@ import com.hongte.alms.base.vo.module.classify.FiveLevelClassifyConditionVO;
 import com.hongte.alms.base.vo.module.classify.FiveLevelClassifyVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
+
+import io.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping("/businessParameter")
@@ -249,7 +255,8 @@ public class BusinessParameterController {
 					.queryFiveLevelClassifyCondition(className, businessType);
 			if (CollectionUtils.isNotEmpty(classifyConditionVOs)) {
 				Collections.sort(classifyConditionVOs, new Comparator<FiveLevelClassifyConditionVO>() {
-					public int compare(FiveLevelClassifyConditionVO conditionVO1, FiveLevelClassifyConditionVO conditionVO2) {
+					public int compare(FiveLevelClassifyConditionVO conditionVO1,
+							FiveLevelClassifyConditionVO conditionVO2) {
 						return conditionVO1.getSubClassName().compareTo(conditionVO2.getSubClassName());
 					}
 				});
@@ -369,4 +376,40 @@ public class BusinessParameterController {
 		}
 	}
 
+	@ApiOperation("根据时间段查询业务五级分类信息")
+	@PostMapping("/queryBusinessFiveLevelClassify")
+	@ResponseBody
+	public Result<Map<String, Object>> queryBusinessFiveLevelClassify(@RequestBody Map<String, Object> paramMap) {
+		try {
+			if (paramMap == null || paramMap.isEmpty() || !paramMap.containsKey("startDate")
+					|| !paramMap.containsKey("endDate")) {
+				return Result.error("参数不能为空！");
+			}
+
+			Date startDate = (Date) paramMap.get("startDate");
+			Date endDate = DateUtil.addDay2Date(1, (Date) paramMap.get("endDate"));
+
+			List<FiveLevelClassifyBusinessChangeLog> changeLogs = fiveLevelClassifyBusinessChangeLogService
+					.selectList(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>().gt("op_time", startDate)
+							.lt("op_time", endDate).eq("valid_status", "1"));
+			
+			if (CollectionUtils.isNotEmpty(changeLogs)) {
+				Map<String, Object> resultMap = new HashMap<>();
+				for (FiveLevelClassifyBusinessChangeLog changeLog : changeLogs) {
+					resultMap.put(changeLog.getOrigBusinessId(), changeLog.getClassName());
+				}
+				return Result.success(resultMap);
+			}else {
+				return Result.success();
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("系统异常：" + e.getMessage());
+		}
+	}
+
+	public static void main(String[] args) {
+		String d = "2018-09-08";
+		System.out.println(DateUtil.addDay2Date(1, DateUtil.getDate(d)));
+	}
 }
