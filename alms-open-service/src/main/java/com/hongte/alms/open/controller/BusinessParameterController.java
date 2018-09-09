@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.FiveLevelClassifyBusinessChangeLog;
@@ -154,7 +157,7 @@ public class BusinessParameterController {
 	@ApiOperation("根据时间段查询业务五级分类信息")
 	@PostMapping("/queryBusinessFiveLevelClassify")
 	@ResponseBody
-	public Result<Map<String, Object>> queryBusinessFiveLevelClassify(@RequestBody Map<String, Object> paramMap) {
+	public Result<List<Map<String, Object>>> queryBusinessFiveLevelClassify(@RequestBody Map<String, Object> paramMap) {
 		try {
 			if (paramMap == null || paramMap.isEmpty() || !paramMap.containsKey("startDate")
 					|| !paramMap.containsKey("endDate")) {
@@ -168,18 +171,52 @@ public class BusinessParameterController {
 					.selectList(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>().gt("op_time", startDate)
 							.lt("op_time", endDate).eq("valid_status", "1"));
 			
+			List<Map<String, Object>> resultList = new LinkedList<>();
 			if (CollectionUtils.isNotEmpty(changeLogs)) {
-				Map<String, Object> resultMap = new HashMap<>();
 				for (FiveLevelClassifyBusinessChangeLog changeLog : changeLogs) {
-					resultMap.put(changeLog.getOrigBusinessId(), changeLog.getClassName());
+					Map<String, Object> resultMap = new HashMap<>();
+					resultMap.put("businessId", changeLog.getOrigBusinessId());
+					resultMap.put("levelName", changeLog.getClassName());
+					resultList.add(resultMap);
 				}
-				return Result.success(resultMap);
-			}else {
-				return Result.success();
 			}
+			return Result.success(resultList);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("系统异常：" + e.getMessage());
 		}
+	}
+	
+	public static void main(String[] args) {
+		String s = "{\r\n" + 
+				"    \"code\": \"1\",\r\n" + 
+				"    \"msg\": \"请求成功！\",\r\n" + 
+				"    \"data\": {\r\n" + 
+				"        \"TDF1012018060811\": \"关注类\",\r\n" + 
+				"        \"TDF1012018032101\": null,\r\n" + 
+				"        \"TDF1012018033014\": \"关注类\",\r\n" + 
+				"        \"TDF1012018062508\": \"关注类\",\r\n" + 
+				"        \"TDF5012018030505\": \"可疑类\",\r\n" + 
+				"        \"TDF1012018052102\": \"关注类\",\r\n" + 
+				"        \"TDF1012018052820\": \"关注类\",\r\n" + 
+				"        \"TDF1012018052106\": \"关注类\",\r\n" + 
+				"        \"TDF5012017111604\": \"可疑类\",\r\n" + 
+				"        \"TDF1012018052835\": \"关注类\",\r\n" + 
+				"        \"TDF1012018052107\": \"关注类\",\r\n" + 
+				"        \"TDF1012018032613\": \"关注类\",\r\n" + 
+				"        \"TDF1012018052823\": \"关注类\",\r\n" + 
+				"        \"TDF1012017112406\": \"关注类\",\r\n" + 
+				"        \"TDF5012018041201\": \"可疑类\",\r\n" + 
+				"        \"TDF1012018062110\": \"关注类\",\r\n" + 
+				"        \"TDF10120171123010B\": \"关注类\",\r\n" + 
+				"        \"TDF1012018040941\": \"关注类\",\r\n" + 
+				"        \"TDF1012018060905\": \"关注类\",\r\n" + 
+				"        \"TDF1012018060802\": \"关注类\"\r\n" + 
+				"    }\r\n" + 
+				"}";
+		Result r = JSONObject.parseObject(s, Result.class);
+		Map m = JSONObject.parseObject(JSONObject.toJSONString(r.getData()), Map.class);
+		Object d = m.get("TDF5012018041201");
+		System.out.println(d);
 	}
 }
