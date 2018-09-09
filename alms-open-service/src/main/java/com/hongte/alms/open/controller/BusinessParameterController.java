@@ -195,8 +195,8 @@ public class BusinessParameterController {
 			String startDate = (String) paramMap.get("startDate");
 			String endDate = (String) paramMap.get("endDate");
 			Map<String, Object> p = new HashMap<>();
-			p.put("startDate", startDate);
-			p.put("endDate", endDate);
+			p.put("startDate", DateUtil.getDate(startDate));
+			p.put("endDate", DateUtil.getDate(endDate));
 			return Result.success(queryBusinessFiveLevelClassify(p).getData());
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
