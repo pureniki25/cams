@@ -187,36 +187,20 @@ public class BusinessParameterController {
 		}
 	}
 	
-	public static void main(String[] args) {
-		String s = "{\r\n" + 
-				"    \"code\": \"1\",\r\n" + 
-				"    \"msg\": \"请求成功！\",\r\n" + 
-				"    \"data\": {\r\n" + 
-				"        \"TDF1012018060811\": \"关注类\",\r\n" + 
-				"        \"TDF1012018032101\": null,\r\n" + 
-				"        \"TDF1012018033014\": \"关注类\",\r\n" + 
-				"        \"TDF1012018062508\": \"关注类\",\r\n" + 
-				"        \"TDF5012018030505\": \"可疑类\",\r\n" + 
-				"        \"TDF1012018052102\": \"关注类\",\r\n" + 
-				"        \"TDF1012018052820\": \"关注类\",\r\n" + 
-				"        \"TDF1012018052106\": \"关注类\",\r\n" + 
-				"        \"TDF5012017111604\": \"可疑类\",\r\n" + 
-				"        \"TDF1012018052835\": \"关注类\",\r\n" + 
-				"        \"TDF1012018052107\": \"关注类\",\r\n" + 
-				"        \"TDF1012018032613\": \"关注类\",\r\n" + 
-				"        \"TDF1012018052823\": \"关注类\",\r\n" + 
-				"        \"TDF1012017112406\": \"关注类\",\r\n" + 
-				"        \"TDF5012018041201\": \"可疑类\",\r\n" + 
-				"        \"TDF1012018062110\": \"关注类\",\r\n" + 
-				"        \"TDF10120171123010B\": \"关注类\",\r\n" + 
-				"        \"TDF1012018040941\": \"关注类\",\r\n" + 
-				"        \"TDF1012018060905\": \"关注类\",\r\n" + 
-				"        \"TDF1012018060802\": \"关注类\"\r\n" + 
-				"    }\r\n" + 
-				"}";
-		Result r = JSONObject.parseObject(s, Result.class);
-		Map m = JSONObject.parseObject(JSONObject.toJSONString(r.getData()), Map.class);
-		Object d = m.get("TDF5012018041201");
-		System.out.println(d);
+	@PostMapping("/queryBusinessFiveLevelClassify1")
+	@ResponseBody
+	public Result<List<Map<String, Object>>> queryBusinessFiveLevelClassify1(@RequestBody Map<String, Object> paramMap) {
+		try {
+
+			String startDate = (String) paramMap.get("startDate");
+			String endDate = (String) paramMap.get("endDate");
+			Map<String, Object> p = new HashMap<>();
+			p.put("startDate", startDate);
+			p.put("endDate", endDate);
+			return Result.success(queryBusinessFiveLevelClassify(p).getData());
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("系统异常：" + e.getMessage());
+		}
 	}
 }
