@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.FiveLevelClassifyBusinessChangeLog;
@@ -187,20 +185,4 @@ public class BusinessParameterController {
 		}
 	}
 	
-	@PostMapping("/queryBusinessFiveLevelClassify1")
-	@ResponseBody
-	public Result<List<Map<String, Object>>> queryBusinessFiveLevelClassify1(@RequestBody Map<String, Object> paramMap) {
-		try {
-
-			String startDate = (String) paramMap.get("startDate");
-			String endDate = (String) paramMap.get("endDate");
-			Map<String, Object> p = new HashMap<>();
-			p.put("startDate", DateUtil.getDate(startDate));
-			p.put("endDate", DateUtil.getDate(endDate));
-			return Result.success(queryBusinessFiveLevelClassify(p).getData());
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return Result.error("系统异常：" + e.getMessage());
-		}
-	}
 }
