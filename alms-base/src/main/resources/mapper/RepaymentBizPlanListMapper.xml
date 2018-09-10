@@ -760,6 +760,13 @@
 			  WHERE t.freeze_status != 1 
 			    AND t.money_type = 1 
 			    AND t.business_id = #{businessId,jdbcType=VARCHAR} 
+			    AND t.business_after_id = rbpl.after_id) - (SELECT 
+			    IFNULL(SUM(t.over_repay_money), 0) over_repay_money_1 
+			  FROM
+			    `tb_accountant_over_repay_log` t 
+			  WHERE t.freeze_status != 1 
+			    AND t.money_type = 0 
+			    AND t.business_id = #{businessId,jdbcType=VARCHAR} 
 			    AND t.business_after_id = rbpl.after_id) surplus,
 			  CASE
 			    rbpl.`current_status` 
