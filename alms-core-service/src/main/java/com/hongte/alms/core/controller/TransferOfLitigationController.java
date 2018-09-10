@@ -449,7 +449,7 @@ public class TransferOfLitigationController {
 
 		try {
 			if (paramMap == null) {
-				LOG.info("-- queryTransferLitigationInfo -- 参数不能为空！！！");
+				LOG.info("-- queryTransferLitigationInfo -- 参数不能为空！！！{}", paramMap);
 				return Result.error("参数不能为空！");
 			}
 

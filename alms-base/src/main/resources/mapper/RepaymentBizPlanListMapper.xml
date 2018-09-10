@@ -209,7 +209,7 @@
 				AND pl.area_pid_ext = #{areaId}
 			</if>
 			<if test="companyId != null">
-				AND pl.company_name_ext = #{companyId}
+				AND pl.company_id_ext = #{companyId}
 			</if>
 			<if test="businessType != null ">
 				AND pl.business_type_ext = #{businessType}
@@ -401,7 +401,7 @@
 				AND pl.area_pid_ext = #{areaId}
 			</if>
 			<if test="companyId != null">
-				AND pl.company_name_ext = #{companyId}
+				AND pl.company_id_ext = #{companyId}
 			</if>
 			<if test="businessType != null ">
 				AND pl.business_type_ext = #{businessType}

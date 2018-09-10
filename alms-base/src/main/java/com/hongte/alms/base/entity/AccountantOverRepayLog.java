@@ -2,7 +2,6 @@ package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
 
-import com.baomidou.mybatisplus.enums.IdType;
 import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
@@ -17,8 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 业务结余暂收日志表
  * </p>
  *
- * @author 王继光
- * @since 2018-05-24
+ * @author wangjiguang
+ * @since 2018-09-07
  */
 @ApiModel
 @TableName("tb_accountant_over_repay_log")
@@ -27,9 +26,14 @@ public class AccountantOverRepayLog extends Model<AccountantOverRepayLog> {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 日志表新主键,贷后专用
+     */
+    @TableId("log_id")
+	@ApiModelProperty(required= true,value = "日志表新主键,贷后专用")
+	private String logId;
+    /**
      * 日志表主键
      */
-	@TableId(value="id", type= IdType.AUTO)
 	@ApiModelProperty(required= true,value = "日志表主键")
 	private Integer id;
     /**
@@ -104,6 +108,14 @@ public class AccountantOverRepayLog extends Model<AccountantOverRepayLog> {
 	@ApiModelProperty(required= true,value = "更新人ID")
 	private String updateUser;
 
+
+	public String getLogId() {
+		return logId;
+	}
+
+	public void setLogId(String logId) {
+		this.logId = logId;
+	}
 
 	public Integer getId() {
 		return id;
@@ -211,12 +223,13 @@ public class AccountantOverRepayLog extends Model<AccountantOverRepayLog> {
 
 	@Override
 	protected Serializable pkVal() {
-		return this.id;
+		return this.logId;
 	}
 
 	@Override
 	public String toString() {
 		return "AccountantOverRepayLog{" +
+			", logId=" + logId +
 			", id=" + id +
 			", businessId=" + businessId +
 			", businessAfterId=" + businessAfterId +

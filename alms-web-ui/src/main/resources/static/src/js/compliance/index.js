@@ -42,6 +42,7 @@ window.layinit(function(htConfig) {
 			infoTabValue:'fundDistributionRecord',//详情tab值
 			businessTypeList:[], // 业务类型集合
 			rechargeAccountTypeList:[], // 代充值账户类型集合
+			queryDistributeFundLoading: false, // 刷新资金分发状态控制
 				
 			/*
 			 *  详情基础信息
@@ -706,8 +707,10 @@ window.layinit(function(htConfig) {
 			 * 查询资金分发处理状态
 			 */
 			queryDistributeFund: function(){
+				this.queryDistributeFundLoading = true;
 				axios.get(basePath + 'tdrepayRecharge/queryDistributeFund')
 				.then(function(result){
+					vm.queryDistributeFundLoading = false;
 					if (result.data.code == "1") {
 						vm.$Modal.success(
 							{   
@@ -721,6 +724,7 @@ window.layinit(function(htConfig) {
 						vm.$Modal.error({ content: result.data.msg });
 					}
 				}).catch(function (error) {
+					vm.queryDistributeFundLoading = false;
 					vm.$Modal.error({content: '接口调用异常!'});
             	});
 			},

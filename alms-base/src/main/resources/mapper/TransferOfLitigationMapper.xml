@@ -20,6 +20,7 @@
    			<result property="sourceSystem" column="sourceSystem"/>
    			<result property="createUserId" column="create_user"/>
    			<result property="overdueDays" column="overdueDays"/>
+   			<result property="dueDate" column="dueDate"/>
 	    <association property="businessCompany" javaType="com.hongte.alms.base.vo.litigation.BusinessCompany">  
 	    	<result property="deptId" column="deptId"/> 
    			<result property="deptName" column="deptName"/>
@@ -323,38 +324,38 @@
 		    ) `fact_principal` 
 		  FROM
 		    tb_repayment_biz_plan_list a,
-		    tb_repayment_biz_plan b,
 		    tb_repayment_biz_plan_list_detail c 
-		  WHERE a.plan_id = b.plan_id 
-		    AND a.plan_list_id = c.plan_list_id 
+		  WHERE a.plan_list_id = c.plan_list_id 
 		    AND IFNULL(a.repay_flag, 0) != 6 
-		    AND b.`original_business_id` = bb.business_id 
-		  GROUP BY b.`original_business_id`) AS repaymentPrincipa,
+		    AND a.`orig_business_id` = bb.business_id 
+		  GROUP BY a.`orig_business_id`) AS repaymentPrincipa,
 		  cc.surplus_principal,
 		  cc.businessAfterId,
 		  (SELECT 
 		    COUNT(1) 
 		  FROM
-		    tb_repayment_biz_plan_list lst,
-		    tb_repayment_biz_plan p 
-		  WHERE lst.`plan_id` = p.`plan_id` 
-		    AND bb.`business_id` = p.original_business_id 
+		    tb_repayment_biz_plan_list lst 
+		  WHERE bb.`business_id` = lst.orig_business_id 
 		    AND lst.current_status = '已还款') repaymentPeriods,
 		  (SELECT 
 		    COUNT(1) 
 		  FROM
-		    tb_repayment_biz_plan_list lst,
-		    tb_repayment_biz_plan p 
-		  WHERE lst.`plan_id` = p.`plan_id` 
-		    AND bb.`business_id` = p.original_business_id) totalPeriods,
-			(SELECT 
-			    TO_DAYS(NOW()) - TO_DAYS(t.`due_date`)
-			  FROM
-			    `tb_repayment_biz_plan_list` t 
-			  WHERE t.`orig_business_id` = bb.`business_id`
-			    AND t.`current_status` = '逾期' 
-			  ORDER BY t.`due_date` 
-			  LIMIT 1) overdueDays
+		    tb_repayment_biz_plan_list lst 
+		  WHERE bb.`business_id` = lst.orig_business_id) totalPeriods,
+		  (SELECT 
+		    TO_DAYS(NOW()) - TO_DAYS(t.`due_date`) 
+		  FROM
+		    `tb_repayment_biz_plan_list` t 
+		  WHERE t.`orig_business_id` = bb.`business_id` 
+		    AND t.`current_status` = '逾期' 
+		  ORDER BY t.`due_date` 
+		  LIMIT 1) overdueDays,
+		  (SELECT 
+		    MIN(t.due_date) 
+		  FROM
+		    `tb_repayment_biz_plan_list` t 
+		  WHERE t.`orig_business_id` = bb.`business_id` 
+		    AND t.`current_status` = '逾期') dueDate 
 		FROM
 		  tb_basic_business bb,
 		  tb_basic_biz_customer bbc,
@@ -1199,6 +1200,43 @@
 		UNION
 		ALL 
 		SELECT 
+		  -- 共借人
+		  a.real_name AS "name",
+		  a.`sex`,
+		  a.`birthday`,
+		  a.identity_card identifyCard,
+		  a.`user_type_id` borrowerType,
+		  a.`address`,
+		  a.`TelNo` telNo,
+		  CASE
+		    a.user_type_id 
+		    WHEN 2 
+		    THEN b.customer_name 
+		    ELSE '' 
+		  END companyName,
+		  CASE
+		    a.user_type_id 
+		    WHEN 2 
+		    THEN b.register_province 
+		    ELSE '' 
+		  END licenseAddr,
+		  CASE
+		    a.user_type_id 
+		    WHEN 2 
+		    THEN b.company_legal_person 
+		    ELSE '' 
+		  END legalPerson,
+		  4 AS "type" 
+		FROM
+		  tb_tuandai_project_info a,
+		  `tb_basic_biz_customer` b 
+		WHERE a.master_issue_id != a.project_id 
+		  AND a.business_id = b.business_id 
+		  AND a.begin_time IS NOT NULL 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}  
+		UNION
+		ALL 
+		SELECT 
 		  -- `出借人`
 		  a.lender AS "name",
 		  '' sex,
@@ -1259,5 +1297,25 @@
 		WHERE a.business_id = b.business_id 
 		  AND b.operator_type = 1 
 		  AND a.business_id = #{businessId,jdbcType=VARCHAR} 
+		UNION
+		ALL 
+		SELECT 
+		  -- `抵押权人/反担保人`
+		  a.pledee AS "name",
+		  '' sex,
+		  NULL birthday,
+		  b.lender_identity identifyCard,
+		  b.creditor_type borrowerType,
+		  b.`creditor_or_guarantors_address` address,
+		  b.`lender_phone` telNo,
+		  b.`TuanDai_Guarantee_Company` companyName,
+		  b.`creditor_or_guarantors_address` licenseAddr,
+		  b.`guarantors_legal_person` legalPerson,
+		  5 AS "type" 
+		FROM
+		  tb_biz_output_contract a,
+		  tb_creditor b 
+		WHERE a.pledee_id = b.creditor_id 
+		  AND a.business_id = #{businessId,jdbcType=VARCHAR}      
 	</select>
 </mapper>

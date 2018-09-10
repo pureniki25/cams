@@ -62,3 +62,4 @@ alms-finance-service/.springBeans
 alms-withhold-service/.factorypath
 alms-web-ui/.vscode/launch.json
 alms-platRepay-service/.factorypath
+alms-finance-service/src/test/java/com/hongte/alms/Tool.java

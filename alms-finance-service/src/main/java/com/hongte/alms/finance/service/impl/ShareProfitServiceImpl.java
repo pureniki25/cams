@@ -277,14 +277,13 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 accountantOverRepayLog.setOverRepayMoney(financeBaseDto.getSurplusAmount());
                 accountantOverRepayLog
                         .setRemark(String.format("收入于%s的%s期线下财务确认", req.getBusinessId(), req.getAfterId()));
+                accountantOverRepayLog.setLogId(UUID.randomUUID().toString());
                 accountantOverRepayLog.insert();
 
                 BigDecimal surplusAmount = financeBaseDto.getSurplusAmount();
                 RepaymentConfirmLog confirmLog = financeBaseDto.getConfirmLog();
                 confirmLog.setSurplusAmount(surplusAmount);
-                confirmLog.setSurplusRefId(accountantOverRepayLog.getId().toString());
-//                this.confirmLog.get().setSurplusAmount(surplusAmount.get());
-//                this.confirmLog.get().setSurplusRefId(accountantOverRepayLog.getId().toString());
+                confirmLog.setSurplusRefId(accountantOverRepayLog.getLogId());
             }
         } else {
             financeBaseDto.setLackAmount(repayPlanAmount.subtract(repayFactAmount));
@@ -446,11 +445,10 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             accountantOverRepayLog.setMoneyType(0);
             accountantOverRepayLog.setOverRepayMoney(req.getSurplusFund());
             accountantOverRepayLog.setRemark(String.format("支出于%s的%s期线下财务确认", req.getBusinessId(), req.getAfterId()));
+            accountantOverRepayLog.setLogId(UUID.randomUUID().toString());
             if (financeBaseDto.getSave()) {
                 accountantOverRepayLog.insert();
-                financeBaseDto.getConfirmLog().setSurplusUseRefId(accountantOverRepayLog.getId().toString());
-//                confirmLog.get().setSurplusUseRefId(accountantOverRepayLog.getId().toString());
-
+                financeBaseDto.getConfirmLog().setSurplusUseRefId(accountantOverRepayLog.getLogId());
             }
 
             RepaymentResource repaymentResource = new RepaymentResource();
@@ -467,18 +465,15 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             //11:用往期结余还款',
             repaymentResource.setRepaySource(RepayPlanRepaySrcEnum.SURPLUS_REPAY.getValue().toString());
             if (financeBaseDto.getSave()) {
-                repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
+                repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getLogId());
                 repaymentResource.insert();
                 if (mprids.size() == 0) {
                     financeBaseDto.getConfirmLog().setRepayDate(repaymentResource.getRepayDate());
-//                    confirmLog.get().setRepayDate(repaymentResource.getRepayDate());
                 }
             }
             BigDecimal reamount = financeBaseDto.getRepayFactAmount().add(req.getSurplusFund());
             financeBaseDto.setRepayFactAmount(reamount);
             financeBaseDto.getRepaymentResources().add(repaymentResource);
-//            repayFactAmount.set(repayFactAmount.get().add(req.getSurplusFund()));
-//            repaymentResources.get().add(repaymentResource);
         }
         
         

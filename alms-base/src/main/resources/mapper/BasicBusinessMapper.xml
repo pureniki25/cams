@@ -665,7 +665,8 @@
 		LEFT JOIN tb_repayment_biz_plan t4 ON t5.plan_id = t4.plan_id 
 		<where> 
 		-- t1.type = 1 AND
-		t2.src_type = 2
+		t2.src_type = 2 and
+		t1.last_push_status in (0,2)
 		<if test="businessId != null">
            <![CDATA[ and t1.business_id = #{businessId}]]>
         </if>
@@ -941,6 +942,7 @@
 		<where> 
 		t2.src_type = 2
 		and t1.is_valid = 1
+		and t1.last_push_status in (0,2)
 		<if test="businessId != null">
            <![CDATA[ and t1.orig_business_id = #{businessId}]]>
         </if>
@@ -995,6 +997,7 @@
 		LEFT JOIN tb_basic_business t9 ON t9.business_id = t1.orig_business_id
 		WHERE t1.is_valid = 1
 		and t1.log_id = #{confirmLogId}
+		and t1.last_push_status in (0,2)
 		ORDER BY t1.create_time
     </select>
     
@@ -1034,5 +1037,34 @@
 		LEFT JOIN tb_basic_business t9 ON t9.business_id = t2.orig_business_id
 		WHERE 
 		t1.log_id = #{repaySourceId}
+    </select>
+    
+    <select id="selectlCancelRepayFlow" resultType="map">
+		SELECT 
+		t1.business_id,
+		t1.after_id,
+		t6.queryFullsuccessDate,
+		t1.confirm_log_id,
+		t1.TYPE as flowType
+		FROM 
+		tb_repayment_confirm_log t1
+		LEFT JOIN tb_tuandai_project_info t6 ON t6.business_id = t1.business_id AND t6.master_issue_id = t6.project_id
+		WHERE t1.is_cancelled = 1 
+		and last_push_status in (1,5)
+    </select>
+    
+    <select id="selectlCancelFenFaFlow" resultType="map">
+		SELECT 
+		t1.orig_business_id as business_id,
+		t1.after_id,
+		t6.queryFullsuccessDate,
+		t1.log_id as confirm_log_id,
+		99 as flowType
+		FROM 
+		tb_tdrepay_recharge_record t1
+		LEFT JOIN tb_tuandai_project_info t6 ON t6.business_id = t1.orig_business_id AND t6.master_issue_id = t6.project_id
+		WHERE (is_valid = 1
+		and last_push_status = 1) or (is_valid = 2
+		and last_push_status = 5)
     </select>
 </mapper>

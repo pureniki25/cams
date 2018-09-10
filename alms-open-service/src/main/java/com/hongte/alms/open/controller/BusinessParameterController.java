@@ -2,7 +2,9 @@ package com.hongte.alms.open.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +31,11 @@ import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.open.vo.BusinessFiveLevelClassifyInfoVO;
+
+import io.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping("/businessParameter")
@@ -147,4 +153,29 @@ public class BusinessParameterController {
 		}
 	}
 
+	@ApiOperation("根据时间段查询业务五级分类信息")
+	@PostMapping("/queryBusinessFiveLevelClassify")
+	@ResponseBody
+	public Result<List<Map<String, Object>>> queryBusinessFiveLevelClassify(@RequestBody BusinessFiveLevelClassifyInfoVO vo) {
+		try {
+			List<FiveLevelClassifyBusinessChangeLog> changeLogs = fiveLevelClassifyBusinessChangeLogService
+					.selectList(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>().gt("op_time", vo.getStartDate())
+							.lt("op_time", vo.getEndDate()).eq("valid_status", "1"));
+			
+			List<Map<String, Object>> resultList = new LinkedList<>();
+			if (CollectionUtils.isNotEmpty(changeLogs)) {
+				for (FiveLevelClassifyBusinessChangeLog changeLog : changeLogs) {
+					Map<String, Object> resultMap = new HashMap<>();
+					resultMap.put("businessId", changeLog.getOrigBusinessId());
+					resultMap.put("levelName", changeLog.getClassName());
+					resultList.add(resultMap);
+				}
+			}
+			return Result.success(resultList);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("系统异常：" + e.getMessage());
+		}
+	}
+	
 }
