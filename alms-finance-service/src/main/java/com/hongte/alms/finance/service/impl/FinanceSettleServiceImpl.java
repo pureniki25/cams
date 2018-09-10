@@ -318,12 +318,12 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             accountantOverRepayLog.setOverRepayMoney(financeSettleBaseDto.getSurplusAmount());
             accountantOverRepayLog
                     .setRemark(String.format("收入于%s的%s期线下财务确认", financeSettleBaseDto.getBusinessId(), financeSettleBaseDto.getAfterId()));
-            
+            accountantOverRepayLog.setLogId(UUID.randomUUID().toString());
             financeSettleBaseDto.getRepaymentConfirmLog().setSurplusAmount(financeSettleBaseDto.getSurplusAmount());
             
             if (!financeSettleBaseDto.getPreview()) {
             	accountantOverRepayLog.insert();
-            	financeSettleBaseDto.getRepaymentConfirmLog().setSurplusRefId(accountantOverRepayLog.getId().toString());
+            	financeSettleBaseDto.getRepaymentConfirmLog().setSurplusRefId(accountantOverRepayLog.getLogId());
     		}
 		}
     	
@@ -1687,7 +1687,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             accountantOverRepayLog.setMoneyType(0);
             accountantOverRepayLog.setOverRepayMoney(financeSettleReq.getSurplusFund());
             accountantOverRepayLog.setRemark(String.format("支出于%s的%s期线下财务結清", financeSettleReq.getBusinessId(), financeSettleReq.getAfterId()));
-
+            accountantOverRepayLog.setLogId(UUID.randomUUID().toString());
 
             RepaymentResource repaymentResource = new RepaymentResource();
             repaymentResource.setIsCancelled(0);
@@ -1705,8 +1705,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 
             if (!financeSettleReq.getPreview()) {
                 accountantOverRepayLog.insert();
-                financeSettleBaseDto.getRepaymentConfirmLog().setSurplusUseRefId(accountantOverRepayLog.getId().toString());
-                repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getId().toString());
+                financeSettleBaseDto.getRepaymentConfirmLog().setSurplusUseRefId(accountantOverRepayLog.getLogId());
+                repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getLogId());
                 repaymentResource.insert();
                 if (mprIds.size() == 0) {
                     financeSettleBaseDto.getRepaymentSettleLog().setRepayDate(repaymentResource.getRepayDate());
