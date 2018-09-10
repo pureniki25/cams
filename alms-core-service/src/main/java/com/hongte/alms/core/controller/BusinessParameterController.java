@@ -249,7 +249,8 @@ public class BusinessParameterController {
 					.queryFiveLevelClassifyCondition(className, businessType);
 			if (CollectionUtils.isNotEmpty(classifyConditionVOs)) {
 				Collections.sort(classifyConditionVOs, new Comparator<FiveLevelClassifyConditionVO>() {
-					public int compare(FiveLevelClassifyConditionVO conditionVO1, FiveLevelClassifyConditionVO conditionVO2) {
+					public int compare(FiveLevelClassifyConditionVO conditionVO1,
+							FiveLevelClassifyConditionVO conditionVO2) {
 						return conditionVO1.getSubClassName().compareTo(conditionVO2.getSubClassName());
 					}
 				});

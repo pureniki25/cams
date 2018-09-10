@@ -1,5 +1,6 @@
 package com.hongte.alms.base.vo.cams;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ public class MessageCommand {
     protected String messageId;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     @NotNull
     protected Date createTime;
 

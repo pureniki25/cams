@@ -16,4 +16,13 @@ import com.hongte.alms.common.result.Result;
 public interface CamsFlowSyncByInterfaceJobClient {
     @RequestMapping(value = "/camsFlowSync/addBatchFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
     public Result<Integer> addBatchFlow();
+    
+    @RequestMapping(value = "/camsFlowSync/addBatchFenFaFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    public Result<Integer> addBatchFenFaFlow();
+    
+    @RequestMapping(value = "/camsFlowSync/cancelRepayFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    public Result<Integer> cancelRepayFlow();
+    
+    @RequestMapping(value = "/camsFlowSync/cancelFenFaFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    public Result<Integer> cancelFenFaFlow();
 }
