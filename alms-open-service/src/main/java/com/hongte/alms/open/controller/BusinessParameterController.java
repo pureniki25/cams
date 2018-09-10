@@ -33,6 +33,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.open.vo.BusinessFiveLevelClassifyInfoVO;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -155,19 +156,11 @@ public class BusinessParameterController {
 	@ApiOperation("根据时间段查询业务五级分类信息")
 	@PostMapping("/queryBusinessFiveLevelClassify")
 	@ResponseBody
-	public Result<List<Map<String, Object>>> queryBusinessFiveLevelClassify(@RequestBody Map<String, Object> paramMap) {
+	public Result<List<Map<String, Object>>> queryBusinessFiveLevelClassify(@RequestBody BusinessFiveLevelClassifyInfoVO vo) {
 		try {
-			if (paramMap == null || paramMap.isEmpty() || !paramMap.containsKey("startDate")
-					|| !paramMap.containsKey("endDate")) {
-				return Result.error("参数不能为空！");
-			}
-
-			Date startDate = (Date) paramMap.get("startDate");
-			Date endDate = DateUtil.addDay2Date(1, (Date) paramMap.get("endDate"));
-
 			List<FiveLevelClassifyBusinessChangeLog> changeLogs = fiveLevelClassifyBusinessChangeLogService
-					.selectList(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>().gt("op_time", startDate)
-							.lt("op_time", endDate).eq("valid_status", "1"));
+					.selectList(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>().gt("op_time", vo.getStartDate())
+							.lt("op_time", vo.getEndDate()).eq("valid_status", "1"));
 			
 			List<Map<String, Object>> resultList = new LinkedList<>();
 			if (CollectionUtils.isNotEmpty(changeLogs)) {
