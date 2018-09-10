@@ -73,6 +73,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 
 import org.slf4j.Logger;
@@ -277,6 +278,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 cAccountantOverRepayLog.setCreateTime(now);
                 cAccountantOverRepayLog.setCreateUser(loginUserInfoHelper.getUserId());
                 cAccountantOverRepayLog.setId(null);
+                cAccountantOverRepayLog.setLogId(UUID.randomUUID().toString());
                 cAccountantOverRepayLog.insert();
             }
         }
@@ -294,6 +296,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 cAccountantOverRepayLog.setCreateTime(now);
                 cAccountantOverRepayLog.setCreateUser(loginUserInfoHelper.getUserId());
                 cAccountantOverRepayLog.setId(null);
+                cAccountantOverRepayLog.setLogId(UUID.randomUUID().toString());
                 cAccountantOverRepayLog.insert();
             }
         }
