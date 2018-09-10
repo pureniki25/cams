@@ -23,7 +23,7 @@ public class VersionAdapter {
 	final String ALMS_PLATREPAY_SERVICE = "V1.0" ;
 	final String ALMS_SCHEDULED_SERVICE = "" ;
 	final String ALMS_WEBUI = "2018-09-25 10:04:00" ;
-	final String ALMS_WITHHOLD_SERVICE = "" ;
+	final String ALMS_WITHHOLD_SERVICE = "2018-09-09 18:07" ;
 	
 	@RequestMapping("/version")
 	public Result version() {
