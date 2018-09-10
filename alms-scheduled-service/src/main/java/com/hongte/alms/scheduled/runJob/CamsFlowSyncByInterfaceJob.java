@@ -34,7 +34,7 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
 
 
     private static Logger logger = LoggerFactory.getLogger(CamsFlowSyncByInterfaceJob.class);
-    
+     
 	@Autowired
 	CamsFlowSyncByInterfaceJobClient camsFlowSyncByInterfaceJobClient;
     
@@ -56,7 +56,6 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
 	    			retryTimes1++;
 				}
 	    	}
-        	
         	XxlJobLogger.log("同步流水到核心结束"+new Date().getTime());
             logger.info("同步流水到核心结束");
             return SUCCESS;

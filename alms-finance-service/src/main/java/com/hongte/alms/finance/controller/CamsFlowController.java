@@ -367,8 +367,8 @@ public class CamsFlowController {
         	String branchId = businessMapInfo.get("company_id")+"";
         	String branchName = businessMapInfo.get("company_name")+"";
         	String businessId = businessMapInfo.get("business_id")+"";
-        	String businessType = businessMapInfo.get("business_type")+"";
-        	String businessTypeId = businessMapInfo.get("business_type_name")+"";
+        	String businessType = businessMapInfo.get("business_type_name")+"";//business_type
+        	String businessTypeId = businessMapInfo.get("business_type")+"";
         	String customerName = businessMapInfo.get("customer_name")+"";
         	String exhibitionId = businessMapInfo.get("business_id")+"";
         	Business business = new Business();
