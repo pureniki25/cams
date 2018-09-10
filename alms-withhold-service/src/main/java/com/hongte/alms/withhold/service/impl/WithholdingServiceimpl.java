@@ -83,6 +83,12 @@ public class WithholdingServiceimpl implements WithholdingService {
 		List<SysParameter> repayStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>()
 				.eq("param_type", SysParameterEnums.REPAY_DAYS.getKey()).eq("status", 1).orderBy("row_Index"));
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
+		try {
+			Thread.sleep(70000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 		for (RepaymentBizPlanList pList : pLists) {
 			if(pList.getPlanListId().equals("de6ee923-9df2-4e44-8f57-7abadf40d7e8")) {
