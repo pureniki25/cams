@@ -2,6 +2,7 @@ package com.hongte.alms.base.vo.litigation;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -162,4 +163,8 @@ public class TransferOfLitigationVO implements Serializable {
 	 */
 	private Integer overdueDays;
 
+	/**
+	 * 逾期时间
+	 */
+	private Date dueDate;
 }

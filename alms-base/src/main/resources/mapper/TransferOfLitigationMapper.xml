@@ -20,6 +20,7 @@
    			<result property="sourceSystem" column="sourceSystem"/>
    			<result property="createUserId" column="create_user"/>
    			<result property="overdueDays" column="overdueDays"/>
+   			<result property="dueDate" column="dueDate"/>
 	    <association property="businessCompany" javaType="com.hongte.alms.base.vo.litigation.BusinessCompany">  
 	    	<result property="deptId" column="deptId"/> 
    			<result property="deptName" column="deptName"/>
@@ -323,38 +324,38 @@
 		    ) `fact_principal` 
 		  FROM
 		    tb_repayment_biz_plan_list a,
-		    tb_repayment_biz_plan b,
 		    tb_repayment_biz_plan_list_detail c 
-		  WHERE a.plan_id = b.plan_id 
-		    AND a.plan_list_id = c.plan_list_id 
+		  WHERE a.plan_list_id = c.plan_list_id 
 		    AND IFNULL(a.repay_flag, 0) != 6 
-		    AND b.`original_business_id` = bb.business_id 
-		  GROUP BY b.`original_business_id`) AS repaymentPrincipa,
+		    AND a.`orig_business_id` = bb.business_id 
+		  GROUP BY a.`orig_business_id`) AS repaymentPrincipa,
 		  cc.surplus_principal,
 		  cc.businessAfterId,
 		  (SELECT 
 		    COUNT(1) 
 		  FROM
-		    tb_repayment_biz_plan_list lst,
-		    tb_repayment_biz_plan p 
-		  WHERE lst.`plan_id` = p.`plan_id` 
-		    AND bb.`business_id` = p.original_business_id 
+		    tb_repayment_biz_plan_list lst 
+		  WHERE bb.`business_id` = lst.orig_business_id 
 		    AND lst.current_status = '已还款') repaymentPeriods,
 		  (SELECT 
 		    COUNT(1) 
 		  FROM
-		    tb_repayment_biz_plan_list lst,
-		    tb_repayment_biz_plan p 
-		  WHERE lst.`plan_id` = p.`plan_id` 
-		    AND bb.`business_id` = p.original_business_id) totalPeriods,
-			(SELECT 
-			    TO_DAYS(NOW()) - TO_DAYS(t.`due_date`)
-			  FROM
-			    `tb_repayment_biz_plan_list` t 
-			  WHERE t.`orig_business_id` = bb.`business_id`
-			    AND t.`current_status` = '逾期' 
-			  ORDER BY t.`due_date` 
-			  LIMIT 1) overdueDays
+		    tb_repayment_biz_plan_list lst 
+		  WHERE bb.`business_id` = lst.orig_business_id) totalPeriods,
+		  (SELECT 
+		    TO_DAYS(NOW()) - TO_DAYS(t.`due_date`) 
+		  FROM
+		    `tb_repayment_biz_plan_list` t 
+		  WHERE t.`orig_business_id` = bb.`business_id` 
+		    AND t.`current_status` = '逾期' 
+		  ORDER BY t.`due_date` 
+		  LIMIT 1) overdueDays,
+		  (SELECT 
+		    MIN(t.due_date) 
+		  FROM
+		    `tb_repayment_biz_plan_list` t 
+		  WHERE t.`orig_business_id` = bb.`business_id` 
+		    AND t.`current_status` = '逾期') dueDate 
 		FROM
 		  tb_basic_business bb,
 		  tb_basic_biz_customer bbc,
