@@ -20,6 +20,7 @@ import com.hongte.alms.base.dto.ConfirmRepaymentReq;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.FinanceFeignClient;
@@ -138,6 +139,7 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				paramMap.put("oidPartner", tdrepayRechargeLog.getOidPartner());
 				paramMap.put("batchId", tdrepayRechargeLog.getBatchId());
 				paramMap.put("requestNo", tdrepayRechargeLog.getRequestNo());
+				paramMap.put("orgType", BusinessTypeEnum.getOrgTypeByValue(tdrepayRechargeLog.getBusinessType()));
 
 				IssueSendOutsideLog issueSendOutsideLog = issueSendOutsideLog(loginUserInfoHelper.getUserId(), paramMap,
 						Constant.INTERFACE_CODE_QUERY_DISTRIBUTE_FUND, Constant.INTERFACE_NAME_QUERY_DISTRIBUTE_FUND,
