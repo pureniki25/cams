@@ -17,7 +17,9 @@ import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
+import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.SectionRepayStatusEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.SysApiCallFailureRecordService;
 import com.hongte.alms.common.result.Result;
@@ -218,6 +220,12 @@ public class RepayPlanController {
                     paramMap.put("afterId", bizPlanList.getAfterId());
                     paramMap.put("overdueDays", bizPlanList.getOverdueDays() != null ? bizPlanList.getOverdueDays().intValue() : 0);
                     paramMap.put("currentStatus", bizPlanList.getCurrentStatus());
+                    /*同步过程中,若线上已还款,则同步信贷后为已还款,9.7与胡青松,曾坤,肖莹环商议*/
+                    if (bizPlanList.getRepayStatus()!=null && bizPlanList.getRepayStatus() >= SectionRepayStatusEnum.ONLINE_REPAID.getKey() ) {
+                    	paramMap.put("currentStatus",RepayCurrentStatusEnums.已还款.toString());
+					}
+                    /*同步过程中,若线上已还款,则同步信贷后为已还款,9.7与胡青松,曾坤,肖莹环商议*/
+                    
                     //源数据: 已还款类型标记，null或0：还款中，6：申请展期已还款，10：线下确认已还款，20：自动线下代扣已还款，21，人工线下代扣已还款，30：自动银行代扣已还款，31：人工银行代扣已还款，
                     // 40：用户APP主动还款，50：线下财务确认全部结清，60：线下代扣全部结清，70：银行代扣全部结清
                     // =>>>>>
