@@ -370,6 +370,17 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		dto.setOrgType(BusinessTypeEnum.getOrgTypeByValue(businessType));
 		String batchId = UUID.randomUUID().toString();
 		dto.setBatchId(batchId);
+		switch (businessType) {
+		case 31:
+			businessType = 9;
+			break;
+		case 32:
+			businessType = 11;
+			break;
+
+		default:
+			break;
+		}
 		String rechargeAccountType = BusinessTypeEnum.getRechargeAccountName(businessType);
 
 		SysParameter sysParameter = this.queryRechargeAccountSysParams(rechargeAccountType);
