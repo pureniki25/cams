@@ -59,6 +59,8 @@
    			<result property="licensePlateNumber" column="licensePlateNumber"/>
    			<result property="engineModel" column="engineModel"/>
    			<result property="vin" column="vin"/>
+   			<result property="model" column="model"/>
+   			<result property="brandName" column="brandName"/>
 	    </collection>
 	    <collection property="houseInfos" ofType="com.hongte.alms.base.vo.litigation.TransferLitigationHouseDTO">  
 	    	<result property="houseName" column="houseName"/> 
@@ -1079,6 +1081,10 @@
 		  cb.`owner_name` ownerName,
 		  -- 车主
 		  cb.`license_plate_number` licensePlateNumber,
+		  -- 汽车品牌 
+		  cb.`brand_name` brandName,
+		  -- 品牌型号
+		  cb.`model`,
 		  -- 车牌号
 		  cb.`engine_model` engineModel,
 		  -- 发动机号

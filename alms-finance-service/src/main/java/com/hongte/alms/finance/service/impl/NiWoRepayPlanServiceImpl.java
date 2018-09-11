@@ -350,9 +350,9 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 													planDetail.setFactAmount(getPlanListDetaiFactRepayAmount(projDetail, RepayPlanFeeTypeEnum.PLAT_CHARGE));
 													planDetail.setPlanAmount(getPlanListDetaiPlanRepayAmount(projDetail, RepayPlanFeeTypeEnum.PLAT_CHARGE));
 													planDetail.setUpdateDate(new Date());
-													repaymentBizPlanListDetailService.updateById(planDetail);
+													repaymentBizPlanListDetailService.updateById(planDetail); 
 												} else if (RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()==projDetail.getPlanItemType()&&RepayPlanFeeTypeEnum.SUB_COMPANY_CHARGE.getValue()==planDetail.getPlanItemType()) {// //分公司服务费
-													if(projDetail.getProjPlanAmount().compareTo(detailDto.getPlatformManageFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
+													if(projDetail.getProjPlanAmount().compareTo(detailDto.getShouldConsultingFee())!=0) {//贷后应还的和你我金融应还的金额不一致，计入异常日志表
 														isDifferent=true;
 													}
 													projDetail.setProjPlanAmount(detailDto.getShouldConsultingFee());

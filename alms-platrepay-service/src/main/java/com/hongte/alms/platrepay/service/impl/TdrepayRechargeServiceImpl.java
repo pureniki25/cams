@@ -1,6 +1,7 @@
 package com.hongte.alms.platrepay.service.impl;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,7 +37,6 @@ import com.hongte.alms.base.entity.TdrepayAdvanceLog;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
-import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
@@ -61,7 +61,6 @@ import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.platrepay.dto.TdGuaranteePaymentDTO;
 import com.hongte.alms.platrepay.dto.TdProjectPaymentDTO;
 import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitDTO;
-import com.hongte.alms.platrepay.dto.TdReturnAdvanceShareProfitResult;
 import com.hongte.alms.platrepay.dto.TdrepayProjectInfoDTO;
 import com.hongte.alms.platrepay.dto.TdrepayProjectPeriodInfoDTO;
 import com.hongte.alms.platrepay.enums.ProcessStatusTypeEnum;
@@ -113,31 +112,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 	@Autowired
 	private EipRemote eipRemote;
-
-	/**
-	 * 判断上标日期是否早于 2018-06-28 （标的ID：boolean） true：早于；false：晚于
-	 */
-	private static final Map<String, Boolean> FLAG_MAP = new HashMap<>();
-
-	private Map<String, Boolean> handleFlagMap(String projectId) {
-		if (FLAG_MAP.containsKey(projectId)) {
-			return FLAG_MAP;
-		}
-
-		TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService
-				.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("project_id", projectId));
-		Date beginTime = tuandaiProjectInfo.getBeginTime();
-		if (beginTime == null) {
-			throw new ServiceRuntimeException("找不到上标时间，标的ID：" + projectId);
-		}
-
-		if (beginTime.before(DateUtil.getDate("2018-06-28"))) {
-			FLAG_MAP.put(projectId, true);
-		} else {
-			FLAG_MAP.put(projectId, false);
-		}
-		return FLAG_MAP;
-	}
 
 	@SuppressWarnings("rawtypes")
 	@Transactional(rollbackFor = Exception.class)
@@ -401,7 +375,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		 */
 		List<DistributeFundDetailDTO> detailList = new LinkedList<>();
 
-		double totalAmount = 0;
+		BigDecimal totalAmount = BigDecimal.ZERO;
 
 		/*
 		 * 记录调用第三方接口日志
@@ -420,12 +394,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			// 设置统一 batchId
 			vo.setBatchId(batchId);
 
-			double amount = vo.getRechargeAmount() == null ? 0 : vo.getRechargeAmount().doubleValue();
+			BigDecimal amount = vo.getRechargeAmount() == null ? BigDecimal.ZERO : vo.getRechargeAmount();
 
-			totalAmount += amount;
+			totalAmount = totalAmount.add(amount);
 
 			DistributeFundDetailDTO detailDTO = new DistributeFundDetailDTO();
-			detailDTO.setAmount(amount);
+			detailDTO.setAmount(amount.doubleValue());
 			detailDTO.setRequestNo(requestNo);
 			detailDTO.setUserId(tdUserId);
 			detailList.add(detailDTO);
@@ -438,7 +412,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			tdrepayRechargeLog.setUserId(logUserId);
 			tdrepayRechargeLog.setUserIp(clientIp);
 			tdrepayRechargeLog.setOidPartner(oIdPartner);
-			tdrepayRechargeLog.setRechargeAmount(BigDecimal.valueOf(amount));
+			tdrepayRechargeLog.setRechargeAmount(amount);
 			tdrepayRechargeLog.setUpdateTime(new Date());
 			tdrepayRechargeLog.setUpdateUser(userId);
 			tdrepayRechargeLogs.add(tdrepayRechargeLog);
@@ -446,13 +420,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 			for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
-				tdrepayRechargeLog
-						.setTotalAmount(BigDecimal.valueOf(totalAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
+				tdrepayRechargeLog.setTotalAmount(totalAmount);
 			}
 		}
 		tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
 
-		dto.setTotalAmount(BigDecimal.valueOf(totalAmount).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+		dto.setTotalAmount(totalAmount.doubleValue());
 		dto.setDetailList(detailList);
 
 		outsideLog.setSendJson(JSONObject.toJSONString(dto));
@@ -462,19 +435,17 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		outsideLog.setCreateUserId(userId);
 
 		Result result = null;
-		LOG.info("资金分发接口/eip/td/assetside/userDistributeFund参数信息，{}", JSONObject.toJSONString(dto));
+		LOG.info("资金分发接口/eip/td/assetside/userDistributeFund参数信息，{}", dto);
 		try {
 			// 调用 eip 平台资金分发接口
 			result = eipRemote.userDistributeFund(dto);
-			LOG.info("资金分发接口/eip/td/assetside/userDistributeFund返回信息，{}", JSONObject.toJSONString(result));
+			outsideLog.setReturnJson(JSONObject.toJSONString(result));
+			LOG.info("资金分发接口/eip/td/assetside/userDistributeFund返回信息，{}", result);
 		} catch (Exception e) {
 			LOG.error("批次号:" + batchId + "，调用eip平台资金分发接口失败！DTO 数据：" + dto.toString(), e);
 			outsideLog.setReturnJson(e.getMessage());
 		}
 
-		if (result != null) {
-			outsideLog.setReturnJson(JSONObject.toJSONString(result));
-		}
 		issueSendOutsideLogService.insert(outsideLog);
 		return result;
 
@@ -496,7 +467,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				dtoMap.put(businessType, list);
 			} else {
 				infoVOs.add(vo);
-				dtoMap.put(businessType, infoVOs);
 			}
 		}
 
@@ -539,27 +509,28 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		/*
 		 * 读取待处理和处理失败的，且资金分发成功的数据
 		 */
-		List<TdrepayRechargeLog> tdrepayRechargeLogs = queryRechargeSuccessData();
-		if (CollectionUtils.isEmpty(tdrepayRechargeLogs)) {
-			return;
-		}
+		List<TdrepayRechargeLog> tdrepayRechargeLogs = null;
 
 		try {
+			tdrepayRechargeLogs = queryRechargeSuccessData();
+			if (CollectionUtils.isEmpty(tdrepayRechargeLogs)) {
+				return;
+			}
 			// 按照projectId分组数据
-			// 结构：Map<projectId, Map<period, List<所有期数的数据>>>
+			// 结构：Map<projectId, Map<period, List<period的所有数据>>>
 			Map<String, Map<Integer, List<TdrepayRechargeLog>>> mapGroupByProjectId = mapGroupByProjectId(
 					tdrepayRechargeLogs);
 
 			for (Entry<String, Map<Integer, List<TdrepayRechargeLog>>> entry : mapGroupByProjectId.entrySet()) {
-				// periodDataMap是同projectId， 按 period 分组，且按 period 从大到小排序后的数据
+				// periodDataMap是同projectId， 按 period 分组，且按 period 从小到大排序后的数据
 				Map<Integer, List<TdrepayRechargeLog>> periodDataMap = entry.getValue();
 
 				for (Entry<Integer, List<TdrepayRechargeLog>> periodDataEntry : periodDataMap.entrySet()) {
 
-					// 同 period 数据集合，已按照period从小到大排序
+					// 同 period 数据集合
 					List<TdrepayRechargeLog> rechargeLogs = periodDataEntry.getValue();
 
-					// 按照实还日期从小到大排序，优先处理最早传入的数据
+					// 按ConfirmTime从小到大排序，优先处理最早传入的数据
 					sortChargeLogListByConfirmTime(rechargeLogs);
 
 					if (differentiateSettleData(rechargeLogs)) {
@@ -575,12 +546,14 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
-				tdrepayRechargeLog.setStatus(0);
-				tdrepayRechargeLog.setUpdateTime(new Date());
-				tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
+					tdrepayRechargeLog.setStatus(0);
+					tdrepayRechargeLog.setUpdateTime(new Date());
+					tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+				}
+				tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
 			}
-			tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
 		}
 	}
 
@@ -598,14 +571,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			// 取最后一次传入的结清状态
 			Integer settleType = tdrepayRechargeLogs.get(tdrepayRechargeLogs.size() - 1).getSettleType();
 
-			// 如果是结清数据
-			if (settleType != null && (settleType.intValue() == 10 || settleType.intValue() == 11
-					|| settleType.intValue() == 20 || settleType.intValue() == 30)) {
-				return true;
-			} else if (settleType != null && (settleType.intValue() == 0)) { // 如果是未结清数据
-				return false;
-			}
-			return false;
+			return (settleType != null && (settleType.intValue() == 10 || settleType.intValue() == 11
+					|| settleType.intValue() == 20 || settleType.intValue() == 30));
 		}
 	}
 
@@ -627,7 +594,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				mapGroupByProjectId.put(projectId, list);
 			} else {
 				list.add(tdrepayRechargeLog);
-				mapGroupByProjectId.put(projectId, list);
 			}
 		}
 
@@ -672,40 +638,53 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.getReturnCode())) {
 
 				// 判断当前期是否存在垫付未还记录
-				// TODO 待提供判断是否存在垫付未还记录查询接口
 				if (isCurrPeriodAdvance(map.get("queryProjectPaymentResult"), map.get("advanceShareProfitResult"),
 						period)) {
 
-					// repayChargeLogs 是同projectId，同period 按照createTime从大到小排好序的数据
+					List<TdrepayRechargeLog> sucLst = new ArrayList<>();
+
 					for (TdrepayRechargeLog tdrepayRechargeLog : repayChargeLogs) {
 
 						// 根据logId 获取对应的费用明细列表
-
-						List<TdrepayRechargeDetail> tdrepayRechargeDetails = tdrepayRechargeDetailService.selectList(
-								new EntityWrapper<TdrepayRechargeDetail>().eq("log_id", tdrepayRechargeLog.getLogId()));
+						List<TdrepayRechargeDetail> tdrepayRechargeDetails = tdrepayRechargeDetailService
+								.selectList(new EntityWrapper<TdrepayRechargeDetail>()
+										.eq("log_id", tdrepayRechargeLog.getLogId()).orderBy("fee_type"));
 
 						if (CollectionUtils.isNotEmpty(tdrepayRechargeDetails)) {
 
-							// 调用 偿还垫付接口 ， 按期数从小到大顺序调用，若某一期执行失败，则后面期数本次不再继续执行
-
+							// 调用 偿还垫付接口 ， 按期数财务确认时间从小到大顺序调用，若本期次某一数据执行失败，则本期次未执行的数据不再继续执行
 							Result result = remoteAdvanceShareProfit(tdrepayRechargeLog, tdrepayRechargeDetails);
+
 							if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 
-								// 标记处理成功,流程结束
-								tdrepayRechargeLog.setStatus(2);
-
-								tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+								sucLst.add(tdrepayRechargeLog);
 
 							} else {
-
-								// 标记处理失败,待定时任务重试
-								tdrepayRechargeLog.setStatus(3);
-
-								tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
-								// 处理每一期的一组数据时，如果某条处理失败，则当期后面的数据本次流程不再处理
 								break;
 							}
 						}
+					}
+
+					if (!sucLst.isEmpty()) {
+						for (TdrepayRechargeLog tdrepayRechargeLog : sucLst) {
+							tdrepayRechargeLog.setStatus(2);
+							tdrepayRechargeLog.setUpdateTime(new Date());
+							tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+						}
+						tdrepayRechargeLogService.updateBatchById(sucLst);
+						// 移除偿还垫付成功的数据
+						repayChargeLogs.removeAll(sucLst);
+					}
+
+					if (!repayChargeLogs.isEmpty()) {
+
+						// 标记处理失败,待定时任务重试
+						for (TdrepayRechargeLog rechargeLog : repayChargeLogs) {
+							rechargeLog.setStatus(3);
+							rechargeLog.setUpdateTime(new Date());
+							rechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+						}
+						tdrepayRechargeLogService.updateBatchById(repayChargeLogs);
 					}
 				} else {
 					for (TdrepayRechargeLog tdrepayRechargeLog : repayChargeLogs) {
@@ -734,14 +713,14 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	private void handleSettleData(List<TdrepayRechargeLog> repayChargeLogs,
 			List<TdrepayRechargeLog> tdrepayRechargeLogs) {
 
-		// repayChargeLogs 均为结清期的数据, 同projectId,同period,且已经根据createTime从大到小排序
+		// repayChargeLogs 均为结清期的数据, 同projectId,同period,且已经根据ConfirmTime从小到大排序
 		if (CollectionUtils.isNotEmpty(repayChargeLogs)) {
-
-			boolean isSuccess = handleSettleAdvanceData(repayChargeLogs);
 
 			/*
 			 * 一、 处理还垫付
 			 */
+			boolean isSuccess = handleSettleAdvanceData(repayChargeLogs);
+
 			if (isSuccess) {
 
 				/*
@@ -792,12 +771,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				if (isAdvanceSettle(repayChargeLogs, periodsList)) {
 
 					// 计算当期提前结清应还分润
-					Map<String, Double> map = totalRepaymentEarlierFinances(repayChargeLogs);
+					Map<String, BigDecimal> map = totalRepaymentEarlierFinances(repayChargeLogs);
 
 					// 计算提前结清应还分润
-					Double assetsCharge = map.get("assetsCharge"); // 资产端服务费
-					Double guaranteeCharge = map.get("guaranteeCharge"); // 担保公司服务费
-					Double agencyCharge = map.get("agencyCharge"); // 中介公司服务费
+					BigDecimal assetsCharge = map.get("assetsCharge"); // 资产端服务费
+					BigDecimal guaranteeCharge = map.get("guaranteeCharge"); // 担保公司服务费
+					BigDecimal agencyCharge = map.get("agencyCharge"); // 中介公司服务费
 
 					Result remoteRepaymentEarlierResult = remoteRepaymentEarlier(repayChargeLogs, assetsCharge,
 							guaranteeCharge, agencyCharge);
@@ -830,13 +809,13 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	 * @param repayChargeLogs
 	 * @return
 	 */
-	private Map<String, Double> totalRepaymentEarlierFinances(List<TdrepayRechargeLog> repayChargeLogs) {
+	private Map<String, BigDecimal> totalRepaymentEarlierFinances(List<TdrepayRechargeLog> repayChargeLogs) {
 
-		Map<String, Double> resultMap = new HashMap<>();
+		Map<String, BigDecimal> resultMap = new HashMap<>();
 
-		Double assetsCharge = 0.0; // 资产端服务费
-		Double guaranteeCharge = 0.0; // 担保公司服务费
-		Double agencyCharge = 0.0; // 中介公司服务费
+		BigDecimal assetsCharge = BigDecimal.ZERO; // 资产端服务费
+		BigDecimal guaranteeCharge = BigDecimal.ZERO; // 担保公司服务费
+		BigDecimal agencyCharge = BigDecimal.ZERO; // 中介公司服务费
 
 		List<String> logIds = new LinkedList<>();
 		for (TdrepayRechargeLog tdrepayRechargeLog : repayChargeLogs) {
@@ -849,16 +828,21 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		// 计算提前结清应还分润
 		for (TdrepayRechargeDetail detail : tdrepayRechargeDetails) {
 			Integer feeType = detail.getFeeType();
-			BigDecimal feeValue = detail.getFeeValue();
+			BigDecimal feeValue = detail.getFeeValue() == null ? BigDecimal.ZERO : detail.getFeeValue();
+			
+			if (feeType == null || feeValue == null || feeValue.compareTo(BigDecimal.ZERO) == 0) {
+				continue;
+			}
+			
 			switch (feeType) {
 			case 40:
-				assetsCharge += (feeValue == null ? 0 : feeValue.doubleValue());
+				assetsCharge = assetsCharge.add(feeValue);
 				break;
 			case 50:
-				guaranteeCharge += (feeValue == null ? 0 : feeValue.doubleValue());
+				guaranteeCharge = guaranteeCharge.add(feeValue);
 				break;
 			case 80:
-				agencyCharge += (feeValue == null ? 0 : feeValue.doubleValue());
+				agencyCharge = agencyCharge.add(feeValue);
 				break;
 
 			default:
@@ -866,12 +850,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			}
 		}
 
-		resultMap.put("assetsCharge",
-				BigDecimal.valueOf(assetsCharge).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-		resultMap.put("guaranteeCharge",
-				BigDecimal.valueOf(guaranteeCharge).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-		resultMap.put("agencyCharge",
-				BigDecimal.valueOf(agencyCharge).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+		resultMap.put("assetsCharge", assetsCharge);
+		resultMap.put("guaranteeCharge", guaranteeCharge);
+		resultMap.put("agencyCharge", agencyCharge);
 		return resultMap;
 	}
 
@@ -885,15 +866,15 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-	private Result remoteRepaymentEarlier(List<TdrepayRechargeLog> repayChargeLogs, Double assetsCharge,
-			Double guaranteeCharge, Double agencyCharge) {
+	private Result remoteRepaymentEarlier(List<TdrepayRechargeLog> repayChargeLogs, BigDecimal assetsCharge,
+			BigDecimal guaranteeCharge, BigDecimal agencyCharge) {
 		TdrepayRechargeLog tdrepayRechargeLog = repayChargeLogs.get(repayChargeLogs.size() - 1);
 
 		// 提前结清接口参数DTO
 		TdDepaymentEarlierDTO tdDepaymentEarlierDTO = new TdDepaymentEarlierDTO();
-		tdDepaymentEarlierDTO.setAgencyCharge(BigDecimal.valueOf(agencyCharge == null ? 0 : agencyCharge));
-		tdDepaymentEarlierDTO.setAssetsCharge(BigDecimal.valueOf(assetsCharge == null ? 0 : assetsCharge));
-		tdDepaymentEarlierDTO.setGuaranteeCharge(BigDecimal.valueOf(guaranteeCharge == null ? 0 : guaranteeCharge));
+		tdDepaymentEarlierDTO.setAgencyCharge(agencyCharge);
+		tdDepaymentEarlierDTO.setAssetsCharge(assetsCharge);
+		tdDepaymentEarlierDTO.setGuaranteeCharge(guaranteeCharge);
 		tdDepaymentEarlierDTO.setProjectId(tdrepayRechargeLog.getProjectId());
 
 		// 判断是否坏账结清
@@ -909,12 +890,11 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				Constant.INTERFACE_NAME_REPAYMENT_EARLIER, Constant.SYSTEM_CODE_EIP, tdrepayRechargeLog.getProjectId());
 
 		Result repaymentEarlierResult = null;
-		LOG.info("提前结清接口/eip/td/repayment/repaymentEarlier参数信息，{}", JSONObject.toJSONString(tdDepaymentEarlierDTO));
+		LOG.info("提前结清接口/eip/td/repayment/repaymentEarlier参数信息，{}", tdDepaymentEarlierDTO);
 		try {
 			// 调用提前结清接口
 			repaymentEarlierResult = eipRemote.repaymentEarlier(tdDepaymentEarlierDTO);
-			LOG.info("提前结清接口/eip/td/repayment/repaymentEarlier返回信息，{}",
-					JSONObject.toJSONString(repaymentEarlierResult));
+			LOG.info("提前结清接口/eip/td/repayment/repaymentEarlier返回信息，{}", repaymentEarlierResult);
 		} catch (Exception e) {
 			issueSendOutsideLog.setReturnJson(e.getMessage());
 			LOG.error(e.getMessage(), e);
@@ -938,12 +918,11 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	@SuppressWarnings("rawtypes")
 	private boolean handleSettleAdvanceData(List<TdrepayRechargeLog> repayChargeLogs) {
 
-		// repayChargeLogs 均为结清期的数据, 同projectId,同period,且已经根据createTime从大到小排序
+		// repayChargeLogs 均为结清期的数据, 同projectId,同period,且已经根据ConfirmTime从大到小排序
 
 		// 从平台获取标的还款信息、还垫付信息 （标的维度）
 		String projectId = repayChargeLogs.get(0).getProjectId();
 		Integer period = repayChargeLogs.get(0).getPeriod();
-		Integer businessType = repayChargeLogs.get(0).getBusinessType();
 
 		Map<String, Result> map = new HashMap<>();
 		try {
@@ -961,38 +940,15 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 		boolean flag = true; // 标记，是否还垫付成功
 
-		Result queryProjectPaymentResult = null;
-		Result advanceShareProfitResult = null;
-
-		if (!map.isEmpty()) {
-			queryProjectPaymentResult = map.get("queryProjectPaymentResult");
-			advanceShareProfitResult = map.get("advanceShareProfitResult");
-		}
-
-		// 1、判断往期是否存在未还垫付
-		// TODO 待提供判断是否存在垫付未还记录查询接口
-
-		/*
-		 * 去掉对往期的判断，在前端调用平台还款接口时做验证，如果往期有未结清期，则数据不能通过。
-		 */
-		/*
-		 * boolean pastPeriodAdvanceFlag = isPastPeriodAdvance(projectId, period,
-		 * businessType, queryProjectPaymentResult, advanceShareProfitResult);
-		 * 
-		 * if (!pastPeriodAdvanceFlag) {
-		 * 
-		 * for (TdrepayRechargeLog tdrepayRechargeLog : repayChargeLogs) { //
-		 * 标记处理失败,待定时任务重试 tdrepayRechargeLog.setStatus(3);
-		 * tdrepayRechargeLog.setUpdateTime(new Date());
-		 * tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId()); }
-		 * tdrepayRechargeLogService.updateBatchById(repayChargeLogs); return false; }
-		 */
+		Result queryProjectPaymentResult = map.get("queryProjectPaymentResult");
+		Result advanceShareProfitResult = map.get("advanceShareProfitResult");
 
 		// 2、判断当前期是否有垫付
-		// TODO 待提供判断是否存在垫付未还记录查询接口
 		Boolean currPeriodAdvanceFlag = isCurrPeriodAdvance(queryProjectPaymentResult, advanceShareProfitResult,
 				period);
 		if (currPeriodAdvanceFlag != null && currPeriodAdvanceFlag) {
+
+			List<TdrepayRechargeLog> sucLst = new ArrayList<>();
 
 			for (TdrepayRechargeLog tdrepayRechargeLog : repayChargeLogs) {
 
@@ -1003,202 +959,45 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 				if (CollectionUtils.isNotEmpty(tdrepayRechargeDetails)) {
 
-					// 调用 偿还垫付接口 ， 按期数从小到大顺序调用，若某一期执行失败，则后面期数本次不再继续执行
+					// 调用 偿还垫付接口 ， 按期数财务确认时间从小到大顺序调用，若本期次某一数据执行失败，则本期次未执行的数据不再继续执行
 					Result result = remoteAdvanceShareProfit(tdrepayRechargeLog, tdrepayRechargeDetails);
 
-					if (result == null || !Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+					if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 
+						sucLst.add(tdrepayRechargeLog);
+
+					} else {
 						flag = false;
-
-						// 标记处理失败,待定时任务重试
-						tdrepayRechargeLog.setStatus(3);
-
-						tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
 						break;
 					}
 				}
 			}
+
+			if (!sucLst.isEmpty()) {
+				for (TdrepayRechargeLog tdrepayRechargeLog : sucLst) {
+					tdrepayRechargeLog.setStatus(2);
+					tdrepayRechargeLog.setUpdateTime(new Date());
+					tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+				}
+				tdrepayRechargeLogService.updateBatchById(sucLst);
+				// 移除偿还垫付成功的数据
+				repayChargeLogs.removeAll(sucLst);
+			}
+
+			if (!repayChargeLogs.isEmpty()) {
+
+				// 标记处理失败,待定时任务重试
+				for (TdrepayRechargeLog rechargeLog : repayChargeLogs) {
+					rechargeLog.setStatus(3);
+					rechargeLog.setUpdateTime(new Date());
+					rechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+				}
+				tdrepayRechargeLogService.updateBatchById(repayChargeLogs);
+			}
+
 		}
 
 		return flag;
-	}
-
-	/**
-	 * 处理往期是否有垫付未还记录
-	 * 
-	 * @param projectId
-	 * @param period
-	 * @param queryProjectPaymentResult
-	 * @param advanceShareProfitResult
-	 */
-	@SuppressWarnings("rawtypes")
-	private boolean isPastPeriodAdvance(String projectId, Integer period, Integer businessType,
-			Result queryProjectPaymentResult, Result advanceShareProfitResult) {
-		if (queryProjectPaymentResult != null && advanceShareProfitResult != null
-				&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(advanceShareProfitResult.getReturnCode())
-				&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.getReturnCode())) {
-
-			// 标的还款信息
-			List<TdProjectPaymentDTO> tdProjectPaymentDTOs = null;
-			if (queryProjectPaymentResult.getData() != null) {
-				JSONObject parseObject = (JSONObject) JSONObject.toJSON(queryProjectPaymentResult.getData());
-				if (parseObject.get("projectPayments") != null) {
-					tdProjectPaymentDTOs = JSONObject.parseArray(
-							JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
-				}
-			}
-
-			// 还垫付信息
-			TdReturnAdvanceShareProfitResult returnAdvanceShareProfitResult = null;
-			if (advanceShareProfitResult.getData() != null) {
-				String json2 = JSONObject.toJSONString(advanceShareProfitResult.getData());
-				returnAdvanceShareProfitResult = JSONObject.parseObject(json2, TdReturnAdvanceShareProfitResult.class);
-			}
-
-			// 担保公司垫付信息
-			double principalAndInterest = 0; // 本金利息
-			double tuandaiAmount = 0; // 实还平台服务费
-			double orgAmount = 0; // 实还资产端服务费
-			double guaranteeAmount = 0; // 实还担保公司服务费
-			double arbitrationAmount = 0; // 实还仲裁服务费
-
-			// 还垫付信息
-			double principalAndInterest2 = 0; // 本金利息
-			double tuandaiAmount2 = 0; // 实还平台服务费
-			double orgAmount2 = 0; // 实还资产端服务费
-			double guaranteeAmount2 = 0; // 实还担保公司服务费
-			double arbitrationAmount2 = 0; // 实还仲裁服务费
-
-			// 得到往期的标的还款信息
-			List<TdProjectPaymentDTO> pastPeriodDTOs = handlePastPeriodTdProjectPaymentDTO(period,
-					tdProjectPaymentDTOs);
-
-			// 得到往期的标的还垫付信息
-			List<TdReturnAdvanceShareProfitDTO> tdReturnAdvanceShareProfitDTOs = handlePastPeriodTdReturnAdvanceShareProfitDTO(
-					returnAdvanceShareProfitResult, period);
-
-			if (CollectionUtils.isEmpty(pastPeriodDTOs)) {
-				return false;
-			}
-
-			// 判断往期是否有未还垫付记录
-			for (TdProjectPaymentDTO tdProjectPaymentDTO : pastPeriodDTOs) {
-
-				TdGuaranteePaymentDTO guaranteePayment = tdProjectPaymentDTO.getGuaranteePayment();
-
-				if (guaranteePayment != null) {
-
-					int tdPeriod = tdProjectPaymentDTO.getPeriod();
-
-					principalAndInterest = guaranteePayment.getPrincipalAndInterest() == null ? 0
-							: guaranteePayment.getPrincipalAndInterest().doubleValue();
-					tuandaiAmount = guaranteePayment.getTuandaiAmount() == null ? 0
-							: guaranteePayment.getTuandaiAmount().doubleValue();
-					orgAmount = guaranteePayment.getOrgAmount() == null ? 0
-							: guaranteePayment.getOrgAmount().doubleValue();
-					guaranteeAmount = guaranteePayment.getGuaranteeAmount() == null ? 0
-							: guaranteePayment.getGuaranteeAmount().doubleValue();
-					arbitrationAmount = guaranteePayment.getArbitrationAmount() == null ? 0
-							: guaranteePayment.getArbitrationAmount().doubleValue();
-
-					for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : tdReturnAdvanceShareProfitDTOs) {
-						if (tdReturnAdvanceShareProfitDTO.getPeriod() == tdPeriod) {
-							principalAndInterest2 = tdReturnAdvanceShareProfitDTO.getPrincipalAndInterest() == null ? 0
-									: tdReturnAdvanceShareProfitDTO.getPrincipalAndInterest().doubleValue();
-							tuandaiAmount2 = tdReturnAdvanceShareProfitDTO.getTuandaiAmount() == null ? 0
-									: tdReturnAdvanceShareProfitDTO.getTuandaiAmount().doubleValue();
-							orgAmount2 = tdReturnAdvanceShareProfitDTO.getOrgAmount() == null ? 0
-									: tdReturnAdvanceShareProfitDTO.getOrgAmount().doubleValue();
-							guaranteeAmount2 = tdReturnAdvanceShareProfitDTO.getGuaranteeAmount() == null ? 0
-									: tdReturnAdvanceShareProfitDTO.getGuaranteeAmount().doubleValue();
-							arbitrationAmount2 = tdReturnAdvanceShareProfitDTO.getArbitrationAmount() == null ? 0
-									: tdReturnAdvanceShareProfitDTO.getArbitrationAmount().doubleValue();
-						}
-					}
-
-					// 往期剩余多少没有还
-					double principalAndInterest3 = BigDecimal.valueOf(principalAndInterest - principalAndInterest2)
-							.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-					double tuandaiAmount3 = BigDecimal.valueOf(tuandaiAmount - tuandaiAmount2)
-							.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-					double orgAmount3 = BigDecimal.valueOf(orgAmount - orgAmount2).setScale(2, BigDecimal.ROUND_HALF_UP)
-							.doubleValue();
-					double guaranteeAmount3 = BigDecimal.valueOf(guaranteeAmount - guaranteeAmount2)
-							.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-					double arbitrationAmount3 = BigDecimal.valueOf(arbitrationAmount - arbitrationAmount2)
-							.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-					double totalAmount = BigDecimal.valueOf(
-							principalAndInterest3 + tuandaiAmount3 + orgAmount3 + guaranteeAmount3 + arbitrationAmount3)
-							.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-
-					if (totalAmount > 0) {
-
-						TdAdvanceShareProfitDTO dto = new TdAdvanceShareProfitDTO();
-						TdrepayAdvanceLog tdrepayAdvanceLog = new TdrepayAdvanceLog();
-						tdrepayAdvanceLog.setArbitrationAmount(BigDecimal.valueOf(arbitrationAmount3));
-						tdrepayAdvanceLog.setTuandaiAmount(BigDecimal.valueOf(tuandaiAmount3));
-						tdrepayAdvanceLog.setOrgAmount(BigDecimal.valueOf(orgAmount3));
-						tdrepayAdvanceLog.setGuaranteeAmount(BigDecimal.valueOf(guaranteeAmount3));
-						tdrepayAdvanceLog.setPrincipalAndInterest(BigDecimal.valueOf(principalAndInterest3));
-						tdrepayAdvanceLog.setTotalAmount(BigDecimal.valueOf(totalAmount));
-						tdrepayAdvanceLog.setStatus(1);
-						tdrepayAdvanceLog.setCreateTime(new Date());
-						String userId = loginUserInfoHelper.getUserId();
-						tdrepayAdvanceLog.setCreateUser(userId);
-
-						dto.setPeriod(tdPeriod); // 往期期次
-						dto.setProjectId(projectId);
-						dto.setPrincipalAndInterest(BigDecimal.valueOf(principalAndInterest3));
-						dto.setStatus(1);
-						dto.setTuandaiAmount(BigDecimal.valueOf(tuandaiAmount3));
-						dto.setOrgType(BusinessTypeEnum.getOrgTypeByValue((businessType)));
-						dto.setOrgAmount(BigDecimal.valueOf(orgAmount3));
-						dto.setGuaranteeAmount(BigDecimal.valueOf(guaranteeAmount3));
-						dto.setArbitrationAmount(BigDecimal.valueOf(arbitrationAmount3));
-						dto.setOverDueAmount(BigDecimal.valueOf(0));
-						dto.setTotalAmount(BigDecimal.valueOf(totalAmount));
-
-						IssueSendOutsideLog issueSendOutsideLog = issueSendOutsideLog(userId, dto,
-								Constant.INTERFACE_CODE_ADVANCE_SHARE_PROFIT,
-								Constant.INTERFACE_NAME_ADVANCE_SHARE_PROFIT, Constant.SYSTEM_CODE_EIP, projectId);
-
-						Result result = null;
-						LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit参数信息，{}", JSONObject.toJSONString(dto));
-						try {
-							// 调用偿还垫付接口
-							result = eipRemote.advanceShareProfit(dto);
-							LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit返回信息，{}",
-									JSONObject.toJSONString(result));
-						} catch (Exception e) {
-							issueSendOutsideLog.setReturnJson(e.getMessage());
-							LOG.error(e.getMessage(), e);
-						}
-
-						if (result != null) {
-							issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
-						}
-
-						if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
-							// 还垫付记录表标记为处理成功
-							tdrepayAdvanceLog.setAdvanceStatus(1);
-						} else {
-							// 还垫付记录表标记为处理失败
-							tdrepayAdvanceLog.setAdvanceStatus(2);
-						}
-
-						tdrepayAdvanceLogService.insert(tdrepayAdvanceLog);
-						issueSendOutsideLogService.insert(issueSendOutsideLog);
-
-						if (result == null || !Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
-							return false;
-						}
-					}
-				}
-			}
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	/**
@@ -1220,35 +1019,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				int tdPeriod = tdProjectPaymentDTO.getPeriod();
 				if (period != null && tdPeriod == period.intValue()) {
 					projectPaymentDTO = tdProjectPaymentDTO;
+					break;
 				}
 			}
 
 		}
 		return projectPaymentDTO;
-	}
-
-	/**
-	 * 得到往期的标的还款信息
-	 * 
-	 * @param period
-	 * @param projectPaymentResult
-	 * @return
-	 */
-	private List<TdProjectPaymentDTO> handlePastPeriodTdProjectPaymentDTO(Integer period,
-			List<TdProjectPaymentDTO> tdProjectPaymentDTOs) {
-
-		List<TdProjectPaymentDTO> pastPeriodDTOs = new ArrayList<>();
-
-		if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
-			// 得到当期的标的还款信息
-			for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
-				if (period != null && tdProjectPaymentDTO.getPeriod() < period.intValue()) {
-					pastPeriodDTOs.add(tdProjectPaymentDTO);
-				}
-			}
-		}
-
-		return pastPeriodDTOs;
 	}
 
 	/**
@@ -1261,7 +1037,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	private boolean isAdvanceSettle(List<TdrepayRechargeLog> repayChargeLogs, List<TdRefundMonthInfoDTO> periodsList) {
 		if (CollectionUtils.isNotEmpty(periodsList)) {
 
-			Date factRepayDate = repayChargeLogs.get(repayChargeLogs.size() - 1).getFactRepayDate();
+			Date confirmTime = repayChargeLogs.get(repayChargeLogs.size() - 1).getConfirmTime();
 
 			if (periodsList.size() > 1) {
 				Collections.sort(periodsList, new Comparator<TdRefundMonthInfoDTO>() {
@@ -1274,9 +1050,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			}
 			String cycDate = periodsList.get(periodsList.size() - 1).getCycDate();
 
-			if (factRepayDate != null && StringUtil.notEmpty(cycDate)) {
+			if (confirmTime != null && StringUtil.notEmpty(cycDate)) {
 				cycDate += " 00:00:00";
-				return factRepayDate.before(DateUtil.getDate(cycDate));
+				return confirmTime.before(DateUtil.getDate(cycDate));
 			}
 		}
 		return false;
@@ -1299,17 +1075,15 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				Constant.INTERFACE_CODE_GET_PROJECT_PAYMENT, Constant.INTERFACE_NAME_GET_PROJECT_PAYMENT,
 				Constant.SYSTEM_CODE_EIP, projectId);
 
-		LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment参数信息，{}", JSONObject.toJSONString(paramMap));
+		LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment参数信息，{}", paramMap);
 		Result result = null;
 		try {
 			result = eipRemote.getProjectPayment(paramMap);
-			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment返回信息，{}", JSONObject.toJSONString(result));
+			issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
+			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment返回信息，{}", result);
 		} catch (Exception e) {
 			issueSendOutsideLog.setReturnJson(e.getMessage());
 			LOG.error(e.getMessage(), e);
-		}
-		if (result != null) {
-			issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
 		}
 		issueSendOutsideLogService.insert(issueSendOutsideLog);
 
@@ -1345,14 +1119,13 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				map.put(period, list);
 			} else {
 				list.add(tdrepayRechargeLog);
-				map.put(period, list);
 			}
 		}
 		return map;
 	}
 
 	/**
-	 * list 按照FactRepayDate进行排序
+	 * list 按照confirmTime进行排序
 	 * 
 	 * @param rechargeLogs
 	 */
@@ -1362,9 +1135,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 				@Override
 				public int compare(TdrepayRechargeLog o1, TdrepayRechargeLog o2) {
-					if (o1.getFactRepayDate().before(o2.getFactRepayDate())) {
+					if (o1.getConfirmTime().before(o2.getConfirmTime())) {
 						return -1;
-					} else if (o1.getFactRepayDate().after(o2.getFactRepayDate())) {
+					} else if (o1.getConfirmTime().after(o2.getConfirmTime())) {
 						return 1;
 					} else {
 						return 0;
@@ -1411,37 +1184,34 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		tdrepayAdvanceLog.setStatus(isComplete);
 		paramDTO.setStatus(isComplete);
 
-		double totalAmount = 0;
+		BigDecimal totalAmount = BigDecimal.ZERO;
 
 		for (TdrepayRechargeDetail tdrepayRechargeDetail : tdrepayRechargeDetails) {
 			// 费用类型
 			Integer feeType = tdrepayRechargeDetail.getFeeType();
-
-			if (feeType == null) {
-				continue;
-			}
 			// 费用值
 			BigDecimal feeValue = tdrepayRechargeDetail.getFeeValue();
 
-			double doubleFeeValue = feeValue == null ? 0 : feeValue.doubleValue();
+			if (feeType == null || feeValue == null || feeValue.compareTo(BigDecimal.ZERO) == 0) {
+				continue;
+			}
 
-			totalAmount += doubleFeeValue;
+			totalAmount = totalAmount.add(feeValue);
 			// 本金 + 利息
-			BigDecimal principalAndInterest = paramDTO.getPrincipalAndInterest();
-			double principalAndInterestDouble = principalAndInterest == null ? 0 : principalAndInterest.doubleValue();
+			BigDecimal principalAndInterest = BigDecimal.ZERO;
+			if (feeType.intValue() == 10 || feeType.intValue() == 20) {
+				principalAndInterest = paramDTO.getPrincipalAndInterest() == null ? principalAndInterest
+						: paramDTO.getPrincipalAndInterest();
+			}
 
 			switch (feeType) {
 			case 10: // 本金
-				BigDecimal principalInterest1 = BigDecimal
-						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue))
-						.setScale(2, BigDecimal.ROUND_HALF_UP);
+				BigDecimal principalInterest1 = principalAndInterest.add(feeValue);
 				paramDTO.setPrincipalAndInterest(principalInterest1);
 				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest1);
 				break;
 			case 20: // 利息
-				BigDecimal principalInterest2 = BigDecimal
-						.valueOf(principalAndInterestDouble + (feeValue == null ? 0 : doubleFeeValue))
-						.setScale(2, BigDecimal.ROUND_HALF_UP);
+				BigDecimal principalInterest2 = principalAndInterest.add(feeValue);
 				paramDTO.setPrincipalAndInterest(principalInterest2);
 				tdrepayAdvanceLog.setPrincipalAndInterest(principalInterest2);
 				break;
@@ -1481,7 +1251,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			}
 		}
 
-		paramDTO.setTotalAmount(BigDecimal.valueOf(totalAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
+		paramDTO.setTotalAmount(totalAmount);
 
 		/*
 		 * 2、开始调用偿还垫付接口
@@ -1495,11 +1265,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 		tdrepayAdvanceLog.setCreateTime(new Date());
 		tdrepayAdvanceLog.setCreateUser(userId);
-		LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit参数信息，{}", JSONObject.toJSONString(paramDTO));
+		LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit参数信息，{}", paramDTO);
 		try {
 			// 调用偿还垫付接口
 			result = eipRemote.advanceShareProfit(paramDTO);
-			LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit返回信息，{}", JSONObject.toJSONString(result));
+			issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
+			LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit返回信息，{}", result);
 		} catch (Exception e) {
 			// 还垫付记录表标记为处理失败
 			tdrepayAdvanceLog.setAdvanceStatus(2);
@@ -1515,9 +1286,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			tdrepayAdvanceLog.setAdvanceStatus(2);
 		}
 
-		if (result != null) {
-			issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
-		}
 		tdrepayAdvanceLogService.insert(tdrepayAdvanceLog);
 		issueSendOutsideLogService.insert(issueSendOutsideLog);
 
@@ -1576,39 +1344,23 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		Result queryProjectPaymentResult = null;
 		Result advanceShareProfitResult = null;
 		try {
-			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment参数信息，{}", JSONObject.toJSONString(paramMap));
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment参数信息，{}", paramMap);
 			queryProjectPaymentResult = eipRemote.queryProjectPayment(paramMap); // 标的还款信息
-			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}",
-					JSONObject.toJSONString(queryProjectPaymentResult));
+			queryProjectPaymentLog.setReturnJson(JSONObject.toJSONString(queryProjectPaymentResult));
+			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", queryProjectPaymentResult);
 
-			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit参数信息，{}", JSONObject.toJSONString(paramMap));
+			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit参数信息，{}", paramMap);
 			advanceShareProfitResult = eipRemote.returnAdvanceShareProfit(paramMap); // 还垫付信息
-			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}",
-					JSONObject.toJSONString(advanceShareProfitResult));
+			advanceShareProfitLog.setReturnJson(JSONObject.toJSONString(advanceShareProfitResult));
+			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}", advanceShareProfitResult);
 		} catch (Exception e) {
 			queryProjectPaymentLog.setReturnJson(e.getMessage());
 			advanceShareProfitLog.setReturnJson(e.getMessage());
 			LOG.error(e.getMessage(), e);
 		}
 
-		if (queryProjectPaymentResult != null) {
-			queryProjectPaymentLog.setReturnJson(JSONObject.toJSONString(queryProjectPaymentResult));
-		}
-		if (advanceShareProfitResult != null) {
-			advanceShareProfitLog.setReturnJson(JSONObject.toJSONString(advanceShareProfitResult));
-		}
-
 		issueSendOutsideLogService.insert(advanceShareProfitLog);
 		issueSendOutsideLogService.insert(queryProjectPaymentLog);
-
-		if (queryProjectPaymentResult == null
-				|| !Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.getReturnCode())
-				|| advanceShareProfitResult == null
-				|| !Constant.REMOTE_EIP_SUCCESS_CODE.equals(advanceShareProfitResult.getReturnCode())) {
-			LOG.info("从平台获取标的还款信息或还垫付信息异常，返回结果垫付信息：{} --- 还垫付信息：{}", queryProjectPaymentResult,
-					advanceShareProfitResult);
-			throw new ServiceRuntimeException("从平台获取标的还款信息或还垫付信息异常");
-		}
 
 		resultMap.put("advanceShareProfitResult", advanceShareProfitResult);
 		resultMap.put("queryProjectPaymentResult", queryProjectPaymentResult);
@@ -1672,36 +1424,36 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 		// 判断 标的当前期是否存在垫付未还记录 需另外创建还垫付记录表 根据 标的还款信息查询接口 和 还垫付信息查询接口 取得数据对比
 
+		BigDecimal zero = BigDecimal.ZERO;
+
 		// 担保公司垫付信息
-		double principalAndInterest = 0; // 本金利息
-		double tuandaiAmount = 0; // 实还平台服务费
-		double orgAmount = 0; // 实还资产端服务费
-		double guaranteeAmount = 0; // 实还担保公司服务费
-		double arbitrationAmount = 0; // 实还仲裁服务费
+		BigDecimal principalAndInterest = zero; // 本金利息
+		BigDecimal tuandaiAmount = zero; // 实还平台服务费
+		BigDecimal orgAmount = zero; // 实还资产端服务费
+		BigDecimal guaranteeAmount = zero; // 实还担保公司服务费
+		BigDecimal arbitrationAmount = zero; // 实还仲裁服务费
 
 		// 还垫付信息
-		double principalAndInterest2 = 0; // 本金利息
-		double tuandaiAmount2 = 0; // 实还平台服务费
-		double orgAmount2 = 0; // 实还资产端服务费
-		double guaranteeAmount2 = 0; // 实还担保公司服务费
-		double arbitrationAmount2 = 0; // 实还仲裁服务费
+		BigDecimal principalAndInterest2 = zero; // 本金利息
+		BigDecimal tuandaiAmount2 = zero; // 实还平台服务费
+		BigDecimal orgAmount2 = zero; // 实还资产端服务费
+		BigDecimal guaranteeAmount2 = zero; // 实还担保公司服务费
+		BigDecimal arbitrationAmount2 = zero; // 实还仲裁服务费
 
 		// 得到当期的标的还款信息
 		TdProjectPaymentDTO projectPaymentDTO = handleTdProjectPaymentDTO(period, tdProjectPaymentDTOs);
-
 		if (projectPaymentDTO != null && projectPaymentDTO.getGuaranteePayment() != null) {
 
 			TdGuaranteePaymentDTO guaranteePayment = projectPaymentDTO.getGuaranteePayment();
 
-			principalAndInterest = guaranteePayment.getPrincipalAndInterest() == null ? 0
-					: guaranteePayment.getPrincipalAndInterest().doubleValue();
-			tuandaiAmount = guaranteePayment.getTuandaiAmount() == null ? 0
-					: guaranteePayment.getTuandaiAmount().doubleValue();
-			orgAmount = guaranteePayment.getOrgAmount() == null ? 0 : guaranteePayment.getOrgAmount().doubleValue();
-			guaranteeAmount = guaranteePayment.getGuaranteeAmount() == null ? 0
-					: guaranteePayment.getGuaranteeAmount().doubleValue();
-			arbitrationAmount = guaranteePayment.getArbitrationAmount() == null ? 0
-					: guaranteePayment.getArbitrationAmount().doubleValue();
+			principalAndInterest = guaranteePayment.getPrincipalAndInterest() == null ? zero
+					: guaranteePayment.getPrincipalAndInterest();
+			tuandaiAmount = guaranteePayment.getTuandaiAmount() == null ? zero : guaranteePayment.getTuandaiAmount();
+			orgAmount = guaranteePayment.getOrgAmount() == null ? zero : guaranteePayment.getOrgAmount();
+			guaranteeAmount = guaranteePayment.getGuaranteeAmount() == null ? zero
+					: guaranteePayment.getGuaranteeAmount();
+			arbitrationAmount = guaranteePayment.getArbitrationAmount() == null ? zero
+					: guaranteePayment.getArbitrationAmount();
 		}
 
 		// 得到当期的标的还垫付信息
@@ -1709,21 +1461,23 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				returnAdvanceShareProfits, period);
 
 		if (returnAdvanceShareProfitDTO != null) {
-			principalAndInterest2 = returnAdvanceShareProfitDTO.getPrincipalAndInterest() == null ? 0
-					: returnAdvanceShareProfitDTO.getPrincipalAndInterest().doubleValue();
-			tuandaiAmount2 = returnAdvanceShareProfitDTO.getTuandaiAmount() == null ? 0
-					: returnAdvanceShareProfitDTO.getTuandaiAmount().doubleValue();
-			orgAmount2 = returnAdvanceShareProfitDTO.getOrgAmount() == null ? 0
-					: returnAdvanceShareProfitDTO.getOrgAmount().doubleValue();
-			guaranteeAmount2 = returnAdvanceShareProfitDTO.getGuaranteeAmount() == null ? 0
-					: returnAdvanceShareProfitDTO.getGuaranteeAmount().doubleValue();
-			arbitrationAmount2 = returnAdvanceShareProfitDTO.getArbitrationAmount() == null ? 0
-					: returnAdvanceShareProfitDTO.getArbitrationAmount().doubleValue();
+			principalAndInterest2 = returnAdvanceShareProfitDTO.getPrincipalAndInterest() == null ? zero
+					: returnAdvanceShareProfitDTO.getPrincipalAndInterest();
+			tuandaiAmount2 = returnAdvanceShareProfitDTO.getTuandaiAmount() == null ? zero
+					: returnAdvanceShareProfitDTO.getTuandaiAmount();
+			orgAmount2 = returnAdvanceShareProfitDTO.getOrgAmount() == null ? zero
+					: returnAdvanceShareProfitDTO.getOrgAmount();
+			guaranteeAmount2 = returnAdvanceShareProfitDTO.getGuaranteeAmount() == null ? zero
+					: returnAdvanceShareProfitDTO.getGuaranteeAmount();
+			arbitrationAmount2 = returnAdvanceShareProfitDTO.getArbitrationAmount() == null ? zero
+					: returnAdvanceShareProfitDTO.getArbitrationAmount();
 		}
 
-		return (principalAndInterest - principalAndInterest2) > 0 || (tuandaiAmount - tuandaiAmount2) > 0
-				|| (orgAmount - orgAmount2) > 0 || (guaranteeAmount - guaranteeAmount2) > 0
-				|| (arbitrationAmount - arbitrationAmount2) > 0;
+		return principalAndInterest.subtract(principalAndInterest2).compareTo(zero) > 0
+				|| tuandaiAmount.subtract(tuandaiAmount2).compareTo(zero) > 0
+				|| orgAmount.subtract(orgAmount2).compareTo(zero) > 0
+				|| guaranteeAmount.subtract(guaranteeAmount2).compareTo(zero) > 0
+				|| arbitrationAmount.subtract(arbitrationAmount2).compareTo(zero) > 0;
 	}
 
 	/**
@@ -1742,38 +1496,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
 				if (period != null && tdReturnAdvanceShareProfitDTO.getPeriod() == period.intValue()) {
 					returnAdvanceShareProfitDTO = tdReturnAdvanceShareProfitDTO;
+					break;
 				}
 			}
 		}
 
 		return returnAdvanceShareProfitDTO;
-	}
-
-	/**
-	 * 得到往期的标的还垫付信息
-	 * 
-	 * @param returnAdvanceShareProfitResult
-	 * @param period
-	 * @return
-	 */
-	private List<TdReturnAdvanceShareProfitDTO> handlePastPeriodTdReturnAdvanceShareProfitDTO(
-			TdReturnAdvanceShareProfitResult returnAdvanceShareProfitResult, Integer period) {
-		List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfitDTOs = new ArrayList<>();
-
-		if (returnAdvanceShareProfitResult != null
-				&& CollectionUtils.isNotEmpty(returnAdvanceShareProfitResult.getReturnAdvanceShareProfits())) {
-
-			List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = returnAdvanceShareProfitResult
-					.getReturnAdvanceShareProfits();
-
-			// 得到往期的标的还垫付信息
-			for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
-				if (period != null && tdReturnAdvanceShareProfitDTO.getPeriod() < period.intValue()) {
-					returnAdvanceShareProfitDTOs.add(tdReturnAdvanceShareProfitDTO);
-				}
-			}
-		}
-		return returnAdvanceShareProfitDTOs;
 	}
 
 	/**
@@ -1919,9 +1647,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						tdProjectPaymentDTOs = JSONObject.parseArray(
 								JSONObject.toJSONString(parseObject.get("projectPayments")), TdProjectPaymentDTO.class);
 						if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
-							
+
 							boolean paymentFlag = false; // 是否有实还记录
-							
+
 							for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
 								/*
 								 * 匹配当期，且平台为结清状态，则更新贷后合规化表状态为处理成功
@@ -1929,7 +1657,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 								if (tdProjectPaymentDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
 									if (tdProjectPaymentDTO.getStatus() == 1) {
 										tdrepayRechargeLog.setStatus(2);
-									}else {
+									} else {
 										tdrepayRechargeLog.setStatus(3);
 									}
 									tdrepayRechargeLog.setUpdateTime(new Date());
@@ -1940,7 +1668,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 									break;
 								}
 							}
-							
+
 							if (!paymentFlag) {
 								tdrepayRechargeLog.setStatus(0);
 								tdrepayRechargeLog.setUpdateTime(new Date());
@@ -1955,5 +1683,11 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 			}
 		}
+	}
+
+	public static void main(String[] args) {
+		Date d1 = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:S");
+		System.out.println(sdf.format(d1));
 	}
 }
