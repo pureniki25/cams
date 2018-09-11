@@ -157,6 +157,7 @@ public class BusinessParameterController {
 	@PostMapping("/queryBusinessFiveLevelClassify")
 	@ResponseBody
 	public Result<List<Map<String, Object>>> queryBusinessFiveLevelClassify(@RequestBody BusinessFiveLevelClassifyInfoVO vo) {
+		LOG.info("BusinessFiveLevelClassifyInfoVO: ", vo);
 		try {
 			List<FiveLevelClassifyBusinessChangeLog> changeLogs = fiveLevelClassifyBusinessChangeLogService
 					.selectList(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>().gt("op_time", vo.getStartDate())
