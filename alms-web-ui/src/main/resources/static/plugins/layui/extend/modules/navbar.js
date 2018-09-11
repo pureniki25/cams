@@ -67,6 +67,18 @@ layui.define(['layer', 'laytpl', 'element'], function(exports) {
             // if (!that.hasElem())
             //     return that;
             // var _elem = that.getElem();
+            _target.find('a[kit-target2]').each(function() {
+                var _that = $(this),
+                    tipsId = undefined;
+                if (defaults.showTips) {
+                    _that.hover(function () {
+                        tipsId = layer.tips($(this).children('span').text(), this);
+                    }, function () {
+                        if (tipsId)
+                            layer.close(tipsId);
+                    });
+                }
+            })
             _target.find('a[kit-target]').each(function() {
                 var _that = $(this),
                     tipsId = undefined;
@@ -128,13 +140,13 @@ layui.define(['layer', 'laytpl', 'element'], function(exports) {
                     '{{# } }}',
                     '{{# var hasChildren = item.children!==undefined && item.children.length>0; }}',
                     '{{# if(hasChildren){ }}',
-                    '<a href="javascript:;">',
+                    '<a href="javascript:;" kit-target2 >',
                     '{{# if (item.icon.indexOf("fa-") !== -1) { }}',
                     '<i class="fa {{item.icon}}" aria-hidden="true"></i>',
                     '{{# } else { }}',
                     '<i class="layui-icon">{{item.icon}}</i>',
                     '{{# } }}',
-                    '<span> {{item.title}}</span>',
+                    '<span ><strong> {{item.title}}</strong></span>',
                     '</a>',
                     '{{# var children = item.children; }}',
                     '<dl class="layui-nav-child">',
@@ -158,7 +170,7 @@ layui.define(['layer', 'laytpl', 'element'], function(exports) {
                     '{{# } else { }}',
                     '<i class="layui-icon">{{item.icon}}</i>',
                     '{{# } }}',
-                    '<span> {{item.title}}</span>',
+                    '<span><strong> {{item.title}}</strong></span>',
                     '</a>',
                     '{{# } }}',
                     '</li>',
