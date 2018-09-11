@@ -47,7 +47,7 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
 
-//@CrossOrigin
+@CrossOrigin
 @RestController
 @RequestMapping("/recharge")
 public class RechargeController {
@@ -295,11 +295,11 @@ public class RechargeController {
 		agencyRechargeLogService.insert(agencyRechargeLog);
 
 		com.ht.ussp.core.Result result = null;
-		LOG.info("代充值接口/eip/td/assetside/agencyRecharge参数信息，{}", JSONObject.toJSONString(dto));
+		LOG.info("代充值接口/eip/td/assetside/agencyRecharge参数信息，{}", dto);
 		try {
 
 			result = eipRemote.agencyRecharge(dto);
-			LOG.info("代充值接口/eip/td/assetside/agencyRecharge返回信息，{}", JSONObject.toJSONString(result));
+			LOG.info("代充值接口/eip/td/assetside/agencyRecharge返回信息，{}", result);
 
 			if (result == null) {
 				return Result.error("调用EPI平台接口失败！");

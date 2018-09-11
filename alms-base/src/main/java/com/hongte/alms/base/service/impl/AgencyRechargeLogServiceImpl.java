@@ -139,7 +139,19 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				paramMap.put("oidPartner", tdrepayRechargeLog.getOidPartner());
 				paramMap.put("batchId", tdrepayRechargeLog.getBatchId());
 				paramMap.put("requestNo", tdrepayRechargeLog.getRequestNo());
-				paramMap.put("orgType", BusinessTypeEnum.getOrgTypeByValue(tdrepayRechargeLog.getBusinessType()));
+				Integer businessType = tdrepayRechargeLog.getBusinessType();
+				switch (businessType) {
+				case 31:
+					businessType = 9;
+					break;
+				case 32:
+					businessType = 11;
+					break;
+
+				default:
+					break;
+				}
+				paramMap.put("orgType", BusinessTypeEnum.getOrgTypeByValue(businessType));
 
 				IssueSendOutsideLog issueSendOutsideLog = issueSendOutsideLog(loginUserInfoHelper.getUserId(), paramMap,
 						Constant.INTERFACE_CODE_QUERY_DISTRIBUTE_FUND, Constant.INTERFACE_NAME_QUERY_DISTRIBUTE_FUND,
@@ -149,14 +161,12 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				try {
 					// 资金分发订单查询
 					result = eipRemote.queryDistributeFund(paramMap);
+					issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
 				} catch (Exception e) {
 					issueSendOutsideLog.setReturnJson(e.getMessage());
 					LOG.error(e.getMessage(), e);
 				}
 
-				if (result != null) {
-					issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
-				}
 				issueSendOutsideLogService.insert(issueSendOutsideLog);
 
 				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
@@ -191,6 +201,8 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 							break;
 						}
 						tdrepayRechargeLog.setUpdateTime(new Date());
+						tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+						tdrepayRechargeLog.setRemark((String) resultMap.get("message"));
 						tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
 					}
 				}
