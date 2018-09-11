@@ -146,19 +146,19 @@ public class RepaymentConfirmLog extends Model<RepaymentConfirmLog> {
 	/**
      * 最后推送状态0未推送1推送成功2推送失败3不需要推送
      */
-	@TableField(value="last_push_status",exist=false)
+	@TableField(value="last_push_status")
 	private Integer lastPushStatus;
 	
 	/**
      * 最后推送时间
      */
-	@TableField(value="last_push_datetime",exist=false)
+	@TableField(value="last_push_datetime")
 	private Date lastPushDatetime;
 	
 	/**
      * 最后推送备注
      */
-	@TableField(value="last_push_remark",exist=false)
+	@TableField(value="last_push_remark")
 	private String lastPushRemark;
 
 	public String getConfirmLogId() {

@@ -34,7 +34,7 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
 
 
     private static Logger logger = LoggerFactory.getLogger(CamsFlowSyncByInterfaceJob.class);
-    
+     
 	@Autowired
 	CamsFlowSyncByInterfaceJobClient camsFlowSyncByInterfaceJobClient;
     
@@ -44,11 +44,12 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
         	XxlJobLogger.log("同步流水到核心开始"+new Date().getTime());
         	
         	// 批量推送还款结清
-        	int retryTimes1 = 0;
+        	int retryTimes1 = 3;
 	    	while(retryTimes1 < 3) {
 	    		try {
 	    			camsFlowSyncByInterfaceJobClient.addBatchFlow();
 	    			camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
+	    			break;//跳出循环
 	    			//camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
 	    			//camsFlowSyncByInterfaceJobClient.cancelFenFaFlow();
 	    		} catch (Exception e) {
@@ -56,7 +57,6 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
 	    			retryTimes1++;
 				}
 	    	}
-        	
         	XxlJobLogger.log("同步流水到核心结束"+new Date().getTime());
             logger.info("同步流水到核心结束");
             return SUCCESS;

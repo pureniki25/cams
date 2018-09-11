@@ -125,6 +125,26 @@ public class CamsFlowController {
     	return Result.buildSuccess("指定业务ID新增账户流水成功");
     }
     
+	/**
+     * 指定业务ID和期数推送账户流水
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "指定业务ID和期数新增账户流水")
+    @GetMapping("/addFlowByBusinessIdAndAfterId")
+    @ResponseBody
+    public Result<Object> addFlowByBusinessIdAndAfterId(String businessId,String afterId) {
+    	//核心流程推送流程
+    	//1# step1 查出未推送和推送失败的业务 list    tb_basic_business加3列 最后推送时间 最后推送状态 最后推送备注   另增加推送流水表
+//    	Map<String,Object> paramMap = new HashMap<>();
+    	Map<String,Object> paramBusinessMap = new HashMap<>();
+    	paramBusinessMap.put("businessId",businessId);
+    	paramBusinessMap.put("afterId",afterId);
+    	List<Map<String,Object>> listMap = basicBusinessService.selectlPushBusiness(paramBusinessMap);
+    	addBusinessFlow(listMap);
+    	return Result.buildSuccess("指定业务ID新增账户流水成功");
+    }
+    
     /**
      * 指定confireLogID推送账户流水
      * @param bankWithholdFlowReq
@@ -367,8 +387,8 @@ public class CamsFlowController {
         	String branchId = businessMapInfo.get("company_id")+"";
         	String branchName = businessMapInfo.get("company_name")+"";
         	String businessId = businessMapInfo.get("business_id")+"";
-        	String businessType = businessMapInfo.get("business_type")+"";
-        	String businessTypeId = businessMapInfo.get("business_type_name")+"";
+        	String businessType = businessMapInfo.get("business_type_name")+"";//business_type
+        	String businessTypeId = businessMapInfo.get("business_type")+"";
         	String customerName = businessMapInfo.get("customer_name")+"";
         	String exhibitionId = businessMapInfo.get("business_id")+"";
         	Business business = new Business();
