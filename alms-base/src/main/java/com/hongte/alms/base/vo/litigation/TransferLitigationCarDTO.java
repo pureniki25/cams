@@ -28,5 +28,13 @@ public class TransferLitigationCarDTO implements Serializable {
 	 * 车辆识别码（车架号）
 	 */
 	private String vin;
+	/**
+	 * 汽车品牌 
+	 */
+	private String brandName;
+	/**
+	 * 品牌型号
+	 */
+	private String model;
 
 }
