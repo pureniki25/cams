@@ -367,9 +367,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	private Result sendDistributeFund(List<TdrepayRechargeInfoVO> rechargeInfoVOs, Integer businessType,
 			String userId) {
 		DistributeFundDTO dto = new DistributeFundDTO();
-		dto.setOrgType(BusinessTypeEnum.getOrgTypeByValue(businessType));
-		String batchId = UUID.randomUUID().toString();
-		dto.setBatchId(batchId);
 		switch (businessType) {
 		case 31:
 			businessType = 9;
@@ -381,6 +378,10 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		default:
 			break;
 		}
+		dto.setOrgType(BusinessTypeEnum.getOrgTypeByValue(businessType));
+		String batchId = UUID.randomUUID().toString();
+		dto.setBatchId(batchId);
+
 		String rechargeAccountType = BusinessTypeEnum.getRechargeAccountName(businessType);
 
 		SysParameter sysParameter = this.queryRechargeAccountSysParams(rechargeAccountType);
