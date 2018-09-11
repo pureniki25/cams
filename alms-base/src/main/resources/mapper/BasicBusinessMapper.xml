@@ -673,6 +673,9 @@
         <if test="confirmLogId != null">
            <![CDATA[ and t1.confirm_log_id = #{confirmLogId}]]>
         </if>
+        <if test="afterId != null">
+           <![CDATA[ and t1.after_id = #{afterId}]]>
+        </if>
 		</where>
     </select>
 

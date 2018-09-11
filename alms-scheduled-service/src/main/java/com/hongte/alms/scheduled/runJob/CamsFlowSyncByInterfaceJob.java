@@ -44,11 +44,12 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
         	XxlJobLogger.log("同步流水到核心开始"+new Date().getTime());
         	
         	// 批量推送还款结清
-        	int retryTimes1 = 0;
+        	int retryTimes1 = 3;
 	    	while(retryTimes1 < 3) {
 	    		try {
 	    			camsFlowSyncByInterfaceJobClient.addBatchFlow();
 	    			camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
+	    			break;//跳出循环
 	    			//camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
 	    			//camsFlowSyncByInterfaceJobClient.cancelFenFaFlow();
 	    		} catch (Exception e) {
