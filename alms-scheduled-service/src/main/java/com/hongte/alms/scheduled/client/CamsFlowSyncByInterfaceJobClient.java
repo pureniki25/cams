@@ -14,15 +14,15 @@ import com.hongte.alms.common.result.Result;
  */
 @FeignClient("alms-finance-service")
 public interface CamsFlowSyncByInterfaceJobClient {
-    @RequestMapping(value = "/camsFlowSync/addBatchFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/camsFlowSync/addBatchFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     public Result<Integer> addBatchFlow();
     
-    @RequestMapping(value = "/camsFlowSync/addBatchFenFaFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/camsFlowSync/addBatchFenFaFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     public Result<Integer> addBatchFenFaFlow();
     
-    @RequestMapping(value = "/camsFlowSync/cancelRepayFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/camsFlowSync/cancelRepayFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     public Result<Integer> cancelRepayFlow();
     
-    @RequestMapping(value = "/camsFlowSync/cancelFenFaFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+    @RequestMapping(value = "/camsFlowSync/cancelFenFaFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     public Result<Integer> cancelFenFaFlow();
 }
