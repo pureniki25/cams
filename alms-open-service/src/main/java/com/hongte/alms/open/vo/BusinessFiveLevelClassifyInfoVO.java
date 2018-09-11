@@ -9,10 +9,10 @@ public class BusinessFiveLevelClassifyInfoVO implements Serializable {
 
 	private static final long serialVersionUID = -9191343488673646058L;
 
-	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date startDate;
 
-	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endDate;
 
 	public Date getStartDate() {
