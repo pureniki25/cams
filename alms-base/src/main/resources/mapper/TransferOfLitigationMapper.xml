@@ -1096,7 +1096,14 @@
 		  -- 房产地址
 		  fh.`house_no` houseNo,
 		  -- 房产证编号
-		  fh.`pledge_type_detail` pledgeTypeDetail -- 几抵
+		  fh.`pledge_type_detail` pledgeTypeDetail,
+		  -- 几抵
+		  fho.`ower_identity_card` houseOwerIdentityCard,
+		  -- 房产权所属人身份证号码
+		  fho.`ower_address` houseOwerAddress,
+		  -- 房产权所属人联系地址
+		  fho.`ower_phone` houseOwerPhone
+		  -- 房产权所属人联系电话
 		FROM
 		  `tb_basic_business` bb 
 		  LEFT JOIN `tb_basic_repayment_type` brt 

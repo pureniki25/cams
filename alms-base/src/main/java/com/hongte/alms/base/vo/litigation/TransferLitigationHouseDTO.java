@@ -29,4 +29,16 @@ public class TransferLitigationHouseDTO implements Serializable {
 	 * 几抵
 	 */
 	private String pledgeTypeDetail;
+	/**
+	 * 房产权所属人身份证号码
+	 */
+	private String houseOwerIdentityCard;
+	/**
+	 * 房产权所属人联系地址
+	 */
+	private String houseOwerAddress;
+	/**
+	 * 房产权所属人联系电话
+	 */
+	private String houseOwerPhone;
 }
