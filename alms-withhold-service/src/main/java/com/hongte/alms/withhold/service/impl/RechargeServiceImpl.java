@@ -1221,7 +1221,8 @@ public class RechargeServiceImpl implements RechargeService {
 		for (WithholdingRepaymentLog log : losgs) {
 			try {
 				if (log.getBindPlatformId() == PlatformEnum.YH_FORM.getValue()) {
-					getBankResult(log,log.getMerchantAccount(),null);
+					Result outsideResult=new Result();
+					getBankResult(log,log.getMerchantAccount(),outsideResult);
 				}
 				if (log.getBindPlatformId() == PlatformEnum.BF_FORM.getValue()) {
 					getBFResult(log);

@@ -351,7 +351,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		case 33:
 			businessType = 20;
 			break;
-			
+
 		default:
 			break;
 		}
@@ -832,11 +832,11 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		for (TdrepayRechargeDetail detail : tdrepayRechargeDetails) {
 			Integer feeType = detail.getFeeType();
 			BigDecimal feeValue = detail.getFeeValue() == null ? BigDecimal.ZERO : detail.getFeeValue();
-			
+
 			if (feeType == null || feeValue == null || feeValue.compareTo(BigDecimal.ZERO) == 0) {
 				continue;
 			}
-			
+
 			switch (feeType) {
 			case 40:
 				assetsCharge = assetsCharge.add(feeValue);
