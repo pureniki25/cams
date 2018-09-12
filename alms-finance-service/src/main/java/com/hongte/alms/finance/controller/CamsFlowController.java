@@ -436,8 +436,8 @@ public class CamsFlowController {
             	FlowAccountIdentifier flowAccountIdentifier = new FlowAccountIdentifier();
             	String accountName = flowMap.get("account_name")+"";
             	String bankCardNo = flowMap.get("bank_card_no")+"";
-            	String depositoryId = uId;//存管编号
-            	String identifierId = flowMap.get("main_id")+"";
+            	String depositoryId = "";//存管编号
+            	String identifierId = uId;//flowMap.get("main_id")+"";
             	Boolean personal = true;
             	int mainType = flowMap.get("main_type")==null||StringUtils.isBlank(flowMap.get("main_type").toString())?1:Integer.parseInt(flowMap.get("main_type")+"");
             	int accountType = mainType;
@@ -448,9 +448,11 @@ public class CamsFlowController {
             	String mainId = flowMap.get("main_id")+"";
             	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
             	if(2 == repayType) {
+            		depositoryId = mainIdBf;
             		mainId = mainIdBf;
             	}
             	if(3 == repayType) {
+            		depositoryId = mainIdYb;
             		mainId = mainIdYb;
             	}
             	
@@ -489,7 +491,8 @@ public class CamsFlowController {
             	flow.setRepayType(repayType);
             	flow.setSegmentationDate(segmentationDate);
             	flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
-            	flow.setTargetAccountIdentifierId(targetAccountIdentifierId);
+            	//TODO XXX
+            	flow.setTargetAccountIdentifierId("");//targetAccountIdentifierId
             	flows.add(flow);
         		
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
