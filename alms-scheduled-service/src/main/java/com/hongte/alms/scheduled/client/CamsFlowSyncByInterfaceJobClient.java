@@ -4,7 +4,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.hongte.alms.common.result.Result;
+import com.ht.ussp.core.Result;
 
 /**
  * @ClassName: SyncDaihouClient  

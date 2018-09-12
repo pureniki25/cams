@@ -47,12 +47,16 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
         	int retryTimes1 = 3;
 	    	while(retryTimes1 < 3) {
 	    		try {
-	    			camsFlowSyncByInterfaceJobClient.addBatchFlow();
-	    			camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
+	    			Result<Integer> ret1 = camsFlowSyncByInterfaceJobClient.addBatchFlow();
+	    			XxlJobLogger.log("同步还款流水到核心开始"+JSONObject.toJSONString(ret1));
+	    			Result<Integer> ret2 = camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
+	    			XxlJobLogger.log("同步撤销流水到核心开始"+JSONObject.toJSONString(ret2));
 	    			break;//跳出循环
 	    			//camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
 	    			//camsFlowSyncByInterfaceJobClient.cancelFenFaFlow();
 	    		} catch (Exception e) {
+	    			XxlJobLogger.log(e.getMessage());
+	    			e.printStackTrace();
 	    			Thread.sleep(100);
 	    			retryTimes1++;
 				}
