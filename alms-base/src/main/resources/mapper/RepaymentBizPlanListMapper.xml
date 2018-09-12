@@ -61,7 +61,7 @@
         LEFT JOIN tb_basic_business_type type on type.business_type_id=business.business_type
 
         WHERE
-        <![CDATA[ TO_DAYS(NOW()) - TO_DAYS(planList.due_date) > #{overDueDays}  ]]>
+        <![CDATA[ TO_DAYS(NOW()) - TO_DAYS(planList.due_date) >=#{overDueDays}  ]]>
         <if test = "companyId != null and companyId!='' ">
             and business.company_id = #{companyId}
         </if>
