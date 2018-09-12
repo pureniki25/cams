@@ -715,8 +715,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //            String[] phonePersons = set.getCollect1Person().split(",");
 //            String[] visitPersons = set.getCollect2Person().split(",");
 
-            //自动移交电催
             if(phonePersons.size()>0){
+            	//自动移交电催
                 setBusinessPhoneStaff(companyId, phonePersons, daysBeforeOverDue,businessType);
 
 
@@ -846,7 +846,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
             CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()).eq("collection_status",CollectionStatusEnum.COLLECTING.getKey()));
-            if(collectionStatus!=null){
+            if(collectionStatus!=null&&visitPersons.contains(collectionStatus.getVisitStaff())){
                 try{
                     setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
                             // yzl 取上门催收人员
