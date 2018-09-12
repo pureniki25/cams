@@ -298,16 +298,15 @@ public class PlatformRepaymentController {
 				default:
 					break;
 				}
-			}
-
-			if ((businessType.intValue() == 1 || businessType.intValue() == 9)
+			} else if ((businessType.intValue() == 1 || businessType.intValue() == 9)
 					&& !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
 				businessType = 31;
-			}
-
-			if ((businessType.intValue() == 2 || businessType.intValue() == 11 || businessType.intValue() == 35)
+			} else if ((businessType.intValue() == 2 || businessType.intValue() == 11 || businessType.intValue() == 35)
 					&& !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
 				businessType = 32;
+			} else if (businessType.intValue() == 20
+					&& !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
+				businessType = 33;
 			}
 			vo.setBusinessType(businessType);
 
@@ -322,8 +321,8 @@ public class PlatformRepaymentController {
 			 * 根据 projPlanListId 获取实还明细 ；
 			 */
 			List<RepaymentProjFactRepay> projFactRepayList = repaymentProjFactRepayService
-					.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", projPlanListId).eq("is_cancelled", 0)
-							.orderBy("create_date", false));
+					.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id", projPlanListId)
+							.eq("is_cancelled", 0).orderBy("create_date", false));
 			if (projFactRepayList == null || projFactRepayList.isEmpty()) {
 				LOGGER.info("@对接合规还款接口@ 查询实还流水为空 输入参数projPlanListId:[{}]", projPlanListId);
 				return Result.error("查询实还流水为空");
@@ -596,8 +595,8 @@ public class PlatformRepaymentController {
 				 * 获取实还明细
 				 */
 				List<RepaymentProjFactRepay> projFactRepays = repaymentProjFactRepayService
-						.selectList(new EntityWrapper<RepaymentProjFactRepay>().eq("proj_plan_list_id",
-								projPlanList.getProjPlanListId()).eq("is_cancelled", 0));
+						.selectList(new EntityWrapper<RepaymentProjFactRepay>()
+								.eq("proj_plan_list_id", projPlanList.getProjPlanListId()).eq("is_cancelled", 0));
 
 				Map<Object, RepaymentProjFactRepay> projFactRepayMap = Maps.newHashMap();
 				// 按费用项大类plan_item_type把重复的费用项进行合并累加
@@ -625,18 +624,18 @@ public class PlatformRepaymentController {
 					 */
 					Map<String, Integer> notShaPrMap = getNotShareProfitFeeIds(projPlanListId);
 					boolean interestAmountFlag = false;
-					
+
 					Map<Integer, TdrepayRechargeDetail> isUsedMap = new HashMap<>();
-					
+
 					for (RepaymentProjFactRepay r : projFactRepays) {
 						// 累计实还金额，包含线下和线上费用
 						factRepayAmount = factRepayAmount.add(r.getFactAmount());
 						/*
 						 * 区分分润与不分润的费用明细（线下费用不用分润）
 						 */
-						 if (notShaPrMap.containsKey(r.getFeeId()) || r.getFactAmount().equals(BigDecimal.ZERO)) {
-							 continue;
-						 }
+						if (notShaPrMap.containsKey(r.getFeeId()) || r.getFactAmount().equals(BigDecimal.ZERO)) {
+							continue;
+						}
 						TdrepayRechargeDetail detailFee = new TdrepayRechargeDetail();
 						// 要对费类型进行转换，押金和冲应收不用分润：
 						// 从
@@ -653,7 +652,7 @@ public class PlatformRepaymentController {
 							if (!interestAmountFlag) {
 								detailFee.setFeeValue(interestAmount);
 								interestAmountFlag = true;
-							}else {
+							} else {
 								detailFee.setFeeValue(BigDecimal.ZERO);
 							}
 							break;
@@ -695,13 +694,13 @@ public class PlatformRepaymentController {
 							LOGGER.info("@对接合规还款接口@ 还款方式不能为空 projPlanListId:[{}]", projPlanListId);
 							return Result.error("还款方式不能为空");
 						}
-						
-						
+
 						if (isUsedMap.containsKey(detailFee.getFeeType())) {
 							TdrepayRechargeDetail detail = isUsedMap.get(detailFee.getFeeType());
-							detail.setFeeValue(detail.getFeeValue().add(detailFee.getFeeValue() == null ? BigDecimal.ZERO : detailFee.getFeeValue()));
+							detail.setFeeValue(detail.getFeeValue()
+									.add(detailFee.getFeeValue() == null ? BigDecimal.ZERO : detailFee.getFeeValue()));
 							continue;
-						}else {
+						} else {
 							isUsedMap.put(detailFee.getFeeType(), detailFee);
 						}
 
