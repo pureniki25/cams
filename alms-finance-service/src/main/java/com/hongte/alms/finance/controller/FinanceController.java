@@ -1306,7 +1306,10 @@ public class FinanceController {
 				return Result.error("上次自动代扣的业务此次不能线下还款");
 			}
 			
-			return checkLastRepay(businessId, afterId);
+			/*肖莹环要求正常还款去掉检查是否存在未还垫付记录,2018-09-12改*/
+//			return checkLastRepay(businessId, afterId);
+			/*肖莹环要求正常还款去掉检查是否存在未还垫付记录,2018-09-12改*/
+			return Result.success();
 		}
 		
 		if (action.equals("settle")) {
