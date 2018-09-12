@@ -441,7 +441,7 @@ public class CamsFlowController {
             	accountIdentifiers.add(flowAccountIdentifier);
             	
             	Flow flow = new Flow();
-            	Date accountTime = new Date();
+            	Date accountTime = (Date) flowMap.get("account_time");
             	String afterId = flowMap.get("after_id")+"";
             	BigDecimal amount = new BigDecimal(flowMap.get("amount")==null?"0":flowMap.get("amount").toString());
             	String externalId = "";
