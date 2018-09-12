@@ -718,7 +718,7 @@
 		t6.plate_type AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		'' AS main_type,
-		'' AS main_id
+		t4.identity_card AS main_id
 		FROM 
 		tb_repayment_resource t1 
 		LEFT JOIN tb_repayment_confirm_log t2 ON t1.confirm_log_id = t2.confirm_log_id
