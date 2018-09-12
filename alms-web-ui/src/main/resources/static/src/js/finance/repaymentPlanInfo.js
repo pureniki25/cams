@@ -32,7 +32,7 @@ window.layinit(function (htConfig) {
         	actualPaymentRecordAfterIdNullList: [],	// -- 实还流水afterId为空的数据 --
         	
         	projectInfoList: [], 	//  标信息LIST
-        	
+            tableHeight:450,
         	// 还款计划表头  -- start --
         	repayPlanColumns: [
         		{
@@ -882,6 +882,10 @@ window.layinit(function (htConfig) {
         	this.initBaseInfo();
         	this.queryRepaymentPlanInfoByBusinessId();
         	this.getProjectInfoByBusinessId();
-        }
+        },
+        mounted: function() {
+
+            this.tableHeight = window.innerHeight-180;
+		}
     })
 })

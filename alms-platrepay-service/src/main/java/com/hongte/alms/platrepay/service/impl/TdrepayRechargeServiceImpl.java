@@ -348,6 +348,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		case 32:
 			businessType = 11;
 			break;
+		case 33:
+			businessType = 20;
+			break;
 
 		default:
 			break;
@@ -655,6 +658,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 							// 调用 偿还垫付接口 ， 按期数财务确认时间从小到大顺序调用，若本期次某一数据执行失败，则本期次未执行的数据不再继续执行
 							Result result = remoteAdvanceShareProfit(tdrepayRechargeLog, tdrepayRechargeDetails);
 
+							if (result != null) {
+								tdrepayRechargeLog.setRemark(result.getCodeDesc());
+							}else {
+								tdrepayRechargeLog.setRemark("eip接口调用异常");
+							}
+							
 							if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 
 								sucLst.add(tdrepayRechargeLog);
@@ -829,11 +838,11 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		for (TdrepayRechargeDetail detail : tdrepayRechargeDetails) {
 			Integer feeType = detail.getFeeType();
 			BigDecimal feeValue = detail.getFeeValue() == null ? BigDecimal.ZERO : detail.getFeeValue();
-			
+
 			if (feeType == null || feeValue == null || feeValue.compareTo(BigDecimal.ZERO) == 0) {
 				continue;
 			}
-			
+
 			switch (feeType) {
 			case 40:
 				assetsCharge = assetsCharge.add(feeValue);
@@ -894,15 +903,19 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		try {
 			// 调用提前结清接口
 			repaymentEarlierResult = eipRemote.repaymentEarlier(tdDepaymentEarlierDTO);
+			issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(repaymentEarlierResult));
 			LOG.info("提前结清接口/eip/td/repayment/repaymentEarlier返回信息，{}", repaymentEarlierResult);
 		} catch (Exception e) {
 			issueSendOutsideLog.setReturnJson(e.getMessage());
 			LOG.error(e.getMessage(), e);
 		}
-
+		
 		if (repaymentEarlierResult != null) {
-			issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(repaymentEarlierResult));
+			tdrepayRechargeLog.setRemark(repaymentEarlierResult.getCodeDesc());
+		}else {
+			tdrepayRechargeLog.setRemark("eip接口调用异常");
 		}
+
 		issueSendOutsideLogService.insert(issueSendOutsideLog);
 
 		return repaymentEarlierResult;
@@ -961,6 +974,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 					// 调用 偿还垫付接口 ， 按期数财务确认时间从小到大顺序调用，若本期次某一数据执行失败，则本期次未执行的数据不再继续执行
 					Result result = remoteAdvanceShareProfit(tdrepayRechargeLog, tdrepayRechargeDetails);
+					
+					if (result != null) {
+						tdrepayRechargeLog.setRemark(result.getCodeDesc());
+					}else {
+						tdrepayRechargeLog.setRemark("eip接口调用异常");
+					}
 
 					if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 

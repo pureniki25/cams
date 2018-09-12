@@ -48,6 +48,7 @@ window.layinit(function(htConfig){
             saving:false, //存储标志位
             exporting:false,//导出标志位
             submitLoading: false,
+            isShowMoreQuery:false,
             searchForm: {
                 areaId:'',  //区域ID
                 companyId:'', //分公司ID

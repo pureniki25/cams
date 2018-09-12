@@ -147,6 +147,9 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				case 32:
 					businessType = 11;
 					break;
+				case 33:
+					businessType = 20;
+					break;
 
 				default:
 					break;
