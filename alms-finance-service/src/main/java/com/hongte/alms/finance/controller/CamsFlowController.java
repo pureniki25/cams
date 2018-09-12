@@ -49,7 +49,10 @@ import io.swagger.annotations.ApiOperation;
 public class CamsFlowController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CamsFlowController.class);
-
+    
+    private String mainIdYb = "97f6369b-e93d-11e7-94ed-94c69109b34a";//易宝
+    private String mainIdBf = "98075bd6-e93d-11e7-94ed-94c69109b34a";//宝付
+    
 //    @Autowired
 //    private AccountListHandlerClient accountListHandlerClient;
     
@@ -183,7 +186,7 @@ public class CamsFlowController {
         	//所属资产端
         	int businessFrom = Integer.parseInt(businessMapInfo.get("businessFrom").toString());
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
-        	Date createTime = (Date) businessMapInfo.get("create_time");
+        	Date createTime = new Date();//(Date) businessMapInfo.get("create_time");
         	String createUser = businessMapInfo.get("create_user")+"";
         	String messageId = confirmLogId;
         	
@@ -226,6 +229,17 @@ public class CamsFlowController {
             		personal = false;
             	}
             	String mainId = flowMap.get("main_id")+"";
+            	
+            	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
+            	if(2 == repayType) {
+            		depositoryId = mainIdBf;
+            		mainId = mainIdBf;
+            	}
+            	if(3 == repayType) {
+            		depositoryId = mainIdYb;
+            		mainId = mainIdYb;
+            	}
+            	
             	String openBank = flowMap.get("open_bank")+"";
             	flowAccountIdentifier.setAccountName(accountName);
             	flowAccountIdentifier.setAccountType(accountType);
@@ -249,7 +263,6 @@ public class CamsFlowController {
             	Date segmentationDate = (Date) flowMap.get("segmentation_date");
             	String sourceAccountIdentifierId = flowMap.get("target_account_id")+"";
             	String targetAccountIdentifierId = flowMap.get("target_bank_card_no")+"";
-            	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
             	String listId = flowMap.get("list_id")+"";
         		flow.setAccountTime(accountTime);
             	flow.setAfterId(afterId);
