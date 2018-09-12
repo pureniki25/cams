@@ -683,7 +683,7 @@
 		SELECT 
 		t1.resource_id AS 'list_id',
 		'' AS 'account_id',
-		t2.create_time AS 'account_time',
+		t1.repay_date AS 'account_time',
 		t2.business_id AS 'business_id',
 		t6.project_id AS 'issue_id',
 		t2.after_id AS 'after_id',

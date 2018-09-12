@@ -625,7 +625,7 @@ public class CamsFlowController {
 	    	command.setAfterId(afterId);
 	    	command.setBusinessId(businessId);
 	    	command.setClientId(clientId);
-	    	command.setCreateTime(queryFullsuccessDate);
+	    	command.setCreateTime(new Date());//queryFullsuccessDate
 	    	command.setTriggerEventSystem("1");
 	    	command.setEventType("FlowCanceled");
 	    	command.setTriggerEventType("CanceledFlow");
