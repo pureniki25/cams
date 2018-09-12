@@ -1114,6 +1114,8 @@
 		    ON bb.`business_id` = cb.`business_id` 
 		  LEFT JOIN `tb_fsd_house` fh 
 		    ON bb.`business_id` = fh.`business_id` 
+		  LEFT JOIN tb_fsd_house_owner fho 
+    		ON fh.`house_id` = fho.`house_id` 
 		WHERE 
 		<choose>
 			<when test="businessType == 1">
