@@ -1,22 +1,14 @@
 package com.hongte.alms.scheduled.runJob;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.hongte.alms.base.service.BasicBusinessService;
-import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.scheduled.client.CamsFlowSyncByInterfaceJobClient;
-import com.hongte.alms.scheduled.client.WithholdingClient;
-import com.hongte.alms.scheduled.job.AutoSetCollectionJob;
 import com.ht.ussp.core.Result;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
@@ -47,9 +39,9 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
         	int retryTimes1 = 1;
 	    	while(retryTimes1 < 3) {
 	    		try {
-	    			Result<Integer> ret1 = camsFlowSyncByInterfaceJobClient.addBatchFlow();
+	    			Result<Object> ret1 = camsFlowSyncByInterfaceJobClient.addBatchFlow();
 	    			XxlJobLogger.log("同步还款流水到核心开始"+JSONObject.toJSONString(ret1));
-	    			Result<Integer> ret2 = camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
+	    			Result<Object> ret2 = camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
 	    			XxlJobLogger.log("同步撤销流水到核心开始"+JSONObject.toJSONString(ret2));
 	    			break;//跳出循环
 	    			//camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
