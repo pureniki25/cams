@@ -508,6 +508,10 @@ public class CamsFlowController {
         		command.setAccountIdentifiers(accountIdentifiers);
         		command.setFlowDetails(flowDetails);
         		
+    	    	command.setTriggerEventSystem("1");
+    	    	command.setEventType("RepayFlow");
+    	    	command.setTriggerEventType("CreateBatchFlowCommand");
+    	    	
         		//4# step4 按业务组装流水 消息对象tb_money_pool
         		//5# step5 调用核心推送接口推送
             	setBusiness(command);
@@ -596,7 +600,6 @@ public class CamsFlowController {
     @GetMapping("/cancelRepayFlow")
     @ResponseBody
     public Result<Object> cancelRepayFlow() {
-    	
     	// 还款 结清撤销
     	Map<String,Object> paramRepayFlowMap = new HashMap<>();
     	List<Map<String,Object>> listRepayFlow = basicBusinessService.selectlCancelRepayFlow(paramRepayFlowMap);
@@ -635,7 +638,7 @@ public class CamsFlowController {
 	    	camsMessage.setHostPort(0);
 	    	camsMessage.setHostUrl("192.168.14.245");
 	    	camsMessage.setMessageId(UUID.randomUUID().toString());
-	    	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
+	    	camsMessage.setQueueName("cams.account.ms.queue.bizAccountListCanceledQueue");
 	    	camsMessage.setMessage(command);
 	    	
 	    	int retryTimes = 0;
@@ -678,7 +681,6 @@ public class CamsFlowController {
 	    	flowPushLog.setPushEndtime(new Date());
 	    	flowPushLogService.insert(flowPushLog);
 		}
-    	
     	return Result.buildSuccess("撤销业务还款流水成功");
     }
     
@@ -726,7 +728,7 @@ public class CamsFlowController {
 	    	camsMessage.setHostPort(0);
 	    	camsMessage.setHostUrl("192.168.14.245");
 	    	camsMessage.setMessageId(UUID.randomUUID().toString());
-	    	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
+	    	camsMessage.setQueueName("cams.account.ms.queue.bizAccountListCanceledQueue");
 	    	camsMessage.setMessage(command);
 	    	
 	    	int retryTimes = 0;

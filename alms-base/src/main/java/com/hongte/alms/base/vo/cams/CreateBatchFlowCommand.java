@@ -30,6 +30,12 @@ public class CreateBatchFlowCommand extends MessageCommand {
     private Integer businessFlag;
 
     private String createUser;
+    
+	public String triggerEventSystem;
+
+	public String eventType;
+
+	public String triggerEventType;
 
     private Business business;
 
@@ -117,7 +123,33 @@ public class CreateBatchFlowCommand extends MessageCommand {
         this.accountIdentifiers = accountIdentifiers;
     }
 
-    public static class Business{
+    public String getTriggerEventSystem() {
+		return triggerEventSystem;
+	}
+
+	public void setTriggerEventSystem(String triggerEventSystem) {
+		this.triggerEventSystem = triggerEventSystem;
+	}
+
+	public String getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
+	}
+
+	public String getTriggerEventType() {
+		return triggerEventType;
+	}
+
+	public void setTriggerEventType(String triggerEventType) {
+		this.triggerEventType = triggerEventType;
+	}
+
+
+
+	public static class Business{
         private String customerName;
 
         private String businessId;

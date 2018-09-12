@@ -52,18 +52,18 @@
 		<Card>
 			<tabs value="repaymentPlan" :animated="true" @on-click="initFunction($event)">
 		        <tab-pane label="还款计划" name="repaymentPlan">
-		        	<i-table height="550" highlight-row border :columns="repayBizPlanColumns" :data="bizRepaymentPlanList" :row-class-name="rowClassName"></i-table>
+		        	<i-table :height="tableHeight" highlight-row border :columns="repayBizPlanColumns" :data="bizRepaymentPlanList" :row-class-name="rowClassName"></i-table>
 		        	
 		        	<Modal v-model="repayPlanFlag" title="计划还款" width="100%">
-		        		<i-table highlight-row border :columns="repayPlanColumns" :data="repayPlanColumnsData"></i-table>
+		        		<i-table :height="tableHeight" highlight-row border :columns="repayPlanColumns" :data="repayPlanColumnsData"></i-table>
 					</Modal>
 					
 		        	<Modal v-model="repayActualFlag" title="实际还款" width="100%">
-		        		<i-table highlight-row border :columns="repayPlanColumns" :data="repayActualColumnsData"></i-table>
+		        		<i-table :height="tableHeight" highlight-row border :columns="repayPlanColumns" :data="repayActualColumnsData"></i-table>
 					</Modal>
 					
 		        	<Modal v-model="repayDifferenceFlag" title="差额" width="100%">
-		        		<i-table highlight-row border :columns="repayPlanColumns" :data="repayDifferenceColumnsData"></i-table>
+		        		<i-table :height="tableHeight" highlight-row border :columns="repayPlanColumns" :data="repayDifferenceColumnsData"></i-table>
 					</Modal>
 					
 		        	<Modal v-model="repayOtherFeeFlag" title="其他费用" width="30%">

@@ -898,33 +898,32 @@ public class FinanceController {
 	
 	@ApiOperation(value = "批量线下转账核销")
 	@PostMapping("/underBatchShareProfit")
-	public Result underBatchShareProfit(@RequestBody String businessIds) {
-		logger.info("@underBatchShareProfit@批量线下核销--开始[{}]", businessIds);
-		Result result = new Result();
-		String[] array = businessIds.split(",");
-		for (int i = 0; i < array.length; i++) {
-			String businessId = array[i];
-			Wrapper<MoneyPoolRepayment> wrapperMoneyPoolRepayment = new EntityWrapper<>();
-			wrapperMoneyPoolRepayment.eq("original_business_id", businessId).eq("state",
-					RepayRegisterFinanceStatus.财务确认已还款.toString());
-			wrapperMoneyPoolRepayment.and(" (is_deleted !=1 or is_deleted is null) ");
-			List<MoneyPoolRepayment> repaymentPools = moneyPoolRepaymentService.selectList(wrapperMoneyPoolRepayment);
-
-			for (MoneyPoolRepayment repaymentPool : repaymentPools) {
-
-				try {
-					shareProfitService.updateMoneyPoolState(repaymentPool);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					logger.error("批量线下核销异常：businessId[{},{}]", businessId, repaymentPool.getMoneyPoolId());
+	public Result underBatchShareProfit(@RequestBody String businessIds){
+		logger.info("@underBatchShareProfit@批量线下核销--开始[{}]",businessIds);
+		Result result=new Result();
+		String[]array=businessIds.split(",");
+		for(int i=0;i<array.length;i++) {
+			String businessId=array[i];
+			 Wrapper<MoneyPoolRepayment> wrapperMoneyPoolRepayment = new EntityWrapper<>();
+			 wrapperMoneyPoolRepayment.eq("original_business_id",businessId).eq("state", RepayRegisterFinanceStatus.财务确认已还款.toString());
+			 wrapperMoneyPoolRepayment.and(" (is_deleted !=1 or is_deleted is null) ");
+			List<MoneyPoolRepayment> repaymentPools=moneyPoolRepaymentService.selectList(wrapperMoneyPoolRepayment);
+				for (MoneyPoolRepayment repaymentPool : repaymentPools) {
+	
+					try {
+						shareProfitService.updateMoneyPoolState(repaymentPool);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+						logger.error("批量线下核销异常：businessId[{},{}]", businessId, repaymentPool.getMoneyPoolId());
+					}
 				}
-			}
-
-		}
-		result.success(1);
-		logger.info("@batchShareProfit@批量核销--结束[{}]", businessIds);
-		return result;
+		
+	  }
+		    result.success(1);
+    		logger.info("@batchShareProfit@批量核销--结束[{}]", businessIds);
+		    return result;
 	}
+	
 	
 	@ApiOperation(value = "批量核销")
 	@PostMapping("/batchShareProfit")
@@ -1307,7 +1306,10 @@ public class FinanceController {
 				return Result.error("上次自动代扣的业务此次不能线下还款");
 			}
 			
-			return checkLastRepay(businessId, afterId);
+			/*肖莹环要求正常还款去掉检查是否存在未还垫付记录,2018-09-12改*/
+//			return checkLastRepay(businessId, afterId);
+			/*肖莹环要求正常还款去掉检查是否存在未还垫付记录,2018-09-12改*/
+			return Result.success();
 		}
 		
 		if (action.equals("settle")) {

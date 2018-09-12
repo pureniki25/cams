@@ -268,7 +268,6 @@ public class RepayPlanController {
 						}
 					}
                     paramMap.put("repayedFlag", repayFlag);
-                    paramMap.put("currentSubStatus", bizPlanList.getCurrentSubStatus());
                     paramMap.put("factRepayDate", bizPlanList.getFactRepayDate());
 
                     List<CarBusinessAfterDetailDto> afterDetailDtos = Lists.newArrayList();
