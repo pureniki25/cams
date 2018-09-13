@@ -1055,6 +1055,8 @@ public class TdrepayRechargeController {
 					Map<String, Object> resultMap = new HashMap<>();
 					resultMap.put("logId", tdrepayRechargeLog.getLogId());
 					resultMap.put("projectId", tdrepayRechargeLog.getProjectId());
+					resultMap.put("customerName", tdrepayRechargeLog.getCustomerName());
+					resultMap.put("businessId", tdrepayRechargeLog.getOrigBusinessId());
 					resultMap.put("paramMap", JSONObject.toJSONString(paramMap));
 					if (queryDistributeFund != null) {
 						resultMap.put("queryDistributeFund", queryDistributeFund.getData());

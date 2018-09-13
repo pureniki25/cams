@@ -1599,9 +1599,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 		}
     	
     	BigDecimal balance = accountantOverRepayLogService.caluCanUse(bizPlanList.getBusinessId(), bizPlanList.getAfterId());
-    	if (financeBaseDto.getConfirmLog().getSurplusAmount()!=null) {
-			balance = balance.add(financeBaseDto.getConfirmLog().getSurplusAmount());
-		}
+//    	if (financeBaseDto.getConfirmLog().getSurplusAmount()!=null) {
+//			balance = balance.add(financeBaseDto.getConfirmLog().getSurplusAmount());
+//		}
     	if (balance.compareTo(BigDecimal.ZERO)>0) {
 			remark.append(balance).append("元").append("结余");
 		}
