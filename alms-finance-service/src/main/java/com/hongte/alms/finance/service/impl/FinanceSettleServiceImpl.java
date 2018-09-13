@@ -2419,9 +2419,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     		}
         	
         	BigDecimal balance = accountantOverRepayLogService.caluCanUse(bizPlanList.getBusinessId(), bizPlanList.getAfterId());
-        	if (financeBaseDto.getRepaymentConfirmLog().getSurplusAmount()!=null) {
-    			balance = balance.add(financeBaseDto.getRepaymentConfirmLog().getSurplusAmount());
-    		}
+//        	if (financeBaseDto.getRepaymentConfirmLog().getSurplusAmount()!=null) {
+//    			balance = balance.add(financeBaseDto.getRepaymentConfirmLog().getSurplusAmount());
+//    		}
         	if (balance.compareTo(BigDecimal.ZERO)>0) {
     			remark.append(balance.setScale(2, RoundingMode.HALF_UP)).append("元").append("结余");
     		}
