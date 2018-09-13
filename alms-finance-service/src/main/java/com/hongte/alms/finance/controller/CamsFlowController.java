@@ -476,14 +476,14 @@ public class CamsFlowController {
             		accountName = "易宝";
             	}
             	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
-            	flowAccountIdentifier.setAccountName(accountName);
-            	flowAccountIdentifier.setAccountType(4);
-            	flowAccountIdentifier.setBankCardNo("");
-            	flowAccountIdentifier.setDepositoryId(depositoryId);
-            	flowAccountIdentifier.setIdentifierId(tId);
-            	flowAccountIdentifier.setPersonal(personal);
-            	flowAccountIdentifier.setMainId(mainId);
-            	flowAccountIdentifier.setOpenBank("");
+            	flowAccountIdentifier2.setAccountName(accountName);
+            	flowAccountIdentifier2.setAccountType(4);
+            	flowAccountIdentifier2.setBankCardNo("");
+            	flowAccountIdentifier2.setDepositoryId(depositoryId);
+            	flowAccountIdentifier2.setIdentifierId(tId);
+            	flowAccountIdentifier2.setPersonal(personal);
+            	flowAccountIdentifier2.setMainId(mainId);
+            	flowAccountIdentifier2.setOpenBank("");
             	accountIdentifiers.add(flowAccountIdentifier2);
             	
             	Flow flow = new Flow();
@@ -509,14 +509,14 @@ public class CamsFlowController {
             	flow.setRemark(remark);
             	flow.setRepayType(repayType);
             	flow.setSegmentationDate(segmentationDate);
-            	flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
-            	flow.setTargetAccountIdentifierId(targetAccountIdentifierId);
+            	flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
+            	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
             	if(4 == repayType) {//银行代扣
             		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
                 	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
-            	}else if(repayType != 2 && repayType != 3) {//线下贷后
-            		flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
-                	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
+            	}else if(repayType != 2 && repayType != 3) {//线下还款
+            		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
+                	flow.setTargetAccountIdentifierId(targetAccountIdentifierId);
             	}
             	flows.add(flow);
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
