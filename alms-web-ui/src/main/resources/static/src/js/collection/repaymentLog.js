@@ -85,7 +85,7 @@ window.layinit(function (htConfig) {
 		            	date2:new Date()
 		            }],	//发送时间范围
 		            */
-		            dateRange:[new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1),new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1)],
+		            dateRange:[new Date(new Date(new Date().toLocaleDateString()).getTime()-72*60*60*1000+1),new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1)],
 		            repayStatus	:'',    //状态
 		            businessTypeId:'',//业务类型
             },

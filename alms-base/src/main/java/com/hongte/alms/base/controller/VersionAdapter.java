@@ -22,7 +22,8 @@ public class VersionAdapter {
 	final String ALMS_OPEN_SERVICE = "0913" ;
 	final String ALMS_PLATREPAY_SERVICE = "0913" ;
 	final String ALMS_SCHEDULED_SERVICE = "0913" ;
-	final String ALMS_WEBUI = "2018-08-25 10:04:00" ;
+
+	final String ALMS_WEBUI = "(finance)2018-09-13 11:33" ; 
 	final String ALMS_WITHHOLD_SERVICE = "(finance)2018-09-13 9:33" ;
 	
 	@RequestMapping("/version")
