@@ -727,6 +727,7 @@
 			ELSE '1' END  AS 'repay_type'
 		]]>, 
 		t4.bank_name AS 'open_bank',
+		t4.customer_name AS 'account_name',
 		t6.plate_type AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		'' AS main_type,
@@ -835,7 +836,6 @@
 		FROM tb_repayment_proj_fact_repay t1
 		LEFT JOIN tb_repayment_biz_plan_list_synch t2 ON t1.plan_list_id = t2.plan_list_id
 		LEFT JOIN tb_tuandai_project_info t6 ON t6.business_id = t1.business_id AND t6.master_issue_id = t6.project_id
-		LEFT JOIN tb_repayment_biz_plan_list_detail t7 ON t7.plan_list_id = t1.plan_list_id AND t7.plan_item_type = t1.plan_item_type
 		LEFT JOIN tb_repayment_confirm_log t8 ON t8.confirm_log_id = t1.confirm_log_id
 		WHERE 
 		t1.repay_source_id = #{repaySourceId}
