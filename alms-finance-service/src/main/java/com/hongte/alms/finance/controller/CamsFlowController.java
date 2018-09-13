@@ -359,10 +359,12 @@ public class CamsFlowController {
             		tdrepayRechargeRecord.setLastPushStatus(1);
             		tdrepayRechargeRecord.setLastPushRemark(retStr);
             		flowPushLog.setPushStatus(1);
+            		flowPushLog.setPushRet(retStr);
             	}else {
             		tdrepayRechargeRecord.setLastPushStatus(2);
             		tdrepayRechargeRecord.setLastPushRemark(retStr);
             		flowPushLog.setPushStatus(2);
+            		flowPushLog.setPushRet(retStr);
             	}
             	//更新推送状态
             	tdrepayRechargeRecord.setLastPushDatetime(new Date());
