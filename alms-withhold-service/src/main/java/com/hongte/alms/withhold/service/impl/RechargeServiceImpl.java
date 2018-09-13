@@ -1056,9 +1056,10 @@ public class RechargeServiceImpl implements RechargeService {
 		
 		List<RepaymentBizPlanList> repaymentBizPlanLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id", list.getPlanId()).eq("confirm_flag", 1));
 		//到了应该还日期的期数集合
-		List<RepaymentBizPlanList> dueDateLists=repaymentBizPlanLists.stream().filter(a->a.getDueDate().compareTo(new Date())<=1).collect(Collectors.toList());
+		List<RepaymentBizPlanList> dueDateLists=repaymentBizPlanLists.stream().filter(a->a.getDueDate().compareTo(new Date())<1).collect(Collectors.toList());
 		//还没有还款的到了应该还日期的期数集合
-		List<RepaymentBizPlanList> notRepayLists=repaymentBizPlanLists.stream().filter(a->(!a.getCurrentStatus().equals("已还款"))).collect(Collectors.toList());
+		
+		List<RepaymentBizPlanList> notRepayLists=dueDateLists.stream().filter(a->(!a.getCurrentStatus().equals("已还款"))).collect(Collectors.toList());
 		notRepayLists=repaymentBizPlanLists.stream().filter(a->(a.getRepayStatus()!=SectionRepayStatusEnum.ALL_REPAID.getKey())).collect(Collectors.toList());
 		
 		//期数从小到大排序
