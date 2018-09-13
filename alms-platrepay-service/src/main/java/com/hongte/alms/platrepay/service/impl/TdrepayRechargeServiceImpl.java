@@ -807,6 +807,14 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						}
 						tdrepayRechargeLogService.updateBatchById(repayChargeLogs);
 					}
+				}else {
+					for (TdrepayRechargeLog tdrepayRechargeLog : repayChargeLogs) {
+						// 非提前结清，标记为成功
+						tdrepayRechargeLog.setStatus(2);
+						tdrepayRechargeLog.setUpdateTime(new Date());
+						tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
+					}
+					tdrepayRechargeLogService.updateBatchById(repayChargeLogs);
 				}
 			}
 		}

@@ -76,12 +76,34 @@
         AND planList.current_status IN ("还款中","逾期")
         AND (
         SELECT COUNT(1) as num1  FROM tb_collection_status  cStatus
-        WHERE cStatus.collection_status  in (100, 200)
+		WHERE
+		<choose>
+			<!-- 电催的业务  催收的业务 -->
+			<when test="colStatus !=null  and (colStatus =1 or colStatus =50)">
+				cStatus.collection_status  in (100, 200,150)
+			</when>
+			<!-- 诉讼的业务 -->
+			<when test="colStatus !=null  and colStatus =100">
+				cStatus.collection_status  in (100, 200)
+			</when>
+		</choose>
+         cStatus.collection_status  in (100, 200,150)
         AND cStatus.business_id = business.business_id
         ) = 0
         AND (
         SELECT COUNT(1) as num2  FROM tb_collection_status  cStatus
-        WHERE cStatus.collection_status = #{colStatus}
+		WHERE
+		<choose>
+			<!-- 电催的业务 -->
+			<when test="colStatus !=null  and colStatus =1">
+				 cStatus.phone_staff is NULL
+			</when>
+			<!-- 催收的业务 -->
+			<when test="colStatus !=null  and colStatus =50">
+				 cStatus.visit_staff is NULL
+			</when>
+			<!-- 诉讼的业务 -->
+		</choose>
         AND cStatus.business_id = business.business_id
         AND cStatus.crp_id = planList.plan_list_id
         ) = 0
