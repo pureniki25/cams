@@ -4,7 +4,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.hongte.alms.common.result.Result;
+import com.ht.ussp.core.Result;
 
 /**
  * @ClassName: SyncDaihouClient  
@@ -15,14 +15,14 @@ import com.hongte.alms.common.result.Result;
 @FeignClient("alms-finance-service")
 public interface CamsFlowSyncByInterfaceJobClient {
     @RequestMapping(value = "/camsFlowSync/addBatchFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
-    public Result<Integer> addBatchFlow();
+    public Result<Object> addBatchFlow();
     
     @RequestMapping(value = "/camsFlowSync/addBatchFenFaFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
-    public Result<Integer> addBatchFenFaFlow();
+    public Result<Object> addBatchFenFaFlow();
     
     @RequestMapping(value = "/camsFlowSync/cancelRepayFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
-    public Result<Integer> cancelRepayFlow();
+    public Result<Object> cancelRepayFlow();
     
     @RequestMapping(value = "/camsFlowSync/cancelFenFaFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
-    public Result<Integer> cancelFenFaFlow();
+    public Result<Object> cancelFenFaFlow();
 }
