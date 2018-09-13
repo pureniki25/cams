@@ -799,7 +799,7 @@
 		LEFT JOIN tb_repayment_biz_plan_list_synch t8 ON t8.business_id = t2.business_id AND t2.after_id = t8.after_id AND t2.period = t8.period
 		LEFT JOIN tb_money_pool t9 ON t3.money_pool_id = t9.money_pool_id
 		LEFT JOIN tb_department_bank t10 ON t10.finance_name = t9.accept_bank  AND t8.company_id_ext = t10.dept_id
-		WHERE t1.repay_source IN (10,11)
+		WHERE t1.repay_source IN (10,11,40,50)
 		AND t2.confirm_log_id = #{confirmLogId}
 		ORDER BY t2.create_time;
     </select>

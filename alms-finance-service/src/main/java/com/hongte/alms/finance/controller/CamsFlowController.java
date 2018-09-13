@@ -380,7 +380,8 @@ public class CamsFlowController {
 	private void addBusinessFlow(List<Map<String, Object>> listMap) {
 		//2# step2 循环业务list，去除每一条业务的流水list
     	for(Map<String,Object> businessMapInfo : listMap) {
-    		String uId = UUIDHtGenerator.getUUID();
+    		String sId = UUIDHtGenerator.getUUID();
+    		String tId = UUIDHtGenerator.getUUID();
     		CreateBatchFlowCommand command = new CreateBatchFlowCommand();
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
@@ -435,11 +436,13 @@ public class CamsFlowController {
         	List<FlowAccountIdentifier> accountIdentifiers = new ArrayList<>();
         	List<FlowDetail> flowDetails = new ArrayList<>();
         	for (Map<String, Object> flowMap : listOnlineFlow) {
+        		//还款账号
             	FlowAccountIdentifier flowAccountIdentifier = new FlowAccountIdentifier();
             	String accountName = flowMap.get("account_name")+"";
             	String bankCardNo = flowMap.get("bank_card_no")+"";
             	String depositoryId = "";//存管编号
-            	String identifierId = uId;//flowMap.get("main_id")+"";
+            	//flowMap.get("main_id")+"";
+            	String identifierId = sId;
             	Boolean personal = true;
             	int mainType = flowMap.get("main_type")==null||StringUtils.isBlank(flowMap.get("main_type").toString())?1:Integer.parseInt(flowMap.get("main_type")+"");
             	int accountType = mainType;
@@ -449,14 +452,6 @@ public class CamsFlowController {
             	
             	String mainId = flowMap.get("main_id")+"";
             	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
-            	if(2 == repayType) {
-            		depositoryId = mainIdBf;
-            		mainId = mainIdBf;
-            	}
-            	if(3 == repayType) {
-            		depositoryId = mainIdYb;
-            		mainId = mainIdYb;
-            	}
             	
             	String openBank = flowMap.get("open_bank")+"";
             	flowAccountIdentifier.setAccountName(accountName);
@@ -469,6 +464,28 @@ public class CamsFlowController {
             	flowAccountIdentifier.setOpenBank(openBank);
             	accountIdentifiers.add(flowAccountIdentifier);
             	
+            	//收入账号
+            	if(2 == repayType) {
+            		depositoryId = mainIdBf;
+            		mainId = mainIdBf;
+            		accountName = "宝付";
+            	}
+            	if(3 == repayType) {
+            		depositoryId = mainIdYb;
+            		mainId = mainIdYb;
+            		accountName = "易宝";
+            	}
+            	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
+            	flowAccountIdentifier.setAccountName(accountName);
+            	flowAccountIdentifier.setAccountType(4);
+            	flowAccountIdentifier.setBankCardNo("");
+            	flowAccountIdentifier.setDepositoryId(depositoryId);
+            	flowAccountIdentifier.setIdentifierId(tId);
+            	flowAccountIdentifier.setPersonal(personal);
+            	flowAccountIdentifier.setMainId(mainId);
+            	flowAccountIdentifier.setOpenBank("");
+            	accountIdentifiers.add(flowAccountIdentifier2);
+            	
             	Flow flow = new Flow();
             	Date accountTime = (Date) flowMap.get("account_time");
             	String afterId = flowMap.get("after_id")+"";
@@ -479,8 +496,8 @@ public class CamsFlowController {
             	String memo = "";
             	String remark = flowMap.get("remark")+"";
             	Date segmentationDate = (Date) flowMap.get("segmentation_date");
-            	String sourceAccountIdentifierId = uId;//flowMap.get("target_account_id")+"";
-            	String targetAccountIdentifierId = flowMap.get("target_bank_card_no")+"";
+            	String sourceAccountIdentifierId = sId;//flowMap.get("target_account_id")+"";
+            	String targetAccountIdentifierId = tId;
             	String listId = flowMap.get("list_id")+"";
         		flow.setAccountTime(accountTime);
             	flow.setAfterId(afterId);
@@ -493,10 +510,15 @@ public class CamsFlowController {
             	flow.setRepayType(repayType);
             	flow.setSegmentationDate(segmentationDate);
             	flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
-            	//TODO XXX 
-            	flow.setTargetAccountIdentifierId("");//targetAccountIdentifierId
+            	flow.setTargetAccountIdentifierId(targetAccountIdentifierId);
+            	if(4 == repayType) {//银行代扣
+            		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
+                	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
+            	}else if(repayType != 2 && repayType != 3) {//线下贷后
+            		flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
+                	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
+            	}
             	flows.add(flow);
-        		
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
             	paramFlowItemMap.put("repaySourceId", listId);
             	List<Map<String,Object>> listFlowItem = basicBusinessService.selectlPushBusinessFlowItem(paramFlowItemMap);
