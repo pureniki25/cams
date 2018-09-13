@@ -1035,28 +1035,38 @@ public class TdrepayRechargeController {
 	@ApiOperation(value = "处理处理资金分发失败的数据")
 	@GetMapping("/handleRechargeFailedData")
 	@ResponseBody
-	public Result handleRechargeFailedData() {
+	public Result<List<Map<String, Object>>> handleRechargeFailedData() {
 		try {
 
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
 					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("process_status", 3).eq("is_valid", 1));
+			List<Map<String, Object>> lst = new LinkedList<>();
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 				Map<String, Object> paramMap = new HashMap<>();
-				Map<String, Object> resultMap = new HashMap<>();
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
-					String batchId = tdrepayRechargeLog.getBatchId();
-					String requestNo = tdrepayRechargeLog.getRequestNo();
-					String oidPartner = tdrepayRechargeLog.getOidPartner();
 					
-					paramMap.put("batchId", batchId);
-					paramMap.put("requestNo", requestNo);
-					paramMap.put("oidPartner", oidPartner);
+					paramMap.put("batchId", tdrepayRechargeLog.getBatchId());
+					paramMap.put("requestNo", tdrepayRechargeLog.getRequestNo());
+					paramMap.put("oidPartner", tdrepayRechargeLog.getOidPartner());
+					paramMap.put("userId", tdrepayRechargeLog.getTdUserId());
 					
-					com.ht.ussp.core.Result result = eipRemote.queryDistributeFund(paramMap);
+					com.ht.ussp.core.Result queryDistributeFund = eipRemote.queryDistributeFund(paramMap);
+					com.ht.ussp.core.Result queryUserAviMoney = eipRemote.queryUserAviMoney(paramMap);
+					Map<String, Object> resultMap = new HashMap<>();
+					resultMap.put("logId", tdrepayRechargeLog.getLogId());
+					resultMap.put("projectId", tdrepayRechargeLog.getProjectId());
+					resultMap.put("paramMap", JSONObject.toJSONString(paramMap));
+					if (queryDistributeFund != null) {
+						resultMap.put("queryDistributeFund", queryDistributeFund.getData());
+					}
+					if (queryUserAviMoney != null) {
+						resultMap.put("queryUserAviMoney", queryUserAviMoney.getData());
+					}
+					lst.add(resultMap);
 				}
 			}
 
-			return Result.success();
+			return Result.success(lst);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error(e.getMessage());
