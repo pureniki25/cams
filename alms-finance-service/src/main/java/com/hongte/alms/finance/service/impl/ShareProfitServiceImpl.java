@@ -274,6 +274,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 accountantOverRepayLog.setIsRefund(0);
                 accountantOverRepayLog.setIsTemporary(0);
                 accountantOverRepayLog.setMoneyType(1);
+                accountantOverRepayLog.setSrcType(2);
                 accountantOverRepayLog.setOverRepayMoney(financeBaseDto.getSurplusAmount());
                 accountantOverRepayLog
                         .setRemark(String.format("收入于%s的%s期线下财务确认", req.getBusinessId(), req.getAfterId()));
@@ -443,6 +444,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             accountantOverRepayLog.setIsRefund(0);
             accountantOverRepayLog.setIsTemporary(0);
             accountantOverRepayLog.setMoneyType(0);
+            accountantOverRepayLog.setSrcType(2);
             accountantOverRepayLog.setOverRepayMoney(req.getSurplusFund());
             accountantOverRepayLog.setRemark(String.format("支出于%s的%s期线下财务确认", req.getBusinessId(), req.getAfterId()));
             accountantOverRepayLog.setLogId(UUID.randomUUID().toString());

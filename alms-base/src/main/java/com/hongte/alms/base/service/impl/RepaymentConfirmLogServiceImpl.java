@@ -279,6 +279,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 cAccountantOverRepayLog.setCreateUser(loginUserInfoHelper.getUserId());
                 cAccountantOverRepayLog.setId(null);
                 cAccountantOverRepayLog.setLogId(UUID.randomUUID().toString());
+                cAccountantOverRepayLog.setSrcType(2);
                 cAccountantOverRepayLog.insert();
             }
         }
@@ -297,6 +298,7 @@ public class RepaymentConfirmLogServiceImpl extends BaseServiceImpl<RepaymentCon
                 cAccountantOverRepayLog.setCreateUser(loginUserInfoHelper.getUserId());
                 cAccountantOverRepayLog.setId(null);
                 cAccountantOverRepayLog.setLogId(UUID.randomUUID().toString());
+                cAccountantOverRepayLog.setSrcType(2);
                 cAccountantOverRepayLog.insert();
             }
         }
