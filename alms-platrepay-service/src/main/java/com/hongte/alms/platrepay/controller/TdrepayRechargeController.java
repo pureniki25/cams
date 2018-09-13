@@ -73,7 +73,7 @@ import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.ApiOperation;
 
-@CrossOrigin
+//@CrossOrigin
 @Controller
 @RequestMapping("/tdrepayRecharge")
 public class TdrepayRechargeController {
@@ -1026,6 +1026,49 @@ public class TdrepayRechargeController {
 			tdrepayRechargeService.handleRunningData();
 
 			return Result.success();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error(e.getMessage());
+		}
+	}
+
+	@ApiOperation(value = "处理处理资金分发失败的数据")
+	@GetMapping("/handleRechargeFailedData")
+	@ResponseBody
+	public Result<List<Map<String, Object>>> handleRechargeFailedData() {
+		try {
+
+			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("process_status", 3).eq("is_valid", 1));
+			List<Map<String, Object>> lst = new LinkedList<>();
+			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+				Map<String, Object> paramMap = new HashMap<>();
+				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
+					
+					paramMap.put("batchId", tdrepayRechargeLog.getBatchId());
+					paramMap.put("requestNo", tdrepayRechargeLog.getRequestNo());
+					paramMap.put("oidPartner", tdrepayRechargeLog.getOidPartner());
+					paramMap.put("userId", tdrepayRechargeLog.getTdUserId());
+					
+					com.ht.ussp.core.Result queryDistributeFund = eipRemote.queryDistributeFund(paramMap);
+					com.ht.ussp.core.Result queryUserAviMoney = eipRemote.queryUserAviMoney(paramMap);
+					Map<String, Object> resultMap = new HashMap<>();
+					resultMap.put("logId", tdrepayRechargeLog.getLogId());
+					resultMap.put("projectId", tdrepayRechargeLog.getProjectId());
+					resultMap.put("customerName", tdrepayRechargeLog.getCustomerName());
+					resultMap.put("businessId", tdrepayRechargeLog.getOrigBusinessId());
+					resultMap.put("paramMap", JSONObject.toJSONString(paramMap));
+					if (queryDistributeFund != null) {
+						resultMap.put("queryDistributeFund", queryDistributeFund.getData());
+					}
+					if (queryUserAviMoney != null) {
+						resultMap.put("queryUserAviMoney", queryUserAviMoney.getData());
+					}
+					lst.add(resultMap);
+				}
+			}
+
+			return Result.success(lst);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error(e.getMessage());

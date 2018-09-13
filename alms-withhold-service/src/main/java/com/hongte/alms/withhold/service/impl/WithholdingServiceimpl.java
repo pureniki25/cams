@@ -102,7 +102,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 //			} else {
 //				continue;
 //			}
-//		}
+//		} 
 		//把集合按planId分组
 	    Map<String, List<RepaymentBizPlanList>> map =pLists.stream().collect(Collectors.groupingBy(RepaymentBizPlanList::getPlanId));
 	    map.values().stream().forEach(lists -> {
