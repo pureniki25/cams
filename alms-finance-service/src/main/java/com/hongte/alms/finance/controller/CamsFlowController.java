@@ -496,7 +496,7 @@ public class CamsFlowController {
             	String memo = "";
             	String remark = flowMap.get("remark")+"";
             	Date segmentationDate = (Date) flowMap.get("segmentation_date");
-            	String sourceAccountIdentifierId = sId;//flowMap.get("target_account_id")+"";
+            	String sourceAccountIdentifierId = sId;
             	String targetAccountIdentifierId = tId;
             	String listId = flowMap.get("list_id")+"";
         		flow.setAccountTime(accountTime);
