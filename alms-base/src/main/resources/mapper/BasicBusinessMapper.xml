@@ -683,7 +683,7 @@
 		SELECT 
 		t1.resource_id AS 'list_id',
 		'' AS 'account_id',
-		t2.create_time AS 'account_time',
+		t1.repay_date AS 'account_time',
 		t2.business_id AS 'business_id',
 		t6.project_id AS 'issue_id',
 		t2.after_id AS 'after_id',
@@ -713,7 +713,19 @@
 		t2.update_time AS 'update_time',
 		1 AS 'import_type',
 		CONCAT('ALMS-',t1.resource_id) AS 'log_id',
-		<![CDATA[ CASE WHEN t1.repay_source = 20 && t4.bind_platform_id = 3 THEN '宝付代扣' WHEN t1.repay_source = 20 && IFNULL(t4.bind_platform_id,0) = 0 THEN '易宝代扣' WHEN t1.repay_source = 30 THEN '银行代扣' ELSE '贷后收款账户' END  AS 'account_name' ]]>,
+		<![CDATA[ CASE 
+			WHEN t1.repay_source = 10 THEN '1'
+			WHEN t1.repay_source = 11 THEN '7'
+			WHEN t1.repay_source = 20 && t4.bind_platform_id = 3 THEN '2'
+			WHEN t1.repay_source = 21 && t4.bind_platform_id = 3 THEN '2'
+			WHEN t1.repay_source = 20 && IFNULL(t4.bind_platform_id,0) = 0 THEN '3'
+			WHEN t1.repay_source = 21 && IFNULL(t4.bind_platform_id,0) = 0 THEN '3'
+			WHEN t1.repay_source = 30 THEN '4'
+			WHEN t1.repay_source = 31 THEN '4'
+			WHEN t1.repay_source = 40 THEN '5'
+			WHEN t1.repay_source = 50 THEN '6'
+			ELSE '1' END  AS 'repay_type'
+		]]>, 
 		t4.bank_name AS 'open_bank',
 		t6.plate_type AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
@@ -750,7 +762,15 @@
 		t1.is_cancelled AS 'status_flag',
 		'贷后系统同步' AS 'remark',
 		'1' AS 'business_flag',
-		CASE WHEN t1.repay_source = 10 THEN '1' ELSE '1' END  AS 'repay_type',
+		<![CDATA[ CASE 
+			WHEN t1.repay_source = 10 THEN '1'
+			WHEN t1.repay_source = 11 THEN '7'
+			WHEN t1.repay_source = 30 THEN '4'
+			WHEN t1.repay_source = 31 THEN '4'
+			WHEN t1.repay_source = 40 THEN '5'
+			WHEN t1.repay_source = 50 THEN '6'
+			ELSE '1' END  AS 'repay_type'
+		]]>,
 		t10.repayment_name AS 'target_account_id',
 		t10.repayment_id AS 'target_bank_card_no',
 		t8.customer_name_ext AS 'customer_name',

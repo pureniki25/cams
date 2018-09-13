@@ -73,7 +73,7 @@ import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.ApiOperation;
 
-@CrossOrigin
+//@CrossOrigin
 @Controller
 @RequestMapping("/tdrepayRecharge")
 public class TdrepayRechargeController {
@@ -1024,6 +1024,37 @@ public class TdrepayRechargeController {
 		try {
 
 			tdrepayRechargeService.handleRunningData();
+
+			return Result.success();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error(e.getMessage());
+		}
+	}
+
+	@ApiOperation(value = "处理处理资金分发失败的数据")
+	@GetMapping("/handleRechargeFailedData")
+	@ResponseBody
+	public Result handleRechargeFailedData() {
+		try {
+
+			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("process_status", 3).eq("is_valid", 1));
+			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
+				Map<String, Object> paramMap = new HashMap<>();
+				Map<String, Object> resultMap = new HashMap<>();
+				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
+					String batchId = tdrepayRechargeLog.getBatchId();
+					String requestNo = tdrepayRechargeLog.getRequestNo();
+					String oidPartner = tdrepayRechargeLog.getOidPartner();
+					
+					paramMap.put("batchId", batchId);
+					paramMap.put("requestNo", requestNo);
+					paramMap.put("oidPartner", oidPartner);
+					
+					com.ht.ussp.core.Result result = eipRemote.queryDistributeFund(paramMap);
+				}
+			}
 
 			return Result.success();
 		} catch (Exception e) {
