@@ -539,12 +539,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
         }
 
         public Integer getAccountType() {
-
-            if(this.accountType!=null) return accountType;
-
-            if(this.isPersonal()) return 0;
-
-            return -1;
+            return accountType;
         }
 
         public void setAccountType(Integer accountType) {
