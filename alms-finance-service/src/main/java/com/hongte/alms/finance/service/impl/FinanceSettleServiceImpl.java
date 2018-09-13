@@ -315,6 +315,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             accountantOverRepayLog.setIsRefund(0);
             accountantOverRepayLog.setIsTemporary(0);
             accountantOverRepayLog.setMoneyType(1);
+            accountantOverRepayLog.setSrcType(2);
             accountantOverRepayLog.setOverRepayMoney(financeSettleBaseDto.getSurplusAmount());
             accountantOverRepayLog
                     .setRemark(String.format("收入于%s的%s期线下财务确认", financeSettleBaseDto.getBusinessId(), financeSettleBaseDto.getAfterId()));
@@ -1685,6 +1686,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             accountantOverRepayLog.setIsRefund(0);
             accountantOverRepayLog.setIsTemporary(0);
             accountantOverRepayLog.setMoneyType(0);
+            accountantOverRepayLog.setSrcType(2);
             accountantOverRepayLog.setOverRepayMoney(financeSettleReq.getSurplusFund());
             accountantOverRepayLog.setRemark(String.format("支出于%s的%s期线下财务結清", financeSettleReq.getBusinessId(), financeSettleReq.getAfterId()));
             accountantOverRepayLog.setLogId(UUID.randomUUID().toString());
@@ -2417,9 +2419,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     		}
         	
         	BigDecimal balance = accountantOverRepayLogService.caluCanUse(bizPlanList.getBusinessId(), bizPlanList.getAfterId());
-        	if (financeBaseDto.getRepaymentConfirmLog().getSurplusAmount()!=null) {
-    			balance = balance.add(financeBaseDto.getRepaymentConfirmLog().getSurplusAmount());
-    		}
+//        	if (financeBaseDto.getRepaymentConfirmLog().getSurplusAmount()!=null) {
+//    			balance = balance.add(financeBaseDto.getRepaymentConfirmLog().getSurplusAmount());
+//    		}
         	if (balance.compareTo(BigDecimal.ZERO)>0) {
     			remark.append(balance.setScale(2, RoundingMode.HALF_UP)).append("元").append("结余");
     		}
