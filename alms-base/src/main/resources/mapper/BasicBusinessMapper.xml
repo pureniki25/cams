@@ -785,7 +785,7 @@
 		t2.update_time AS 'update_time',
 		1 AS 'import_type',
 		CONCAT('ALMS-',t1.resource_id) AS 'log_id',
-		t3.fact_transfer_name AS 'account_name',
+		t3.bank_account AS 'account_name',
 		t9.remit_bank AS 'open_bank',
 		t6.plate_type AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
