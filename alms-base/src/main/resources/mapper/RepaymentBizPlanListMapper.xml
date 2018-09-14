@@ -87,7 +87,7 @@
 				cStatus.collection_status  in (100, 200)
 			</when>
 		</choose>
-         cStatus.collection_status  in (100, 200,150)
+        AND cStatus.collection_status  in (100, 200,150)
         AND cStatus.business_id = business.business_id
         ) = 0
         AND (

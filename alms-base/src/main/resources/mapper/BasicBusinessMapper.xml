@@ -811,7 +811,7 @@
 			t1.after_id AS 'after_id',
 			t1.project_id AS 'issue_id',
 			t6.business_after_guid AS 'batch_id',
-			t1.proj_plan_detail_repay_id AS 'fee_id',
+			t1.fee_id AS 'fee_id',
 			t1.plan_item_name AS 'fee_name',
 			t1.fact_amount AS 'amount',
 			t8.create_time AS 'account_time',
