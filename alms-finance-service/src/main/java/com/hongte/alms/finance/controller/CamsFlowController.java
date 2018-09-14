@@ -56,8 +56,8 @@ public class CamsFlowController {
     
     private String mainIdYb = "97f6369b-e93d-11e7-94ed-94c69109b34a";//易宝
     private String mainIdBf = "98075bd6-e93d-11e7-94ed-94c69109b34a";//宝付
-    private String dMainIdYb = "98075b88-e93d-11e7-94ed-94c69109b34a";//易宝
-    private String dMainIdBf = "97f6364a-e93d-11e7-94ed-94c69109b34a";//宝付
+    private String dMainIdYb = "97f6364a-e93d-11e7-94ed-94c69109b34a";//易宝
+    private String dMainIdBf = "98075b88-e93d-11e7-94ed-94c69109b34a";//宝付
     
 //    @Autowired
 //    private AccountListHandlerClient accountListHandlerClient;
