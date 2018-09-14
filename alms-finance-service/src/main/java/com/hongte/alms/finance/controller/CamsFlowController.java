@@ -455,6 +455,9 @@ public class CamsFlowController {
             	int accountType = mainType;
             	if(mainType == 2) {
             		personal = false;
+            		accountType = 1; //企业1
+            	}else {
+            		accountType = 0; //个人0
             	}
             	
             	String mainId = flowMap.get("main_id")+"";
