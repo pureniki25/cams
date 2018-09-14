@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.FlowPushLogService;
@@ -527,7 +528,10 @@ public class CamsFlowController {
             		String detailAfterId = listFlowItemMap.get("after_id")+"";
             		BigDecimal detailAmount = new BigDecimal(listFlowItemMap.get("amount")+"");
             		String detailFeeId = listFlowItemMap.get("fee_id")+"";
-            		String detailFeeName = listFlowItemMap.get("fee_name")+"";
+            		String detailFeeName = RepayPlanFeeTypeEnum.feeIdOf(listFlowItemMap.get("fee_id")+"").getDesc();
+            		if(StringUtils.isBlank(detailFeeName)) {
+            			detailFeeName = listFlowItemMap.get("fee_name")+"";
+            		}
             		String detailIssueId = listFlowItemMap.get("issue_id")+"";
             		int detailRegisterType = StringUtils.isBlank(flowMap.get("register_type")+"")?0:Integer.parseInt(listFlowItemMap.get("register_type")+"");
             		Date detailSegmentationDate = (Date) listFlowItemMap.get("segmentation_date");
