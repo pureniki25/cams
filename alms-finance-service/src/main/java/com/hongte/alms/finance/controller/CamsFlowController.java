@@ -528,9 +528,12 @@ public class CamsFlowController {
             		String detailAfterId = listFlowItemMap.get("after_id")+"";
             		BigDecimal detailAmount = new BigDecimal(listFlowItemMap.get("amount")+"");
             		String detailFeeId = listFlowItemMap.get("fee_id")+"";
-            		String detailFeeName = RepayPlanFeeTypeEnum.feeIdOf(listFlowItemMap.get("fee_id")+"").getDesc();
-            		if(StringUtils.isBlank(detailFeeName)) {
-            			detailFeeName = listFlowItemMap.get("fee_name")+"";
+            		String detailFeeName = listFlowItemMap.get("fee_name")+"";
+            		if("滞纳金".equals(detailFeeName)) {
+            			String detailFeeName1 = RepayPlanFeeTypeEnum.feeIdOf(listFlowItemMap.get("fee_id")+"").getDesc();
+            			if(!StringUtils.isBlank(detailFeeName1)) {
+            				detailFeeName = detailFeeName1;
+            			}
             		}
             		String detailIssueId = listFlowItemMap.get("issue_id")+"";
             		int detailRegisterType = StringUtils.isBlank(flowMap.get("register_type")+"")?0:Integer.parseInt(listFlowItemMap.get("register_type")+"");
