@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.FlowPushLogService;
@@ -476,14 +477,14 @@ public class CamsFlowController {
             		accountName = "易宝";
             	}
             	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
-            	flowAccountIdentifier.setAccountName(accountName);
-            	flowAccountIdentifier.setAccountType(4);
-            	flowAccountIdentifier.setBankCardNo("");
-            	flowAccountIdentifier.setDepositoryId(depositoryId);
-            	flowAccountIdentifier.setIdentifierId(tId);
-            	flowAccountIdentifier.setPersonal(personal);
-            	flowAccountIdentifier.setMainId(mainId);
-            	flowAccountIdentifier.setOpenBank("");
+            	flowAccountIdentifier2.setAccountName(accountName);
+            	flowAccountIdentifier2.setAccountType(4);
+            	flowAccountIdentifier2.setBankCardNo("");
+            	flowAccountIdentifier2.setDepositoryId(depositoryId);
+            	flowAccountIdentifier2.setIdentifierId(tId);
+            	flowAccountIdentifier2.setPersonal(personal);
+            	flowAccountIdentifier2.setMainId(mainId);
+            	flowAccountIdentifier2.setOpenBank("");
             	accountIdentifiers.add(flowAccountIdentifier2);
             	
             	Flow flow = new Flow();
@@ -496,7 +497,7 @@ public class CamsFlowController {
             	String memo = "";
             	String remark = flowMap.get("remark")+"";
             	Date segmentationDate = (Date) flowMap.get("segmentation_date");
-            	String sourceAccountIdentifierId = sId;//flowMap.get("target_account_id")+"";
+            	String sourceAccountIdentifierId = sId;
             	String targetAccountIdentifierId = tId;
             	String listId = flowMap.get("list_id")+"";
         		flow.setAccountTime(accountTime);
@@ -509,14 +510,14 @@ public class CamsFlowController {
             	flow.setRemark(remark);
             	flow.setRepayType(repayType);
             	flow.setSegmentationDate(segmentationDate);
-            	flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
-            	flow.setTargetAccountIdentifierId(targetAccountIdentifierId);
+            	flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
+            	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
             	if(4 == repayType) {//银行代扣
             		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
                 	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
-            	}else if(repayType != 2 && repayType != 3) {//线下贷后
-            		flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
-                	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
+            	}else if(repayType != 2 && repayType != 3) {//线下还款
+            		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
+                	flow.setTargetAccountIdentifierId(targetAccountIdentifierId);
             	}
             	flows.add(flow);
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
@@ -528,6 +529,12 @@ public class CamsFlowController {
             		BigDecimal detailAmount = new BigDecimal(listFlowItemMap.get("amount")+"");
             		String detailFeeId = listFlowItemMap.get("fee_id")+"";
             		String detailFeeName = listFlowItemMap.get("fee_name")+"";
+            		if("滞纳金".equals(detailFeeName)) {
+            			String detailFeeName1 = RepayPlanFeeTypeEnum.feeIdOf(listFlowItemMap.get("fee_id")+"").getDesc();
+            			if(!StringUtils.isBlank(detailFeeName1)) {
+            				detailFeeName = detailFeeName1;
+            			}
+            		}
             		String detailIssueId = listFlowItemMap.get("issue_id")+"";
             		int detailRegisterType = StringUtils.isBlank(flowMap.get("register_type")+"")?0:Integer.parseInt(listFlowItemMap.get("register_type")+"");
             		Date detailSegmentationDate = (Date) listFlowItemMap.get("segmentation_date");

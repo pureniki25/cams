@@ -69,6 +69,19 @@
         <include refid="selectPerson_SQL"></include>
     </select>
 
+	<select id="getRecentlyCollectionStatus"
+		resultType="com.hongte.alms.base.collection.entity.CollectionStatus">
+		select 
+		    <include refid="Table_Column_List"></include>
+		from tb_collection_status colSstatus left join
+
+		tb_repayment_biz_plan_list pList on colSstatus.crp_id=pList.plan_list_id
+
+		where colSstatus.business_id=#{businessId} and colSstatus.collection_status=#{colStatus} order by pList.period
+		desc limit 1
+
+	</select>
+
 
 </mapper>
 
