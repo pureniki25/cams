@@ -728,7 +728,7 @@
 		]]>, 
 		t4.bank_name AS 'open_bank',
 		t4.customer_name AS 'account_name',
-		t6.plate_type AS 'business_from',
+		t6.project_from+1 AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		'' AS main_type,
 		t4.identity_card AS main_id
@@ -787,7 +787,7 @@
 		CONCAT('ALMS-',t1.resource_id) AS 'log_id',
 		t3.bank_account AS 'account_name',
 		t9.remit_bank AS 'open_bank',
-		t6.plate_type AS 'business_from',
+		t6.project_from+1 AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		t10.main_type,
 		t10.main_id
@@ -829,7 +829,7 @@
 			t2.company_id_ext AS 'branch_id',
 			t2.company_name_ext AS 'branch_name',
 			t2.customer_name_ext AS 'customer_name',
-			t6.plate_type AS 'business_from',
+			t6.project_from+1 AS 'business_from',
 			t6.queryFullsuccessDate AS 'segmentation_date',
 			t1.confirm_log_id AS 'log_id',
 			'贷后系统同步' AS 'remark'
