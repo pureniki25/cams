@@ -55,16 +55,17 @@ import io.swagger.annotations.ApiOperation;
 public class CamsFlowController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CamsFlowController.class);
     
+    //虚拟账号定义
     private String mainIdYb = "97f6369b-e93d-11e7-94ed-94c69109b34a";//易宝
     private String mainIdBf = "98075bd6-e93d-11e7-94ed-94c69109b34a";//宝付
     private String dMainIdYb = "97f6364a-e93d-11e7-94ed-94c69109b34a";//易宝
     private String dMainIdBf = "98075b88-e93d-11e7-94ed-94c69109b34a";//宝付
-    
     private String mainIdCard = "a98903d8-08b2-11e8-90c4-94c69109b34a";//刷卡账户
     private String mainIdCash = "bfefb0ec-08b2-11e8-90c4-94c69109b34a";//现金账户
     private String dMainIdCard = "7d4a3442bda446dc9df227024524d062";//刷卡账户
     private String dMainIdCash = "85dbddef27e3475c966da7b6ed0a343e";//现金账户
-    
+    private String mainIdnull = "无";//无的虚拟账号
+    private String dMainIdnull = "786fd138695a4c53a7a45f3f323c8b0e";//无的现金账号
 //    @Autowired
 //    private AccountListHandlerClient accountListHandlerClient;
     
@@ -451,6 +452,7 @@ public class CamsFlowController {
         	List<FlowAccountIdentifier> accountIdentifiers = new ArrayList<>();
         	List<FlowDetail> flowDetails = new ArrayList<>();
         	int flagLeft = 0;//结余标记
+        	int flagLeftToRepay = 0;//结余转还款标记
         	for (Map<String, Object> flowMap : listOnlineFlow) {
         		String sId = UUIDHtGenerator.getUUID();
         		String tId = UUIDHtGenerator.getUUID();
@@ -597,6 +599,25 @@ public class CamsFlowController {
                 		flowDetail.setAmount(accountantOverRepayLog.getOverRepayMoney());
                 		flowDetail.setFeeId("8d76bc55-f80a-11e7-94ed-94c69109b34a");
                 		flowDetail.setFeeName("结余");
+                		flowDetail.setIssueId(issueId);
+                		flowDetail.setRegisterType(0);
+                		flowDetail.setSegmentationDate(segmentationDate);
+                		flowDetails.add(flowDetail);
+            		}
+            	}
+            	
+            	//结余 费用
+            	String surplusUseRefId = repaymentConfirmLog.getSurplusUseRefId();
+            	if(!StringUtils.isBlank(surplusUseRefId)) {
+            		AccountantOverRepayLog accountantOverRepayLog = accountantOverRepayLogService.selectById(surplusRefId);
+            		if(null != accountantOverRepayLog && flagLeftToRepay == 0) {
+            			flagLeftToRepay = 1;
+            			FlowDetail flowDetail = new FlowDetail();
+                		flowDetail.setAccountTime(accountantOverRepayLog.getCreateTime());
+                		flowDetail.setAfterId(repaymentConfirmLog.getAfterId());
+                		flowDetail.setAmount(accountantOverRepayLog.getOverRepayMoney());
+                		flowDetail.setFeeId("de273023-20e6-11e8-a070-000c296e4c97");
+                		flowDetail.setFeeName("结余转还款");
                 		flowDetail.setIssueId(issueId);
                 		flowDetail.setRegisterType(0);
                 		flowDetail.setSegmentationDate(segmentationDate);
