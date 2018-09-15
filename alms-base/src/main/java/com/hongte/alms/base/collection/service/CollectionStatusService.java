@@ -113,6 +113,13 @@ public interface CollectionStatusService extends BaseService<CollectionStatus> {
      * @return
      */
     public boolean  revokeClosedStatus(String businessId);
+    
+    /**
+     * 获取最近一次已分配催收的CollectionStatus
+     * @param businessId
+     * @return
+     */
+    public CollectionStatus  getRecentlyCollectionStatus(String businessId,Integer collectionStatus);
 
 
 //    /**
