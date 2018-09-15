@@ -387,8 +387,6 @@ public class CamsFlowController {
 	private void addBusinessFlow(List<Map<String, Object>> listMap) {
 		//2# step2 循环业务list，去除每一条业务的流水list
     	for(Map<String,Object> businessMapInfo : listMap) {
-    		String sId = UUIDHtGenerator.getUUID();
-    		String tId = UUIDHtGenerator.getUUID();
     		CreateBatchFlowCommand command = new CreateBatchFlowCommand();
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
@@ -443,6 +441,8 @@ public class CamsFlowController {
         	List<FlowAccountIdentifier> accountIdentifiers = new ArrayList<>();
         	List<FlowDetail> flowDetails = new ArrayList<>();
         	for (Map<String, Object> flowMap : listOnlineFlow) {
+        		String sId = UUIDHtGenerator.getUUID();
+        		String tId = UUIDHtGenerator.getUUID();
         		//还款账号
             	FlowAccountIdentifier flowAccountIdentifier = new FlowAccountIdentifier();
             	String accountName = flowMap.get("account_name")+"";
