@@ -44,10 +44,10 @@ public class CollectionPersonSet extends Model<CollectionPersonSet> {
 	private String companyCode;
 	
 	 /**
-     * 催收人员设置ID
+     * 业务类型ID
      */
     @TableId("business_type")
-	@ApiModelProperty(required= true,value = "业务类型")
+	@ApiModelProperty(required= true,value = "业务类型ID")
 	private Integer businessType;
     /**
      * 创建时间
@@ -73,6 +73,7 @@ public class CollectionPersonSet extends Model<CollectionPersonSet> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户ID")
 	private String updateUser;
+
 
 
 	public String getColPersonId() {
