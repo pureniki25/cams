@@ -53,13 +53,17 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/camsFlowSync")
 @Api(tags = "CamsFlowSyncController", description = "核心账号同步测试", hidden = true)
 public class CamsFlowController {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CamsFlowController.class);
     
     private String mainIdYb = "97f6369b-e93d-11e7-94ed-94c69109b34a";//易宝
     private String mainIdBf = "98075bd6-e93d-11e7-94ed-94c69109b34a";//宝付
     private String dMainIdYb = "97f6364a-e93d-11e7-94ed-94c69109b34a";//易宝
     private String dMainIdBf = "98075b88-e93d-11e7-94ed-94c69109b34a";//宝付
+    
+    private String mainIdCard = "a98903d8-08b2-11e8-90c4-94c69109b34a";//刷卡账户
+    private String mainIdCash = "bfefb0ec-08b2-11e8-90c4-94c69109b34a";//现金账户
+    private String dMainIdCard = "7d4a3442bda446dc9df227024524d062";//刷卡账户
+    private String dMainIdCash = "85dbddef27e3475c966da7b6ed0a343e";//现金账户
     
 //    @Autowired
 //    private AccountListHandlerClient accountListHandlerClient;
