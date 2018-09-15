@@ -609,7 +609,7 @@ public class CamsFlowController {
             	//结余 费用
             	String surplusUseRefId = repaymentConfirmLog.getSurplusUseRefId();
             	if(!StringUtils.isBlank(surplusUseRefId)) {
-            		AccountantOverRepayLog accountantOverRepayLog = accountantOverRepayLogService.selectById(surplusRefId);
+            		AccountantOverRepayLog accountantOverRepayLog = accountantOverRepayLogService.selectById(surplusUseRefId);
             		if(null != accountantOverRepayLog && flagLeftToRepay == 0) {
             			flagLeftToRepay = 1;
             			FlowDetail flowDetail = new FlowDetail();
