@@ -656,6 +656,7 @@
 		CASE WHEN t2.business_ctype = '小微企业贷用信' THEN '小微企业贷' ELSE t2.business_ctype END  AS 'business_ctype',
 		t2.customer_name,t2.asset_id,
 		CASE WHEN t1.type= 2 THEN '3' ELSE '2' END  AS 'action_id',
+		CASE WHEN t4.plan_status= 10 THEN '3' WHEN t4.plan_status= 20 THEN '31' WHEN t4.plan_status = 30 THEN '32' ELSE t4.plan_status END  AS 'plan_status',
 		'1' as businessFlag,
 		t6.project_from+1 as businessFrom
 		FROM tb_repayment_confirm_log t1

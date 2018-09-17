@@ -424,6 +424,7 @@ public class CamsFlowController {
         	String businessId = businessMapInfo.get("business_id")==null?"":businessMapInfo.get("business_id").toString();
         	String businessType = businessMapInfo.get("business_type_name")==null?"":businessMapInfo.get("business_type_name").toString();//business_type
         	String businessCtype = businessMapInfo.get("business_ctype")==null?"":businessMapInfo.get("business_ctype").toString();
+        	String planStatus = businessMapInfo.get("plan_status")==null?"":businessMapInfo.get("plan_status").toString();
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
@@ -475,6 +476,10 @@ public class CamsFlowController {
             	int accountType = 0;
             	String mainId = flowMap.get("main_id")==null?"":flowMap.get("main_id").toString();
             	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
+            	
+            	if(planStatus.equals("31") || planStatus.equals("32")) {
+            		repayType = Integer.parseInt(planStatus);
+            	}
             	
             	if(repayType == 1) {//手动
             		accountType = 9;
