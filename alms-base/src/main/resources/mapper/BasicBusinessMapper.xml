@@ -653,7 +653,7 @@
     <select id="selectlPushBusiness" resultType="map">
 		SELECT t1.confirm_log_id,t2.business_id,t2.source_business_id,t4.repayment_batch_id,t2.asset_id,t2.create_time,t2.create_user,t2.company_id,t2.company_name,
 		t2.business_type,t3.business_type_name,
-		t2.business_ctype,
+		CASE WHEN t2.business_ctype = '小微企业贷用信' THEN '小微企业贷' ELSE t2.business_ctype END  AS 'business_ctype',
 		t2.customer_name,t2.asset_id,
 		CASE WHEN t1.type= 2 THEN '3' ELSE '2' END  AS 'action_id',
 		'1' as businessFlag,
@@ -664,7 +664,7 @@
 		LEFT JOIN tb_repayment_biz_plan_list t5 ON t5.business_id = t1.business_id AND t5.after_id = t1.after_id
 		LEFT JOIN tb_repayment_biz_plan t4 ON t5.plan_id = t4.plan_id 
 		LEFT JOIN tb_tuandai_project_info t6 ON t6.business_id = t1.business_id AND t6.master_issue_id = t6.project_id
-		<where> 
+		<where>
 		-- t1.type = 1 AND
 		t2.src_type = 2 and
 		t1.last_push_status in (0,2)
