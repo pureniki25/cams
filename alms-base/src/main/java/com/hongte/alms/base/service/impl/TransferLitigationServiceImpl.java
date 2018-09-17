@@ -73,6 +73,7 @@ import com.hongte.alms.base.vo.litigation.BusinessHouse;
 import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.LitigationResponse;
 import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
+import com.hongte.alms.base.vo.litigation.TransferLitigationPersonDTO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
