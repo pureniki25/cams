@@ -519,7 +519,7 @@
             </if>
            <!--   /*//当前登录用户ID*  且不是全局用户 / -->
             <if test="userId !=null and needPermission == 1">
-                and pList.orig_business_id in (
+                and pList.business_id in (
 					select business_id from tb_sys_user_permission where user_id = #{userId} and page_type = 1   	
                 )
             </if>

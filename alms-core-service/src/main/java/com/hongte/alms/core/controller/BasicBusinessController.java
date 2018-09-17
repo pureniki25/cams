@@ -78,7 +78,7 @@ public class BasicBusinessController {
             List<SysParameter> unit = sysParameterService.selectList(new EntityWrapper<SysParameter>().eq("param_type", SysParameterTypeEnums.BORROW_LIMIT_UNIT.getKey()).eq("param_value",business.getBorrowLimitUnit()));
 
             //根据业务还款计划判断业务还款状态
-            List<RepaymentBizPlan> plans =  repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",business.getBusinessId()));
+            List<RepaymentBizPlan> plans =  repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id",business.getBusinessId()));
             vo.setStatus("已结清");
             for(RepaymentBizPlan plan: plans){
                 if(plan.getPlanStatus().equals(RepayPlanSettleStatusEnum.REPAYINF.getValue())){
@@ -86,6 +86,22 @@ public class BasicBusinessController {
                     break;
                 }
             }
+
+//            //判断是否有展期的
+//            if(vo.getStatus().equals("已结清")){
+//                List<RepaymentBizPlan> zqPlans =  repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id",business.getBusinessId()));
+//
+//                if(zqPlans!=null&& zqPlans.size()>0){
+//                    for(RepaymentBizPlan plan: zqPlans){
+//                        if(plan.getPlanStatus().equals(RepayPlanSettleStatusEnum.REPAYINF.getValue())){
+//                            vo.setStatus("还款中");
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+
+
 
 
             if(repartmentType.size()>0){

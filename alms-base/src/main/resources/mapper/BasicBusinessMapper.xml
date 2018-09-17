@@ -265,8 +265,6 @@
 				#{companyId}
 			</foreach>
 		</if>
-
-
 	</select>
 
     <select id="findBusinessIds" resultType="java.lang.String">
@@ -654,16 +652,20 @@
     
     <select id="selectlPushBusiness" resultType="map">
 		SELECT t1.confirm_log_id,t2.business_id,t2.source_business_id,t4.repayment_batch_id,t2.asset_id,t2.create_time,t2.create_user,t2.company_id,t2.company_name,
-		t2.business_type,t3.business_type_name,t2.customer_name,t2.asset_id,
+		t2.business_type,t3.business_type_name,
+		CASE WHEN t2.business_ctype = '小微企业贷用信' THEN '小微企业贷' ELSE t2.business_ctype END  AS 'business_ctype',
+		t2.customer_name,t2.asset_id,
 		CASE WHEN t1.type= 2 THEN '3' ELSE '2' END  AS 'action_id',
+		CASE WHEN t4.plan_status= 10 THEN '3' WHEN t4.plan_status= 20 THEN '31' WHEN t4.plan_status = 30 THEN '32' ELSE t4.plan_status END  AS 'plan_status',
 		'1' as businessFlag,
-		'2' as businessFrom
+		t6.project_from+1 as businessFrom
 		FROM tb_repayment_confirm_log t1
 		LEFT JOIN tb_basic_business t2 ON t1.business_id = t2.business_id
 		LEFT JOIN tb_basic_business_type t3 ON t3.business_type_id = t2.business_type
 		LEFT JOIN tb_repayment_biz_plan_list t5 ON t5.business_id = t1.business_id AND t5.after_id = t1.after_id
 		LEFT JOIN tb_repayment_biz_plan t4 ON t5.plan_id = t4.plan_id 
-		<where> 
+		LEFT JOIN tb_tuandai_project_info t6 ON t6.business_id = t1.business_id AND t6.master_issue_id = t6.project_id
+		<where>
 		-- t1.type = 1 AND
 		t2.src_type = 2 and
 		t1.last_push_status in (0,2)
@@ -688,7 +690,7 @@
 		t6.project_id AS 'issue_id',
 		t2.after_id AS 'after_id',
 		t2.business_id AS 'exhibition_id',
-		t4.current_amount AS 'amount',
+		t1.repay_amount AS 'amount',
 		'0' AS 'balance',
 		t4.bank_card AS 'bank_card_no',
 		CASE WHEN t2.type= 2 THEN '3' ELSE '2' END AS 'action_id',
@@ -728,7 +730,7 @@
 		]]>, 
 		t4.bank_name AS 'open_bank',
 		t4.customer_name AS 'account_name',
-		t6.plate_type AS 'business_from',
+		t6.project_from+1 AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		'' AS main_type,
 		t4.identity_card AS main_id
@@ -747,14 +749,14 @@
 		SELECT
 		t1.resource_id AS 'list_id',
 		''  AS 'account_id',
-		t2.create_time AS 'account_time',
+		t3.trade_date AS 'account_time',
 		t2.org_business_id AS 'business_id',
 		t6.project_id AS 'issue_id',
 		t2.after_id AS 'after_id',
 		t2.business_id AS 'exhibition_id',
-		t3.account_money AS 'amount',
+		t1.repay_amount AS 'amount',
 		'0' AS 'balance',
-		'' AS 'bank_card_no',
+		t10.repayment_id AS 'bank_card_no',
 		CASE WHEN t2.type= 2 THEN '3' ELSE '2' END AS 'action_id',
 		1 AS 'in_out',
 		t2.create_user AS 'create_user',
@@ -785,9 +787,9 @@
 		t2.update_time AS 'update_time',
 		1 AS 'import_type',
 		CONCAT('ALMS-',t1.resource_id) AS 'log_id',
-		t3.fact_transfer_name AS 'account_name',
+		CASE WHEN t3.trade_type = '现金' THEN '现金' WHEN t3.trade_type = '刷卡' THEN '刷卡' ELSE t3.bank_account END AS 'account_name',
 		t9.remit_bank AS 'open_bank',
-		t6.plate_type AS 'business_from',
+		t6.project_from+1 AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		t10.main_type,
 		t10.main_id
@@ -829,7 +831,7 @@
 			t2.company_id_ext AS 'branch_id',
 			t2.company_name_ext AS 'branch_name',
 			t2.customer_name_ext AS 'customer_name',
-			t6.plate_type AS 'business_from',
+			t6.project_from+1 AS 'business_from',
 			t6.queryFullsuccessDate AS 'segmentation_date',
 			t1.confirm_log_id AS 'log_id',
 			'贷后系统同步' AS 'remark'

@@ -1590,6 +1590,14 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				feesVO.setFeeId(factRepay.getFeeId());
 				feesVO.setAmount(factRepay.getFactAmount());
 				feesVO.setPlanItemName(factRepay.getPlanItemName());
+				if (factRepay.getPlanItemType().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT.getValue())) {
+					if (factRepay.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+						feesVO.setPlanItemName(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getDesc());
+					}
+					if (factRepay.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+						feesVO.setPlanItemName(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getDesc());
+					}
+				}
 				feesVOs.add(feesVO);
 			}
 		}
