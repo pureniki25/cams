@@ -580,7 +580,7 @@ public class CamsFlowController {
             	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
             	if(4 == repayType) {//银行代扣
             		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
-                	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
+                	flow.setTargetAccountIdentifierId(targetAccountIdentifierId);
             	}else if(repayType != 2 && repayType != 3) {//线下还款
             		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
                 	flow.setTargetAccountIdentifierId(null);
