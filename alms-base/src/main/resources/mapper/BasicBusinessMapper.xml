@@ -733,7 +733,9 @@
 		t6.project_from+1 AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		'' AS main_type,
-		t4.identity_card AS main_id
+		t4.identity_card AS main_id,
+		'' AS t_area_id,
+		'' AS t_area_name
 		FROM 
 		tb_repayment_resource t1 
 		LEFT JOIN tb_repayment_confirm_log t2 ON t1.confirm_log_id = t2.confirm_log_id
@@ -792,7 +794,9 @@
 		t6.project_from+1 AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		t10.main_type,
-		t10.main_id
+		t10.main_id,
+		t11.area_id AS t_area_id,
+		t11.area_name AS t_area_name
 		FROM 
 		tb_repayment_resource t1 
 		LEFT JOIN tb_repayment_confirm_log t2 ON t2.confirm_log_id = t1.confirm_log_id
@@ -801,6 +805,7 @@
 		LEFT JOIN tb_repayment_biz_plan_list_synch t8 ON t8.business_id = t2.business_id AND t2.after_id = t8.after_id AND t2.period = t8.period
 		LEFT JOIN tb_money_pool t9 ON t3.money_pool_id = t9.money_pool_id
 		LEFT JOIN tb_department_bank t10 ON t10.finance_name = t9.accept_bank  AND t8.company_id_ext = t10.dept_id
+		LEFT JOIN `tb_basic_company` t11 ON t10.dept_id = t11.`area_id`
 		WHERE t1.repay_source IN (10,11,40,50)
 		AND t2.confirm_log_id = #{confirmLogId}
 		ORDER BY t2.create_time;
