@@ -756,7 +756,7 @@
 		t2.business_id AS 'exhibition_id',
 		t1.repay_amount AS 'amount',
 		'0' AS 'balance',
-		'' AS 'bank_card_no',
+		t10.repayment_id AS 'bank_card_no',
 		CASE WHEN t2.type= 2 THEN '3' ELSE '2' END AS 'action_id',
 		1 AS 'in_out',
 		t2.create_user AS 'create_user',
