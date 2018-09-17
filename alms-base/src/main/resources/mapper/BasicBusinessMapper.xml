@@ -652,7 +652,9 @@
     
     <select id="selectlPushBusiness" resultType="map">
 		SELECT t1.confirm_log_id,t2.business_id,t2.source_business_id,t4.repayment_batch_id,t2.asset_id,t2.create_time,t2.create_user,t2.company_id,t2.company_name,
-		t2.business_type,t3.business_type_name,t2. t2.customer_name,t2.asset_id,
+		t2.business_type,t3.business_type_name,
+		t2.business_ctype,
+		t2.customer_name,t2.asset_id,
 		CASE WHEN t1.type= 2 THEN '3' ELSE '2' END  AS 'action_id',
 		'1' as businessFlag,
 		t6.project_from+1 as businessFrom
