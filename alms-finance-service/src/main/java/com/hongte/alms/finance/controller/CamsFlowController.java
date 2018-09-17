@@ -486,6 +486,16 @@ public class CamsFlowController {
             		accountName = "无";
             	}
             	
+            	if("刷卡".equals(accountName)) {
+            		depositoryId = dMainIdCard;
+            		mainId = mainIdCard;
+            	}
+            	
+            	if("现金".equals(accountName)) {
+            		depositoryId = dMainIdCash;
+            		mainId = mainIdCash;
+            	}
+            	
             	String openBank = flowMap.get("open_bank")+"";
             	flowAccountIdentifier.setAccountName(accountName);
             	flowAccountIdentifier.setAccountType(accountType);
