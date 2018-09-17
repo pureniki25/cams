@@ -480,6 +480,12 @@ public class CamsFlowController {
             		accountType = 9;
             	}
             	
+            	if(repayType == 7) {
+            		depositoryId = dMainIdnull;
+            		mainId = mainIdnull;
+            		accountName = "无";
+            	}
+            	
             	String openBank = flowMap.get("open_bank")+"";
             	flowAccountIdentifier.setAccountName(accountName);
             	flowAccountIdentifier.setAccountType(accountType);
@@ -541,7 +547,11 @@ public class CamsFlowController {
             	String sourceAccountIdentifierId = sId;
             	String targetAccountIdentifierId = tId;
             	String listId = flowMap.get("list_id")==null?"":flowMap.get("list_id").toString();
-        		flow.setAccountTime(accountTime);
+            	if(repayType == 7) {
+            		inOut = -1;
+            		amount = new BigDecimal(0);
+            	}
+            	flow.setAccountTime(accountTime);
             	flow.setAfterId(afterId);
             	flow.setAmount(amount);
             	flow.setExternalId(externalId);
