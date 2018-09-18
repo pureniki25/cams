@@ -20,7 +20,7 @@ public class VersionAdapter {
 	final String ALMS_CORE_SERVICE = "0913" ;
 	final String ALMS_FINANCE_SERVICE = "2018-09-14 15:55:00" ;
 	final String ALMS_OPEN_SERVICE = "0913" ;
-	final String ALMS_PLATREPAY_SERVICE = "0913" ;
+	final String ALMS_PLATREPAY_SERVICE = "0918 10:26:27" ;
 	final String ALMS_SCHEDULED_SERVICE = "0913" ;
 
 	final String ALMS_WEBUI = "(finance)2018-09-13 11:33" ; 
