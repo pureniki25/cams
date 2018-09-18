@@ -1276,19 +1276,24 @@ public class RechargeServiceImpl implements RechargeService {
 				log.setUpdateTime(new Date());
 				withholdingRepaymentLogService.updateById(log);
 				shareProfit(pList, log);
+				return;
 			}else if(bankRepayTestResult.getParamValue().equals("1111")){
 				String resultMsg="银行卡余额不足";
 				result.setReturnCode("1111");
 				result.msg(resultMsg);
+				return;
 			}else if(bankRepayTestResult.getParamValue().equals("2222")){
 				outsideResult.setCode("2");
 				String resultMsg="处理中";
 				result.msg(resultMsg);
 				result.setReturnCode("EIP_TD_HANDLER_EXECEPTION");
+				return;
 			}else {
+				outsideResult.setCode("-1");
 				String resultMsg="代扣失败";
 				result.msg(resultMsg);
 				result.setReturnCode("9999");
+				return;
 			}
 		}
 		//*********************************************挡板测试代码***************************************//

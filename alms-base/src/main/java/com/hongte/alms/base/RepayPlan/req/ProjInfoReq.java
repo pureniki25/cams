@@ -541,7 +541,7 @@ public class ProjInfoReq {
     /**
      * 平台标志位：1，团贷网； 2，你我金融
      */
-    @ApiModelProperty(required= true,value = "平台标志位：1，团贷网； 2，你我金融")
+    @ApiModelProperty(required= true,value = "平台标志位：1.团贷网;2.你我金融;3.粤财;4.线下出款")
     @NotNull(message="ProjInfoReq 平台标志位(plateType)不能为空")
     private Integer plateType;
     

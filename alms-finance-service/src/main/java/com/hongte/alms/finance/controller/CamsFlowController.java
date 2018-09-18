@@ -428,6 +428,9 @@ public class CamsFlowController {
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
+        	if(planStatus.equals("31") || planStatus.equals("32")) {
+        		actionId = Integer.parseInt(planStatus);
+        	}
         	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();
         	String customerName = businessMapInfo.get("customer_name")==null?"":businessMapInfo.get("customer_name").toString();
         	String exhibitionId = businessMapInfo.get("business_id")==null?"":businessMapInfo.get("business_id").toString();
@@ -466,6 +469,8 @@ public class CamsFlowController {
             	String accountName = flowMap.get("account_name")==null?"":flowMap.get("account_name").toString();
             	String bankCardNo = flowMap.get("bank_card_no")==null?"":flowMap.get("bank_card_no").toString();
             	String depositoryId = null;//存管编号
+            	String tAreaId = flowMap.get("t_area_id")==null?"":flowMap.get("t_area_id").toString();
+            	String tAreaName = flowMap.get("t_area_name")==null?"":flowMap.get("t_area_name").toString();
             	//flowMap.get("main_id")+"";
             	String identifierId = sId;
             	Boolean personal = true;
@@ -476,10 +481,6 @@ public class CamsFlowController {
             	int accountType = 0;
             	String mainId = flowMap.get("main_id")==null?"":flowMap.get("main_id").toString();
             	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
-            	
-            	if(planStatus.equals("31") || planStatus.equals("32")) {
-            		repayType = Integer.parseInt(planStatus);
-            	}
             	
             	if(repayType == 1) {//手动
             		accountType = 9;
@@ -510,6 +511,8 @@ public class CamsFlowController {
             	flowAccountIdentifier.setPersonal(personal);
             	flowAccountIdentifier.setMainId(mainId);
             	flowAccountIdentifier.setOpenBank(openBank);
+            	flowAccountIdentifier.setBranchId(tAreaId);
+            	flowAccountIdentifier.setBranchName(tAreaName);
             	accountIdentifiers.add(flowAccountIdentifier);
             	accountType = 1;
             	//收入账号
