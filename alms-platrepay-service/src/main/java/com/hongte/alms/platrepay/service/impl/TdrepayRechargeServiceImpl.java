@@ -37,6 +37,7 @@ import com.hongte.alms.base.entity.TdrepayAdvanceLog;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
@@ -118,16 +119,24 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	@Override
 	public void saveTdrepayRechargeInfo(TdrepayRechargeInfoVO vo) {
 		try {
+			TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectById(vo.getProjectId());
+			if (tuandaiProjectInfo == null) {
+				LOG.info("找不到上标信息，{}", vo);
+				throw new ServiceRuntimeException("找不到上标信息！" + vo.getProjectId());
+			}
+			
+			if (!tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
+				TuandaiProjectInfo projectInfo = tuandaiProjectInfoService.selectById(tuandaiProjectInfo.getMasterIssueId());
+				vo.setTdUserId(projectInfo.getTdUserId());
+			}
 			TdrepayRechargeLog rechargeLog = handleTdrepayRechargeLog(vo);
 
 			Map<String, Object> paramMap = new HashMap<>();
-			// paramMap.put("orgType",
-			// BusinessTypeEnum.getOrgTypeByValue(vo.getBusinessType())); // 机构类型 传输任意值
 			paramMap.put("projectId", vo.getProjectId());
 
-			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment参数信息，{}", JSONObject.toJSONString(paramMap));
+			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment参数信息，{}", paramMap);
 			Result result = eipRemote.getProjectPayment(paramMap);
-			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment返回信息，{}", JSONObject.toJSONString(result));
+			LOG.info("标的还款信息查询接口/eip/td/assetside/getProjectPayment返回信息，{}", result);
 
 			if (result != null && result.getData() != null
 					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
@@ -641,8 +650,10 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(queryProjectPaymentResult.getReturnCode())) {
 
 				// 判断当前期是否存在垫付未还记录
-				if (isCurrPeriodAdvance(map.get("queryProjectPaymentResult"), map.get("advanceShareProfitResult"),
-						period)) {
+				Boolean currPeriodAdvance = isCurrPeriodAdvance(map.get("queryProjectPaymentResult"), map.get("advanceShareProfitResult"),
+								period);
+				
+				if (currPeriodAdvance != null && currPeriodAdvance) {
 
 					List<TdrepayRechargeLog> sucLst = new ArrayList<>();
 

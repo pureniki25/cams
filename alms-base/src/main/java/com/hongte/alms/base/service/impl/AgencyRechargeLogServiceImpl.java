@@ -181,26 +181,18 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 
 					if (StringUtil.notEmpty(handlerStatus)) {
 						switch (handlerStatus) {
-						case "0":
-							tdrepayRechargeLog.setProcessStatus(1);
-							break;
-						case "1":
-							tdrepayRechargeLog.setProcessStatus(1);
-							break;
 						case "2":
 							tdrepayRechargeLog.setProcessStatus(2);
 							break;
+							
 						case "3":
-							tdrepayRechargeLog.setProcessStatus(3);
-							break;
 						case "4":
-							tdrepayRechargeLog.setProcessStatus(3);
-							break;
 						case "500":
 							tdrepayRechargeLog.setProcessStatus(3);
 							break;
-
+							
 						default:
+							tdrepayRechargeLog.setProcessStatus(1);
 							break;
 						}
 						tdrepayRechargeLog.setUpdateTime(new Date());
