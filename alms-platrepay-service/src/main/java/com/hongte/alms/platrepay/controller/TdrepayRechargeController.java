@@ -1,5 +1,13 @@
 package com.hongte.alms.platrepay.controller;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.ObjectInputStream;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -446,16 +454,16 @@ public class TdrepayRechargeController {
 							infoVO.setPeriodTypeStr("正常还款");
 							break;
 						case 10:
-							infoVO.setPeriodTypeStr("结清");
+							infoVO.setPeriodTypeStr("正常结清");
 							break;
 						case 11:
-							infoVO.setPeriodTypeStr("结清");
+							infoVO.setPeriodTypeStr("逾期结清");
+							break;
+						case 20:
+							infoVO.setPeriodTypeStr("展期确认");
 							break;
 						case 30:
-							infoVO.setPeriodTypeStr("结清");
-							break;
-						case 25:
-							infoVO.setPeriodTypeStr("展期确认");
+							infoVO.setPeriodTypeStr("坏账结清");
 							break;
 
 						default:
@@ -1044,12 +1052,12 @@ public class TdrepayRechargeController {
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 				Map<String, Object> paramMap = new HashMap<>();
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
-					
+
 					paramMap.put("batchId", tdrepayRechargeLog.getBatchId());
 					paramMap.put("requestNo", tdrepayRechargeLog.getRequestNo());
 					paramMap.put("oidPartner", tdrepayRechargeLog.getOidPartner());
 					paramMap.put("userId", tdrepayRechargeLog.getTdUserId());
-					
+
 					com.ht.ussp.core.Result queryDistributeFund = eipRemote.queryDistributeFund(paramMap);
 					com.ht.ussp.core.Result queryUserAviMoney = eipRemote.queryUserAviMoney(paramMap);
 					Map<String, Object> resultMap = new HashMap<>();
@@ -1072,6 +1080,47 @@ public class TdrepayRechargeController {
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error(e.getMessage());
+		}
+	}
+
+	public static void main(String[] args) throws Exception {
+		FileInputStream inStream = new FileInputStream(
+				new File("C:\\Users\\Administrator\\Desktop\\ALMS_source_data.json"));
+
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+		byte[] buffer = new byte[1024];
+
+		int length = -1;
+
+		while ((length = inStream.read(buffer)) != -1)
+
+		{
+
+			bos.write(buffer, 0, length);
+
+		}
+
+		bos.close();
+
+		inStream.close();
+		Result result = JSONObject.parseObject(bos.toString(), Result.class);
+		List<Map> list = JSONObject.parseArray(JSONObject.toJSONString(result.getData()), Map.class);
+		List<Map> lst1 = new ArrayList<>();
+		List<Map> lst2 = new ArrayList<>();
+		List<String> lst3 = new ArrayList<>();
+		for (Map map : list) {
+			Map m = JSONObject.parseObject(JSONObject.toJSONString(map.get("queryUserAviMoney")), Map.class);
+			if (Double.valueOf((String) m.get("aviMoney")) == 0) {
+				lst1.add(map);
+				lst3.add((String) map.get("businessId"));
+			} else {
+				lst2.add(map);
+			}
+		}
+		for (String string : lst3) {
+
+			System.out.println(string);
 		}
 	}
 
