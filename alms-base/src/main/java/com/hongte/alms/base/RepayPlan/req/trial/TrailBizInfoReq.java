@@ -15,11 +15,11 @@ import java.math.BigDecimal;
 public class TrailBizInfoReq {
 
 
-//    /**
-//     * 资产端业务编号
-//     */
-//    @ApiModelProperty(required= true,value = "资产端业务编号")
-//    private String businessId;
+    /**
+     * 资产端业务编号
+     */
+    @ApiModelProperty(value = "资产端业务编号")
+    private String businessId;
 //
 //    /**
 //     * 资产端原业务编号

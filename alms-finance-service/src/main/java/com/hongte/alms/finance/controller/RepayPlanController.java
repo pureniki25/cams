@@ -5,6 +5,8 @@ import java.util.*;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.TrailProjPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizPlanListDto;
@@ -327,6 +329,34 @@ public class RepayPlanController {
 //        dto.setTestTime(new Date());
 //        return Result.success(dto);
 //    }
+
+    public Result<TrailProjPlanDto> trailRepayPlanForProject(@Valid @RequestBody TrailRepayPlanReq trailRepayPlanReq , BindingResult bindingResult){
+        Result<PlanReturnInfoDto> result = trailRepayPlan(trailRepayPlanReq,bindingResult);
+
+        if(!result.getCode().equals("1")){
+            return Result.error(result.getCode(),result.getMsg());
+        }else{
+
+            TrailProjPlanDto trailProjPlanDto = new TrailProjPlanDto();
+            PlanReturnInfoDto planReturnInfoDto =result.getData();
+            //最好用for循环处理
+
+            List<RepaymentProjPlanDto> projPlanDtos  = planReturnInfoDto.getRepaymentBizPlanDtos().get(0).getProjPlanDtos();
+            RepaymentProjPlanDto repaymentProjPlanDto =projPlanDtos.get(0);
+
+//            for(RepaymentProjPlanDto repaymentProjPlanDto: projPlanDtos){
+//                planReturnInfoDto = new
+//            }
+//            trailProjPlanDto.getBusinessId();
+            //  根据repaymentProjPlanDto  组装  trailProjPlanDto
+
+            return Result.success(trailProjPlanDto);
+
+//            return
+        }
+    }
+
+
 
 
 
