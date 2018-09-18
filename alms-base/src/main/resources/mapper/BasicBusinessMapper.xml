@@ -660,6 +660,7 @@
 		CASE WHEN t1.type= 2 && t4.plan_status= 10 THEN '3' 
 			WHEN t1.type= 2 && t4.plan_status= 20 THEN '31' 
 			WHEN t1.type= 2 && t4.plan_status = 30 THEN '32' 
+			WHEN t1.type= 2 && t4.plan_status = 31 THEN '35'
 			ELSE t4.plan_status END  AS 'plan_status',
 		]]>
 		'1' as businessFlag,
@@ -797,7 +798,7 @@
 		1 AS 'import_type',
 		CONCAT('ALMS-',t1.resource_id) AS 'log_id',
 		CASE WHEN t3.trade_type = '现金' THEN '现金' WHEN t3.trade_type = '刷卡' THEN '刷卡' ELSE t3.bank_account END AS 'account_name',
-		t9.remit_bank AS 'open_bank',
+		t10.repayment_bank AS 'open_bank',
 		t6.project_from+1 AS 'business_from',
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		t10.main_type,
