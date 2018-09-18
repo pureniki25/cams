@@ -119,16 +119,22 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	@Override
 	public void saveTdrepayRechargeInfo(TdrepayRechargeInfoVO vo) {
 		try {
-			TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectById(vo.getProjectId());
-			if (tuandaiProjectInfo == null) {
-				LOG.info("找不到上标信息，{}", vo);
-				throw new ServiceRuntimeException("找不到上标信息！" + vo.getProjectId());
-			}
-			
-			if (!tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
-				TuandaiProjectInfo projectInfo = tuandaiProjectInfoService.selectById(tuandaiProjectInfo.getMasterIssueId());
-				vo.setTdUserId(projectInfo.getTdUserId());
-			}
+			/*if (vo.getSettleType().intValue() != 30) {
+				
+				TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectById(vo.getProjectId());
+				if (tuandaiProjectInfo == null) {
+					LOG.info("找不到上标信息，{}", vo);
+					throw new ServiceRuntimeException("找不到上标信息！" + vo.getProjectId());
+				}
+				
+				if (!tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
+					TuandaiProjectInfo projectInfo = tuandaiProjectInfoService.selectById(tuandaiProjectInfo.getMasterIssueId());
+					if (projectInfo == null) {
+						throw new ServiceRuntimeException("找不到主借标信息");
+					}
+					vo.setTdUserId(projectInfo.getTdUserId());
+				}
+			}*/
 			TdrepayRechargeLog rechargeLog = handleTdrepayRechargeLog(vo);
 
 			Map<String, Object> paramMap = new HashMap<>();
