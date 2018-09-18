@@ -428,7 +428,7 @@ public class CamsFlowController {
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
-        	if(planStatus.equals("31") || planStatus.equals("32")) {
+        	if(planStatus.equals("31") || planStatus.equals("32") || planStatus.equals("35")) {
         		actionId = Integer.parseInt(planStatus);
         	}
         	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();

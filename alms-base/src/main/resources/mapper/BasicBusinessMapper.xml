@@ -660,6 +660,7 @@
 		CASE WHEN t1.type= 2 && t4.plan_status= 10 THEN '3' 
 			WHEN t1.type= 2 && t4.plan_status= 20 THEN '31' 
 			WHEN t1.type= 2 && t4.plan_status = 30 THEN '32' 
+			WHEN t1.type= 2 && t4.plan_status = 31 THEN '35'
 			ELSE t4.plan_status END  AS 'plan_status',
 		]]>
 		'1' as businessFlag,
