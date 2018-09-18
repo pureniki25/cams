@@ -700,6 +700,7 @@
 		t8.accountant_confirm_user_name AS 'operator',
 		t1.is_cancelled AS 'status_flag',
 		'贷后系统同步' AS 'remark',
+		t4.remark AS 'memo',
 		'1' AS 'business_flag',
 		t1.repay_source,
 		'' AS 'target_account_id',
@@ -766,6 +767,7 @@
 		t8.accountant_confirm_user_name AS 'operator',
 		t1.is_cancelled AS 'status_flag',
 		'贷后系统同步' AS 'remark',
+		t9.trade_remark AS 'memo',
 		'1' AS 'business_flag',
 		<![CDATA[ CASE 
 			WHEN t1.repay_source = 10 THEN '1'
