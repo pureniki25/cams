@@ -502,7 +502,7 @@ public class CamsFlowController {
             		mainId = mainIdCash;
             	}
             	
-            	String openBank = flowMap.get("open_bank")+"";
+            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
             	flowAccountIdentifier.setAccountName(accountName);
             	flowAccountIdentifier.setAccountType(accountType);
             	flowAccountIdentifier.setBankCardNo(bankCardNo);
