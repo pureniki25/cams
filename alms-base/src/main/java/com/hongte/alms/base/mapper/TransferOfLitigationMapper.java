@@ -213,4 +213,12 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	List<TransferLitigationPersonDTO> queryTransferLitigationPersonInfo(@Param(value = "businessId") String businessId);
+	
+	/**
+	 * 移交诉讼信息查询接口明细
+	 * 
+	 * @param businessId
+	 * @return
+	 */
+	List<TransferLitigationDTO> queryTransferLitigationDetail(@Param(value = "businessId") String businessId);
 }

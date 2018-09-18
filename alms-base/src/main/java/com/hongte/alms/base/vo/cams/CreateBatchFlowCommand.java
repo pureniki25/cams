@@ -475,6 +475,10 @@ public class CreateBatchFlowCommand extends MessageCommand {
         @ApiModelProperty(value = "是否是个人账户")
         private Boolean isPersonal;
 
+        private String branchId;
+
+        private String branchName;
+
         @Override
         public String toString() {
             StringBuilder sb=new StringBuilder();
@@ -569,5 +573,22 @@ public class CreateBatchFlowCommand extends MessageCommand {
         public void setOpenBank(String openBank) {
             this.openBank = openBank;
         }
+
+		public String getBranchId() {
+			return branchId;
+		}
+
+		public void setBranchId(String branchId) {
+			this.branchId = branchId;
+		}
+
+		public String getBranchName() {
+			return branchName;
+		}
+
+		public void setBranchName(String branchName) {
+			this.branchName = branchName;
+		}
+        
     }
 }

@@ -48,6 +48,20 @@
    			<result property="repaymentTypeName" column="repaymentTypeName"/>
    			<result property="factOutputMoney" column="factOutputMoney"/>
    			<result property="borrowMoney" column="borrowMoney"/>
+	</resultMap>  
+	
+	<resultMap id="TransferLitigationDetailMap" type="com.hongte.alms.base.vo.litigation.TransferLitigationDTO" >  
+	    	<result property="businessId" column="businessId"/> 
+   			<result property="businessType" column="businessType"/>
+   			<result property="districtName" column="districtName"/>
+   			<result property="companyName" column="companyName"/>
+   			<result property="customerName" column="customerName"/>
+   			<result property="contractStartDate" column="contractStartDate"/>
+   			<result property="contractEndDate" column="contractEndDate"/>
+   			<result property="borrowRate" column="borrowRate"/>
+   			<result property="repaymentTypeName" column="repaymentTypeName"/>
+   			<result property="factOutputMoney" column="factOutputMoney"/>
+   			<result property="borrowMoney" column="borrowMoney"/>
 	    <collection property="factOutputDates" ofType="java.util.Date">  
 	    	<result property="factOutputDate" column="factOutputDate"/>
 	    </collection>
@@ -1031,7 +1045,55 @@
 	
 	<!-- 移交诉讼信息查询接口相关信息 -->
 	<select id="queryTransferLitigationInfo" resultMap="TransferLitigationInfoMap">
-		SELECT DISTINCT 
+		SELECT bb.`business_id` businessId,
+		  -- 业务编号
+		  (
+		    CASE
+		      WHEN bb.`business_type` IN (1, 9) 
+		      THEN 2 
+		      WHEN bb.`business_type` IN (2, 11) 
+		      THEN 1 
+		      ELSE NULL 
+		    END
+		  ) businessType,
+		  -- 业务类型
+		  bb.`district_name` districtName,
+		  -- 片区
+		  bb.`company_name` companyName,
+		  -- 分公司
+		  bb.`customer_name` customerName
+		  -- 主借款人姓名
+		FROM
+		  `tb_basic_business` bb  
+		WHERE 
+		<choose>
+			<when test="businessType == 1">
+				bb.business_type IN (2, 11)
+			</when>
+			<when test="businessType == 2">
+				bb.business_type IN (1, 9)
+			</when>
+			<otherwise>
+				bb.`business_type` IN (1, 2, 9, 11)
+			</otherwise>
+		</choose>
+		<if test="businessId != null and businessId != ''">
+		  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
+		</if> 
+		<if test="districtName != null and districtName != ''">
+		  AND bb.`district_name` = #{districtName,jdbcType=VARCHAR}
+		</if> 
+		<if test="companyName != null and companyName != ''">
+		  AND bb.`company_name` = #{companyName,jdbcType=VARCHAR}
+		</if> 
+		<if test="customerName != null and customerName != ''">
+		  AND bb.`customer_name` = #{customerName,jdbcType=VARCHAR}
+		</if> 
+		LIMIT ${(page-1) * limit}, ${limit}
+	</select>
+	
+	<select id="queryTransferLitigationDetail" resultMap="TransferLitigationDetailMap">
+		SELECT 
 		  bb.`business_id` businessId,
 		  -- 业务编号
 		  (
@@ -1116,28 +1178,7 @@
 		    ON bb.`business_id` = fh.`business_id` 
 		  LEFT JOIN tb_fsd_house_owner fho 
     		ON fh.`house_id` = fho.`house_id` 
-		WHERE 
-		<choose>
-			<when test="businessType == 1">
-				bb.business_type IN (2, 11)
-			</when>
-			<when test="businessType == 2">
-				bb.business_type IN (1, 9)
-			</when>
-			<otherwise>
-				bb.`business_type` IN (1, 2, 9, 11)
-			</otherwise>
-		</choose>
-		<if test="businessId != null and businessId != ''">
-		  AND bb.`business_id` = #{businessId,jdbcType=VARCHAR}
-		</if> 
-		<if test="districtName != null and districtName != ''">
-		  AND bb.`district_name` = #{districtName,jdbcType=VARCHAR}
-		</if> 
-		<if test="companyName != null and companyName != ''">
-		  AND bb.`company_name` = #{companyName,jdbcType=VARCHAR}
-		</if> 
-		LIMIT ${(page-1) * limit}, ${limit}
+		WHERE bb.`business_id` = #{businessId,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="countTransferLitigationInfo" resultType="java.lang.Integer">
