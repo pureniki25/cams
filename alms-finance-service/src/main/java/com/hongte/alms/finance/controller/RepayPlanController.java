@@ -5,8 +5,11 @@ import java.util.*;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.RepayPlan.dto.PlanReturnInfoDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentBizPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.RepaymentProjPlanListDto;
 import com.hongte.alms.base.RepayPlan.dto.TrailProjPlanDto;
+import com.hongte.alms.base.RepayPlan.dto.TrailProjPlanListDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizPlanDto;
 import com.hongte.alms.base.RepayPlan.dto.app.BizPlanListDto;
@@ -22,6 +25,7 @@ import com.hongte.alms.base.enums.ProjPlatTypeEnum;
 import com.hongte.alms.base.enums.RepayTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanBorrowLimitUnitEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanCreateSysEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanSettleStatusEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanStatus;
 import com.hongte.alms.base.service.*;
@@ -44,6 +48,7 @@ import com.alibaba.fastjson.JSON;
 import com.hongte.alms.base.baseException.CreatRepaymentExcepiton;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.ClassCopyUtil;
+import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.finance.req.RepayPlanReq;
 import com.hongte.alms.finance.service.CreatRepayPlanService;
@@ -51,6 +56,7 @@ import com.ht.ussp.util.DateUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolation;
@@ -133,6 +139,9 @@ public class RepayPlanController {
     @Qualifier("RepaymentProjPlanListDetailService")
     RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
     
+    @Autowired
+    @Qualifier("IssueSendOutsideLogService")
+    IssueSendOutsideLogService issueSendOutsideLogService ;
 
 
     private static Validator validator;
@@ -330,33 +339,71 @@ public class RepayPlanController {
 //        return Result.success(dto);
 //    }
 
-    public Result<TrailProjPlanDto> trailRepayPlanForProject(@Valid @RequestBody TrailRepayPlanReq trailRepayPlanReq , BindingResult bindingResult){
+    @ApiOperation(value = "试算还款计划接口ForProject, 精简字段")
+    @PostMapping("/trailRepayPlanForProject")
+    @ResponseBody
+    public Result<TrailProjPlanDto> trailRepayPlanForProject(@ApiParam @Valid @RequestBody TrailRepayPlanReq trailRepayPlanReq , BindingResult bindingResult){
+    	IssueSendOutsideLog issueSendOutsideLog = new IssueSendOutsideLog() ;
+    	issueSendOutsideLog.setBusinessId(trailRepayPlanReq.getTrailBizInfoReq().getBusinessId());
+    	issueSendOutsideLog.setCreateTime(new Date());
+    	issueSendOutsideLog.setCreateUserId("daiqian");
+    	issueSendOutsideLog.setInterfacecode(Constant.INTERFACE_CODE_FINANCE_FINANCE_TRAILREPAYPLANFORPROJECT);
+    	issueSendOutsideLog.setInterfacename(Constant.INTERFACE_NAME_FINANCE_FINANCE_TRAILREPAYPLANFORPROJECT);
+    	issueSendOutsideLog.setSendJson(JSON.toJSONString(trailRepayPlanReq));
+    	issueSendOutsideLog.setSystem("alms");
         Result<PlanReturnInfoDto> result = trailRepayPlan(trailRepayPlanReq,bindingResult);
-
+        logger.info("@@trailRepayPlanForProject试算还款计划接口, 精简字段  开始 输入的试算信息：[{}]", JSON.toJSONString(trailRepayPlanReq));
         if(!result.getCode().equals("1")){
+        	logger.info("@@trailRepayPlanForProject试算还款计划接口, 精简字段  结束 输出：[{}]", JSON.toJSONString(result));        	
+        	issueSendOutsideLog.setReturnJson(JSON.toJSONString(result));
+        	issueSendOutsideLog.insert();
             return Result.error(result.getCode(),result.getMsg());
         }else{
-
             TrailProjPlanDto trailProjPlanDto = new TrailProjPlanDto();
             PlanReturnInfoDto planReturnInfoDto =result.getData();
             //最好用for循环处理
 
-            List<RepaymentProjPlanDto> projPlanDtos  = planReturnInfoDto.getRepaymentBizPlanDtos().get(0).getProjPlanDtos();
-            RepaymentProjPlanDto repaymentProjPlanDto =projPlanDtos.get(0);
-
-//            for(RepaymentProjPlanDto repaymentProjPlanDto: projPlanDtos){
-//                planReturnInfoDto = new
-//            }
-//            trailProjPlanDto.getBusinessId();
-            //  根据repaymentProjPlanDto  组装  trailProjPlanDto
-
+            for (RepaymentBizPlanDto bizPlanDto : planReturnInfoDto.getRepaymentBizPlanDtos()) {
+            	trailProjPlanDto.setBusinessId(bizPlanDto.getRepaymentBizPlan().getBusinessId() ); ;
+				for (RepaymentProjPlanDto projPlanDto : bizPlanDto.getProjPlanDtos()) {
+					trailProjPlanDto.setProjectId(projPlanDto.getRepaymentProjPlan().getProjectId());
+					
+					trailProjPlanDto.setProjPlanLists(new ArrayList<>());
+					for (RepaymentProjPlanListDto projPlanListDto : projPlanDto.getProjPlanListDtos()) {
+						TrailProjPlanListDto trailProjPlanListDto = new TrailProjPlanListDto() ;
+						trailProjPlanListDto.setPeriod(projPlanListDto.getRepaymentProjPlanList().getPeriod());
+						trailProjPlanListDto.setAmount(calcuItem10(projPlanListDto.getProjPlanListDetails()));
+						trailProjPlanListDto.setInterestAmount(calcuItem20(projPlanListDto.getProjPlanListDetails()));
+						trailProjPlanDto.getProjPlanLists().add(trailProjPlanListDto);
+					}
+				}
+			}
+            logger.info("@@trailRepayPlanForProject试算还款计划接口, 精简字段  结束 输出：[{}]", JSON.toJSONString(Result.success(trailProjPlanDto)));        	
+            issueSendOutsideLog.setReturnJson(JSON.toJSONString(Result.success(trailProjPlanDto)));
+            issueSendOutsideLog.insert();
             return Result.success(trailProjPlanDto);
-
-//            return
         }
     }
 
+    private BigDecimal calcuItem10(List<RepaymentProjPlanListDetail> projPlanListDetails) {
+    	BigDecimal item10 = BigDecimal.ZERO ;
+    	for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
+			if (repaymentProjPlanListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.PRINCIPAL.getUuid())) {
+				item10 = item10.add(repaymentProjPlanListDetail.getProjPlanAmount()) ;
+			}
+		}
+    	return item10 ;
+    }
 
+    private BigDecimal calcuItem20(List<RepaymentProjPlanListDetail> projPlanListDetails) {
+    	BigDecimal item20 = BigDecimal.ZERO ;
+    	for (RepaymentProjPlanListDetail repaymentProjPlanListDetail : projPlanListDetails) {
+			if (repaymentProjPlanListDetail.getFeeId().equals(RepayPlanFeeTypeEnum.INTEREST.getUuid())) {
+				item20 = item20.add(repaymentProjPlanListDetail.getProjPlanAmount()) ;
+			}
+		}
+    	return item20 ;
+    }
 
 
 

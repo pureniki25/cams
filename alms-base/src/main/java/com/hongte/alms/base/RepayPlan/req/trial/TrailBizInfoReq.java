@@ -245,6 +245,14 @@ public class TrailBizInfoReq {
 //        this.borrowLimit = borrowLimit;
 //    }
 
+	public String getBusinessId() {
+		return businessId;
+	}
+
+	public void setBusinessId(String businessId) {
+		this.businessId = businessId;
+	}
+
 //    public Integer getBorrowLimitUnit() {
 //        return borrowLimitUnit;
 //    }
