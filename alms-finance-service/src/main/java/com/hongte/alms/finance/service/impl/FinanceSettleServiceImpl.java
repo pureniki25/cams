@@ -1711,7 +1711,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getLogId());
                 repaymentResource.insert();
                 if (mprIds.size() == 0) {
-                    financeSettleBaseDto.getRepaymentSettleLog().setRepayDate(repaymentResource.getRepayDate());
+                    financeSettleBaseDto.getRepaymentConfirmLog().setRepayDate(repaymentResource.getRepayDate());
                 }
 
             }
