@@ -20,6 +20,12 @@ public class TrailProjInfoReq {
 
 
     /**
+     * 项目编号
+     */
+    @ApiModelProperty(value = "项目编号")
+    private String projectId;
+
+    /**
      *利率
      */
     @ApiModelProperty(required= true,value = "利率")
