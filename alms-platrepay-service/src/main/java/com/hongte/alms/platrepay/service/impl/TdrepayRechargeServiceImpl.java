@@ -273,7 +273,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			/*
 			 * 将分发状态更新为处理中 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
 			 */
-			updateTdrepayRechargeLogProcessStatus(vos, 0, userId);
+			updateTdrepayRechargeLogProcessStatus(vos, 3, userId);
 
 			throw new ServiceRuntimeException("资金分发执行失败", e);
 		}
