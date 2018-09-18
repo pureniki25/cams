@@ -559,7 +559,7 @@ public class CamsFlowController {
             	String externalId = "";
             	int inOut = Integer.parseInt(flowMap.get("in_out").toString());
             	String issueId = flowMap.get("issue_id")==null?"":flowMap.get("issue_id").toString();
-            	String memo = flowMap.get("meno")==null?"":flowMap.get("memo").toString();;
+            	String memo = flowMap.get("memo")==null?"":flowMap.get("memo").toString();;
             	String remark = flowMap.get("remark")==null?"":flowMap.get("remark").toString();
             	Date segmentationDate = (Date) flowMap.get("segmentation_date");
             	String sourceAccountIdentifierId = sId;
