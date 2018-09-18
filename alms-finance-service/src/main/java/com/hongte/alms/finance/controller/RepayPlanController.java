@@ -346,11 +346,11 @@ public class RepayPlanController {
     	IssueSendOutsideLog issueSendOutsideLog = new IssueSendOutsideLog() ;
     	issueSendOutsideLog.setBusinessId(trailRepayPlanReq.getTrailBizInfoReq().getBusinessId());
     	issueSendOutsideLog.setCreateTime(new Date());
-    	issueSendOutsideLog.setCreateUserId("daiqian");
+    	issueSendOutsideLog.setCreateUserId("贷前");
     	issueSendOutsideLog.setInterfacecode(Constant.INTERFACE_CODE_FINANCE_FINANCE_TRAILREPAYPLANFORPROJECT);
     	issueSendOutsideLog.setInterfacename(Constant.INTERFACE_NAME_FINANCE_FINANCE_TRAILREPAYPLANFORPROJECT);
     	issueSendOutsideLog.setSendJson(JSON.toJSONString(trailRepayPlanReq));
-    	issueSendOutsideLog.setSystem("alms");
+    	issueSendOutsideLog.setSystem("ALMS");
         Result<PlanReturnInfoDto> result = trailRepayPlan(trailRepayPlanReq,bindingResult);
         logger.info("@@trailRepayPlanForProject试算还款计划接口, 精简字段  开始 输入的试算信息：[{}]", JSON.toJSONString(trailRepayPlanReq));
         if(!result.getCode().equals("1")){
