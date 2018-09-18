@@ -900,6 +900,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							if (planListDetailShowPayDto.getFeelId().equals(RepayPlanFeeTypeEnum.PRINCIPAL.getUuid())) {
 								financeSettleBaseDto.setLossSettle(true);
 								e = RepayPlanSettleStatusEnum.PAYED_BAD ;
+								break ;
 							}
 						}
 					}
