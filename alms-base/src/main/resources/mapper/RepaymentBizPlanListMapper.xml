@@ -581,16 +581,7 @@
 			  IFNULL(rbpl.`overdue_days`, 0) overdueDays,
 			  -- 应还线上滞纳金
 			  (SELECT 
-			    IFNULL(
-			      SUM(
-			        CASE
-			          WHEN t2.plan_item_type = 60 
-			          THEN t2.plan_amount - t2.`derate_amount` 
-			          ELSE 0 
-			        END
-			      ),
-			      0
-			    ) 
+			    SUM(IFNULL(t2.plan_amount, 0)) - SUM(IFNULL(t2.`derate_amount`, 0))
 			  FROM
 			    `tb_repayment_biz_plan_list` t1,
 			    `tb_repayment_biz_plan_list_detail` t2 
@@ -599,16 +590,7 @@
 			    AND t1.plan_list_id = rbpl.plan_list_id) onlineLateFee,
 			  -- 应还线下滞纳金
 			  (SELECT 
-			    IFNULL(
-			      SUM(
-			        CASE
-			          WHEN t2.plan_item_type = 60 
-			          THEN t2.plan_amount 
-			          ELSE 0 
-			        END
-			      ),
-			      0
-			    ) 
+			    SUM(IFNULL(t2.plan_amount), 0)
 			  FROM
 			    `tb_repayment_biz_plan_list` t1,
 			    `tb_repayment_biz_plan_list_detail` t2 
@@ -779,15 +761,19 @@
 			    IFNULL(SUM(t.over_repay_money), 0) over_repay_money_1 
 			  FROM
 			    `tb_accountant_over_repay_log` t 
+			  LEFT JOIN tb_repayment_confirm_log rcl on rcl.surplus_ref_id = t.log_id 
 			  WHERE t.freeze_status != 1 
 			    AND t.money_type = 1 
+			    AND rcl.is_cancelled = 0 
 			    AND t.business_id = #{businessId,jdbcType=VARCHAR} 
 			    AND t.business_after_id = rbpl.after_id) - (SELECT 
 			    IFNULL(SUM(t.over_repay_money), 0) over_repay_money_1 
 			  FROM
 			    `tb_accountant_over_repay_log` t 
+			  LEFT JOIN tb_repayment_confirm_log rcl on rcl.surplus_ref_id = t.log_id 
 			  WHERE t.freeze_status != 1 
 			    AND t.money_type = 0 
+			    AND rcl.is_cancelled = 0 
 			    AND t.business_id = #{businessId,jdbcType=VARCHAR} 
 			    AND t.business_after_id = rbpl.after_id) surplus,
 			  CASE

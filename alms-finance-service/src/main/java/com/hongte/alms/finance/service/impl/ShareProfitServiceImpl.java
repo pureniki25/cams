@@ -1534,8 +1534,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				allFactRepay.addAll(factRepays);
 			}
 		}
-//    	allResource.addAll(financeBaseDto.getRepaymentResources());
-//    	allFactRepay.addAll(financeBaseDto.getProjFactRepayArray());
     	
     	StringBuffer remark = new StringBuffer() ;
     	remark.append("备注:\r\n");
@@ -1606,12 +1604,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			remark.append(settleFeesVO.getAmount().setScale(2, RoundingMode.HALF_UP)).append("元").append(settleFeesVO.getPlanItemName()).append(",") ;
 		}
     	
-    	BigDecimal balance = accountantOverRepayLogService.caluCanUse(bizPlanList.getBusinessId(), bizPlanList.getAfterId());
-//    	if (financeBaseDto.getConfirmLog().getSurplusAmount()!=null) {
-//			balance = balance.add(financeBaseDto.getConfirmLog().getSurplusAmount());
-//		}
+    	BigDecimal balance = BigDecimal.ZERO;
+    	if (financeBaseDto.getConfirmLog().getSurplusAmount()!=null) {
+			balance = balance.add(financeBaseDto.getConfirmLog().getSurplusAmount());
+		}
     	if (balance.compareTo(BigDecimal.ZERO)>0) {
-			remark.append(balance).append("元").append("结余");
+			remark.append(balance.setScale(2, RoundingMode.HALF_UP)).append("元").append("结余");
 		}
     	remark.append(DateUtil.formatDate("yyyy-MM-dd HH:mm:ss", financeBaseDto.getConfirmLog().getCreateTime())) ;
     	
