@@ -200,18 +200,19 @@ public class ImportBusiness {
 	
 	@Test
 	public void importBusiness() {
+		File file = new File("需补录(1).xlsx");
 		//线下数据导入到贷后，需填写的字段信息-9-4(有数据).xlsx
 		ImportParams sheetIndex0 = new ImportParams() ;
 		sheetIndex0.setKeyIndex(0);
-		List<BaseBusinessEntity> list = ExcelImportUtil.importExcel(new File("需补录(1).xlsx"), BaseBusinessEntity.class,sheetIndex0) ;
+		List<BaseBusinessEntity> list = ExcelImportUtil.importExcel(file, BaseBusinessEntity.class,sheetIndex0) ;
 		ImportParams sheetIndex1 = new ImportParams() ;
 		sheetIndex1.setStartSheetIndex(1);
 		sheetIndex1.setKeyIndex(0);
-		List<CustomerInfoEntity> list1 = ExcelImportUtil.importExcel(new File("需补录(1).xlsx"), CustomerInfoEntity.class,sheetIndex1) ;
+		List<CustomerInfoEntity> list1 = ExcelImportUtil.importExcel(file, CustomerInfoEntity.class,sheetIndex1) ;
 		ImportParams sheetIndex2 = new ImportParams() ;
 		sheetIndex2.setStartSheetIndex(2);
 		sheetIndex2.setKeyIndex(0);
-		List<RepayPlanEntity> list2 = ExcelImportUtil.importExcel(new File("需补录(1).xlsx"), RepayPlanEntity.class,sheetIndex2) ;
+		List<RepayPlanEntity> list2 = ExcelImportUtil.importExcel(file, RepayPlanEntity.class,sheetIndex2) ;
 		
 		List<Task> tasks = new ArrayList<>() ;
 		

@@ -71,7 +71,6 @@ public class TdrepayRechargeServiceImplTest {
 		System.out.println(JSONObject.toJSONString(infoVO));
 		
 		tdrepayRechargeService.saveTdrepayRechargeInfo(infoVO);
-		
 	}
 	
 	@Test

@@ -196,7 +196,8 @@ public class Constant {
 	public static final String INTERFACE_CODE_FINANCE_NIWOCONTROLLER_SYCREPAYPLAN = "/niwoController/sycRepayPlan";
 	public static final String INTERFACE_NAME_FINANCE_NIWOCONTROLLER_SYCREPAYPLAN = "同步你我金融还款计划";
 
-
+	public static final String INTERFACE_CODE_FINANCE_FINANCE_TRAILREPAYPLANFORPROJECT = "/finance/trailRepayPlanForProject";
+	public static final String INTERFACE_NAME_FINANCE_FINANCE_TRAILREPAYPLANFORPROJECT = "试算还款计划接口ForProject(精简字段)";
 
 	public static final String CANWITHHOLD_NO="该卡当前不支持代扣，请及时更换";
 	public static final String CANWITHHOLD_YES_1="限额足够，可一次代扣";

@@ -428,7 +428,7 @@ public class CamsFlowController {
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
-        	if(planStatus.equals("31") || planStatus.equals("32")) {
+        	if(planStatus.equals("31") || planStatus.equals("32") || planStatus.equals("35")) {
         		actionId = Integer.parseInt(planStatus);
         	}
         	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();
@@ -502,7 +502,7 @@ public class CamsFlowController {
             		mainId = mainIdCash;
             	}
             	
-            	String openBank = flowMap.get("open_bank")+"";
+            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
             	flowAccountIdentifier.setAccountName(accountName);
             	flowAccountIdentifier.setAccountType(accountType);
             	flowAccountIdentifier.setBankCardNo(bankCardNo);
@@ -588,7 +588,7 @@ public class CamsFlowController {
             		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
                 	flow.setTargetAccountIdentifierId(null);
             	}
-            	if(repayType != 7 || flowMap.size() == 1) {
+            	if(repayType != 7 || listOnlineFlow.size() == 1) {
             		flows.add(flow);
             	}
             	Map<String,Object> paramFlowItemMap = new HashMap<>();

@@ -649,8 +649,19 @@ public class TdrepayRechargeController {
 		}
 
 		try {
+			Wrapper<RepaymentProjPlan> wrapper = new EntityWrapper<RepaymentProjPlan>();
+			wrapper.eq("original_business_id", businessId);
+			wrapper.orderBy("query_full_success_date", false);
+			List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanService.selectList(wrapper);
+			
+			String businessId2 = businessId;
+			
+			if (CollectionUtils.isNotEmpty(repaymentProjPlans)) {
+				businessId2 = repaymentProjPlans.get(0).getBusinessId();
+			}
+			
 			return Result.success(tuandaiProjectInfoService
-					.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", businessId)));
+					.selectList(new EntityWrapper<TuandaiProjectInfo>().eq("business_id", businessId2)));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());
