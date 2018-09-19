@@ -588,9 +588,9 @@ public class CamsFlowController {
             		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
                 	flow.setTargetAccountIdentifierId(null);
             	}
-            	if(repayType != 7 || listOnlineFlow.size() == 1) {
+            	//if(repayType != 7 || listOnlineFlow.size() == 1) {
             		flows.add(flow);
-            	}
+            	//}
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
             	paramFlowItemMap.put("repaySourceId", listId);
             	List<Map<String,Object>> listFlowItem = basicBusinessService.selectlPushBusinessFlowItem(paramFlowItemMap);
