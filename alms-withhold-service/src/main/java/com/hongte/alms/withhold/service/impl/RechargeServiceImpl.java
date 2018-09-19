@@ -1532,6 +1532,33 @@ public class RechargeServiceImpl implements RechargeService {
 		com.ht.ussp.core.Result result = eipRemote.queryOrder(paramMap);
 		logger.info("========调用外联易宝代扣订单查询结束,结果为："+result.toString()+"====================================");
 		ResultData resultData=getYBResultMsg(result);
+		
+		
+		//**************挡板测试代码****************************************************/
+				SysParameter  thirtyRepayTestResult = sysParameterService.selectOne(
+						new EntityWrapper<SysParameter>().eq("param_type", "thirtyRepayTest")
+								.eq("status", 1).orderBy("param_value"));
+				if(thirtyRepayTestResult!=null) {
+					if(thirtyRepayTestResult.getParamValue().equals("0000")) {
+						String resultMsg="充值成功";
+						result.setMsg(resultMsg);
+						result.setReturnCode("0000");
+					}else if(thirtyRepayTestResult.getParamValue().equals("1111")){
+						String resultMsg="银行卡余额不足";
+						result.setMsg(resultMsg);
+						result.setReturnCode("1111");
+					}else if(thirtyRepayTestResult.getParamValue().equals("2222")){
+						String resultMsg="处理中";
+						result.setMsg(resultMsg);
+						result.setReturnCode("EIP_BAOFU_BF00115");
+					}else {
+						String resultMsg="代扣失败";
+						result.setMsg(resultMsg);
+						result.setReturnCode("9999");
+					}
+				}
+				//**************挡板测试代码****************************************************/
+		
 		if (result.getReturnCode().equals("0000") && resultData.getStatus().equals("1")) {//成功
 			log.setRepayStatus(1);
 			log.setRepayStatus(1); 
