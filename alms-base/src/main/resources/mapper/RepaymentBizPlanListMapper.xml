@@ -106,7 +106,7 @@
 		</choose>
         AND cStatus.business_id = business.business_id
         AND cStatus.crp_id = planList.plan_list_id
-        ) = 0
+        ) = 0 order by planList.period;
 
 
     </select>
