@@ -50,6 +50,6 @@ public interface CollectionStatusMapper extends SuperMapper<CollectionStatus> {
      * @param businessId
      * @return
      */
-    public CollectionStatus  getRecentlyCollectionStatus(@Param("businessId") String businessId,@Param("colStatus") Integer colStatus);
+    public CollectionStatus  getRecentlyCollectionStatus(@Param("planId") String planId,@Param("pListId") String pListId);
 
 }

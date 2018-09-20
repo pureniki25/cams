@@ -119,7 +119,7 @@ public class CamsFlowController {
     @ResponseBody
     public Result<Object> addBatchFenFaFlow() {
     	//核心流程推送流程
-    	//1# step1 查出未推送和推送失败的业务 list    tb_basic_business加3列 最后推送时间 最后推送状态 最后推送备注   另增加推送流水表
+    	//1# step1 查出未推送和推送失败的业务 list  tb_basic_business加3列 最后推送时间 最后推送状态 最后推送备注   另增加推送流水表
     	Map<String,Object> paramBusinessMap = new HashMap<>();
     	List<Map<String,Object>> listMap = basicBusinessService.selectlPushFenFaBusiness(paramBusinessMap);
     	addBusinessFenFaFlow(listMap);
@@ -428,7 +428,7 @@ public class CamsFlowController {
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
-        	if(planStatus.equals("31") || planStatus.equals("32")) {
+        	if(planStatus.equals("31") || planStatus.equals("32") || planStatus.equals("35")) {
         		actionId = Integer.parseInt(planStatus);
         	}
         	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();
@@ -502,7 +502,7 @@ public class CamsFlowController {
             		mainId = mainIdCash;
             	}
             	
-            	String openBank = flowMap.get("open_bank")+"";
+            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
             	flowAccountIdentifier.setAccountName(accountName);
             	flowAccountIdentifier.setAccountType(accountType);
             	flowAccountIdentifier.setBankCardNo(bankCardNo);
@@ -588,9 +588,9 @@ public class CamsFlowController {
             		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
                 	flow.setTargetAccountIdentifierId(null);
             	}
-            	if(repayType != 7 || listOnlineFlow.size() == 1) {
+            	//if(repayType != 7) {//|| listOnlineFlow.size() == 1
             		flows.add(flow);
-            	}
+            	//}
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
             	paramFlowItemMap.put("repaySourceId", listId);
             	List<Map<String,Object>> listFlowItem = basicBusinessService.selectlPushBusinessFlowItem(paramFlowItemMap);
