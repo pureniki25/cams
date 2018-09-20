@@ -769,8 +769,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
 
         //一般业务
-//        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedPhoneUrgNorBiz(companyId,daysBeforeOverDue,businessType);
-        List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", "70462eca-ec76-4b8b-b49e-4eb649f45a8c"));
+        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedPhoneUrgNorBiz(companyId,daysBeforeOverDue,businessType);
+ //       List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", "70462eca-ec76-4b8b-b49e-4eb649f45a8c"));
 //        //展期业务
 //        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedPhoneUrgRenewBiz(companyId,daysBeforeOverDue);
 //        planLists.addAll(renewPlanLists);
