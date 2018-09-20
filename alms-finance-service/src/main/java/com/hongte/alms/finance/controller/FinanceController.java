@@ -526,7 +526,7 @@ public class FinanceController {
 			result = Result.success(detailVOs);
 		}
 		catch (ServiceRuntimeException e) {
-			if (e.getErrorCode().equals("NO_RESOURCE")) {
+			if (e.getErrorCode()!=null && e.getErrorCode().equals("NO_RESOURCE")) {
 				result = Result.success();
 			}else {
 				result = Result.error("500", e.getMessage());
