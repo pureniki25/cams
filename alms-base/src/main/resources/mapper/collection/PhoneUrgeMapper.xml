@@ -384,6 +384,7 @@
         from tb_repayment_biz_plan_list_synch  as pList
         <if test="paymentPlatformCode!=null">
         JOIN tb_tuandai_project_info as ttpi ON pList.business_id = ttpi.business_id
+        AND  ttpi.`project_id` = ttpi.`master_issue_id`
         and ttpi.plate_type = #{paymentPlatformCode,jdbcType=INTEGER}
         </if>
         <choose>
