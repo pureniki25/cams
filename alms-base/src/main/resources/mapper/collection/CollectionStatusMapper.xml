@@ -16,11 +16,13 @@
         <result column="describe" property="describe" />
         <result column="set_way" property="setWay" />
         <result column="crp_type" property="crpType" />
+        <result column="original_business_id" property="originalBusinessId" />
+        <result column="after_id" property="afterId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-    business_id AS businessId, crp_id AS crpId, collection_status AS collectionStatus, phone_staff AS phoneStaff, visit_staff AS visitStaff, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, describe, set_way AS setWay,
+        business_id AS businessId, crp_id AS crpId, collection_status AS collectionStatus, phone_staff AS phoneStaff, visit_staff AS visitStaff, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, describe, set_way AS setWay, crp_type AS crpType, original_business_id AS originalBusinessId, after_id AS afterId
     </sql>
 
 
@@ -73,13 +75,18 @@
 		resultType="com.hongte.alms.base.collection.entity.CollectionStatus">
 		select 
 		    <include refid="Table_Column_List"></include>
-		from tb_collection_status colSstatus left join
+		from tb_collection_status colSstatus  join
 
-		tb_repayment_biz_plan_list pList on colSstatus.crp_id=pList.plan_list_id
+	
 
-		where colSstatus.business_id=#{businessId} and colSstatus.collection_status=#{colStatus} order by pList.period
-		desc limit 1
 
+
+( select a.* from tb_repayment_biz_plan_list a where a.period &lt; (
+
+select t.period from tb_repayment_biz_plan_list t where t.plan_list_id=#{pListId}
+)
+
+and a.plan_id=#{planId} order by a.period desc limit 1 ) a  on a.plan_list_id=colSstatus.crp_id 
 	</select>
 
 
