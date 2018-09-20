@@ -3,6 +3,7 @@ package com.hongte.alms.base.collection.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.hongte.alms.base.collection.dto.CollectionStatusCountDto;
 import com.hongte.alms.base.collection.entity.*;
 import com.hongte.alms.base.collection.entity.Collection;
@@ -18,6 +19,7 @@ import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.entity.SysUserPermission;
+import com.hongte.alms.base.entity.SysUserRole;
 import com.hongte.alms.base.feignClient.AlmsCoreServiceFeignClient;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.LitigationFeignClient;
@@ -65,7 +67,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
     @Autowired
     LoginUserInfoHelper loginUserInfoHelper;
-
+    
+  
 
     @Autowired
     @Qualifier("CollectionPersonSetService")
@@ -766,55 +769,69 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
 
         //一般业务
-        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedPhoneUrgNorBiz(companyId,daysBeforeOverDue,businessType);
+//        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedPhoneUrgNorBiz(companyId,daysBeforeOverDue,businessType);
+        List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", "70462eca-ec76-4b8b-b49e-4eb649f45a8c"));
 //        //展期业务
 //        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedPhoneUrgRenewBiz(companyId,daysBeforeOverDue);
 //        planLists.addAll(renewPlanLists);
         for(RepaymentBizPlanList planList:planLists){
+        	if(planList.getPlanListId().equals("70462eca-ec76-4b8b-b49e-4eb649f45a8c")||planList.getPlanListId().equals("050abc1f-0bbf-4cb3-969a-254c7603bd03")||planList.getPlanListId().equals("a90f963f-269f-4a0a-b00d-dc250e9cc926")) {
+        		System.out.println("stop");
+        	}
 
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
-            CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()).eq("collection_status",CollectionStatusEnum.PHONE_STAFF.getKey()));
-          
-            if(collectionStatus!=null&&phonePersons.contains(collectionStatus.getPhoneStaff())){
-                try{
-                    setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                            collectionStatus.getPhoneStaff(),StaffPersonType.PHONE_STAFF.getKey());
-                }catch (Exception e){
-                    e.printStackTrace();
-                    logger.error("自动分配电催 延续上一期分配  数据存储异常 businessID:"+planList.getBusinessId()+
-                            "  planListId:"+ planList.getPlanListId());
-                }
+            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
+            CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()));
+            
+        
+            
+            if(currentCollectionStatus==null) {
+            	
+                if(lastCollectionStatus!=null&&lastCollectionStatus.getPhoneStaff()!=null&&phonePersons.contains(lastCollectionStatus.getPhoneStaff())){
+                    try{
+                        setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
+                        		lastCollectionStatus.getPhoneStaff(),StaffPersonType.PHONE_STAFF.getKey());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        logger.error("自动分配电催 延续上一期分配  数据存储异常 businessID:"+planList.getBusinessId()+
+                                "  planListId:"+ planList.getPlanListId());
+                    }
 
-                continue;
-            }
-            /////////  此业务第一次分配 则区分月还逾期与末期逾期 ///////////
-            if(ifPlanListIsLast(planList)){//是末期逾期
-                Integer minIndex = getLimitCountIndex(lastPlanPFPersonlist);
-                try{
-                    setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                            lastPlanPFPersonlist.get(minIndex).getPhoneStaff(),
-                            StaffPersonType.PHONE_STAFF.getKey());
-                    lastPlanPFPersonlist.get(minIndex).setCounts(lastPlanPFPersonlist.get(minIndex).getCounts()+1);
-                }catch (Exception e){
-                    e.printStackTrace();
-                    logger.error("自动分配电催 末期逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
-                            "  planListId:"+ planList.getPlanListId());
-                }
+                    continue;
+                }else if((lastCollectionStatus!=null&&lastCollectionStatus.getPhoneStaff()==null)||lastCollectionStatus==null||(!phonePersons.contains(lastCollectionStatus.getPhoneStaff()))){
 
-            }else{//是月还逾期
-                try{
-                    Integer minIndex = getLimitCountIndex(monthPlanPFPersonlist);
-                    setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                            // yzl 月还逾期 取monthPlanPFPersonlist
-                            monthPlanPFPersonlist.get(minIndex).getPhoneStaff(),
-                            StaffPersonType.PHONE_STAFF.getKey());
-                    monthPlanPFPersonlist.get(minIndex).setCounts(monthPlanPFPersonlist.get(minIndex).getCounts()+1);
-                }catch (Exception e){
-                    e.printStackTrace();
-                    logger.error("自动分配电催 月还逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
-                            "  planListId:"+ planList.getPlanListId());
+                    /////////  此业务第一次分配 则区分月还逾期与末期逾期 ///////////
+                    if(ifPlanListIsLast(planList)){//是末期逾期
+                        Integer minIndex = getLimitCountIndex(lastPlanPFPersonlist);
+                        try{
+                            setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
+                                    lastPlanPFPersonlist.get(minIndex).getPhoneStaff(),
+                                    StaffPersonType.PHONE_STAFF.getKey());
+                            lastPlanPFPersonlist.get(minIndex).setCounts(lastPlanPFPersonlist.get(minIndex).getCounts()+1);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            logger.error("自动分配电催 末期逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
+                                    "  planListId:"+ planList.getPlanListId());
+                        }
+
+                    }else{//是月还逾期
+                        try{
+                            Integer minIndex = getLimitCountIndex(monthPlanPFPersonlist);
+                            setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
+                                    // yzl 月还逾期 取monthPlanPFPersonlist
+                                    monthPlanPFPersonlist.get(minIndex).getPhoneStaff(),
+                                    StaffPersonType.PHONE_STAFF.getKey());
+                            monthPlanPFPersonlist.get(minIndex).setCounts(monthPlanPFPersonlist.get(minIndex).getCounts()+1);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            logger.error("自动分配电催 月还逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
+                                    "  planListId:"+ planList.getPlanListId());
+                        }
+                    }
                 }
+            	
             }
+        
         }
         ////////////  分配电催  结束 ////////////////////
     }
@@ -845,49 +862,61 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         for(RepaymentBizPlanList planList:visitPlanLists){
 
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
-            CollectionStatus collectionStatus =  selectOne(new EntityWrapper<CollectionStatus>().eq("business_id",planList.getBusinessId()).eq("collection_status",CollectionStatusEnum.COLLECTING.getKey()));
-            if(collectionStatus!=null&&visitPersons.contains(collectionStatus.getVisitStaff())){
-                try{
-                    setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                            // yzl 取上门催收人员
-                            collectionStatus.getVisitStaff(),StaffPersonType.VISIT_STAFF.getKey());
-                }catch (Exception e){
-                    e.printStackTrace();
-                    logger.error("自动分配电催 月还逾期 已分配过  数据存储异常 businessID:"+planList.getBusinessId()+
-                            "  planListId:"+ planList.getPlanListId());
-                }
+            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
+            CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()));
+            
+         
+            if(currentCollectionStatus==null) {
+            	
+            	   if(lastCollectionStatus!=null&&lastCollectionStatus.getVisitStaff()!=null&&visitPersons.contains(lastCollectionStatus.getVisitStaff())){
+                       try{
+                           setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
+                                   // yzl 取上门催收人员
+                           		lastCollectionStatus.getVisitStaff(),StaffPersonType.VISIT_STAFF.getKey());
+                       }catch (Exception e){
+                           e.printStackTrace();
+                           logger.error("自动分配电催 月还逾期 已分配过  数据存储异常 businessID:"+planList.getBusinessId()+
+                                   "  planListId:"+ planList.getPlanListId());
+                       }
 
-                continue;
-            }
-            /////////  此业务第一次分配 则区分月还逾期与末期逾期 ///////////
-            if(ifPlanListIsLast(planList)){//是末期逾期
-                Integer minIndex = getLimitCountIndex(lastPlanVisitPersonlist);
-                try{
-                setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                        // yzl 取上门催收人员
-                        lastPlanVisitPersonlist.get(minIndex).getVisitStaff(),
-                        StaffPersonType.VISIT_STAFF.getKey());
-                }catch (Exception e){
-                    e.printStackTrace();
-                    logger.error("自动分配电催 末期逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
-                            "  planListId:"+ planList.getPlanListId());
-                }
-                lastPlanVisitPersonlist.get(minIndex).setCounts(lastPlanVisitPersonlist.get(minIndex).getCounts()+1);
+                       continue;
+                   }else if((lastCollectionStatus!=null&&lastCollectionStatus.getVisitStaff()==null)||lastCollectionStatus==null||(!visitPersons.contains(lastCollectionStatus.getVisitStaff()))){
+                	   /////////  此业务第一次分配 则区分月还逾期与末期逾期 ///////////
+                       if(ifPlanListIsLast(planList)){//是末期逾期
+                           Integer minIndex = getLimitCountIndex(lastPlanVisitPersonlist);
+                           try{
+                           setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
+                                   // yzl 取上门催收人员
+                                   lastPlanVisitPersonlist.get(minIndex).getVisitStaff(),
+                                   StaffPersonType.VISIT_STAFF.getKey());
+                           }catch (Exception e){
+                               e.printStackTrace();
+                               logger.error("自动分配电催 末期逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
+                                       "  planListId:"+ planList.getPlanListId());
+                           }
+                           lastPlanVisitPersonlist.get(minIndex).setCounts(lastPlanVisitPersonlist.get(minIndex).getCounts()+1);
 
-            }else{//是月还逾期
-                Integer minIndex = getLimitCountIndex(monthPlanVisitersonlist);
-                try{
-                setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                        // yzl 取上门催收人员
-                        monthPlanVisitersonlist.get(minIndex).getVisitStaff(),
-                        StaffPersonType.VISIT_STAFF.getKey());
-                }catch (Exception e){
-                    e.printStackTrace();
-                    logger.error("自动分配电催 月还逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
-                            "  planListId:"+ planList.getPlanListId());
-                }
-                monthPlanVisitersonlist.get(minIndex).setCounts(monthPlanVisitersonlist.get(minIndex).getCounts()+1);
+                       }else{//是月还逾期
+                           Integer minIndex = getLimitCountIndex(monthPlanVisitersonlist);
+                           try{
+                           setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
+                                   // yzl 取上门催收人员
+                                   monthPlanVisitersonlist.get(minIndex).getVisitStaff(),
+                                   StaffPersonType.VISIT_STAFF.getKey());
+                           }catch (Exception e){
+                               e.printStackTrace();
+                               logger.error("自动分配电催 月还逾期 第一次分配  数据存储异常 businessID:"+planList.getBusinessId()+
+                                       "  planListId:"+ planList.getPlanListId());
+                           }
+                           monthPlanVisitersonlist.get(minIndex).setCounts(monthPlanVisitersonlist.get(minIndex).getCounts()+1);
+                       }
+                   }
+            	
+            	
+            	
+               
             }
+        
         }
 
         ////////////  分配上门催收  结束 ////////////////////
@@ -912,8 +941,13 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 //        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedLawRenewBiz(lawDaysAfterOverDue);
 //        planLists.addAll(renewPlanLists);
         for(RepaymentBizPlanList planList:planLists) {
-
-            setOneRepaymentBizPlanToLaw(planList);
+           try {
+        	      setOneRepaymentBizPlanToLaw(planList); 
+           }catch(Exception e){
+        	   e.printStackTrace();
+        	   logger.error("发送诉讼系统失败planListId:[{0}]",planList.getPlanListId());
+           }
+      
 
 
            /* setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
@@ -1255,12 +1289,12 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         }
 
         return retBoolean;
-    }
+    } 
 
 	@Override
-	public CollectionStatus getRecentlyCollectionStatus(String planId, String pListId) {
-		// TODO Auto-generated method stub
-		return null;
+	public CollectionStatus getRecentlyCollectionStatus(String planId,String pListId) {
+		CollectionStatus colStatus = collectionStatusMapper.getRecentlyCollectionStatus(planId,pListId);
+		return colStatus;
 	}
 
 
