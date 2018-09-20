@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.util.IdGenerator;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,6 +25,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AccountantOverRepayLog;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
+import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
@@ -33,6 +33,7 @@ import com.hongte.alms.base.service.AccountantOverRepayLogService;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.FlowPushLogService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
+import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeRecordService;
 import com.hongte.alms.base.util.UUIDHtGenerator;
 import com.hongte.alms.base.vo.cams.CamsMessage;
@@ -82,6 +83,10 @@ public class CamsFlowController {
     @Autowired
     @Qualifier("TdrepayRechargeRecordService")
     TdrepayRechargeRecordService tdrepayRechargeRecordService;
+    
+    @Autowired
+    @Qualifier("TdrepayRechargeLogService")
+    TdrepayRechargeLogService tdrepayRechargeLogService;
     
     @Autowired
     @Qualifier("FlowPushLogService")
@@ -169,7 +174,7 @@ public class CamsFlowController {
      * @param bankWithholdFlowReq
      * @return
      */
-    @ApiOperation(value = "指定confirmLogId同步账户流水到核心")
+    @ApiOperation(value = "指定confirmLogId同步分发流水到核心")
     @GetMapping("/addFlowByConfireLogID")
     @ResponseBody
     public Result<Object> addFlowByConfireLogID(String confirmLogId) {
@@ -181,6 +186,24 @@ public class CamsFlowController {
     	addBusinessFlow(listMap);
     	return Result.buildSuccess("指定confirmLogId同步账户流水到核心成功");
     }
+    
+    /**
+     * 指定confireLogID推送账户流水
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "指定logid同步分发流水到核心")
+    @GetMapping("/addFenFaFlowByConfireLogID")
+    @ResponseBody
+    public Result<Object> addFenFaFlowByConfireLogID(String logId) {
+    	//核心流程推送流程
+    	//1# step1 查出未推送和推送失败的业务 list    tb_basic_business加3列 最后推送时间 最后推送状态 最后推送备注   另增加推送流水表
+    	Map<String,Object> paramBusinessMap = new HashMap<>();
+    	paramBusinessMap.put("confirmLogId", logId);
+    	List<Map<String,Object>> listMap = basicBusinessService.selectlPushFenFaBusiness(paramBusinessMap);
+    	addBusinessFenFaFlow(listMap);
+    	return Result.buildSuccess("指定confirmLogId同步账户流水到核心成功");
+    }
 
 	private void addBusinessFenFaFlow(List<Map<String, Object>> listMap) {
 		//2# step2 循环业务list，去除每一条业务的流水list
@@ -190,7 +213,7 @@ public class CamsFlowController {
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
         	int actionId = Integer.parseInt(businessMapInfo.get("action_id").toString());
         	String batchId = confirmLogId;
-        	TdrepayRechargeRecord tdrepayRechargeRecord = tdrepayRechargeRecordService.selectOne(new EntityWrapper<TdrepayRechargeRecord>().eq("log_id", batchId).eq("is_valid", 1));
+        	TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("log_id", batchId).eq("is_valid", 1));
         	FlowPushLog flowPushLog = new FlowPushLog();
         	flowPushLog.setPushKey(batchId);
         	flowPushLog.setPushLogType(2);
@@ -243,6 +266,9 @@ public class CamsFlowController {
             	FlowAccountIdentifier flowAccountIdentifier = new FlowAccountIdentifier();
             	String accountName = flowMap.get("account_name")==null?"":flowMap.get("account_name").toString();
             	String bankCardNo = flowMap.get("bank_card_no")==null?"":flowMap.get("bank_card_no").toString();
+            	
+            	String target_account_id = flowMap.get("bank_card_no")==null?"":flowMap.get("bank_card_no").toString();
+            	
             	String depositoryId = null;//存管编号
             	//flowMap.get("main_id")+"";
             	String identifierId = sId;
@@ -450,19 +476,19 @@ public class CamsFlowController {
             	}
             	
             	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
-	              tdrepayRechargeRecord.setLastPushStatus(1);
-	              tdrepayRechargeRecord.setLastPushRemark(retStr);
+            	  tdrepayRechargeLog.setLastPushStatus(1);
+            	  tdrepayRechargeLog.setLastPushRemark(retStr);
 	              flowPushLog.setPushStatus(1);
 	              flowPushLog.setPushRet(retStr);
 	            }else {
-	              tdrepayRechargeRecord.setLastPushStatus(2);
-	              tdrepayRechargeRecord.setLastPushRemark(retStr);
+	              tdrepayRechargeLog.setLastPushStatus(2);
+	              tdrepayRechargeLog.setLastPushRemark(retStr);
 	              flowPushLog.setPushStatus(2);
 	              flowPushLog.setPushRet(retStr);
 	            }
             	//更新推送状态
-                tdrepayRechargeRecord.setLastPushDatetime(new Date());
-                tdrepayRechargeRecordService.update(tdrepayRechargeRecord,new EntityWrapper<TdrepayRechargeRecord>().eq("log_id", confirmLogId).eq("is_valid", 1));
+            	tdrepayRechargeLog.setLastPushDatetime(new Date());
+            	tdrepayRechargeLogService.update(tdrepayRechargeLog,new EntityWrapper<TdrepayRechargeLog>().eq("log_id", confirmLogId).eq("is_valid", 1));
                 
             	//记录推送日志
             	flowPushLog.setPushEndtime(new Date());

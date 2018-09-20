@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -242,7 +241,24 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新时间")
 	private Date updateTime;
-
+	
+	/**
+     * 最后推送状态0未推送1推送成功2推送失败3不需要推送
+     */
+	@TableField("last_push_status")
+	private Integer lastPushStatus;
+	
+	/**
+     * 最后推送时间
+     */
+	@TableField("last_push_datetime")
+	private Date lastPushDatetime;
+	
+	/**
+     * 最后推送备注
+     */
+	@TableField("last_push_remark")
+	private String lastPushRemark;
 
 	public String getLogId() {
 		return logId;
@@ -530,6 +546,30 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public Integer getLastPushStatus() {
+		return lastPushStatus;
+	}
+
+	public void setLastPushStatus(Integer lastPushStatus) {
+		this.lastPushStatus = lastPushStatus;
+	}
+
+	public Date getLastPushDatetime() {
+		return lastPushDatetime;
+	}
+
+	public void setLastPushDatetime(Date lastPushDatetime) {
+		this.lastPushDatetime = lastPushDatetime;
+	}
+
+	public String getLastPushRemark() {
+		return lastPushRemark;
+	}
+
+	public void setLastPushRemark(String lastPushRemark) {
+		this.lastPushRemark = lastPushRemark;
 	}
 
 	@Override
