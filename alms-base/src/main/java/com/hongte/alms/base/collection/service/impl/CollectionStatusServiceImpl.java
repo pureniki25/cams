@@ -770,7 +770,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         //一般业务
         List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedPhoneUrgNorBiz(companyId,daysBeforeOverDue,businessType);
- //       List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", "70462eca-ec76-4b8b-b49e-4eb649f45a8c"));
+       // List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", "6fa65d52-c5c3-4860-9586-083a0b0e0426"));
 //        //展期业务
 //        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedPhoneUrgRenewBiz(companyId,daysBeforeOverDue);
 //        planLists.addAll(renewPlanLists);
@@ -781,7 +781,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
             CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
-            CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()));
+            CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()).isNotNull("phone_staff"));
             
         
             
@@ -856,6 +856,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         //一般业务
         List<RepaymentBizPlanList> visitPlanLists = repaymentBizPlanListService.selectNeedVisitNorBiz(companyId,visitDaysAfterOverDue, businessType);
+      //  List<RepaymentBizPlanList> visitPlanLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", "6fa65d52-c5c3-4860-9586-083a0b0e0426"));
+
 //        //展期业务
 //        List<RepaymentBizPlanList> visitRnewPlanLists = repaymentBizPlanListService.selectNeedVisitRenewBiz(companyId,visitDaysAfterOverDue);
 //        visitPlanLists.addAll(visitRnewPlanLists);
@@ -863,7 +865,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
             CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
-            CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()));
+            CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()).isNotNull("visit_staff"));
             
          
             if(currentCollectionStatus==null) {
