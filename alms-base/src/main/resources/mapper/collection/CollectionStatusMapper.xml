@@ -16,11 +16,13 @@
         <result column="describe" property="describe" />
         <result column="set_way" property="setWay" />
         <result column="crp_type" property="crpType" />
+        <result column="original_business_id" property="originalBusinessId" />
+        <result column="after_id" property="afterId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-    business_id AS businessId, crp_id AS crpId, collection_status AS collectionStatus, phone_staff AS phoneStaff, visit_staff AS visitStaff, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, describe, set_way AS setWay,
+        business_id AS businessId, crp_id AS crpId, collection_status AS collectionStatus, phone_staff AS phoneStaff, visit_staff AS visitStaff, create_time AS createTime, create_user AS createUser, update_time AS updateTime, update_user AS updateUser, describe, set_way AS setWay, crp_type AS crpType, original_business_id AS originalBusinessId, after_id AS afterId
     </sql>
 
 
