@@ -3,7 +3,7 @@
 <mapper namespace="com.hongte.alms.base.collection.mapper.CollectionStatusMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CollectionStatus">
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.collection.entity.CollectionStatus">
         <id column="business_id" property="businessId" />
         <result column="crp_id" property="crpId" />
         <result column="collection_status" property="collectionStatus" />
