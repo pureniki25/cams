@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONObject;
 import com.hongte.alms.scheduled.client.CamsFlowSyncByInterfaceJobClient;
 import com.ht.ussp.core.Result;
+import com.ht.ussp.util.DateUtil;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
@@ -39,10 +40,13 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
         	int retryTimes1 = 1;
 	    	while(retryTimes1 < 3) {
 	    		try {
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还款流水到核心开始");
 	    			Result<Object> ret1 = camsFlowSyncByInterfaceJobClient.addBatchFlow();
-	    			XxlJobLogger.log("同步还款流水到核心开始"+JSONObject.toJSONString(ret1));
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还款流水到核心结束,"+JSONObject.toJSONString(ret1)+"等待30秒推送撤销流水");
+	    			Thread.sleep(30000);
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步撤销流水到核心开始");
 	    			Result<Object> ret2 = camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
-	    			XxlJobLogger.log("同步撤销流水到核心开始"+JSONObject.toJSONString(ret2));
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步撤销流水到核心结束"+JSONObject.toJSONString(ret2));
 	    			break;//跳出循环
 	    			//camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
 	    			//camsFlowSyncByInterfaceJobClient.cancelFenFaFlow();
