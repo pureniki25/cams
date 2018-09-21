@@ -432,7 +432,7 @@ public class CamsFlowController {
     				}
             	}
             	
-            	if(StringUtils.isNotBlank(retStr) && retStr.contains("-500")) {
+            	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
             	  tdrepayRechargeLog.setLastPushStatus(1);
             	  tdrepayRechargeLog.setLastPushRemark(retStr);
 	              flowPushLog.setPushStatus(1);
@@ -772,7 +772,7 @@ public class CamsFlowController {
     				}
             	}
             	
-            	if(StringUtils.isNotBlank(retStr) && retStr.contains("-500")) {
+            	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
             		repaymentConfirmLog.setLastPushStatus(1);
             		repaymentConfirmLog.setLastPushRemark(retStr);
             		flowPushLog.setPushStatus(1);
@@ -890,7 +890,7 @@ public class CamsFlowController {
 				}
 	    	//}
 	    	
-	    	if(StringUtils.isNotBlank(retStr) && retStr.contains("-500")) {
+	    	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
 	    		repaymentConfirmLog.setLastPushStatus(4);
 	    		repaymentConfirmLog.setLastPushRemark(retStr);
 				flowPushLog.setPushStatus(4);
@@ -980,7 +980,7 @@ public class CamsFlowController {
 				}
 	    	}
 	    	
-	    	if(StringUtils.isNotBlank(retStr) && retStr.contains("-500")) {
+	    	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
 	    		tdrepayRechargeRecord.setLastPushStatus(4);
 	    		tdrepayRechargeRecord.setLastPushRemark(retStr);
 				flowPushLog.setPushStatus(4);
