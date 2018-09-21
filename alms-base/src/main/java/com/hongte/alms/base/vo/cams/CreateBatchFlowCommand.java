@@ -221,7 +221,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
         }
     }
 
-    public static class Flow{
+    public static class Flow implements Cloneable{
         @JsonProperty("sid")
         private String sourceAccountIdentifierId;
 
