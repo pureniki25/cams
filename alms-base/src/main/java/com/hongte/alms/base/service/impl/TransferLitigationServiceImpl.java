@@ -368,7 +368,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 			LOG.info("移交法务诉讼系统地址：{}", sendUrl);
 			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
-//			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
 			litigationResponse = litigationFeignClient.importLitigation(transferLitigationData);
 			String returnJson = JSONObject.toJSONString(litigationResponse);
 			transferLitigationLog.setResultJson(returnJson);
@@ -389,9 +388,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 								CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.AUTO_SET);
 					}
 				} else {
-					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
+					LOG.info("businessId：{}，发送诉讼系统失败！诉讼系统返回信息：{}", businessId, returnJson);
 					throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);
 				}
+			}else {
+				LOG.info("businessId：{}，发送诉讼系统失败！诉讼系统返回信息：{}", businessId, returnJson);
+				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
