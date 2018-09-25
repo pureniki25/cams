@@ -38,7 +38,7 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
         	
         	// 批量推送还款结清
         	int retryTimes1 = 1;
-	    	while(retryTimes1 < 3) {
+	    	//while(retryTimes1 < 3) {
 	    		try {
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还款流水到核心开始");
 	    			Result<Object> ret1 = camsFlowSyncByInterfaceJobClient.addBatchFlow();
@@ -47,7 +47,7 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步撤销流水到核心开始");
 	    			Result<Object> ret2 = camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步撤销流水到核心结束"+JSONObject.toJSONString(ret2));
-	    			break;//跳出循环
+	    			//break;//跳出循环
 	    			//camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
 	    			//camsFlowSyncByInterfaceJobClient.cancelFenFaFlow();
 	    		} catch (Exception e) {
@@ -56,7 +56,7 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
 	    			Thread.sleep(100);
 	    			retryTimes1++;
 				}
-	    	}
+	    	//}
         	XxlJobLogger.log("同步流水到核心结束"+new Date().getTime());
             logger.info("同步流水到核心结束");
             return SUCCESS;

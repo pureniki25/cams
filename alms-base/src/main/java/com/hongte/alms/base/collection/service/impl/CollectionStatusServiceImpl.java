@@ -773,12 +773,13 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         //一般业务
         List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedPhoneUrgNorBiz(companyId,daysBeforeOverDue,businessType);
+    
        // List<RepaymentBizPlanList> planLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", "6fa65d52-c5c3-4860-9586-083a0b0e0426"));
 //        //展期业务
 //        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedPhoneUrgRenewBiz(companyId,daysBeforeOverDue);
 //        planLists.addAll(renewPlanLists);
         for(RepaymentBizPlanList planList:planLists){
-        	if(planList.getPlanListId().equals("70462eca-ec76-4b8b-b49e-4eb649f45a8c")||planList.getPlanListId().equals("050abc1f-0bbf-4cb3-969a-254c7603bd03")||planList.getPlanListId().equals("a90f963f-269f-4a0a-b00d-dc250e9cc926")) {
+        	if(planList.getPlanListId().equals("d204ded7-2b46-4e8c-970d-ad1ebe2aa8c5")||planList.getPlanListId().equals("c8c0449f-2ad5-4346-8cdd-f0c6e59e60aa")||planList.getPlanListId().equals("2c35a9cc-052a-4b04-bb62-adcfd758dae9")) {
         		System.out.println("stop");
         	}
 
@@ -859,13 +860,15 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
         //一般业务
         List<RepaymentBizPlanList> visitPlanLists = repaymentBizPlanListService.selectNeedVisitNorBiz(companyId,visitDaysAfterOverDue, businessType);
-      //  List<RepaymentBizPlanList> visitPlanLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", "6fa65d52-c5c3-4860-9586-083a0b0e0426"));
+        //List<RepaymentBizPlanList> visitPlanLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_list_id", "d204ded7-2b46-4e8c-970d-ad1ebe2aa8c5"));
 
 //        //展期业务
 //        List<RepaymentBizPlanList> visitRnewPlanLists = repaymentBizPlanListService.selectNeedVisitRenewBiz(companyId,visitDaysAfterOverDue);
 //        visitPlanLists.addAll(visitRnewPlanLists);
         for(RepaymentBizPlanList planList:visitPlanLists){
-
+           	if(planList.getPlanListId().equals("d204ded7-2b46-4e8c-970d-ad1ebe2aa8c5")||planList.getPlanListId().equals("c8c0449f-2ad5-4346-8cdd-f0c6e59e60aa")||planList.getPlanListId().equals("2c35a9cc-052a-4b04-bb62-adcfd758dae9")) {
+        		System.out.println("stop");
+        	}
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
             CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
             CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()).isNotNull("visit_staff"));
