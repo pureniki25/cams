@@ -185,10 +185,15 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 				// 3、根据 origBusinessId 取出所有对应的催收记录
 				List<CollectionStatus> list = selectList(
 						new EntityWrapper<CollectionStatus>().eq("original_business_id", origBusinessId));
+				
+				bizPlanLists = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", origBusinessId));
 
 				// 4、根据 PlanListId -- RepaymentBizPlanList 的关系存入 bizPlanListMap 中
 				Map<String, RepaymentBizPlanList> bizPlanListMap = new HashMap<>();
 				for (RepaymentBizPlanList repaymentBizPlanList : bizPlanLists) {
+					if (vo.getCrpId().equals(repaymentBizPlanList.getPlanListId())) {
+						vo.setBusinessId(repaymentBizPlanList.getBusinessId());
+					}
 					bizPlanListMap.put(repaymentBizPlanList.getPlanListId(), repaymentBizPlanList);
 				}
 
@@ -319,6 +324,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 			status.setSetWay(setWayEnum.getKey());
 			RepaymentBizPlanList planList = repaymentBizPlanListService.selectById(vo.getCrpId());
 			status.setOriginalBusinessId(planList.getOrigBusinessId());
+			status.setAfterId(planList.getAfterId());
 			if (ifPlanListIsLast(planList)) {
 				status.setCrpType(CollectionCrpTypeEnum.LAST.getKey());
 			} else {
@@ -784,7 +790,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         	}
 
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
-            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
+            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId(),planList.getOrigBusinessId());
             CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()).isNotNull("phone_staff"));
             
         
@@ -870,7 +876,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         		System.out.println("stop");
         	}
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
-            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
+            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId(),planList.getOrigBusinessId());
             CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()).isNotNull("visit_staff"));
             
          
@@ -1300,8 +1306,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     } 
 
 	@Override
-	public CollectionStatus getRecentlyCollectionStatus(String planId,String pListId) {
-		CollectionStatus colStatus = collectionStatusMapper.getRecentlyCollectionStatus(planId,pListId);
+	public CollectionStatus getRecentlyCollectionStatus(String planId,String pListId,String originalBusinessId) {
+		CollectionStatus colStatus = collectionStatusMapper.getRecentlyCollectionStatus(planId,pListId,originalBusinessId);
 		return colStatus;
 	}
 
