@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.RepaymentPlatformListBorrowerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.RepaymentPlatformListBorrower">
+        <id column="id" property="id" />
+        <result column="project_id" property="projectId" />
+        <result column="period" property="period" />
+        <result column="repay_status" property="repayStatus" />
+        <result column="repay_id" property="repayId" />
+        <result column="add_date" property="addDate" />
+        <result column="principal_andinterest" property="principalAndinterest" />
+        <result column="tuandai_amount" property="tuandaiAmount" />
+        <result column="org_amount" property="orgAmount" />
+        <result column="guarantee_amount" property="guaranteeAmount" />
+        <result column="arbitration_amount" property="arbitrationAmount" />
+        <result column="agency_amount" property="agencyAmount" />
+        <result column="insurance_amount" property="insuranceAmount" />
+        <result column="privilege_package_amount" property="privilegePackageAmount" />
+        <result column="create_time" property="createTime" />
+        <result column="create_man" property="createMan" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_man" property="updateMan" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, project_id AS projectId, period, repay_status AS repayStatus, repay_id AS repayId, add_date AS addDate, principal_andinterest AS principalAndinterest, tuandai_amount AS tuandaiAmount, org_amount AS orgAmount, guarantee_amount AS guaranteeAmount, arbitration_amount AS arbitrationAmount, agency_amount AS agencyAmount, insurance_amount AS insuranceAmount, privilege_package_amount AS privilegePackageAmount, create_time AS createTime, create_man AS createMan, update_time AS updateTime, update_man AS updateMan
+    </sql>
+
+</mapper>
