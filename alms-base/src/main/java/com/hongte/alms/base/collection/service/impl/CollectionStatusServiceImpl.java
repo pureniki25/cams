@@ -781,7 +781,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         	}
 
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
-            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
+            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId(),planList.getOrigBusinessId());
             CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()).isNotNull("phone_staff"));
             
         
@@ -867,7 +867,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         		System.out.println("stop");
         	}
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
-            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
+            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId(),planList.getOrigBusinessId());
             CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()).isNotNull("visit_staff"));
             
          
@@ -1297,8 +1297,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     } 
 
 	@Override
-	public CollectionStatus getRecentlyCollectionStatus(String planId,String pListId) {
-		CollectionStatus colStatus = collectionStatusMapper.getRecentlyCollectionStatus(planId,pListId);
+	public CollectionStatus getRecentlyCollectionStatus(String planId,String pListId,String originalBusinessId) {
+		CollectionStatus colStatus = collectionStatusMapper.getRecentlyCollectionStatus(planId,pListId,originalBusinessId);
 		return colStatus;
 	}
 

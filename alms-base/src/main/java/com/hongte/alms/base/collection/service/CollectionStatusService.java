@@ -119,7 +119,7 @@ public interface CollectionStatusService extends BaseService<CollectionStatus> {
      * @param businessId
      * @return
      */
-    public CollectionStatus  getRecentlyCollectionStatus(String planId,String pListId);
+    public CollectionStatus  getRecentlyCollectionStatus(String planId,String pListId,String originalBusinessId);
 
 
 //    /**
