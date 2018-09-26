@@ -80,49 +80,55 @@ public class WithholdingServiceimpl implements WithholdingService {
 
 	@Override
 	public void withholding() {
-		List<SysParameter> repayStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>()
-				.eq("param_type", SysParameterEnums.REPAY_DAYS.getKey()).eq("status", 1).orderBy("row_Index"));
-		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
-//		try {
-//			Thread.sleep(70000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
-//		for (RepaymentBizPlanList pList : pLists) {
-//			if(pList.getPlanListId().equals("de6ee923-9df2-4e44-8f57-7abadf40d7e8")) {
-//				System.out.println("STOP");
-//			}
-//			//获取该还款计划最早一期没有还的代扣
-//			pList=rechargeService.getEarlyPeriod(pList);
-//			// 是否符合自动代扣规则
-//			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
-//				autoRepayPerList(pList,WithholdTypeEnum.AUTORUN.getValue().toString());
-//			} else {
-//				continue;
-//			}
-//		} 
-		//把集合按planId分组
-	    Map<String, List<RepaymentBizPlanList>> map =pLists.stream().collect(Collectors.groupingBy(RepaymentBizPlanList::getPlanId));
-	    map.values().stream().forEach(lists -> {
-	    	executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					for(RepaymentBizPlanList pList:lists) {
-		        		//获取该还款计划最早一期没有还的代扣
-		    			pList=rechargeService.getEarlyPeriod(pList);
-		    			// 是否符合自动代扣规则
-		    			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
-		    				autoRepayPerList(pList,WithholdTypeEnum.AUTORUN.getValue().toString());
-		    			} else {
-		    				continue; 
-		    			}
-		        	}					
-				}
-			});
-        
-        });
+		executor.execute(new Runnable() {
+			
+			@Override
+			public void run() {
+							List<SysParameter> repayStatusList = sysParameterService.selectList(new EntityWrapper<SysParameter>()
+									.eq("param_type", SysParameterEnums.REPAY_DAYS.getKey()).eq("status", 1).orderBy("row_Index"));
+							Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
+							try {
+								Thread.sleep(70000);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
+					//		for (RepaymentBizPlanList pList : pLists) {
+					//			if(pList.getPlanListId().equals("de6ee923-9df2-4e44-8f57-7abadf40d7e8")) {
+					//				System.out.println("STOP");
+					//			}
+					//			//获取该还款计划最早一期没有还的代扣
+					//			pList=rechargeService.getEarlyPeriod(pList);
+					//			// 是否符合自动代扣规则
+					//			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
+					//				autoRepayPerList(pList,WithholdTypeEnum.AUTORUN.getValue().toString());
+					//			} else {
+					//				continue;
+					//			}
+					//		} 
+							//把集合按planId分组
+						    Map<String, List<RepaymentBizPlanList>> map =pLists.stream().collect(Collectors.groupingBy(RepaymentBizPlanList::getPlanId));
+						    map.values().stream().forEach(lists -> {
+						    	executor.execute(new Runnable() {
+									@Override
+									public void run() {
+										for(RepaymentBizPlanList pList:lists) {
+							        		//获取该还款计划最早一期没有还的代扣
+							    			pList=rechargeService.getEarlyPeriod(pList);
+							    			// 是否符合自动代扣规则
+							    			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
+							    				autoRepayPerList(pList,WithholdTypeEnum.AUTORUN.getValue().toString());
+							    			} else {
+							    				continue; 
+							    			}
+							        	}					
+									}
+								});
+					        
+					        });
+			}
+		});
 	    
 	}
 	@Override
