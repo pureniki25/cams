@@ -36,6 +36,7 @@ import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeRecordService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
+import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.util.UUIDHtGenerator;
 import com.hongte.alms.base.vo.cams.CamsMessage;
 import com.hongte.alms.base.vo.cams.CancelBizAccountListCommand;
@@ -97,6 +98,10 @@ public class CamsFlowController {
     @Autowired
     @Qualifier("AccountantOverRepayLogService")
     AccountantOverRepayLogService accountantOverRepayLogService;
+    
+    @Autowired
+    @Qualifier("tuandaiProjectInfoService")
+    TuandaiProjectInfoService tuandaiProjectInfoService;
     
     /**
      * 批量新增账户流水
@@ -1003,15 +1008,67 @@ public class CamsFlowController {
     }
     
     /**
+     * 获取平台还款及垫付信息
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "获取平台还款及垫付信息")
+    @GetMapping("/pullPlatformRepayInfo")
+    @ResponseBody
+    public Result<Object> pullPlatformRepayInfo(String projectId) {
+    	Result ret = flowPushLogService.queryDistributeFundRecord(projectId);
+    	return Result.buildSuccess(ret);
+    }
+    
+    /**
      * 指定confireLogID推送账户流水
      * @param bankWithholdFlowReq
      * @return
      */
-    @ApiOperation(value = "根据标id获取垫付信息")
-    @GetMapping("/getPaymentInfo")
+    @ApiOperation(value = "获取平台还垫付信息")
+    @GetMapping("/pullAdvanceRepayInfo")
     @ResponseBody
-    public Result<Object> getPaymentInfo(String projectId) {
-    	List<DistributeFundRecordVO> list = flowPushLogService.queryDistributeFundRecord(projectId);
-    	return Result.buildSuccess(list);
+    public Result<Object> pullAdvanceRepayInfo(String projectId) {
+    	Result ret = flowPushLogService.pullAdvanceRepayInfo(projectId);
+    	return Result.buildSuccess(ret);
+    }
+    
+    /**
+     * 推送平台还款流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送平台还款流水到核心")
+    @GetMapping("/pushPlatformRepayFlowToCams")
+    @ResponseBody
+    public Result<Object> pushPlatformRepayFlowToCams(String projectId) {
+    	flowPushLogService.pushPlatformRepayFlowToCams(projectId);
+    	return Result.buildSuccess("推送平台还款流水到核心执行成功");
+    }
+    
+    /**
+     * 推送垫付流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送垫付流水到核心")
+    @GetMapping("/pushAdvancePayFlowToCams")
+    @ResponseBody
+    public Result<Object> pushAdvancePayFlowToCams(String projectId) {
+    	flowPushLogService.pushAdvancePayFlowToCams(projectId);
+    	return Result.buildSuccess("推送垫付流水到核心");
+    }
+    
+    /**
+     * 推送还垫付流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送还垫付流水到核心")
+    @GetMapping("/pushAdvanceRepayFlowToCams")
+    @ResponseBody
+    public Result<Object> pushAdvanceRepayFlowToCams(String projectId) {
+    	flowPushLogService.pushAdvanceRepayFlowToCams(projectId);
+    	return Result.buildSuccess("推送还垫付流水到核心");
     }
 }
