@@ -14,15 +14,15 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
  * <p>
- * 平台还款-担保公司垫付信息
+ * 还垫付流水表
  * </p>
  *
  * @author 刘正全
- * @since 2018-09-25
+ * @since 2018-09-26
  */
 @ApiModel
-@TableName("tb_repayment_platform_list_guarantee")
-public class RepaymentPlatformListGuarantee extends Model<RepaymentPlatformListGuarantee> {
+@TableName("tb_repayment_advance_repay_flow")
+public class RepaymentAdvanceRepayFlow extends Model<RepaymentAdvanceRepayFlow> {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,11 +56,17 @@ public class RepaymentPlatformListGuarantee extends Model<RepaymentPlatformListG
 	@ApiModelProperty(required= true,value = "还款id")
 	private Long repayId;
     /**
-     * 还款日期
+     * 还款日期yyyy-MM-dd HH:mm:ss
      */
-	@TableField("add_date")
-	@ApiModelProperty(required= true,value = "还款日期")
-	private String addDate;
+	@TableField("refund_date")
+	@ApiModelProperty(required= true,value = "还款日期yyyy-MM-dd HH:mm:ss")
+	private String refundDate;
+    /**
+     * 还款总金额
+     */
+	@TableField("total_amount")
+	@ApiModelProperty(required= true,value = "还款总金额")
+	private BigDecimal totalAmount;
     /**
      * 本金利息
      */
@@ -92,17 +98,11 @@ public class RepaymentPlatformListGuarantee extends Model<RepaymentPlatformListG
 	@ApiModelProperty(required= true,value = "实还仲裁服务费")
 	private BigDecimal arbitrationAmount;
     /**
-     * 实还中介服务费
+     * 逾期费用（罚息）
      */
-	@TableField("agency_amount")
-	@ApiModelProperty(required= true,value = "实还中介服务费")
-	private BigDecimal agencyAmount;
-    /**
-     * 滞纳金
-     */
-	@TableField("penalty_amount")
-	@ApiModelProperty(required= true,value = "滞纳金")
-	private BigDecimal penaltyAmount;
+	@TableField("overdue_amount")
+	@ApiModelProperty(required= true,value = "逾期费用（罚息）")
+	private BigDecimal overdueAmount;
     /**
      * 创建时间
      */
@@ -127,34 +127,25 @@ public class RepaymentPlatformListGuarantee extends Model<RepaymentPlatformListG
 	@TableField("update_man")
 	@ApiModelProperty(required= true,value = "更新人")
 	private String updateMan;
-	
     /**
      * 最后推送状态0未推送1流水推送成功2推送失败3不需要推送4撤销推送成功5撤销推送失败
      */
 	@TableField("last_push_status")
 	@ApiModelProperty(required= true,value = "最后推送状态0未推送1流水推送成功2推送失败3不需要推送4撤销推送成功5撤销推送失败")
 	private Integer lastPushStatus;
-   
-	/**
+    /**
      * 最后推送时间
      */
 	@TableField("last_push_datetime")
 	@ApiModelProperty(required= true,value = "最后推送时间")
 	private Date lastPushDatetime;
- 
-	/**
+    /**
      * 最后推送备注
      */
 	@TableField("last_push_remark")
 	@ApiModelProperty(required= true,value = "最后推送备注")
 	private String lastPushRemark;
-	
-    /**
-     * 垫付实还总金额
-     */
-	@TableField("total_amount")
-	@ApiModelProperty(required= true,value = "实还总金额")
-	private BigDecimal totalAmount;
+
 
 	public Long getId() {
 		return id;
@@ -196,12 +187,20 @@ public class RepaymentPlatformListGuarantee extends Model<RepaymentPlatformListG
 		this.repayId = repayId;
 	}
 
-	public String getAddDate() {
-		return addDate;
+	public String getRefundDate() {
+		return refundDate;
 	}
 
-	public void setAddDate(String addDate) {
-		this.addDate = addDate;
+	public void setRefundDate(String refundDate) {
+		this.refundDate = refundDate;
+	}
+
+	public BigDecimal getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(BigDecimal totalAmount) {
+		this.totalAmount = totalAmount;
 	}
 
 	public BigDecimal getPrincipalAndinterest() {
@@ -244,20 +243,12 @@ public class RepaymentPlatformListGuarantee extends Model<RepaymentPlatformListG
 		this.arbitrationAmount = arbitrationAmount;
 	}
 
-	public BigDecimal getAgencyAmount() {
-		return agencyAmount;
+	public BigDecimal getOverdueAmount() {
+		return overdueAmount;
 	}
 
-	public void setAgencyAmount(BigDecimal agencyAmount) {
-		this.agencyAmount = agencyAmount;
-	}
-
-	public BigDecimal getPenaltyAmount() {
-		return penaltyAmount;
-	}
-
-	public void setPenaltyAmount(BigDecimal penaltyAmount) {
-		this.penaltyAmount = penaltyAmount;
+	public void setOverdueAmount(BigDecimal overdueAmount) {
+		this.overdueAmount = overdueAmount;
 	}
 
 	public Date getCreateTime() {
@@ -315,14 +306,6 @@ public class RepaymentPlatformListGuarantee extends Model<RepaymentPlatformListG
 	public void setLastPushRemark(String lastPushRemark) {
 		this.lastPushRemark = lastPushRemark;
 	}
-	
-	public BigDecimal getTotalAmount() {
-		return totalAmount;
-	}
-
-	public void setTotalAmount(BigDecimal totalAmount) {
-		this.totalAmount = totalAmount;
-	}
 
 	@Override
 	protected Serializable pkVal() {
@@ -331,24 +314,27 @@ public class RepaymentPlatformListGuarantee extends Model<RepaymentPlatformListG
 
 	@Override
 	public String toString() {
-		return "RepaymentPlatformListGuarantee{" +
+		return "RepaymentAdvanceRepayFlow{" +
 			", id=" + id +
 			", projectId=" + projectId +
 			", period=" + period +
 			", repayStatus=" + repayStatus +
 			", repayId=" + repayId +
-			", addDate=" + addDate +
+			", refundDate=" + refundDate +
+			", totalAmount=" + totalAmount +
 			", principalAndinterest=" + principalAndinterest +
 			", tuandaiAmount=" + tuandaiAmount +
 			", orgAmount=" + orgAmount +
 			", guaranteeAmount=" + guaranteeAmount +
 			", arbitrationAmount=" + arbitrationAmount +
-			", agencyAmount=" + agencyAmount +
-			", penaltyAmount=" + penaltyAmount +
+			", overdueAmount=" + overdueAmount +
 			", createTime=" + createTime +
 			", createMan=" + createMan +
 			", updateTime=" + updateTime +
 			", updateMan=" + updateMan +
+			", lastPushStatus=" + lastPushStatus +
+			", lastPushDatetime=" + lastPushDatetime +
+			", lastPushRemark=" + lastPushRemark +
 			"}";
 	}
 }
