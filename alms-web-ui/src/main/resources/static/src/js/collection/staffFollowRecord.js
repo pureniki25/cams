@@ -304,7 +304,7 @@ var editLogFormSubmit = function () {
             * 传输参数放在http请求的body内，后台需使用@RequestBody进行参数匹配
             * */
 
-            vm.editLogForm.isSend = vm.editLogForm.ifSendToPlat=="是"?1:0;
+            vm.editLogForm.isSend = vm.editLogForm.ifSendToPlat=="否";
             for(var i=0;i<vm.statusList.length;i++){
                 var item = vm.statusList[i];
                 if(item.paramValue == vm.editLogForm.status){
@@ -364,7 +364,7 @@ var queryEditModule = function (trackLogId) {
                 vm.editLogForm.trackStatusName = res.data.data.trackStatusName;
                 vm.editLogForm.trackStatusId = res.data.data.trackStatusId;
                 vm.editLogForm.status = res.data.data.trackStatusId;
-                vm.editLogForm.ifSendToPlat = (res.data.data.isSend==0)?"否":"是";
+                vm.editLogForm.ifSendToPlat = "否";
                 vm.editLogForm.isSend = res.data.data.isSend;
                 vm.editLogForm.content = res.data.data.content;
                 vm.editLogForm.borrowerConditionDescList = res.data.data.borrowerConditionDescList;
