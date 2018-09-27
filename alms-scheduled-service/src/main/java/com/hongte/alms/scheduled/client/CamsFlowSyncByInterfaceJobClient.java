@@ -25,4 +25,25 @@ public interface CamsFlowSyncByInterfaceJobClient {
     
     @RequestMapping(value = "/camsFlowSync/cancelFenFaFlow",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     public Result<Object> cancelFenFaFlow();
+    
+    //获取平台还款及垫付流水到贷后
+    @RequestMapping(value = "/camsFlowSync/pullPlatformRepayInfo",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    public Result<Object> pullPlatformRepayInfo();    
+    
+    //获取还垫付流水到贷后
+    @RequestMapping(value = "/camsFlowSync/pullAdvanceRepayInfo",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    public Result<Object> pullAdvanceRepayInfo();    
+    
+    //平台还款流水
+    @RequestMapping(value = "/camsFlowSync/pushPlatformRepayFlowToCams",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    public Result<Object> pushPlatformRepayFlowToCams();
+    
+    //平台垫付流水
+    @RequestMapping(value = "/camsFlowSync/pushAdvancePayFlowToCams",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    public Result<Object> pushAdvancePayFlowToCams();
+    
+    //平台还垫付流水
+    @RequestMapping(value = "/camsFlowSync/pushAdvanceRepayFlowToCams",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    public Result<Object> pushAdvanceRepayFlowToCams();
+    
 }
