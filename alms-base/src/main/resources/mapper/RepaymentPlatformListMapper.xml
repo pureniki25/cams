@@ -100,8 +100,8 @@
 		1 AS 'main_type',
 		0 AS 'account_type',
 		'45BC0637-412F-45AF-A44A-14348BEB400C' AS 'target_main_id',
-		3 AS 'target_main_type',
-		2 AS 'target_account_type'
+		2 AS 'target_main_type',
+		3 AS 'target_account_type'
 		FROM 
 		tb_repayment_platform_list t1
 		LEFT JOIN tb_tuandai_project_info t6 ON t1.project_id = t6.project_id
@@ -209,8 +209,8 @@
 		1 AS 'main_type',
 		0 AS 'account_type',
 		'45BC0637-412F-45AF-A44A-14348BEB400C' AS 'target_main_id',
-		3 AS 'target_main_type',
-		2 AS 'target_account_type'
+		2 AS 'target_main_type',
+		3 AS 'target_account_type'
 		FROM 
 		tb_repayment_platform_list_guarantee t1
 		LEFT JOIN tb_tuandai_project_info t6 ON t1.project_id = t6.project_id
@@ -318,8 +318,8 @@
 		1 AS 'main_type',
 		0 AS 'account_type',
 		'45BC0637-412F-45AF-A44A-14348BEB400C' AS 'target_main_id',
-		3 AS 'target_main_type',
-		2 AS 'target_account_type'
+		2 AS 'target_main_type',
+		3 AS 'target_account_type'
 		FROM 
 		tb_repayment_advance_repay_flow t1
 		LEFT JOIN tb_tuandai_project_info t6 ON t1.project_id = t6.project_id
