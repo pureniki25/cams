@@ -1,5 +1,20 @@
 package com.hongte.alms.base.service.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -8,7 +23,6 @@ import com.hongte.alms.base.entity.RepaymentAdvanceRepayFlow;
 import com.hongte.alms.base.entity.RepaymentPlatformList;
 import com.hongte.alms.base.entity.RepaymentPlatformListBorrower;
 import com.hongte.alms.base.entity.RepaymentPlatformListGuarantee;
-import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.feignClient.EipRemote;
@@ -18,7 +32,6 @@ import com.hongte.alms.base.service.RepaymentAdvanceRepayFlowService;
 import com.hongte.alms.base.service.RepaymentPlatformListBorrowerService;
 import com.hongte.alms.base.service.RepaymentPlatformListGuaranteeService;
 import com.hongte.alms.base.service.RepaymentPlatformListService;
-import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.util.UUIDHtGenerator;
 import com.hongte.alms.base.vo.cams.CamsMessage;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand;
@@ -28,24 +41,8 @@ import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowAccountIdentifier
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowDetail;
 import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.hongte.alms.common.util.DateUtil;
 import com.ht.ussp.core.Result;
-
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.xmlbeans.impl.piccolo.xml.EntityManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 
 /**
  * <p>
@@ -83,6 +80,9 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     @Autowired
     @Qualifier("FlowPushLogService")
     FlowPushLogService flowPushLogService;
+    
+    @Autowired
+    private FlowPushLogMapper flowPushLogMapper;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowPushLogServiceImpl.class);
 	
@@ -362,6 +362,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
             	flowAccountIdentifier.setAccountType(accountType);
             	flowAccountIdentifier.setDepositoryId(bankCardNo);
+            	flowAccountIdentifier.setAccountName(accountName);
             	flowAccountIdentifier.setIdentifierId(identifierId);
             	flowAccountIdentifier.setPersonal(personal);
             	if(!StringUtils.isBlank(mainId)) {
@@ -378,14 +379,15 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	flowAccountIdentifier2.setDepositoryId(targetBankCardNo);
             	flowAccountIdentifier2.setIdentifierId(tId);
             	flowAccountIdentifier2.setPersonal(personal);
+            	flowAccountIdentifier2.setAccountName(targetAccountId);
             	if(!StringUtils.isBlank(targetMainId)) {
             		flowAccountIdentifier.setMainId(targetMainId);
             	}
             	accountIdentifiers.add(flowAccountIdentifier2);
             	
             	Flow flow = new Flow();
-            	Date accountTime = (Date) flowMap.get("account_time");
-            	String afterId = flowMap.get("after_id").toString();
+            	Date accountTime = null == flowMap.get("account_time")?null:DateUtil.getDateTime(flowMap.get("account_time").toString());
+            	String afterId = null == flowMap.get("after_id")?null:flowMap.get("after_id").toString();
             	BigDecimal amount = new BigDecimal(flowMap.get("amount")==null?"0":flowMap.get("amount").toString());
             	String externalId = "";
             	int inOut = Integer.parseInt(flowMap.get("in_out").toString());
@@ -442,15 +444,9 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             		if(StringUtils.isBlank(detailFeeId)) {
             			detailFeeId = detailFeeName;
             		}
-            		if("滞纳金".equals(detailFeeName)) {
-            			String detailFeeName1 = RepayPlanFeeTypeEnum.feeIdOf(listFlowItemMap.get("fee_id")+"").getDesc();
-            			if(!StringUtils.isBlank(detailFeeName1)) {
-            				detailFeeName = detailFeeName1;
-            			}
-            		}
-            		String detailIssueId = listFlowItemMap.get("issue_id")==null?"":listFlowItemMap.get("issue_id").toString();
-            		int detailRegisterType = StringUtils.isBlank(flowMap.get("register_type")+"")?0:Integer.parseInt(listFlowItemMap.get("register_type").toString());
-            		Date detailSegmentationDate = (Date) listFlowItemMap.get("segmentation_date");
+            		String detailIssueId = issueId;//listFlowItemMap.get("issue_id")==null?"":listFlowItemMap.get("issue_id").toString();
+            		int detailRegisterType = 0;//StringUtils.isBlank(flowMap.get("register_type")+"")?0:Integer.parseInt(listFlowItemMap.get("register_type").toString());
+            		Date detailSegmentationDate = segmentationDate;//(Date) listFlowItemMap.get("segmentation_date");
             		
             		FlowDetail flowDetail = new FlowDetail();
             		flowDetail.setAccountTime(detailAccountTime);
@@ -517,26 +513,78 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             			retryTimes++;
     				}
             	}
-            	RepaymentPlatformList repaymentPlatformList = repaymentPlatformListService.selectById(confirmLogId);
-            	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
-            	  repaymentPlatformList.setLastPushStatus(1);
-            	  repaymentPlatformList.setLastPushRemark(retStr);
-	              flowPushLog.setPushStatus(1);
-	              flowPushLog.setPushRet(retStr);
-	            }else {
-	              repaymentPlatformList.setLastPushStatus(2);
-	              repaymentPlatformList.setLastPushRemark(retStr);
-	              flowPushLog.setPushStatus(2);
-	              flowPushLog.setPushRet(retStr);
-	            }
-            	//更新推送状态
-            	repaymentPlatformList.setLastPushDatetime(new Date());
-            	repaymentPlatformListService.updateById(repaymentPlatformList);
-                
-            	//记录推送日志
-            	flowPushLog.setPushEndtime(new Date());
-            	flowPushLogService.insert(flowPushLog);
+            	updatePushLog(actionId,confirmLogId, flowPushLog, retStr);
         	}
+	}
+
+	private void updatePushLog(int actionId, String confirmLogId, FlowPushLog flowPushLog, String retStr) {
+		switch (actionId) {
+		case 7://平台还款
+			RepaymentPlatformList repaymentPlatformList = repaymentPlatformListService.selectById(confirmLogId);
+			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
+			  repaymentPlatformList.setLastPushStatus(1);
+			  repaymentPlatformList.setLastPushRemark(retStr);
+			  flowPushLog.setPushStatus(1);
+			  flowPushLog.setPushRet(retStr);
+			}else {
+			  repaymentPlatformList.setLastPushStatus(2);
+			  repaymentPlatformList.setLastPushRemark(retStr);
+			  flowPushLog.setPushStatus(2);
+			  flowPushLog.setPushRet(retStr);
+			}
+			//更新推送状态
+			repaymentPlatformList.setLastPushDatetime(new Date());
+			repaymentPlatformListService.updateById(repaymentPlatformList);
+			
+			//记录推送日志
+			flowPushLog.setPushEndtime(new Date());
+			flowPushLogService.insert(flowPushLog);
+			break;
+		case 8://垫付
+			RepaymentPlatformListGuarantee repaymentPlatformListGuarantee = repaymentPlatformListGuaranteeService.selectById(confirmLogId);
+			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
+			  repaymentPlatformListGuarantee.setLastPushStatus(1);
+			  repaymentPlatformListGuarantee.setLastPushRemark(retStr);
+			  flowPushLog.setPushStatus(1);
+			  flowPushLog.setPushRet(retStr);
+			}else {
+			  repaymentPlatformListGuarantee.setLastPushStatus(2);
+			  repaymentPlatformListGuarantee.setLastPushRemark(retStr);
+			  flowPushLog.setPushStatus(2);
+			  flowPushLog.setPushRet(retStr);
+			}
+			//更新推送状态
+			repaymentPlatformListGuarantee.setLastPushDatetime(new Date());
+			repaymentPlatformListGuaranteeService.updateById(repaymentPlatformListGuarantee);
+			
+			//记录推送日志
+			flowPushLog.setPushEndtime(new Date());
+			flowPushLogService.insert(flowPushLog);
+			break;
+		case 81://还垫付
+			RepaymentAdvanceRepayFlow repaymentAdvanceRepayFlow = repaymentAdvanceRepayFlowService.selectById(confirmLogId);
+			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
+			  repaymentAdvanceRepayFlow.setLastPushStatus(1);
+			  repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
+			  flowPushLog.setPushStatus(1);
+			  flowPushLog.setPushRet(retStr);
+			}else {
+			  repaymentAdvanceRepayFlow.setLastPushStatus(2);
+			  repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
+			  flowPushLog.setPushStatus(2);
+			  flowPushLog.setPushRet(retStr);
+			}
+			//更新推送状态
+			repaymentAdvanceRepayFlow.setLastPushDatetime(new Date());
+			repaymentAdvanceRepayFlowService.updateById(repaymentAdvanceRepayFlow);
+			
+			//记录推送日志
+			flowPushLog.setPushEndtime(new Date());
+			flowPushLogService.insert(flowPushLog);
+			break;
+		default:
+			break;
+		}
 	}
 
 	/**
@@ -605,7 +653,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 		switch (actionId) {
 		case 7://平台还款
 			//flowItemList = repaymentPlatformListService.selectPushPlatformRepayFlowItem(paramFlowItemMap);
-			long confirmLogId = (long) paramFlowItemMap.get("confirmLogId");
+			String confirmLogId = paramFlowItemMap.get("repaySourceId").toString();
 			RepaymentPlatformList repaymentPlatformList = repaymentPlatformListService.selectById(confirmLogId);
 			 //实还本息
 			 BigDecimal principalAndInterest = repaymentPlatformList.getPrincipalAndinterest();
@@ -637,7 +685,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 8://垫付
 			//flowItemList = repaymentPlatformListService.selectPushAdvancePayFlowItem(paramFlowItemMap);
-			 long guaranteeLogId = (long) paramFlowItemMap.get("confirmLogId");
+			 String guaranteeLogId = paramFlowItemMap.get("repaySourceId").toString();
 			 RepaymentPlatformListGuarantee repaymentPlatformListGuarantee = repaymentPlatformListGuaranteeService.selectById(guaranteeLogId);
 			 //实还本息
 			 BigDecimal principalAndInterestGuarantee = repaymentPlatformListGuarantee.getPrincipalAndinterest();
@@ -663,7 +711,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 81://还垫付
 			//flowItemList = repaymentPlatformListService.selectPushAdvanceRepayFlowItem(paramFlowItemMap);
-			 long advanceRepayLogId = (long) paramFlowItemMap.get("confirmLogId");
+			 String advanceRepayLogId = paramFlowItemMap.get("repaySourceId").toString();
 			 RepaymentAdvanceRepayFlow repaymentAdvanceRepayFlow = repaymentAdvanceRepayFlowService.selectById(advanceRepayLogId);
 			 //实还本息
 			 BigDecimal principalAndInterestAdvanceRepay = repaymentAdvanceRepayFlow.getPrincipalAndinterest();
@@ -756,9 +804,9 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    			 repaymentAdvanceRepayFlow.setArbitrationAmount(arbitrationAmount);
 	    			 repaymentAdvanceRepayFlow.setOverdueAmount(overDueAmount);
 	    			 //通过标号和期号取平台还款记录 ,如果有比较总金额 相同则不改 不同则修改 没有记录则插入
-	    			 RepaymentPlatformList repaymentPlatformListOld = repaymentPlatformListService.selectOne(new EntityWrapper<RepaymentPlatformList>().eq("project_id", projectId1).eq("period", period));
+	    			 RepaymentAdvanceRepayFlow repaymentAdvanceRepayFlowOld = repaymentAdvanceRepayFlowService.selectOne(new EntityWrapper<RepaymentAdvanceRepayFlow>().eq("project_id", projectId1).eq("period", period));
 	    			 int updateType = 0;
-	    			 if(repaymentPlatformListOld == null) {
+	    			 if(repaymentAdvanceRepayFlowOld == null) {
 	    				 updateType = 1;
 	    				 repaymentAdvanceRepayFlow.setCreateMan("平台接口获取");
 	    				 repaymentAdvanceRepayFlow.setCreateTime(new Date());
@@ -801,6 +849,12 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     	}
     	List<Map<String,Object>> listMap = getPushFlowList(81,paramBusinessMap);
     	addBusinessCamsFlow(listMap,81);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectPushProjectList() {
+		Map<String, Object> mapParam = new HashMap<>();
+		return flowPushLogMapper.selectPushProjectList(mapParam);
 	}
 
 }

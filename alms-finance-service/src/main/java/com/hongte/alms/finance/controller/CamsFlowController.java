@@ -1016,7 +1016,18 @@ public class CamsFlowController {
     @GetMapping("/pullPlatformRepayInfo")
     @ResponseBody
     public Result<Object> pullPlatformRepayInfo(String projectId) {
-    	Result ret = flowPushLogService.queryDistributeFundRecord(projectId);
+    	Result ret = null;
+    	if(StringUtils.isBlank(projectId)) {
+    		List<Map<String,Object>> listProjs = flowPushLogService.selectPushProjectList();
+    		for(Map<String,Object> map:listProjs) {
+    			String pushProjectId = map.get("project_id").toString();
+    			if(StringUtils.isNoneBlank(pushProjectId)) {
+    				ret = flowPushLogService.queryDistributeFundRecord(pushProjectId);
+    			}
+    		}
+    	}else {
+    		ret = flowPushLogService.queryDistributeFundRecord(projectId);
+    	}
     	return Result.buildSuccess(ret);
     }
     
@@ -1029,7 +1040,18 @@ public class CamsFlowController {
     @GetMapping("/pullAdvanceRepayInfo")
     @ResponseBody
     public Result<Object> pullAdvanceRepayInfo(String projectId) {
-    	Result ret = flowPushLogService.pullAdvanceRepayInfo(projectId);
+    	Result ret = null;
+    	if(StringUtils.isBlank(projectId)) {
+    		List<Map<String,Object>> listProjs = flowPushLogService.selectPushProjectList();
+    		for(Map<String,Object> map:listProjs) {
+    			String pushProjectId = map.get("project_id").toString();
+    			if(StringUtils.isNoneBlank(pushProjectId)) {
+    				ret = flowPushLogService.pullAdvanceRepayInfo(pushProjectId);
+    			}
+    		}
+    	}else {
+    		ret = flowPushLogService.pullAdvanceRepayInfo(projectId);
+    	}
     	return Result.buildSuccess(ret);
     }
     

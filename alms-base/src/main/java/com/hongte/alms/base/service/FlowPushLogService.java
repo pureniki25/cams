@@ -1,5 +1,8 @@
 package com.hongte.alms.base.service;
 
+import java.util.List;
+import java.util.Map;
+
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.common.service.BaseService;
 import com.ht.ussp.core.Result;
@@ -23,5 +26,7 @@ public interface FlowPushLogService extends BaseService<FlowPushLog> {
 	void pushAdvancePayFlowToCams(String projectId);
 
 	void pushAdvanceRepayFlowToCams(String projectId);
+
+	List<Map<String, Object>> selectPushProjectList();
 
 }
