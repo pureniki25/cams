@@ -220,7 +220,7 @@ public class CamsFlowController {
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
         	int actionId = Integer.parseInt(businessMapInfo.get("action_id").toString());
         	String batchId = confirmLogId;
-        	TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("log_id", batchId).eq("is_valid", 1));
+        	TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("log_id", confirmLogId));
         	FlowPushLog flowPushLog = new FlowPushLog();
         	flowPushLog.setPushKey(batchId);
         	flowPushLog.setPushLogType(2);
@@ -352,19 +352,19 @@ public class CamsFlowController {
             	List<Map<String,Object>> listFlowItem = basicBusinessService.selectlPushBusinessFenFaFlowItem(paramFlowItemMap);
             	for (Map<String, Object> listFlowItemMap : listFlowItem) {
             		Date detailAccountTime = (Date) listFlowItemMap.get("account_date");
-            		String detailAfterId = listFlowItemMap.get("after_id").toString();
+            		String detailAfterId = afterId;//listFlowItemMap.get("after_id").toString();
             		BigDecimal detailAmount = new BigDecimal(listFlowItemMap.get("amount").toString());
             		String detailFeeId = listFlowItemMap.get("fee_id").toString();
             		String detailFeeName = listFlowItemMap.get("fee_name").toString();
             		if(StringUtils.isBlank(detailFeeId)) {
             			detailFeeId = detailFeeName;
             		}
-            		if("滞纳金".equals(detailFeeName)) {
-            			String detailFeeName1 = RepayPlanFeeTypeEnum.feeIdOf(listFlowItemMap.get("fee_id")+"").getDesc();
-            			if(!StringUtils.isBlank(detailFeeName1)) {
-            				detailFeeName = detailFeeName1;
-            			}
-            		}
+//            		if("滞纳金".equals(detailFeeName)) {
+//            			String detailFeeName1 = RepayPlanFeeTypeEnum.feeIdOf(listFlowItemMap.get("fee_id")+"").getDesc();
+//            			if(!StringUtils.isBlank(detailFeeName1)) {
+//            				detailFeeName = detailFeeName1;
+//            			}
+//            		}
             		String detailIssueId = listFlowItemMap.get("issue_id")==null?"":listFlowItemMap.get("issue_id").toString();
             		int detailRegisterType = StringUtils.isBlank(flowMap.get("register_type")+"")?0:Integer.parseInt(listFlowItemMap.get("register_type").toString());
             		Date detailSegmentationDate = (Date) listFlowItemMap.get("segmentation_date");
