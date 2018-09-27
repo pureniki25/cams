@@ -61,7 +61,7 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 			LOG.info("更新platStatus字段 ---- 开始");
 			long start = System.currentTimeMillis();
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-					.selectList(new EntityWrapper<TdrepayRechargeLog>().ne("plat_status", 1).eq("is_valid", 1));
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().where("IFNULL(plat_status, 0) != 1").where("is_valid = 1"));
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 				Map<String, Object> paramMap = new HashMap<>();
 				List<TdrepayRechargeLog> list = new ArrayList<>();
