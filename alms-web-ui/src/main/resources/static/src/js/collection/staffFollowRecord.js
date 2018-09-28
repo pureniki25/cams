@@ -304,7 +304,8 @@ var editLogFormSubmit = function () {
             * 传输参数放在http请求的body内，后台需使用@RequestBody进行参数匹配
             * */
 
-            vm.editLogForm.isSend = vm.editLogForm.ifSendToPlat=="否";
+           // vm.editLogForm.isSend = vm.editLogForm.ifSendToPlat=="是"?1:0;
+            vm.editLogForm.isSend = 0;
             for(var i=0;i<vm.statusList.length;i++){
                 var item = vm.statusList[i];
                 if(item.paramValue == vm.editLogForm.status){
