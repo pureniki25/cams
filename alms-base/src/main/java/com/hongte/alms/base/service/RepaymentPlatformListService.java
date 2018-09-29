@@ -34,4 +34,12 @@ public interface RepaymentPlatformListService extends BaseService<RepaymentPlatf
 
 	List<Map<String, Object>> selectPushAdvanceRepayFlowItem(Map<String, Object> paramFlowItemMap);
 
+	List<Map<String, Object>> selectPushNiWoRepayFlowList(Map<String, Object> paramBusinessMap);
+
+	List<Map<String, Object>> selectPushNiWoRepayFlow(Map<String, Object> paramFlowMap);
+
+	List<Map<String, Object>> selectPushRechargeFlowList(Map<String, Object> paramBusinessMap);
+
+	List<Map<String, Object>> selectPushRechargeFlow(Map<String, Object> paramFlowMap);
+
 }
