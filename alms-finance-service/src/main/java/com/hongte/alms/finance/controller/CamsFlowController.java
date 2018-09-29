@@ -749,6 +749,12 @@ public class CamsFlowController {
             	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
             	camsMessage.setMessage(command);
             	
+            	FlowPushLog flowPushLog = new FlowPushLog();
+            	flowPushLog.setPushKey(batchId);
+            	flowPushLog.setPushLogType(2);
+            	flowPushLog.setPushTo(1);
+            	flowPushLog.setPushStarttime(new Date());
+            	flowPushLog.setPushStatus(0);
             	int retryTimes = 0;
             	String retStr = "";
             	//while(retryTimes < 3) {
@@ -763,10 +769,19 @@ public class CamsFlowController {
                 		LOGGER.debug(JSON.toJSONString(camsMessage));
                 		LOGGER.debug(JSONObject.toJSONString(ret));
                     	retStr = JSON.toJSONString(ret);
+                    	
+                    	repaymentConfirmLog.setLastPushStatus(1);
+                		repaymentConfirmLog.setLastPushRemark(retStr);
+                		flowPushLog.setPushStatus(1);
                 		//break;//跳出循环
             		} catch (Exception e) {
+            			repaymentConfirmLog.setLastPushStatus(2);
+                		repaymentConfirmLog.setLastPushRemark(retStr);
+                		flowPushLog.setPushStatus(2);
+            			
             			retStr = e.getMessage();
             			e.printStackTrace();
+            			LOGGER.debug(JSON.toJSONString(camsMessage));
             			LOGGER.debug(JSON.toJSONString(retStr));
             			System.err.println(e.getMessage());
 						try {
@@ -778,21 +793,15 @@ public class CamsFlowController {
     				//}
             	}
             	
-            	FlowPushLog flowPushLog = new FlowPushLog();
-            	flowPushLog.setPushKey(batchId);
-            	flowPushLog.setPushLogType(2);
-            	flowPushLog.setPushTo(1);
-            	flowPushLog.setPushStarttime(new Date());
-            	flowPushLog.setPushStatus(0);
-            	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
-            		repaymentConfirmLog.setLastPushStatus(1);
-            		repaymentConfirmLog.setLastPushRemark(retStr);
-            		flowPushLog.setPushStatus(1);
-            	}else {
-            		repaymentConfirmLog.setLastPushStatus(2);
-            		repaymentConfirmLog.setLastPushRemark(retStr);
-            		flowPushLog.setPushStatus(2);
-            	}
+//            	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
+//            		repaymentConfirmLog.setLastPushStatus(1);
+//            		repaymentConfirmLog.setLastPushRemark(retStr);
+//            		flowPushLog.setPushStatus(1);
+//            	}else {
+//            		repaymentConfirmLog.setLastPushStatus(2);
+//            		repaymentConfirmLog.setLastPushRemark(retStr);
+//            		flowPushLog.setPushStatus(2);
+//            	}
             	//更新推送状态
             	repaymentConfirmLog.setLastPushDatetime(new Date());
             	repaymentConfirmLogService.updateById(repaymentConfirmLog);
