@@ -753,12 +753,13 @@ public class CamsFlowController {
             	String retStr = "";
             	//while(retryTimes < 3) {
             		try {
-            			Result<Object> ret = Result.buildFail();
             			RepaymentConfirmLog repaymentConfirmLogNew = repaymentConfirmLogService.selectById(batchId);
                 		int newStatus = repaymentConfirmLogNew.getLastPushStatus();
-            			if(newStatus == 0 || newStatus == 2) {
-            				ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+            			if(newStatus == 1 || newStatus == 4) {
+            				LOGGER.error("该流水已推送过"+batchId); 
+            				return;
             			}
+            			Result ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
                 		LOGGER.debug(JSON.toJSONString(camsMessage));
                 		LOGGER.debug(JSONObject.toJSONString(ret));
                     	retStr = JSON.toJSONString(ret);
