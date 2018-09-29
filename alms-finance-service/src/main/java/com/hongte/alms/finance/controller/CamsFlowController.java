@@ -763,7 +763,7 @@ public class CamsFlowController {
                 		LOGGER.debug(JSON.toJSONString(camsMessage));
                 		LOGGER.debug(JSONObject.toJSONString(ret));
                     	retStr = JSON.toJSONString(ret);
-                		break;//跳出循环
+                		//break;//跳出循环
             		} catch (Exception e) {
             			retStr = e.getMessage();
             			e.printStackTrace();
