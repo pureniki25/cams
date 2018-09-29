@@ -732,6 +732,9 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 201://你我金融流水
 			flowList = repaymentPlatformListService.selectPushNiWoRepayFlow(paramFlowMap);
+			if(flowList.size()>1) {
+				return flowList.subList(0, 1);
+			}
 			break;
 		case 10://充值流水
 			flowList = repaymentPlatformListService.selectPushRechargeFlow(paramFlowMap);
