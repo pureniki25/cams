@@ -1093,4 +1093,31 @@ public class CamsFlowController {
     	flowPushLogService.pushAdvanceRepayFlowToCams(projectId);
     	return Result.buildSuccess("推送还垫付流水到核心");
     }
+    
+    /**
+     * 推送还垫付流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送你我金融还款流水到核心")
+    @GetMapping("/pushNiWoRepayFlowToCams")
+    @ResponseBody
+    public Result<Object> pushNiWoRepayFlowToCams(String planListId) {
+    	flowPushLogService.pushNiWoRepayFlowToCams(planListId);
+    	return Result.buildSuccess("推送你我金融还款流水到核心");
+    }
+    
+    /**
+     * 推送还垫付流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送充值流水到核心")
+    @GetMapping("/pushRechargeFlowToCams")
+    @ResponseBody
+    public Result<Object> pushRechargeFlowToCams(String logId) {
+    	flowPushLogService.pushRechargeFlowToCams(logId);
+    	return Result.buildSuccess("推送充值流水到核心");
+    }
+    
 }

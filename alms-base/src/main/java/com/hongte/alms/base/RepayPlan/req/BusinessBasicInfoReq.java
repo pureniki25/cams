@@ -187,9 +187,26 @@ public class BusinessBasicInfoReq {
     @ApiModelProperty(required= true,value = "是否展期业务，1：是，0：否")
     @NotNull(message = "BusinessBasicInfoReq是否展期业务(isRenewBusiness)不能为空")
     private Integer isRenewBusiness;
+    
+    /**
+     * 资金端类型，1：团贷网 2：你我金融 3：粤财
+     */
+    @ApiModelProperty(value = "资金端类型，1：团贷网 2：你我金融 3粤财")
+    private Integer outputPlatformid;
+    
+    
 
 
-    public String getBusinessId() {
+  
+	public Integer getOutputPlatformid() {
+		return outputPlatformid;
+	}
+
+	public void setOutputPlatformid(Integer outputPlatformid) {
+		this.outputPlatformid = outputPlatformid;
+	}
+
+	public String getBusinessId() {
         return businessId;
     }
 

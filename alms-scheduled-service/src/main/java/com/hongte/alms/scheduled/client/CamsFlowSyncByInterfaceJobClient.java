@@ -45,5 +45,9 @@ public interface CamsFlowSyncByInterfaceJobClient {
     //平台还垫付流水
     @RequestMapping(value = "/camsFlowSync/pushAdvanceRepayFlowToCams",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     public Result<Object> pushAdvanceRepayFlowToCams();
+
+    //你我金融流水
+    @RequestMapping(value = "/camsFlowSync/pushNiWoRepayFlowToCams",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+	public Result<Object> pushNiWoRepayFlowToCams();
     
 }

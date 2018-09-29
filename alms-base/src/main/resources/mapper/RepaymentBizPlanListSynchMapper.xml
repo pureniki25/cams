@@ -355,7 +355,7 @@
   </update>
   
   <update id="updateFiveLevelClassifyBusinessChangeLog">
-  		UPDATE tb_repayment_biz_plan_list_synch t1,tb_five_level_classify_business_change_log t2 SET 
+		UPDATE tb_repayment_biz_plan_list_synch t1,tb_five_level_classify_business_change_log t2 SET 
 		t1.class_name_ext = t2.class_name
 		WHERE 
 		t1.business_id_ext = t2.orig_business_id 
