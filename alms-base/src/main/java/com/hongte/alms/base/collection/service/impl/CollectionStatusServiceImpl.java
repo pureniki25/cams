@@ -1028,6 +1028,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
 		} catch (Exception e) {
 			logger.error("自動移交法务异常", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}
 
