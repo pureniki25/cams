@@ -35,7 +35,6 @@ import com.hongte.alms.base.service.FlowPushLogService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeRecordService;
-import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.util.UUIDHtGenerator;
 import com.hongte.alms.base.vo.cams.CamsMessage;
@@ -45,7 +44,6 @@ import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Business;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Flow;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowAccountIdentifier;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowDetail;
-import com.hongte.alms.base.vo.compliance.DistributeFundRecordVO;
 import com.ht.ussp.core.Result;
 
 import io.swagger.annotations.Api;
@@ -461,18 +459,13 @@ public class CamsFlowController {
 	private void addBusinessFlow(List<Map<String, Object>> listMap) {
 		//2# step2 循环业务list，去除每一条业务的流水list
     	for(Map<String,Object> businessMapInfo : listMap) {
+    		LOGGER.info("同步开始");
     		CreateBatchFlowCommand command = new CreateBatchFlowCommand();
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
         	int actionId = Integer.parseInt(businessMapInfo.get("action_id").toString());
         	String batchId = confirmLogId;
         	RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(batchId);
-        	FlowPushLog flowPushLog = new FlowPushLog();
-        	flowPushLog.setPushKey(batchId);
-        	flowPushLog.setPushLogType(2);
-        	flowPushLog.setPushTo(1);
-        	flowPushLog.setPushStarttime(new Date());
-        	flowPushLog.setPushStatus(0);
         	//是否业务交易明细,1是,0否
         	int businessFlag = Integer.parseInt(businessMapInfo.get("businessFlag").toString());
         	//所属资产端
@@ -758,15 +751,22 @@ public class CamsFlowController {
             	
             	int retryTimes = 0;
             	String retStr = "";
-            	while(retryTimes < 3) {
+            	//while(retryTimes < 3) {
             		try {
-                		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
-                		System.err.println(JSON.toJSONString(camsMessage));
-                    	System.err.println(JSONObject.toJSONString(ret));
+            			Result<Object> ret = Result.buildFail();
+            			RepaymentConfirmLog repaymentConfirmLogNew = repaymentConfirmLogService.selectById(batchId);
+                		int newStatus = repaymentConfirmLogNew.getLastPushStatus();
+            			if(newStatus == 0 || newStatus == 2) {
+            				ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+            			}
+                		LOGGER.debug(JSON.toJSONString(camsMessage));
+                		LOGGER.debug(JSONObject.toJSONString(ret));
                     	retStr = JSON.toJSONString(ret);
                 		break;//跳出循环
             		} catch (Exception e) {
             			retStr = e.getMessage();
+            			e.printStackTrace();
+            			LOGGER.debug(JSON.toJSONString(retStr));
             			System.err.println(e.getMessage());
 						try {
 							Thread.sleep(100);
@@ -774,9 +774,15 @@ public class CamsFlowController {
 							e1.printStackTrace();
 						}
             			retryTimes++;
-    				}
+    				//}
             	}
             	
+            	FlowPushLog flowPushLog = new FlowPushLog();
+            	flowPushLog.setPushKey(batchId);
+            	flowPushLog.setPushLogType(2);
+            	flowPushLog.setPushTo(1);
+            	flowPushLog.setPushStarttime(new Date());
+            	flowPushLog.setPushStatus(0);
             	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
             		repaymentConfirmLog.setLastPushStatus(1);
             		repaymentConfirmLog.setLastPushRemark(retStr);
