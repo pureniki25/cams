@@ -526,44 +526,39 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
             	camsMessage.setMessage(command);
             	
-            	int retryTimes = 0;
-            	String retStr = "";
-            	while(retryTimes < 3) {
-            		try {
-                		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
-                		System.err.println(JSON.toJSONString(camsMessage));
-                    	System.err.println(JSONObject.toJSONString(ret));
-                    	retStr = JSON.toJSONString(ret);
-                		break;//跳出循环
-            		} catch (Exception e) {
-            			retStr = e.getMessage();
-            			System.err.println(e.getMessage());
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e1) {
-							e1.printStackTrace();
-						}
-            			retryTimes++;
-    				}
-            	}
-            	updatePushLog(actionId,confirmLogId, flowPushLog, retStr);
+            	updatePushLog(actionId,confirmLogId, flowPushLog, camsMessage);
         	}
 	}
 
-	private void updatePushLog(int actionId, String confirmLogId, FlowPushLog flowPushLog, String retStr) {
+	private void updatePushLog(int actionId, String confirmLogId, FlowPushLog flowPushLog,CamsMessage camsMessage) {
+		String retStr = "";
 		switch (actionId) {
 		case 7://平台还款
 			RepaymentPlatformList repaymentPlatformList = repaymentPlatformListService.selectById(confirmLogId);
-			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
-			  repaymentPlatformList.setLastPushStatus(1);
-			  repaymentPlatformList.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(1);
-			  flowPushLog.setPushRet(retStr);
-			}else {
-			  repaymentPlatformList.setLastPushStatus(2);
-			  repaymentPlatformList.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(2);
-			  flowPushLog.setPushRet(retStr);
+			try {
+    			int newStatus = repaymentPlatformList.getLastPushStatus();
+    			if(newStatus == 1 || newStatus == 4) {
+    				LOGGER.error("该流水已推送过"+confirmLogId); 
+    				return;
+    			}
+        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+        		LOGGER.debug(JSON.toJSONString(camsMessage));
+        		LOGGER.debug(JSONObject.toJSONString(ret));;
+            	retStr = JSON.toJSONString(ret);
+            	
+            	repaymentPlatformList.setLastPushStatus(1);
+            	repaymentPlatformList.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(1);
+//        		break;//跳出循环
+    		} catch (Exception e) {
+    			repaymentPlatformList.setLastPushStatus(2);
+    			repaymentPlatformList.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(2);
+        		
+        		retStr = e.getMessage();
+    			e.printStackTrace();
+    			LOGGER.debug(JSON.toJSONString(camsMessage));
+    			LOGGER.debug(JSON.toJSONString(retStr));
 			}
 			//更新推送状态
 			repaymentPlatformList.setLastPushDatetime(new Date());
@@ -575,16 +570,30 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 8://垫付
 			RepaymentPlatformListGuarantee repaymentPlatformListGuarantee = repaymentPlatformListGuaranteeService.selectById(confirmLogId);
-			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
-			  repaymentPlatformListGuarantee.setLastPushStatus(1);
-			  repaymentPlatformListGuarantee.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(1);
-			  flowPushLog.setPushRet(retStr);
-			}else {
-			  repaymentPlatformListGuarantee.setLastPushStatus(2);
-			  repaymentPlatformListGuarantee.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(2);
-			  flowPushLog.setPushRet(retStr);
+			try {
+    			int newStatus = repaymentPlatformListGuarantee.getLastPushStatus();
+    			if(newStatus == 1 || newStatus == 4) {
+    				LOGGER.error("该流水已推送过"+confirmLogId); 
+    				return;
+    			}
+        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+        		LOGGER.debug(JSON.toJSONString(camsMessage));
+        		LOGGER.debug(JSONObject.toJSONString(ret));;
+            	retStr = JSON.toJSONString(ret);
+            	
+            	repaymentPlatformListGuarantee.setLastPushStatus(1);
+            	repaymentPlatformListGuarantee.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(1);
+//        		break;//跳出循环
+    		} catch (Exception e) {
+    			repaymentPlatformListGuarantee.setLastPushStatus(2);
+    			repaymentPlatformListGuarantee.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(2);
+        		
+        		retStr = e.getMessage();
+    			e.printStackTrace();
+    			LOGGER.debug(JSON.toJSONString(camsMessage));
+    			LOGGER.debug(JSON.toJSONString(retStr));
 			}
 			//更新推送状态
 			repaymentPlatformListGuarantee.setLastPushDatetime(new Date());
@@ -596,16 +605,30 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 81://还垫付
 			RepaymentAdvanceRepayFlow repaymentAdvanceRepayFlow = repaymentAdvanceRepayFlowService.selectById(confirmLogId);
-			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
-			  repaymentAdvanceRepayFlow.setLastPushStatus(1);
-			  repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(1);
-			  flowPushLog.setPushRet(retStr);
-			}else {
-			  repaymentAdvanceRepayFlow.setLastPushStatus(2);
-			  repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(2);
-			  flowPushLog.setPushRet(retStr);
+			try {
+    			int newStatus = repaymentAdvanceRepayFlow.getLastPushStatus();
+    			if(newStatus == 1 || newStatus == 4) {
+    				LOGGER.error("该流水已推送过"+confirmLogId); 
+    				return;
+    			}
+        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+        		LOGGER.debug(JSON.toJSONString(camsMessage));
+        		LOGGER.debug(JSONObject.toJSONString(ret));;
+            	retStr = JSON.toJSONString(ret);
+            	
+            	repaymentAdvanceRepayFlow.setLastPushStatus(1);
+            	repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(1);
+//        		break;//跳出循环
+    		} catch (Exception e) {
+    			repaymentAdvanceRepayFlow.setLastPushStatus(2);
+    			repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(2);
+        		
+        		retStr = e.getMessage();
+    			e.printStackTrace();
+    			LOGGER.debug(JSON.toJSONString(camsMessage));
+    			LOGGER.debug(JSON.toJSONString(retStr));
 			}
 			//更新推送状态
 			repaymentAdvanceRepayFlow.setLastPushDatetime(new Date());
@@ -615,19 +638,33 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			flowPushLog.setPushEndtime(new Date());
 			flowPushLogService.insert(flowPushLog);
 			break;
-		case 201://还垫付
+		case 201://你我金融
 			RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectById(confirmLogId);
-			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
-			  repaymentBizPlanList.setLastPushStatus(1);
-			  repaymentBizPlanList.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(1);
-			  flowPushLog.setPushRet(retStr);
-			}else {
-			  repaymentBizPlanList.setLastPushStatus(2);
-			  repaymentBizPlanList.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(2);
-			  flowPushLog.setPushRet(retStr);
-			}
+        		try {
+        			int newStatus = repaymentBizPlanList.getLastPushStatus();
+        			if(newStatus == 1 || newStatus == 4) {
+        				LOGGER.error("该流水已推送过"+confirmLogId); 
+        				return;
+        			}
+            		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+            		LOGGER.debug(JSON.toJSONString(camsMessage));
+            		LOGGER.debug(JSONObject.toJSONString(ret));;
+                	retStr = JSON.toJSONString(ret);
+                	
+                	repaymentBizPlanList.setLastPushStatus(1);
+                	repaymentBizPlanList.setLastPushRemark(retStr);
+            		flowPushLog.setPushStatus(1);
+//            		break;//跳出循环
+        		} catch (Exception e) {
+        			repaymentBizPlanList.setLastPushStatus(2);
+        			repaymentBizPlanList.setLastPushRemark(retStr);
+            		flowPushLog.setPushStatus(2);
+            		
+            		retStr = e.getMessage();
+        			e.printStackTrace();
+        			LOGGER.debug(JSON.toJSONString(camsMessage));
+        			LOGGER.debug(JSON.toJSONString(retStr));
+				}
 			//更新推送状态
 			repaymentBizPlanList.setLastPushDatetime(new Date());
 			repaymentBizPlanListService.updateById(repaymentBizPlanList);
