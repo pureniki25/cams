@@ -1060,9 +1060,16 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 }
             }
         }
-
-
+        
+        
         List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
+        if(projInfoReqs.size()==0) {
+        	if(businessBasicInfoReq.getOutputPlatformid()==PaymentPlatformEnums.YUECAI.getValue()) {
+            	projInfoReqs= createProjInfoReqsList(businessBasicInfoReq, bizCusInfoReqs);
+            }
+          
+        }
+        
 
         ////////   传入的标信息  校验  开始   ///////////////////////////
 
@@ -2375,7 +2382,89 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}
-
+	
+	private  List<ProjInfoReq>  createProjInfoReqsList(BusinessBasicInfoReq businessBasicInfoReq,List<BusinessCustomerInfoReq> bizCusInfoReqs ){
+	      List<ProjInfoReq>  projInfoReqs = new ArrayList();
+	      BusinessCustomerInfoReq customerReq=null;
+	      for(BusinessCustomerInfoReq businessCustomerInfoReq:bizCusInfoReqs) {
+	    	  if(businessCustomerInfoReq.getIsmainCustomer()==1) {
+	    		  customerReq=businessCustomerInfoReq;
+	    	  }
+	      }
+        ProjInfoReq projInfoReq = creatProjInfoReq2(businessBasicInfoReq, customerReq);
+        projInfoReqs.add(projInfoReq);
+		return projInfoReqs;
+  
+        
+	}
+	private  ProjInfoReq creatProjInfoReq2(BusinessBasicInfoReq  businessBasicInfoReq,BusinessCustomerInfoReq main){
+		ProjInfoReq p = new ProjInfoReq();
+        String projectId = UUID.randomUUID().toString() ;
+        p.setProjFeeInfos(new ArrayList<>());
+        p.setIsHaveCar(0);
+        p.setIsHaveHouse(0);
+        p.setRate(businessBasicInfoReq.getBorrowRate());
+        p.setRateUnitType(businessBasicInfoReq.getBorrowRateUnit());
+        p.setOffLineInOverDueRate(new BigDecimal(0.1));
+        p.setOffLineInOverDueRateType(2);
+        p.setOffLineOutOverDueRate(new BigDecimal(0.1));
+        p.setOffLineOutOverDueRateType(2);
+        p.setOnLineOverDueRate(new BigDecimal(0.06));
+		p.setOnLineOverDueRateType(2);
+		p.setRepayType(businessBasicInfoReq.getRepaymentTypeId());
+		p.setProjectId(projectId);
+		p.setCustomerId(main.getCustomerId());
+		p.setTdUserId("");
+		p.setStatusFlag("2");
+		p.setBeginTime(businessBasicInfoReq.getInputTime());
+		p.setFullBorrowMoney(businessBasicInfoReq.getBorrowMoney());
+		p.setBorrowLimit(businessBasicInfoReq.getBorrowLimit());
+		p.setExtendFlag(0);
+		p.setOrgIssueId("");
+		p.setMasterIssueId(projectId);
+		p.setIssueOrder(1);
+		p.setQueryFullsuccessDate(businessBasicInfoReq.getInputTime());
+		p.setTelNo(main.getPhoneNumber()==null?"":main.getPhoneNumber());
+		p.setIdentityCard(main.getIdentifyCard());
+		p.setRealName(main.getCustomerName());
+		p.setBankAccountNo("");
+		p.setBankType(0);
+		p.setBankProvice("");
+		p.setBankCity("");
+		p.setOpenBankName("");
+		p.setPeriodMonth(businessBasicInfoReq.getBorrowLimit());
+		p.setRepaymentType(businessBasicInfoReq.getRepaymentTypeId());
+		p.setAmount(businessBasicInfoReq.getBorrowMoney());
+		p.setBranchCompanyId("");
+		p.setControlDesc("");
+		p.setTdStatus(4);
+		p.setProjectType(0);
+		p.setEnterpriseUserId("");
+		p.setAviCreditGrantingAmount(new BigDecimal(0));
+		p.setOverRate(new BigDecimal(0.1));
+		p.setUserTypeId(main.getCustomerType().equals("个人")?1:2);
+		p.setTuandaiAmount(new BigDecimal(0));
+		p.setGuaranteeRate(new BigDecimal(0));
+		p.setSubCompanyRate(new BigDecimal(0));
+		p.setSubCompanyCharge(new BigDecimal(0));
+		p.setAgencyId("");
+		p.setAgencyRate(new BigDecimal(0));
+		p.setAgencyAmount(new BigDecimal(0));
+		p.setDepositAmount(new BigDecimal(0));
+		p.setFreedAmount(BigDecimal.ZERO);
+		p.setFreedRate(new BigDecimal(0));
+		p.setCooperativeTdComUserId("");
+		p.setCooperativeTdComRate(BigDecimal.ZERO);
+		p.setCooperativeTdComAmount(BigDecimal.ZERO);
+		p.setBorrowerRate(BigDecimal.ZERO);
+		p.setBorrowAmount(businessBasicInfoReq.getBorrowMoney());
+		p.setProjectFrom(0);
+		p.setMonthPrincipalAmount(BigDecimal.ZERO);
+		p.setPlateType(0);
+		p.setTuandaiRate(BigDecimal.ZERO);
+		p.setGuaranteeAmount(BigDecimal.ZERO);
+		return p ;
+	}
     public static void main(String[] args) {
 
 //        BusinessBasicInfoReq  businessBasicInfo = new BusinessBasicInfoReq();

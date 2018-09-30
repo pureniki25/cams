@@ -1,35 +1,15 @@
 package com.hongte.alms.base.collection.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.hongte.alms.base.collection.dto.CollectionStatusCountDto;
-import com.hongte.alms.base.collection.entity.*;
-import com.hongte.alms.base.collection.entity.Collection;
-import com.hongte.alms.base.collection.enums.CollectionCrpTypeEnum;
-import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
-import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
-import com.hongte.alms.base.collection.enums.StaffPersonType;
-import com.hongte.alms.base.collection.mapper.CollectionStatusMapper;
-import com.hongte.alms.base.collection.service.*;
-import com.hongte.alms.base.collection.vo.StaffBusinessVo;
-import com.hongte.alms.base.entity.CarBusinessAfter;
-import com.hongte.alms.base.entity.RepaymentBizPlan;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.SysUser;
-import com.hongte.alms.base.entity.SysUserPermission;
-import com.hongte.alms.base.entity.SysUserRole;
-import com.hongte.alms.base.feignClient.AlmsCoreServiceFeignClient;
-import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
-import com.hongte.alms.base.feignClient.LitigationFeignClient;
-import com.hongte.alms.base.service.*;
-import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.service.impl.BaseServiceImpl;
-import com.hongte.alms.common.util.Constant;
-import com.ht.ussp.bean.LoginUserInfoHelper;
-import com.ht.ussp.client.dto.LoginInfoDto;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Executor;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +20,46 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.concurrent.Executor;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.collection.dto.CollectionStatusCountDto;
+import com.hongte.alms.base.collection.entity.Collection;
+import com.hongte.alms.base.collection.entity.CollectionLog;
+import com.hongte.alms.base.collection.entity.CollectionPersonSet;
+import com.hongte.alms.base.collection.entity.CollectionPersonSetDetail;
+import com.hongte.alms.base.collection.entity.CollectionStatus;
+import com.hongte.alms.base.collection.entity.CollectionTimeSet;
+import com.hongte.alms.base.collection.enums.CollectionCrpTypeEnum;
+import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
+import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
+import com.hongte.alms.base.collection.enums.StaffPersonType;
+import com.hongte.alms.base.collection.mapper.CollectionStatusMapper;
+import com.hongte.alms.base.collection.service.CollectionLogService;
+import com.hongte.alms.base.collection.service.CollectionPersonSetDetailService;
+import com.hongte.alms.base.collection.service.CollectionPersonSetService;
+import com.hongte.alms.base.collection.service.CollectionStatusService;
+import com.hongte.alms.base.collection.service.CollectionTimeSetService;
+import com.hongte.alms.base.collection.vo.StaffBusinessVo;
+import com.hongte.alms.base.entity.CarBusinessAfter;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.SysUser;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.AlmsCoreServiceFeignClient;
+import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
+import com.hongte.alms.base.feignClient.LitigationFeignClient;
+import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
+import com.hongte.alms.base.service.SysUserPermissionService;
+import com.hongte.alms.base.service.SysUserRoleService;
+import com.hongte.alms.base.service.SysUserService;
+import com.hongte.alms.base.service.TransferOfLitigationService;
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.hongte.alms.common.util.Constant;
+import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.client.dto.LoginInfoDto;
 
 /**
  * <p>
@@ -129,264 +147,257 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public boolean setBusinessStaff(
-            List<StaffBusinessVo> voList,
-            String staffUserId,
-            String describe ,
-            String staffType,
-            CollectionSetWayEnum  setWayEnum
-    ){
+	public boolean setBusinessStaff(List<StaffBusinessVo> voList, String staffUserId, String describe, String staffType,
+			CollectionSetWayEnum setWayEnum) {
 
-        String  userId= loginUserInfoHelper.getUserId();
-        if(userId ==null){
-            userId = Constant.ADMIN_ID;
-        }
-//      String  userId= "programer_zk";
+		String userId = loginUserInfoHelper.getUserId();
+		if (userId == null) {
+			userId = Constant.ADMIN_ID;
+		}
 
+		// 需要设置的其他期数
+		List<StaffBusinessVo> needSetOtherPlanLists = new LinkedList<>();
 
+		// 如果是移交法务、关闭、拖车登记
+		// 需要更新此业务所有的历史记录为移交法务/关闭 /拖车登记
+		if (staffType.equals(CollectionStatusEnum.TO_LAW_WORK.getPageStr())
+				|| staffType.equals(CollectionStatusEnum.CLOSED.getPageStr())
+				|| staffType.equals(CollectionStatusEnum.TRAILER_REG.getPageStr())) {
 
-//        if(staffType.equals(StaffPersonType.PHONE_STAFF.getKey())){
-//            collectionStatus = CollectionStatusEnum.PHONE_STAFF.getKey();
-//        }else if (staffType.equals(StaffPersonType.VISIT_STAFF.getKey())){
-//            collectionStatus =CollectionStatusEnum.COLLECTING.getKey();
-//        }else if(staffType.equals(StaffPersonType.LAW.getKey())){
-//            collectionStatus =CollectionStatusEnum.TO_LAW_WORK.getKey();
-//        }else{
-//            collectionStatus =CollectionStatusEnum.CLOSED.getKey();
-//        }
+			// 1、更新历史记录为移交法务 /关闭 /拖车登记
+			for (StaffBusinessVo vo : voList) {
 
-        //需要设置的其他期数
-        List<StaffBusinessVo> needSetOtherPlanLists = new LinkedList<>();
+				/*
+				 * Modifier：huweiqian Date: 2018-09-21 Desc: 如果催收状态将更新为 移交法务 /关闭
+				 * /拖车登记，则需要根据原业务ID来更新所有对应的催收记录
+				 */
 
-        //如果是移交法务、关闭、拖车登记
-        //需要更新此业务所有的历史记录为移交法务/关闭 /拖车登记
-        if(staffType.equals(CollectionStatusEnum.TO_LAW_WORK.getPageStr())
-                || staffType.equals(CollectionStatusEnum.CLOSED.getPageStr())
-                || staffType.equals(CollectionStatusEnum.TRAILER_REG.getPageStr())){
-            //1、更新历史记录为移交法务 /关闭  /拖车登记
-            for(StaffBusinessVo vo:voList){
-                List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()));
-                List<CollectionLog> logs = new ArrayList<>() ;
-                List<RepaymentBizPlanList> bizPlanLists = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id",vo.getBusinessId()));
-                Map<String,RepaymentBizPlanList> bizPlanListMap = new HashMap<>();
-                for(RepaymentBizPlanList repaymentBizPlanList: bizPlanLists){
-                    bizPlanListMap.put(repaymentBizPlanList.getPlanListId(),repaymentBizPlanList);
-                }
-                //去除这次需要设置催收信息的还款计划
-                bizPlanListMap.remove(vo.getCrpId());
-                for(CollectionStatus status:list){
+				// 1、根据businessId找到
+				List<RepaymentBizPlanList> bizPlanLists = repaymentBizPlanListService
+						.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", vo.getBusinessId()));
 
-                    //跳过crpId一致的记录
-                    if(status.getCrpId().equals(vo.getCrpId())) {
-                        continue;
-                    }
-                    //去除已存在催收记录的还款计划
-                    bizPlanListMap.remove(status.getCrpId());
+				if (CollectionUtils.isEmpty(bizPlanLists)) {
+					logger.info("根据业务ID：{}，找不到对应的还款计划！", vo.getBusinessId());
+					continue;
+				}
 
-                    status.setSetWay(setWayEnum.getKey());
-                    status.setUpdateTime(new Date());
-                    switch (setWayEnum){
-                        case XINDAI_CALL:
-                        case AUTO_SET:
-                            status.setUpdateUser(Constant.ADMIN_ID);
-                            break;
-                        case MANUAL_SET:
-                            status.setUpdateUser(loginUserInfoHelper.getUserId()==null?Constant.ADMIN_ID:loginUserInfoHelper.getUserId());
-                            break;
-                    }
-                    CollectionLog log = new CollectionLog();
-                    log.setBusinessId(status.getBusinessId());
-                    log.setCrpId(status.getCrpId());
-                    log.setAfterStatus(CollectionStatusEnum.getByPageStr(staffType).getKey());
-                    log.setCollectionUser("".equals(staffUserId)?Constant.ADMIN_ID:staffUserId);
-                    log.setCreateTime(new Date());
-                    log.setCreateUser(status.getUpdateUser());
-                    log.setUpdateTime(new Date());
-                    log.setUpdateUser(status.getUpdateUser());
-                    log.setDescribe(setWayEnum.getName());
-                    log.setSetWay(setWayEnum.getKey());
-                    log.setBeforeStatus(status.getCollectionStatus());
-                    Integer afterStatus = getCurrentColStatu(status, CollectionStatusEnum.getByPageStr(staffType).getKey());
-                    status.setCollectionStatus(afterStatus);
-                    String crpId= status.getCrpId();
-                    status.setCrpId(null);
-                    update(status, new EntityWrapper<CollectionStatus>().eq("business_id", status.getBusinessId()).eq("crp_id",crpId));
-                    logs.add(log);
-                }
+				// 2、拿到对应的 原业务ID origBusinessId
+				String origBusinessId = bizPlanLists.get(0).getOrigBusinessId();
 
-                //如果有未设置催收状态的期数，则新建这一期的催收状态
-                if(bizPlanListMap.size()>0){
-                    for(String planListId: bizPlanListMap.keySet()){
-                        RepaymentBizPlanList rbPlanList = bizPlanListMap.get(planListId);
-                        StaffBusinessVo staffBizVO = new StaffBusinessVo();
-                        staffBizVO.setCrpId(rbPlanList.getPlanListId());
-                        staffBizVO.setBusinessId(rbPlanList.getBusinessId());
-                        needSetOtherPlanLists.add(staffBizVO);
-                    }
-                }
+				// 3、根据 origBusinessId 取出所有对应的催收记录
+				List<CollectionStatus> list = selectList(
+						new EntityWrapper<CollectionStatus>().eq("original_business_id", origBusinessId));
+				
+				bizPlanLists = repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", origBusinessId));
 
-//                if(list.size()>0){
-////                	update(entity, wrapper)
-////                    updateBatchById(list);
-//                    for (CollectionStatus status : list) {
-// 					}
-//                }
-                if(logs.size()>0){
-                    collectionLogService.insertBatch(logs);
-                }
-            }
-        }
-//        else if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
-//                || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())){
-//            //如果是设置电催或者催收 判断业务是否已经拖车登记/关闭/移交法务
-//            for(StaffBusinessVo vo:voList){
-//                List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()));
-//                for(CollectionStatus status:list) {
-//                    if (status.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
-//                    ||status.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())
-//                    ||status.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
-//                        String statStr = CollectionStatusEnum.getByKey(status.getCollectionStatus()).getName();
-//                        logger.error("此业务已"+statStr+"，不能再设置催收或者电催！  businessId:"+ status.getBusinessId()+"     crpId:"+status.getCrpId());
-//                        throw  new  RuntimeException("此业务已"+statStr+"，不能再设置催收或者电催！");
-//                    }
-//                }
-//            }
-//        }
+				// 4、根据 PlanListId -- RepaymentBizPlanList 的关系存入 bizPlanListMap 中
+				Map<String, RepaymentBizPlanList> bizPlanListMap = new HashMap<>();
+				for (RepaymentBizPlanList repaymentBizPlanList : bizPlanLists) {
+					if (vo.getCrpId().equals(repaymentBizPlanList.getPlanListId())) {
+						vo.setBusinessId(repaymentBizPlanList.getBusinessId());
+					}
+					bizPlanListMap.put(repaymentBizPlanList.getPlanListId(), repaymentBizPlanList);
+				}
 
-        //将其他需要设置状态的期数加到voList中
-        voList.addAll(needSetOtherPlanLists);
-        Integer setTypeStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
-        for(StaffBusinessVo vo:voList){
-            String oldStaffUserId = "";
-            CollectionStatus status = new CollectionStatus();
-            //1、插入或更新催收状态表
-            List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()).eq("crp_id",vo.getCrpId()));
-            if(list.size()>0){
-                status = list.get(0);
-                if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())){
-                    oldStaffUserId = status.getPhoneStaff();
-                }else if (staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())){
-                    oldStaffUserId = status.getVisitStaff();
-                }
-            }else{
-//                //如果是设置关闭状态，又没有写过催收的状态记录则跳过，不增加催收状态记录
-//                if(CollectionStatusEnum.getByPageStr(staffType).equals(CollectionStatusEnum.CLOSED)){
-//                    continue;
-//                }
-            }
-            Integer beforeStatus = status.getCollectionStatus();
-            Integer afterStatus = getCurrentColStatu(status,setTypeStatus);
-            status.setBusinessId(vo.getBusinessId());
-            status.setCollectionStatus(afterStatus);
-            status.setCrpId(vo.getCrpId());
-            if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())){
-                status.setPhoneStaff(staffUserId);
-            }else if (staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())){
-                status.setVisitStaff(staffUserId);
-            }
-            status.setUpdateUser(userId);
-            status.setCreateUser(userId);
-            status.setDescribe(describe);
-            status.setCreateTime(new Date());
-            status.setUpdateTime(new Date());
-            status.setSetWay(setWayEnum.getKey());
-            RepaymentBizPlanList planList = repaymentBizPlanListService.selectById(vo.getCrpId());
-            if(ifPlanListIsLast(planList)){
-                status.setCrpType(CollectionCrpTypeEnum.LAST.getKey());
-            }else{
-                status.setCrpType(CollectionCrpTypeEnum.NORMAL.getKey());
-            }
+				// 去除这次需要设置催收信息的还款计划
+				bizPlanListMap.remove(vo.getCrpId());
 
-            if(list.size()>0){
-                status.setCrpId(null);
-                update(status,new EntityWrapper<CollectionStatus>().eq("business_id",vo.getBusinessId()).eq("crp_id",vo.getCrpId()));
-            }else{
-                insert(status);
-            }
-//            insertOrUpdate(status);
-            //2、记录移交记录表
-            CollectionLog log = new CollectionLog();
-            log.setAfterStatus(afterStatus);
-            log.setBusinessId(vo.getBusinessId());
-            log.setCollectionUser("".equals(staffUserId)?Constant.ADMIN_ID:staffUserId);
-            log.setCrpId(vo.getCrpId());
-            log.setUpdateUser(userId);
-            log.setCreateUser(userId);
-            log.setDescribe(describe);
-            log.setCreateTime(new Date());
-            log.setUpdateTime(new Date());
-            log.setSetWay(setWayEnum.getKey());
-            log.setBeforeStatus(beforeStatus);
-            log.setSetTypeStatus(setTypeStatus);
-            collectionLogService.insert(log);
+				List<CollectionLog> logs = new ArrayList<>();
+				for (CollectionStatus status : list) {
 
+					// 跳过crpId一致的记录
+					if (status.getCrpId().equals(vo.getCrpId())) {
+						continue;
+					}
+					// 去除已存在催收记录的还款计划
+					bizPlanListMap.remove(status.getCrpId());
 
-            //信贷历史数据导入则不刷新跟单人的权限信息
-            if(setWayEnum.getKey()!= CollectionSetWayEnum.XINDAI_LOG.getKey()){
-                //刷新相关跟单人员的用户设置
-                //1.旧的那个跟单人的permission刷新
-                if(oldStaffUserId!=null){
-//                    List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
-//                    if(lsys!=null && lsys.size()>0){
-//                        sysUserPermissionService.delete(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",oldStaffUserId));
-//                    }
-                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && !StringUtils.isBlank(oldStaffUserId)) {
-                		String oldStaffUserIds = oldStaffUserId;
-//                		cunshouThreadAsync.execute(new Runnable() {
-//        					@Override
-//        					public void run() {
-		                		List<StaffBusinessVo> voTempList = new ArrayList<>();
-		                		voTempList.add(vo);
-        						sysUserPermissionService.setUserPermissonsInBusinessList(oldStaffUserIds,voTempList);
-        						
-        						
-//        					}
-//        	        	});
-                		
-                	}else {
-                		SysUser sysUser = sysUserService.selectById(oldStaffUserId);
-						if(null != sysUser) {
+					status.setSetWay(setWayEnum.getKey());
+					status.setUpdateTime(new Date());
+
+					switch (setWayEnum) {
+					
+					case XINDAI_CALL:
+					case AUTO_SET:
+						status.setUpdateUser(Constant.ADMIN_ID);
+						break;
+						
+					case MANUAL_SET:
+						status.setUpdateUser(loginUserInfoHelper.getUserId() == null ? Constant.ADMIN_ID
+								: loginUserInfoHelper.getUserId());
+						break;
+						
+					default:
+						break;
+					}
+
+					CollectionLog log = new CollectionLog();
+					log.setBusinessId(status.getBusinessId());
+					log.setCrpId(status.getCrpId());
+					log.setAfterStatus(CollectionStatusEnum.getByPageStr(staffType).getKey());
+					log.setCollectionUser("".equals(staffUserId) ? Constant.ADMIN_ID : staffUserId);
+					log.setCreateTime(new Date());
+					log.setCreateUser(status.getUpdateUser());
+					log.setUpdateTime(new Date());
+					log.setUpdateUser(status.getUpdateUser());
+					log.setDescribe(setWayEnum.getName());
+					log.setSetWay(setWayEnum.getKey());
+					log.setBeforeStatus(status.getCollectionStatus());
+
+					Integer afterStatus = getCurrentColStatu(status,
+							CollectionStatusEnum.getByPageStr(staffType).getKey());
+
+					status.setCollectionStatus(afterStatus);
+
+					String crpId = status.getCrpId();
+
+					status.setCrpId(null);
+
+					update(status, new EntityWrapper<CollectionStatus>().eq("crp_id", crpId));
+
+					logs.add(log);
+				}
+
+				// 如果有未设置催收状态的期数，则新建这一期的催收状态
+				if (bizPlanListMap.size() > 0) {
+					
+					for (String planListId : bizPlanListMap.keySet()) {
+						
+						RepaymentBizPlanList rbPlanList = bizPlanListMap.get(planListId);
+						
+						StaffBusinessVo staffBizVO = new StaffBusinessVo();
+						
+						staffBizVO.setCrpId(rbPlanList.getPlanListId());
+						staffBizVO.setBusinessId(rbPlanList.getBusinessId());
+						staffBizVO.setOrigBusinessId(rbPlanList.getOrigBusinessId());
+						
+						needSetOtherPlanLists.add(staffBizVO);
+					}
+				}
+
+				if (!logs.isEmpty()) {
+					collectionLogService.insertBatch(logs);
+				}
+			}
+		}
+
+		// 将其他需要设置状态的期数加到voList中
+		voList.addAll(needSetOtherPlanLists);
+		
+		Integer setTypeStatus = CollectionStatusEnum.getByPageStr(staffType).getKey();
+		
+		for (StaffBusinessVo vo : voList) {
+			
+			String oldStaffUserId = "";
+			
+			CollectionStatus status = new CollectionStatus();
+			
+			// 1、插入或更新催收状态表
+			List<CollectionStatus> list = selectList(new EntityWrapper<CollectionStatus>().eq("crp_id", vo.getCrpId()));
+			
+			if (CollectionUtils.isNotEmpty(list)) {
+				status = list.get(0);
+				if (staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())) {
+					oldStaffUserId = status.getPhoneStaff();
+				} else if (staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
+					oldStaffUserId = status.getVisitStaff();
+				}
+			} else {
+				// //如果是设置关闭状态，又没有写过催收的状态记录则跳过，不增加催收状态记录
+				// if(CollectionStatusEnum.getByPageStr(staffType).equals(CollectionStatusEnum.CLOSED)){
+				// continue;
+				// }
+				status.setCreateTime(new Date());
+				status.setCreateUser(userId);
+			}
+			Integer beforeStatus = status.getCollectionStatus();
+			Integer afterStatus = getCurrentColStatu(status, setTypeStatus);
+			status.setBusinessId(vo.getBusinessId());
+			status.setCollectionStatus(afterStatus);
+			status.setCrpId(vo.getCrpId());
+			if (staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())) {
+				status.setPhoneStaff(staffUserId);
+			} else if (staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
+				status.setVisitStaff(staffUserId);
+			}
+			status.setUpdateUser(userId);
+			status.setDescribe(describe);
+			status.setUpdateTime(new Date());
+			status.setSetWay(setWayEnum.getKey());
+			RepaymentBizPlanList planList = repaymentBizPlanListService.selectById(vo.getCrpId());
+			status.setOriginalBusinessId(planList.getOrigBusinessId());
+			status.setAfterId(planList.getAfterId());
+			if (ifPlanListIsLast(planList)) {
+				status.setCrpType(CollectionCrpTypeEnum.LAST.getKey());
+			} else {
+				status.setCrpType(CollectionCrpTypeEnum.NORMAL.getKey());
+			}
+
+			if (CollectionUtils.isNotEmpty(list)) {
+				status.setCrpId(null);
+				update(status, new EntityWrapper<CollectionStatus>().eq("crp_id", vo.getCrpId()));
+			} else {
+				insert(status);
+			}
+
+			// 2、记录移交记录表
+			CollectionLog log = new CollectionLog();
+			log.setAfterStatus(afterStatus);
+			log.setBusinessId(vo.getBusinessId());
+			log.setCollectionUser("".equals(staffUserId) ? Constant.ADMIN_ID : staffUserId);
+			log.setCrpId(vo.getCrpId());
+			log.setUpdateUser(userId);
+			log.setCreateUser(userId);
+			log.setDescribe(describe);
+			log.setCreateTime(new Date());
+			log.setUpdateTime(new Date());
+			log.setSetWay(setWayEnum.getKey());
+			log.setBeforeStatus(beforeStatus);
+			log.setSetTypeStatus(setTypeStatus);
+			collectionLogService.insert(log);
+
+			// 信贷历史数据导入则不刷新跟单人的权限信息
+			if (setWayEnum.getKey() != CollectionSetWayEnum.XINDAI_LOG.getKey()) {
+				// 刷新相关跟单人员的用户设置
+				// 1.旧的那个跟单人的permission刷新
+				if (oldStaffUserId != null) {
+					if (setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey()
+							&& !StringUtils.isBlank(oldStaffUserId)) {
+						String oldStaffUserIds = oldStaffUserId;
+						List<StaffBusinessVo> voTempList = new ArrayList<>();
+						voTempList.add(vo);
+						sysUserPermissionService.setUserPermissonsInBusinessList(oldStaffUserIds, voTempList);
+
+					} else {
+						SysUser sysUser = sysUserService.selectById(oldStaffUserId);
+						if (null != sysUser) {
 							sysUser.setLastPermissionStatus(1);
 							sysUserService.updateById(sysUser);
 						}
-                	}
-                }
+					}
+				}
 
-                //2.新的那个跟单人的permission刷新
-                if(staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
-                        || staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
-                	if(setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey() && !StringUtils.isBlank(staffUserId)) {
-//                		cunshouThreadAsync.execute(new Runnable() {
-//        					@Override
-//        					public void run() {
-		                		List<StaffBusinessVo> voTempList = new ArrayList<>();
-		                		voTempList.add(vo);
-        						sysUserPermissionService.setUserPermissonsInBusinessList(staffUserId,voTempList);
-//        					}
-//        	        	});
-                	}
-                	else {
-                		SysUser sysUser = sysUserService.selectById(staffUserId);
-						if(null != sysUser) {
+				// 2.新的那个跟单人的permission刷新
+				if (staffType.equals(CollectionStatusEnum.PHONE_STAFF.getPageStr())
+						|| staffType.equals(CollectionStatusEnum.COLLECTING.getPageStr())) {
+					if (setWayEnum.getKey() != CollectionSetWayEnum.AUTO_SET.getKey()
+							&& !StringUtils.isBlank(staffUserId)) {
+						List<StaffBusinessVo> voTempList = new ArrayList<>();
+						voTempList.add(vo);
+						sysUserPermissionService.setUserPermissonsInBusinessList(staffUserId, voTempList);
+					} else {
+						SysUser sysUser = sysUserService.selectById(staffUserId);
+						if (null != sysUser) {
 							sysUser.setLastPermissionStatus(1);
 							sysUserService.updateById(sysUser);
 						}
-                	}
-                    /*List<SysUserPermission>  lsys = sysUserPermissionService.selectList(new EntityWrapper<SysUserPermission>().eq("business_id",status.getBusinessId()).eq("user_id",staffUserId));
-                    if(lsys == null || lsys.size()==0){
-                        SysUserPermission temp = new SysUserPermission();
-                        temp.setUserId(staffUserId);
-                        temp.setBusinessId(status.getBusinessId());
-                        sysUserPermissionService.insert(temp);
+					}
+				}
+			}
 
-                    }*/
-                }
-            }
-
-
-        }
-        return true;
-    }
+		}
+		return true;
+	}
 
     /**
      * 同步业务的贷后状态到信贷
@@ -781,7 +792,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         	}
 
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
-            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
+            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId(),planList.getOrigBusinessId());
             CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()).isNotNull("phone_staff"));
             
         
@@ -867,7 +878,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
         		System.out.println("stop");
         	}
             // yzl  判断是否分配过催收时，需要按催收方式分类判断
-            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId());
+            CollectionStatus lastCollectionStatus =getRecentlyCollectionStatus(planList.getPlanId(),planList.getPlanListId(),planList.getOrigBusinessId());
             CollectionStatus currentCollectionStatus =selectOne(new EntityWrapper<CollectionStatus>().eq("crp_id", planList.getPlanListId()).isNotNull("visit_staff"));
             
          
@@ -935,117 +946,91 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
      */
     @Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
     private String sendUrl;
-    public void setBusinessToLaw() {
-        CollectionTimeSet lawTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.TO_LAW_WORK.getKey()).and("start_time <= NOW()"));
 
-        Integer lawDaysAfterOverDue = lawTimeSet!=null?lawTimeSet.getOverDueDays():91;
+	public void setBusinessToLaw() {
+		CollectionTimeSet lawTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>()
+				.eq("col_type", CollectionStatusEnum.TO_LAW_WORK.getKey()).and("start_time <= NOW()"));
 
-        //一般业务
-        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedLawNorBiz(lawDaysAfterOverDue,null);
-//        //展期业务
-//        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedLawRenewBiz(lawDaysAfterOverDue);
-//        planLists.addAll(renewPlanLists);
-        for(RepaymentBizPlanList planList:planLists) {
-           try {
-        	      setOneRepaymentBizPlanToLaw(planList); 
-           }catch(Exception e){
-        	   e.printStackTrace();
-        	   logger.error("发送诉讼系统失败planListId:[{0}]",planList.getPlanListId());
-           }
-      
+		Integer lawDaysAfterOverDue = lawTimeSet != null ? lawTimeSet.getOverDueDays() : 91;
 
+		// 一般业务
+		List<RepaymentBizPlanList> planLists = repaymentBizPlanListService
+				.queryTransferOfLitigationData(lawDaysAfterOverDue, null);
 
-           /* setAutoBusinessStaff(planList.getBusinessId(),planList.getPlanListId(),
-                    null,
-                    StaffPersonType.VISIT_STAFF.getKey());
-            List<Integer> l = new LinkedList<>();
-            l.add(CollectionStatusEnum.PHONE_STAFF.getKey());
-            l.add(CollectionStatusEnum.COLLECTING.getKey());
-            List<CollectionStatus> oldStatus = selectList(new EntityWrapper<CollectionStatus>()
-                    .in("collection_status",l)
-                    .eq("business_id",planList.getBusinessId()));
-            if(oldStatus.size()>0){
-                for(CollectionStatus ss:oldStatus){
-                    setAutoBusinessStaff(ss.getBusinessId(),ss.getCrpId(),
-                            null,
-                            StaffPersonType.VISIT_STAFF.getKey());
-                }
-            }*/
-                            //[CollectionStatusEnum.PHONE_STAFF.getKey(),CollectionStatusEnum.COLLECTING.getKey()])
+		if (CollectionUtils.isEmpty(planLists)) {
+			return;
+		}
 
-        }
-    }
+		Map<String, RepaymentBizPlanList> map = new HashMap<>();
+
+		for (RepaymentBizPlanList planList : planLists) {
+			if (map.containsKey(planList.getOrigBusinessId())) {
+				continue;
+			} else {
+				map.put(planList.getOrigBusinessId(), planList);
+			}
+		}
+
+		if (!map.isEmpty()) {
+			for (Entry<String, RepaymentBizPlanList> entry : map.entrySet()) {
+				RepaymentBizPlanList planList = entry.getValue();
+				try {
+					setOneRepaymentBizPlanToLaw(planList);
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("发送诉讼系统失败planListId:[{0}]", planList.getPlanListId());
+				}
+			}
+		}
+	}
 
     /**
      * 将指定业务移交法务
      * @param businessId
      */
-    public void setOneBusinessToLaw(String businessId){
-        CollectionTimeSet lawTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>().eq("col_type",CollectionStatusEnum.TO_LAW_WORK.getKey()).and("start_time <= NOW()"));
+	public void setOneBusinessToLaw(String businessId) {
+		CollectionTimeSet lawTimeSet = collectionTimeSetService.selectOne(new EntityWrapper<CollectionTimeSet>()
+				.eq("col_type", CollectionStatusEnum.TO_LAW_WORK.getKey()).and("start_time <= NOW()"));
 
-        Integer lawDaysAfterOverDue = lawTimeSet!=null?lawTimeSet.getOverDueDays():91;
+		Integer lawDaysAfterOverDue = lawTimeSet != null ? lawTimeSet.getOverDueDays() : 91;
 
-        //一般业务
-        List<RepaymentBizPlanList> planLists = repaymentBizPlanListService.selectNeedLawNorBizByBizId(lawDaysAfterOverDue,null,businessId);
-        if(planLists==null || planLists.size()==0){
-            throw new RuntimeException("找不到需要移交法务的业务");
-        }
-//        //展期业务
-//        List<RepaymentBizPlanList> renewPlanLists = repaymentBizPlanListService.selectNeedLawRenewBiz(lawDaysAfterOverDue);
-//        planLists.addAll(renewPlanLists);
-        for(RepaymentBizPlanList planList:planLists) {
-
-            setOneRepaymentBizPlanToLaw(planList);
-        }
-
-    }
+		// 一般业务
+		List<RepaymentBizPlanList> planLists = repaymentBizPlanListService
+				.queryTransferOfLitigationData(lawDaysAfterOverDue, businessId);
+		if (CollectionUtils.isEmpty(planLists)) {
+			throw new ServiceRuntimeException("找不到需要移交法务的业务");
+		}
+		setOneRepaymentBizPlanToLaw(planLists.get(0));
+	}
 
 
-    public  void setOneRepaymentBizPlanToLaw(RepaymentBizPlanList planList){
-        RepaymentBizPlan repaymentBizPlan =  repaymentBizPlanService.selectById(planList.getPlanId());
+	public void setOneRepaymentBizPlanToLaw(RepaymentBizPlanList planList) {
+		try {
+			String origBusinessId = planList.getOrigBusinessId();
+			Result result = litigationFeignClient.isImportLitigation(origBusinessId);
+			logger.info("调用诉讼系统查询接口，参数：{}；返回信息：{}", origBusinessId, JSONObject.toJSONString(result));
+			// 调用诉讼系统查询接口，若调用失败或者非成功状态，则这条数据暂时不处理
+			if (result == null || !"1".equals(result.getCode())) {
+				return;
+			} else {
+				// 若调用成功，且状态是true，说明移交过法务
+				if (!(Boolean) result.getData()) {
+					// 调用移交诉讼接口
+					transferLitigationService.sendTransferLitigationData(origBusinessId, sendUrl, null, 1);
+				}
+			}
 
-        try{
-            String originalBusinessId = repaymentBizPlan.getOriginalBusinessId();
-            Result result = litigationFeignClient.isImportLitigation(originalBusinessId);
-            logger.info("调用诉讼系统查询接口，参数：{}；返回信息：{}", originalBusinessId, JSONObject.toJSONString(result));
-            // 调用诉讼系统查询接口，若调用失败或者非成功状态，则这条数据暂时不处理
-            if (result == null || !"1".equals(result.getCode())) {
-                return;
-            }else {
-                // 若调用成功，且状态是true，说明移交过法务
-                if (!(Boolean) result.getData()) {
-                    //调用移交诉讼接口
-                    transferLitigationService.sendTransferLitigationData(
-                            originalBusinessId,sendUrl,null, 1);
-//                	Map<String, Object> paramMap = new HashMap<>();
-//                	paramMap.put("businessId", originalBusinessId);
-//                	paramMap.put("channel", 1);
-//                	almsCoreServiceFeignClient.sendTransferLitigation(paramMap);
-                }
-            }
+			List<StaffBusinessVo> voList = new LinkedList<>();
+			StaffBusinessVo vo = new StaffBusinessVo();
+			vo.setCrpId(planList.getPlanListId());
+			vo.setBusinessId(origBusinessId);
+			voList.add(vo);
 
-            //修改状态
-          /*  setBussinessAfterStatus(
-                    originalBusinessId,
-                    planList.getPlanListId(),
-                    "自动移交法务",
-                    CollectionStatusEnum.TO_LAW_WORK,
-                    CollectionSetWayEnum.AUTO_SET);*/
-
-            List<StaffBusinessVo> voList = new LinkedList<>();
-            StaffBusinessVo vo  = new StaffBusinessVo();
-            vo.setCrpId(planList.getPlanListId());
-            vo.setBusinessId(originalBusinessId);
-            voList.add(vo);
-
-            //同步贷后状态到信贷
-//                SyncBusinessColStatusToXindai(voList,null,"定时任务自动分配",CollectionStatusEnum.TO_LAW_WORK.getPageStr());
-
-        }catch (Exception e){
-            logger.error("自動移交法务异常",e);
-            e.printStackTrace();
-        }
-    }
+		} catch (Exception e) {
+			logger.error("自動移交法务异常", e);
+			throw new ServiceRuntimeException(e.getMessage(), e);
+		}
+	}
 
 
     /**
@@ -1297,8 +1282,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     } 
 
 	@Override
-	public CollectionStatus getRecentlyCollectionStatus(String planId,String pListId) {
-		CollectionStatus colStatus = collectionStatusMapper.getRecentlyCollectionStatus(planId,pListId);
+	public CollectionStatus getRecentlyCollectionStatus(String planId,String pListId,String originalBusinessId) {
+		CollectionStatus colStatus = collectionStatusMapper.getRecentlyCollectionStatus(planId,pListId,originalBusinessId);
 		return colStatus;
 	}
 

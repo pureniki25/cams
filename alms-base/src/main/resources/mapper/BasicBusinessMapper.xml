@@ -989,6 +989,7 @@
 		t2.src_type = 2
 		AND t1.process_status = 2
 		AND t1.last_push_status in (0,2)
+		and t1.is_valid = 1
 		<if test="businessId != null">
            <![CDATA[ and t1.orig_business_id = #{businessId}]]>
         </if>

@@ -46,7 +46,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="TableName_Column_List">
-        planList.plan_list_id AS planListId, planList.plan_id AS planId, planList.business_id AS businessId, planList.period as period, planList.after_id AS afterId, planList.due_date AS dueDate, planList.total_borrow_amount AS totalBorrowAmount, planList.overdue_amount AS overdueAmount, planList.overdue_days AS overdueDays, planList.current_status AS currentStatus, planList.repay_flag AS repayFlag, planList.fact_repay_date AS factRepayDate, planList.finance_comfirm_date AS financeComfirmDate, planList.finance_confirm_user AS financeConfirmUser, planList.finance_confirm_user_name AS financeConfirmUserName, planList.confirm_flag AS confirmFlag, planList.auto_withholding_confirmed_date AS autoWithholdingConfirmedDate, planList.auto_withholding_confirmed_user AS autoWithholdingConfirmedUser, planList.accountant_confirm_status AS accountantConfirmStatus, planList.accountant_confirm_user AS accountantConfirmUser, planList.accountant_confirm_user_name AS accountantConfirmUserName, planList.accountant_confirm_date AS accountantConfirmDate, planList.remark AS  remark, planList.create_time AS createTime, planList.create_user AS createUser, planList.update_time AS updateTime, planList.update_user AS updateUser
+        planList.plan_list_id AS planListId, planList.plan_id AS planId, planList.business_id AS businessId, planList.orig_business_id AS origBusinessId,planList.period as period, planList.after_id AS afterId, planList.due_date AS dueDate, planList.total_borrow_amount AS totalBorrowAmount, planList.overdue_amount AS overdueAmount, planList.overdue_days AS overdueDays, planList.current_status AS currentStatus, planList.repay_flag AS repayFlag, planList.fact_repay_date AS factRepayDate, planList.finance_comfirm_date AS financeComfirmDate, planList.finance_confirm_user AS financeConfirmUser, planList.finance_confirm_user_name AS financeConfirmUserName, planList.confirm_flag AS confirmFlag, planList.auto_withholding_confirmed_date AS autoWithholdingConfirmedDate, planList.auto_withholding_confirmed_user AS autoWithholdingConfirmedUser, planList.accountant_confirm_status AS accountantConfirmStatus, planList.accountant_confirm_user AS accountantConfirmUser, planList.accountant_confirm_user_name AS accountantConfirmUserName, planList.accountant_confirm_date AS accountantConfirmDate, planList.remark AS  remark, planList.create_time AS createTime, planList.create_user AS createUser, planList.update_time AS updateTime, planList.update_user AS updateUser
     </sql>
 
     <!-- 选择需要 自动移交的一般业务还款计划列表(包括展期业务) -->
@@ -595,6 +595,7 @@
 			    `tb_repayment_biz_plan_list` t1,
 			    `tb_repayment_biz_plan_list_detail` t2 
 			  WHERE t1.plan_list_id = t2.plan_list_id 
+			  	AND t2.plan_item_type = 60
 			    AND t2.fee_id != '2e646c87-5721-11e8-8a00-0242ac110002' 
 			    AND t1.plan_list_id = rbpl.plan_list_id) offlineLateFee,
 			  -- 线下减免金额
@@ -1095,6 +1096,26 @@
 FROM tb_repayment_biz_plan_list
 WHERE (src_type = 2 AND current_status <![CDATA[ <>  ]]> '已还款' AND (current_sub_status <![CDATA[ <>  ]]> '还款待确认' OR current_sub_status IS NULL) AND plan_id = #{planListId}) 
     
+    </select>
+    
+    <select id="queryTransferOfLitigationData" resultType="com.hongte.alms.base.entity.RepaymentBizPlanList">
+    	SELECT 
+		  <include refid="TableName_Column_List"/> 
+		FROM
+		  tb_repayment_biz_plan_list planList 
+		WHERE TO_DAYS(NOW()) - TO_DAYS(planList.due_date) >= #{overDueDays,jdbcType=INTEGER} 
+		  AND planList.current_status IN ("还款中", "逾期") 
+		  AND IFNULL(planList.`repay_status`, 0) NOT IN (1, 2, 3) 
+		  AND NOT EXISTS 
+		  (SELECT 
+		    1 
+		  FROM
+		    `tb_collection_status` t2 
+		  WHERE t2.`collection_status` IN (100, 200) 
+		    AND t2.`original_business_id` = planList.`orig_business_id`)
+		<if test = "origBusinessId != null and origBusinessId !=''">
+		  AND planList.`orig_business_id` = #{origBusinessId,jdbcType=VARCHAR}
+		</if>
     </select>
     
  
