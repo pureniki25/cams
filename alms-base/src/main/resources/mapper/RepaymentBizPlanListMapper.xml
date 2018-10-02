@@ -1098,5 +1098,25 @@ WHERE (src_type = 2 AND current_status <![CDATA[ <>  ]]> '已还款' AND (curren
     
     </select>
     
+    <select id="queryTransferOfLitigationData" resultType="com.hongte.alms.base.entity.RepaymentBizPlanList">
+    	SELECT 
+		  <include refid="TableName_Column_List"/> 
+		FROM
+		  tb_repayment_biz_plan_list planList 
+		WHERE TO_DAYS(NOW()) - TO_DAYS(planList.due_date) >= #{overDueDays,jdbcType=INTEGER} 
+		  AND planList.current_status IN ("还款中", "逾期") 
+		  AND IFNULL(planList.`repay_status`, 0) NOT IN (1, 2, 3) 
+		  AND NOT EXISTS 
+		  (SELECT 
+		    1 
+		  FROM
+		    `tb_collection_status` t2 
+		  WHERE t2.`collection_status` IN (100, 200) 
+		    AND t2.`original_business_id` = planList.`orig_business_id`)
+		<if test = "origBusinessId != null and origBusinessId !=''">
+		  AND planList.`orig_business_id` = #{origBusinessId,jdbcType=VARCHAR}
+		</if>
+    </select>
+    
  
 </mapper>

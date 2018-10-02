@@ -1,16 +1,15 @@
 package com.hongte.alms.base.service.impl;
 
-import com.hongte.alms.base.entity.RepaymentPlatformList;
-import com.hongte.alms.base.mapper.BasicBusinessMapper;
-import com.hongte.alms.base.mapper.RepaymentPlatformListMapper;
-import com.hongte.alms.base.service.RepaymentPlatformListService;
-import com.hongte.alms.common.service.impl.BaseServiceImpl;
-
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.hongte.alms.base.entity.RepaymentPlatformList;
+import com.hongte.alms.base.mapper.RepaymentPlatformListMapper;
+import com.hongte.alms.base.service.RepaymentPlatformListService;
+import com.hongte.alms.common.service.impl.BaseServiceImpl;
 
 /**
  * <p>
@@ -69,6 +68,26 @@ public class RepaymentPlatformListServiceImpl extends BaseServiceImpl<RepaymentP
 	@Override
 	public List<Map<String, Object>> selectPushAdvanceRepayFlowItem(Map<String, Object> paramFlowItemMap) {
 		return repaymentPlatformListMapper.selectPushAdvanceRepayFlowItem(paramFlowItemMap);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectPushNiWoRepayFlowList(Map<String, Object> paramBusinessMap) {
+		return repaymentPlatformListMapper.selectPushNiWoRepayFlowList(paramBusinessMap);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectPushNiWoRepayFlow(Map<String, Object> paramFlowMap) {
+		return repaymentPlatformListMapper.selectPushNiWoRepayFlow(paramFlowMap);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectPushRechargeFlowList(Map<String, Object> paramBusinessMap) {
+		return repaymentPlatformListMapper.selectPushRechargeFlowList(paramBusinessMap);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectPushRechargeFlow(Map<String, Object> paramFlowMap) {
+		return repaymentPlatformListMapper.selectPushRechargeFlow(paramFlowMap);
 	}
 
 }

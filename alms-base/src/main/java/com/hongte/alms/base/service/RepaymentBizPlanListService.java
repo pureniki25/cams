@@ -1,17 +1,15 @@
 package com.hongte.alms.base.service;
 
-import com.hongte.alms.base.dto.FinanceManagerListReq;
-import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.RepaymentProjPlanList;
-import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
-import com.hongte.alms.common.service.BaseService;
-import com.hongte.alms.common.vo.PageResult;
-
 import java.util.Date;
 import java.util.List;
 
-import com.hongte.alms.common.vo.PageResult;
 import org.apache.ibatis.annotations.Param;
+
+import com.hongte.alms.base.dto.FinanceManagerListReq;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
+import com.hongte.alms.common.service.BaseService;
+import com.hongte.alms.common.vo.PageResult;
 
 /**
  * <p>
@@ -128,4 +126,11 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
 	 * @return
 	 */
 	List<RepaymentBizPlanList> getPlanListForCalLateFee(String planListId);
+	
+	/**
+     * 查询自动或手动移交法务的数据
+     * @param origBusinessId
+     * @return
+     */
+    List<RepaymentBizPlanList> queryTransferOfLitigationData(Integer overDueDays, String origBusinessId);
 }

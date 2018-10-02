@@ -358,5 +358,145 @@
 		WHERE 
 		t1.id = #{repaySourceId}
     </select>
-
+    
+    
+    <select id="selectPushNiWoRepayFlowList" resultType="map">
+		SELECT t1.plan_list_id AS confirm_log_id,t1.business_id,t1.orig_business_id,t4.asset_id,t1.create_time,t1.create_user,t4.company_id,t4.company_name,
+		t4.business_type,t5.business_type_name,t4.customer_name,
+		2  AS 'action_id',
+		'1' as businessFlag,
+		t3.project_from+1 as businessFrom
+		FROM `tb_repayment_biz_plan_list` t1
+		LEFT JOIN tb_repayment_biz_plan t2 ON t1.plan_id = t2.plan_id
+		LEFT JOIN tb_tuandai_project_info t3 ON t3.business_id = t2.business_id AND t2.repayment_batch_id = t3.business_after_guid
+		LEFT JOIN tb_basic_business t4 ON t1.business_id = t4.business_id
+		LEFT JOIN tb_basic_business_type t5 ON t5.business_type_id = t4.business_type
+		<where> 
+		t3.plate_type = 2
+		AND current_status = '已还款'
+		AND t4.src_type = 2
+		AND t1.last_push_status IN (0,2)
+		<if test="businessId != null">
+           <![CDATA[ and t1.business_id = #{businessId}]]>
+        </if>
+        <if test="planListId != null">
+           <![CDATA[ and t1.plan_list_id = #{planListId}]]>
+        </if>
+		</where>
+    </select>
+    
+    <select id="selectPushNiWoRepayFlow" resultType="map">
+		SELECT 
+		t1.plan_list_id AS 'list_id',
+		'' AS 'account_id',
+		t1.fact_repay_date AS 'account_time',
+		t1.business_id AS 'business_id',
+		t3.project_id AS 'issue_id', 
+		t1.after_id AS 'after_id',
+		t1.business_id AS 'exhibition_id',
+		'0'AS 'amount', 
+		'0' AS 'balance',
+		t3.bank_account_no AS 'bank_card_no', 
+		1 AS 'in_out',
+		t1.finance_confirm_user AS 'create_user', 
+		t1.fact_repay_date AS 'create_time',
+		'你我金融' AS 'operator',
+		t1.repay_status AS 'status_flag',
+		'贷后系统同步' AS 'remark',
+		'1' AS 'business_flag',
+		'1' AS 'repay_type',
+		t3.real_name AS 'customer_name',  
+		'' AS 'external_id',
+		t5.business_type_name AS 'business_type', 
+		t4.business_type AS 'business_type_id', 
+		t4.business_ctype AS 'business_ctype',
+		t4.company_id AS 'branch_id',
+		t4.company_name AS 'branch_name',
+		CONCAT('ALMS-',t1.plan_list_id) AS 'batch_id',
+		NULL AS 'update_user',
+		NULL AS 'update_time',
+		1 AS 'import_type',
+		CONCAT('ALMS-',t1.plan_list_id) AS 'log_id',
+		t3.project_from+1 AS 'business_from',
+		t3.queryFullsuccessDate AS 'segmentation_date'
+		FROM `tb_repayment_biz_plan_list` t1
+		LEFT JOIN tb_repayment_biz_plan t2 ON t1.plan_id = t2.plan_id
+		LEFT JOIN tb_tuandai_project_info t3 ON t3.business_id = t2.business_id AND t2.repayment_batch_id = t3.business_after_guid
+		LEFT JOIN tb_basic_business t4 ON t1.business_id = t4.business_id
+		LEFT JOIN tb_basic_business_type t5 ON t5.business_type_id = t4.business_type
+		WHERE 
+		t1.plan_list_id = #{confirmLogId}
+		AND t1.last_push_status IN (0,2)
+		AND t1.current_status = '已还款'
+		ORDER BY t1.create_time
+    </select>
+    
+	<select id="selectPushRechargeFlowList" resultType="map">
+		SELECT t1.id AS confirm_log_id,t1.orig_business_id AS 'business_id',t1.orig_business_id,t4.asset_id,t1.create_time,t1.create_user,t4.company_id,t4.company_name,
+		t4.business_type,t5.business_type_name,t4.customer_name,
+		10  AS 'action_id',
+		'1' AS businessFlag,
+		1 AS businessFrom
+		FROM tb_agency_recharge_log t1
+		LEFT JOIN tb_basic_business t4 ON t1.orig_business_id = t4.business_id
+		LEFT JOIN tb_basic_business_type t5 ON t5.business_type_id = t4.business_type
+		<where> 
+		t1.handle_status = 2
+		AND t4.src_type = 2
+		AND t1.last_push_status IN (0,2)
+		<if test="businessId != null">
+           <![CDATA[ and t1.orig_business_id = #{businessId}]]>
+        </if>
+        <if test="logId != null">
+           <![CDATA[ and t1.id = #{logId}]]>
+        </if>
+		</where>
+    </select>
+    
+    <select id="selectPushRechargeFlow" resultType="map">
+		SELECT 
+		t1.plan_list_id AS 'list_id',
+		'' AS 'account_id',
+		t1.fact_repay_date AS 'account_time',
+		t1.business_id AS 'business_id',
+		t3.project_id AS 'issue_id', 
+		t1.after_id AS 'after_id',
+		t1.business_id AS 'exhibition_id',
+		'0'AS 'amount', 
+		'0' AS 'balance',
+		t3.bank_account_no AS 'bank_card_no', 
+		1 AS 'in_out',
+		t1.finance_confirm_user AS 'create_user', 
+		t1.fact_repay_date AS 'create_time',
+		'你我金融' AS 'operator',
+		t1.repay_status AS 'status_flag',
+		'贷后系统同步' AS 'remark',
+		'1' AS 'business_flag',
+		'1' AS 'repay_type',
+		t3.real_name AS 'customer_name',  
+		'' AS 'external_id',
+		t5.business_type_name AS 'business_type', 
+		t4.business_type AS 'business_type_id', 
+		t4.business_ctype AS 'business_ctype',
+		t4.company_id AS 'branch_id',
+		t4.company_name AS 'branch_name',
+		CONCAT('ALMS-',t1.plan_list_id) AS 'batch_id',
+		NULL AS 'update_user',
+		NULL AS 'update_time',
+		1 AS 'import_type',
+		CONCAT('ALMS-',t1.plan_list_id) AS 'log_id',
+		t3.project_from+1 AS 'business_from',
+		t3.queryFullsuccessDate AS 'segmentation_date'
+		FROM `tb_repayment_biz_plan_list` t1
+		LEFT JOIN tb_repayment_biz_plan t2 ON t1.plan_id = t2.plan_id
+		LEFT JOIN tb_tuandai_project_info t3 ON t3.business_id = t2.business_id AND t2.repayment_batch_id = t3.business_after_guid
+		LEFT JOIN tb_basic_business t4 ON t1.business_id = t4.business_id
+		LEFT JOIN tb_basic_business_type t5 ON t5.business_type_id = t4.business_type
+		WHERE 
+		t1.plan_list_id = #{confirmLogId}
+		AND t1.last_push_status IN (0,2)
+		AND t1.current_status = '已还款'
+		ORDER BY t1.create_time
+    </select>
+	
 </mapper>

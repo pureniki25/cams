@@ -20,6 +20,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentAdvanceRepayFlow;
+import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentPlatformList;
 import com.hongte.alms.base.entity.RepaymentPlatformListBorrower;
 import com.hongte.alms.base.entity.RepaymentPlatformListGuarantee;
@@ -29,6 +31,8 @@ import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.mapper.FlowPushLogMapper;
 import com.hongte.alms.base.service.FlowPushLogService;
 import com.hongte.alms.base.service.RepaymentAdvanceRepayFlowService;
+import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
+import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentPlatformListBorrowerService;
 import com.hongte.alms.base.service.RepaymentPlatformListGuaranteeService;
 import com.hongte.alms.base.service.RepaymentPlatformListService;
@@ -80,6 +84,14 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     @Autowired
     @Qualifier("FlowPushLogService")
     FlowPushLogService flowPushLogService;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanListService")
+    RepaymentBizPlanListService repaymentBizPlanListService;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanListDetailService")
+    RepaymentBizPlanListDetailService repaymentBizPlanListDetailService;
     
     @Autowired
     private FlowPushLogMapper flowPushLogMapper;
@@ -290,6 +302,10 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	 */
 	private void addBusinessCamsFlow(List<Map<String, Object>> listMap,int actionId) {
 		//2# step2 循环业务list，去除每一条业务的流水list
+		int realActionId = actionId;
+		if(actionId == 201) {
+			realActionId = 2;
+		}
     	for(Map<String,Object> businessMapInfo : listMap) {
     		CreateBatchFlowCommand command = new CreateBatchFlowCommand();
     		
@@ -299,7 +315,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	
         	FlowPushLog flowPushLog = new FlowPushLog();
         	flowPushLog.setPushKey(batchId);
-        	flowPushLog.setPushLogType(2);
+        	flowPushLog.setPushLogType(realActionId);
         	flowPushLog.setPushTo(1);
         	flowPushLog.setPushStarttime(new Date());
         	flowPushLog.setPushStatus(0);
@@ -344,6 +360,10 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	for (Map<String, Object> flowMap : listFlow) {
         		String sId = UUIDHtGenerator.getUUID();
         		String tId = UUIDHtGenerator.getUUID();
+        		if(actionId == 201) {
+        			sId = null;
+        			tId = null;
+        		}
         		//还款账号
             	FlowAccountIdentifier flowAccountIdentifier = new FlowAccountIdentifier();
             	String accountName = flowMap.get("account_name")==null?"":flowMap.get("account_name").toString();
@@ -357,36 +377,47 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	String identifierId = sId;
             	Boolean personal = true;
             	
-            	int accountType = Integer.parseInt(flowMap.get("account_type").toString());
-            	String mainId = flowMap.get("main_id").toString();
-            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
-            	flowAccountIdentifier.setAccountType(accountType);
-            	flowAccountIdentifier.setDepositoryId(bankCardNo);
-            	flowAccountIdentifier.setAccountName(accountName);
-            	flowAccountIdentifier.setIdentifierId(identifierId);
-            	flowAccountIdentifier.setPersonal(personal);
-            	if(!StringUtils.isBlank(mainId)) {
-            		flowAccountIdentifier.setMainId(mainId);
+            	if(actionId != 201) {//你我金融没有账户信息
+	            	int accountType = Integer.parseInt(flowMap.get("account_type").toString());
+	            	String mainId = flowMap.get("main_id").toString();
+	            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
+	            	flowAccountIdentifier.setAccountType(accountType);
+	            	flowAccountIdentifier.setDepositoryId(bankCardNo);
+	            	flowAccountIdentifier.setAccountName(accountName);
+	            	flowAccountIdentifier.setIdentifierId(identifierId);
+	            	flowAccountIdentifier.setPersonal(personal);
+	            	if(!StringUtils.isBlank(mainId)) {
+	            		flowAccountIdentifier.setMainId(mainId);
+	            	}
+	            	accountIdentifiers.add(flowAccountIdentifier);
+	            	
+	            	int targetAccountType = Integer.parseInt(flowMap.get("target_account_type").toString());
+	            	String targetMainId = flowMap.get("target_main_id").toString();
+	            	personal = false;
+	            	//收入账号
+	            	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
+	            	flowAccountIdentifier2.setAccountType(targetAccountType);
+	            	flowAccountIdentifier2.setDepositoryId(targetBankCardNo);
+	            	flowAccountIdentifier2.setIdentifierId(tId);
+	            	flowAccountIdentifier2.setPersonal(personal);
+	            	flowAccountIdentifier2.setAccountName(targetAccountId);
+	            	if(!StringUtils.isBlank(targetMainId)) {
+	            		flowAccountIdentifier.setMainId(targetMainId);
+	            	}
+	            	accountIdentifiers.add(flowAccountIdentifier2);
             	}
-            	accountIdentifiers.add(flowAccountIdentifier);
-            	
-            	int targetAccountType = Integer.parseInt(flowMap.get("target_account_type").toString());
-            	String targetMainId = flowMap.get("target_main_id").toString();
-            	personal = false;
-            	//收入账号
-            	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
-            	flowAccountIdentifier2.setAccountType(targetAccountType);
-            	flowAccountIdentifier2.setDepositoryId(targetBankCardNo);
-            	flowAccountIdentifier2.setIdentifierId(tId);
-            	flowAccountIdentifier2.setPersonal(personal);
-            	flowAccountIdentifier2.setAccountName(targetAccountId);
-            	if(!StringUtils.isBlank(targetMainId)) {
-            		flowAccountIdentifier.setMainId(targetMainId);
-            	}
-            	accountIdentifiers.add(flowAccountIdentifier2);
             	
             	Flow flow = new Flow();
-            	Date accountTime = null == flowMap.get("account_time")?null:DateUtil.getDateTime(flowMap.get("account_time").toString());
+            	
+            	Date accountTime = null;
+            	if(actionId == 7 || actionId == 8 || actionId == 81)
+            	{
+            		accountTime = null == flowMap.get("account_time")?null:DateUtil.getDateTime(flowMap.get("account_time").toString());
+            	}
+            	else {
+            		accountTime = (Date) flowMap.get("account_time");
+            	}
+            	
             	String afterId = null == flowMap.get("after_id")?null:flowMap.get("after_id").toString();
             	BigDecimal amount = new BigDecimal(flowMap.get("amount")==null?"0":flowMap.get("amount").toString());
             	String externalId = "";
@@ -415,21 +446,23 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
             	flows.add(flow);
             	
-            	//支出流水
-            	Flow flow1 = new Flow();
-            	flow1.setAccountTime(accountTime);
-            	flow1.setAfterId(afterId);
-            	flow1.setAmount(amount);
-            	flow1.setExternalId(externalId);
-            	flow1.setInOut(1);
-            	flow1.setIssueId(issueId);
-            	flow1.setMemo(memo);
-            	flow1.setRemark(remark);
-            	flow1.setRepayType(repayType);
-            	flow1.setSegmentationDate(segmentationDate);
-            	flow1.setSourceAccountIdentifierId(sourceAccountIdentifierId);
-            	flow1.setTargetAccountIdentifierId(targetAccountIdentifierId);
-            	flows.add(flow1);
+            	if(actionId != 201) {  //你我金融流水 不构建支出流水
+	            	//支出流水
+	            	Flow flow1 = new Flow();
+	            	flow1.setAccountTime(accountTime);
+	            	flow1.setAfterId(afterId);
+	            	flow1.setAmount(amount);
+	            	flow1.setExternalId(externalId);
+	            	flow1.setInOut(1);
+	            	flow1.setIssueId(issueId);
+	            	flow1.setMemo(memo);
+	            	flow1.setRemark(remark);
+	            	flow1.setRepayType(repayType);
+	            	flow1.setSegmentationDate(segmentationDate);
+	            	flow1.setSourceAccountIdentifierId(sourceAccountIdentifierId);
+	            	flow1.setTargetAccountIdentifierId(targetAccountIdentifierId);
+	            	flows.add(flow1);
+            	}
             	
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
             	paramFlowItemMap.put("repaySourceId", listId);
@@ -462,7 +495,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	paramFlowItemMap.put("businessId", businessId);
         	}
         		//3# step4 按业务组装流水 消息对象tb_money_pool
-            	command.setActionId(actionId);
+            	command.setActionId(realActionId);
             	command.setBatchId(batchId);
             	command.setBusinessFlag(businessFlag);
             	command.setBusinessFrom(businessFrom);
@@ -493,44 +526,39 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
             	camsMessage.setMessage(command);
             	
-            	int retryTimes = 0;
-            	String retStr = "";
-            	while(retryTimes < 3) {
-            		try {
-                		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
-                		System.err.println(JSON.toJSONString(camsMessage));
-                    	System.err.println(JSONObject.toJSONString(ret));
-                    	retStr = JSON.toJSONString(ret);
-                		break;//跳出循环
-            		} catch (Exception e) {
-            			retStr = e.getMessage();
-            			System.err.println(e.getMessage());
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e1) {
-							e1.printStackTrace();
-						}
-            			retryTimes++;
-    				}
-            	}
-            	updatePushLog(actionId,confirmLogId, flowPushLog, retStr);
+            	updatePushLog(actionId,confirmLogId, flowPushLog, camsMessage);
         	}
 	}
 
-	private void updatePushLog(int actionId, String confirmLogId, FlowPushLog flowPushLog, String retStr) {
+	private void updatePushLog(int actionId, String confirmLogId, FlowPushLog flowPushLog,CamsMessage camsMessage) {
+		String retStr = "";
 		switch (actionId) {
 		case 7://平台还款
 			RepaymentPlatformList repaymentPlatformList = repaymentPlatformListService.selectById(confirmLogId);
-			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
-			  repaymentPlatformList.setLastPushStatus(1);
-			  repaymentPlatformList.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(1);
-			  flowPushLog.setPushRet(retStr);
-			}else {
-			  repaymentPlatformList.setLastPushStatus(2);
-			  repaymentPlatformList.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(2);
-			  flowPushLog.setPushRet(retStr);
+			try {
+    			int newStatus = repaymentPlatformList.getLastPushStatus();
+    			if(newStatus == 1 || newStatus == 4) {
+    				LOGGER.error("该流水已推送过"+confirmLogId); 
+    				return;
+    			}
+        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+        		LOGGER.debug(JSON.toJSONString(camsMessage));
+        		LOGGER.debug(JSONObject.toJSONString(ret));;
+            	retStr = JSON.toJSONString(ret);
+            	
+            	repaymentPlatformList.setLastPushStatus(1);
+            	repaymentPlatformList.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(1);
+//        		break;//跳出循环
+    		} catch (Exception e) {
+    			repaymentPlatformList.setLastPushStatus(2);
+    			repaymentPlatformList.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(2);
+        		
+        		retStr = e.getMessage();
+    			e.printStackTrace();
+    			LOGGER.debug(JSON.toJSONString(camsMessage));
+    			LOGGER.debug(JSON.toJSONString(retStr));
 			}
 			//更新推送状态
 			repaymentPlatformList.setLastPushDatetime(new Date());
@@ -542,16 +570,30 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 8://垫付
 			RepaymentPlatformListGuarantee repaymentPlatformListGuarantee = repaymentPlatformListGuaranteeService.selectById(confirmLogId);
-			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
-			  repaymentPlatformListGuarantee.setLastPushStatus(1);
-			  repaymentPlatformListGuarantee.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(1);
-			  flowPushLog.setPushRet(retStr);
-			}else {
-			  repaymentPlatformListGuarantee.setLastPushStatus(2);
-			  repaymentPlatformListGuarantee.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(2);
-			  flowPushLog.setPushRet(retStr);
+			try {
+    			int newStatus = repaymentPlatformListGuarantee.getLastPushStatus();
+    			if(newStatus == 1 || newStatus == 4) {
+    				LOGGER.error("该流水已推送过"+confirmLogId); 
+    				return;
+    			}
+        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+        		LOGGER.debug(JSON.toJSONString(camsMessage));
+        		LOGGER.debug(JSONObject.toJSONString(ret));;
+            	retStr = JSON.toJSONString(ret);
+            	
+            	repaymentPlatformListGuarantee.setLastPushStatus(1);
+            	repaymentPlatformListGuarantee.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(1);
+//        		break;//跳出循环
+    		} catch (Exception e) {
+    			repaymentPlatformListGuarantee.setLastPushStatus(2);
+    			repaymentPlatformListGuarantee.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(2);
+        		
+        		retStr = e.getMessage();
+    			e.printStackTrace();
+    			LOGGER.debug(JSON.toJSONString(camsMessage));
+    			LOGGER.debug(JSON.toJSONString(retStr));
 			}
 			//更新推送状态
 			repaymentPlatformListGuarantee.setLastPushDatetime(new Date());
@@ -563,16 +605,30 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 81://还垫付
 			RepaymentAdvanceRepayFlow repaymentAdvanceRepayFlow = repaymentAdvanceRepayFlowService.selectById(confirmLogId);
-			if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
-			  repaymentAdvanceRepayFlow.setLastPushStatus(1);
-			  repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(1);
-			  flowPushLog.setPushRet(retStr);
-			}else {
-			  repaymentAdvanceRepayFlow.setLastPushStatus(2);
-			  repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
-			  flowPushLog.setPushStatus(2);
-			  flowPushLog.setPushRet(retStr);
+			try {
+    			int newStatus = repaymentAdvanceRepayFlow.getLastPushStatus();
+    			if(newStatus == 1 || newStatus == 4) {
+    				LOGGER.error("该流水已推送过"+confirmLogId); 
+    				return;
+    			}
+        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+        		LOGGER.debug(JSON.toJSONString(camsMessage));
+        		LOGGER.debug(JSONObject.toJSONString(ret));;
+            	retStr = JSON.toJSONString(ret);
+            	
+            	repaymentAdvanceRepayFlow.setLastPushStatus(1);
+            	repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(1);
+//        		break;//跳出循环
+    		} catch (Exception e) {
+    			repaymentAdvanceRepayFlow.setLastPushStatus(2);
+    			repaymentAdvanceRepayFlow.setLastPushRemark(retStr);
+        		flowPushLog.setPushStatus(2);
+        		
+        		retStr = e.getMessage();
+    			e.printStackTrace();
+    			LOGGER.debug(JSON.toJSONString(camsMessage));
+    			LOGGER.debug(JSON.toJSONString(retStr));
 			}
 			//更新推送状态
 			repaymentAdvanceRepayFlow.setLastPushDatetime(new Date());
@@ -582,6 +638,41 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			flowPushLog.setPushEndtime(new Date());
 			flowPushLogService.insert(flowPushLog);
 			break;
+		case 201://你我金融
+			RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService.selectById(confirmLogId);
+        		try {
+        			int newStatus = repaymentBizPlanList.getLastPushStatus();
+        			if(newStatus == 1 || newStatus == 4) {
+        				LOGGER.error("该流水已推送过"+confirmLogId); 
+        				return;
+        			}
+            		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+            		LOGGER.debug(JSON.toJSONString(camsMessage));
+            		LOGGER.debug(JSONObject.toJSONString(ret));;
+                	retStr = JSON.toJSONString(ret);
+                	
+                	repaymentBizPlanList.setLastPushStatus(1);
+                	repaymentBizPlanList.setLastPushRemark(retStr);
+            		flowPushLog.setPushStatus(1);
+//            		break;//跳出循环
+        		} catch (Exception e) {
+        			repaymentBizPlanList.setLastPushStatus(2);
+        			repaymentBizPlanList.setLastPushRemark(retStr);
+            		flowPushLog.setPushStatus(2);
+            		
+            		retStr = e.getMessage();
+        			e.printStackTrace();
+        			LOGGER.debug(JSON.toJSONString(camsMessage));
+        			LOGGER.debug(JSON.toJSONString(retStr));
+				}
+			//更新推送状态
+			repaymentBizPlanList.setLastPushDatetime(new Date());
+			repaymentBizPlanListService.updateById(repaymentBizPlanList);
+			
+			//记录推送日志
+			flowPushLog.setPushEndtime(new Date());
+			flowPushLogService.insert(flowPushLog);
+			break;	
 		default:
 			break;
 		}
@@ -606,6 +697,12 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 81://还垫付
 			pushFlowList = repaymentPlatformListService.selectPushAdvanceRepayFlowList(paramBusinessMap);
+			break;
+		case 201://你我金融流水
+			pushFlowList = repaymentPlatformListService.selectPushNiWoRepayFlowList(paramBusinessMap);
+			break;
+		case 10://充值流水
+			pushFlowList = repaymentPlatformListService.selectPushRechargeFlowList(paramBusinessMap);
 			break;
 		default:
 			break;
@@ -632,6 +729,15 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 81://还垫付
 			flowList = repaymentPlatformListService.selectPushAdvanceRepayFlow(paramFlowMap);
+			break;
+		case 201://你我金融流水
+			flowList = repaymentPlatformListService.selectPushNiWoRepayFlow(paramFlowMap);
+			if(flowList.size()>1) {
+				return flowList.subList(0, 1);
+			}
+			break;
+		case 10://充值流水
+			flowList = repaymentPlatformListService.selectPushRechargeFlow(paramFlowMap);
 			break;
 		default:
 			break;
@@ -731,6 +837,30 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			 //滞纳金
 			 BigDecimal overdueAmountAdvanceRepay = repaymentAdvanceRepayFlow.getOverdueAmount();
 			 addPlatformRepayFlowItem(flowItemList, "逾期费用（罚息）", overdueAmountAdvanceRepay);	
+			break;
+		case 201://你我金融
+			String niWoConfirmLogId = paramFlowItemMap.get("repaySourceId").toString();
+			List<RepaymentBizPlanListDetail> repaymentBizPlanListDetailList = repaymentBizPlanListDetailService.selectList(new EntityWrapper<RepaymentBizPlanListDetail>().eq("plan_list_id", niWoConfirmLogId));
+			for (RepaymentBizPlanListDetail repaymentBizPlanListDetail : repaymentBizPlanListDetailList) {
+				String freeId = repaymentBizPlanListDetail.getFeeId();
+				String freeName = repaymentBizPlanListDetail.getPlanItemName();
+				BigDecimal factAmount = repaymentBizPlanListDetail.getFactAmount();
+				if(null != factAmount && factAmount.compareTo(new BigDecimal(0)) != 0) {
+					 if("滞纳金".equals(freeName) && !StringUtils.isBlank(freeId)) {
+	            			String detailFeeName1 = RepayPlanFeeTypeEnum.feeIdOf(freeId).getDesc();
+	            			if(!StringUtils.isBlank(detailFeeName1)) {
+	            				freeName = detailFeeName1;
+	            			}
+	            		}
+					 Map<String, Object> map = new HashMap<>();
+					 map.put("amount", factAmount);
+					 map.put("fee_id", freeId);
+					 map.put("fee_name", freeName);
+					 flowItemList.add(map);
+				 }
+			}
+			break;
+		case 10://充值 没有明细
 			break;
 		default:
 			break;
@@ -855,6 +985,26 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	public List<Map<String, Object>> selectPushProjectList() {
 		Map<String, Object> mapParam = new HashMap<>();
 		return flowPushLogMapper.selectPushProjectList(mapParam);
+	}
+
+	@Override
+	public void pushNiWoRepayFlowToCams(String planListId) {
+    	Map<String,Object> paramBusinessMap = new HashMap<>();
+    	if(!StringUtils.isBlank(planListId)) {
+    		paramBusinessMap.put("planListId", planListId);
+    	}
+    	List<Map<String,Object>> listMap = getPushFlowList(201,paramBusinessMap);
+    	addBusinessCamsFlow(listMap,201);		
+	}
+
+	@Override
+	public void pushRechargeFlowToCams(String logId) {
+    	Map<String,Object> paramBusinessMap = new HashMap<>();
+    	if(!StringUtils.isBlank(logId)) {
+    		paramBusinessMap.put("logId", logId);
+    	}
+    	List<Map<String,Object>> listMap = getPushFlowList(10,paramBusinessMap);
+    	addBusinessCamsFlow(listMap,10);
 	}
 
 }

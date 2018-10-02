@@ -235,23 +235,24 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	private String updateUser;
 	
     /**
-     * 更新用户
+     * 最后推送状态0未推送1流水推送成功2推送失败3不需要推送4撤销推送成功5撤销推送失败
      */
-	@TableField("is_running")
-	@ApiModelProperty(required= true,value = "是否正在被执行 0：否  1：是")
-	private Integer isRunning;
-     
-	
-	
+	@TableField("last_push_status")
+	@ApiModelProperty(required= true,value = "最后推送状态0未推送1流水推送成功2推送失败3不需要推送4撤销推送成功5撤销推送失败")
+	private Integer lastPushStatus;
+    /**
+     * 最后推送时间
+     */
+	@TableField("last_push_datetime")
+	@ApiModelProperty(required= true,value = "最后推送时间")
+	private Date lastPushDatetime;
+    /**
+     * 最后推送备注
+     */
+	@TableField("last_push_remark")
+	@ApiModelProperty(required= true,value = "最后推送备注")
+	private String lastPushRemark;
 
-
-	public Integer getIsRunning() {
-		return isRunning;
-	}
-
-	public void setIsRunning(Integer isRunning) {
-		this.isRunning = isRunning;
-	}
 
 	public String getPlanListId() {
 		return planListId;
@@ -570,6 +571,30 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	 */
 	public void setRepayStatus(Integer repayStatus) {
 		this.repayStatus = repayStatus;
+	}
+
+	public Integer getLastPushStatus() {
+		return lastPushStatus;
+	}
+
+	public void setLastPushStatus(Integer lastPushStatus) {
+		this.lastPushStatus = lastPushStatus;
+	}
+
+	public Date getLastPushDatetime() {
+		return lastPushDatetime;
+	}
+
+	public void setLastPushDatetime(Date lastPushDatetime) {
+		this.lastPushDatetime = lastPushDatetime;
+	}
+
+	public String getLastPushRemark() {
+		return lastPushRemark;
+	}
+
+	public void setLastPushRemark(String lastPushRemark) {
+		this.lastPushRemark = lastPushRemark;
 	}
 
 	/**

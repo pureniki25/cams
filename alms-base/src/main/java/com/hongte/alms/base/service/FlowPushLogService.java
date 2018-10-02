@@ -29,4 +29,8 @@ public interface FlowPushLogService extends BaseService<FlowPushLog> {
 
 	List<Map<String, Object>> selectPushProjectList();
 
+	void pushNiWoRepayFlowToCams(String planListId);
+
+	void pushRechargeFlowToCams(String logId);
+
 }

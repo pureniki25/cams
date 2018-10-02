@@ -1519,8 +1519,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 List<ProjFeeReq> projFeeReqs =  projInfoReq.getProjFeeInfos();
 
                 ///////  标的还款计划00期   一次性收取的费用信息  开始   ///////////////
-//                ////00期List 信息
-//                RepaymentProjPlanList  zeroList =  creatRepaymentProjPlanList(repaymentProjPlan,0);// new RepaymentProjPlanList();
+                ////00期List 信息
+//                RepaymentProjPlanList  zeroList =  creatRepaymentProjPlanList(repaymentProjPlan,0,planIndex);// new RepaymentProjPlanList();
 //                zeroList.setCurrentStatus(RepayPlanStatus.REPAYED.getName()); //当前还款状态  00期的直接置位为已还款
 //                //将标的00期写入还款计划map
 //                addPlanListToMap(repaymentPlanListPeriorMap,projPlanListPMap,zeroList, 0);
@@ -1564,7 +1564,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                    zeroProidTotol = zeroProidTotol.add(detail.getProjPlanAmount());
 //                }
 //                zeroList.setTotalBorrowAmount(zeroProidTotol);
-//
+
 //                ///////  标的还款计划00期   一次性收取的费用信息  结束   ///////////////
 
                 //////   标的其他期还款计划   按月收取费用信息   开始  ///////////////
