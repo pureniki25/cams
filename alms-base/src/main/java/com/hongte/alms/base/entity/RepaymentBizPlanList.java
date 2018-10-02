@@ -233,7 +233,25 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
+	
+    /**
+     * 更新用户
+     */
+	@TableField("is_running")
+	@ApiModelProperty(required= true,value = "是否正在被执行 0：否  1：是")
+	private Integer isRunning;
+     
+	
+	
 
+
+	public Integer getIsRunning() {
+		return isRunning;
+	}
+
+	public void setIsRunning(Integer isRunning) {
+		this.isRunning = isRunning;
+	}
 
 	public String getPlanListId() {
 		return planListId;
