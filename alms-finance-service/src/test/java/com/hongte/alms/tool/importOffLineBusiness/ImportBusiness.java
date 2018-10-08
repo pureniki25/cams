@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hongte.alms;
+package com.hongte.alms.tool.importOffLineBusiness;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,13 +53,15 @@ import lombok.Data;
 @ComponentScan({"com.hongte.alms"})
 public class ImportBusiness {
 
+	static Logger logger = LoggerFactory.getLogger(ImportBusiness.class);
+	
 	@Autowired
 	@Qualifier("BasicBusinessService")
 	BasicBusinessService basicBusinessService ;
 	
 	@Autowired
 	@Qualifier("api")
-	CreatRepayPlanRemoteApi CreatRepayPlanRemoteApi ;
+	CreatRepayPlanRemoteApi api ;
 	
 	enum Dept {
 		cz(208,"常州","常州分公司","常州分公司","5d98acc5-3e20-4eae-90f6-45e69265e2fc","华东片区"),
@@ -146,6 +150,7 @@ public class ImportBusiness {
 	enum Type{
 		TDS(3,"TDS","金融仓储"),
 		TDN(4,"TDN","三农金融"),
+		TDC(9,"TDC","车易贷"),
 		TDF(11,"TDF","房速贷"),
 		TDXQS(25,"TDXQS","小微企业贷用信");
 		private int code;
@@ -200,19 +205,22 @@ public class ImportBusiness {
 	
 	@Test
 	public void importBusiness() {
-		File file = new File("需补录(1).xlsx");
+		File file = new File("需重新导入数据9.21(2).xlsx");
 		//线下数据导入到贷后，需填写的字段信息-9-4(有数据).xlsx
 		ImportParams sheetIndex0 = new ImportParams() ;
 		sheetIndex0.setKeyIndex(0);
 		List<BaseBusinessEntity> list = ExcelImportUtil.importExcel(file, BaseBusinessEntity.class,sheetIndex0) ;
+		logger.info("excel.BaseBusinessEntity.size = "+list.size());
 		ImportParams sheetIndex1 = new ImportParams() ;
 		sheetIndex1.setStartSheetIndex(1);
 		sheetIndex1.setKeyIndex(0);
 		List<CustomerInfoEntity> list1 = ExcelImportUtil.importExcel(file, CustomerInfoEntity.class,sheetIndex1) ;
+		logger.info("excel.CustomerInfoEntity.size = "+list.size());
 		ImportParams sheetIndex2 = new ImportParams() ;
 		sheetIndex2.setStartSheetIndex(2);
 		sheetIndex2.setKeyIndex(0);
 		List<RepayPlanEntity> list2 = ExcelImportUtil.importExcel(file, RepayPlanEntity.class,sheetIndex2) ;
+		logger.info("excel.RepayPlanEntity.size = "+list.size());
 		
 		List<Task> tasks = new ArrayList<>() ;
 		
@@ -226,6 +234,7 @@ public class ImportBusiness {
 			try {
 				businessId = initBusinessId(baseBusinessEntity);
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.err.println(baseBusinessEntity.getBusinessId());
 				return ;
 			}
@@ -238,8 +247,8 @@ public class ImportBusiness {
 			businessBasicInfoReq.setBusinessCtype(Type.desc(baseBusinessEntity.getBusinessType()).getTypeName());
 			businessBasicInfoReq.setBusinessId(businessId);
 			businessBasicInfoReq.setBusinessType(baseBusinessEntity.getBusinessType());
-			businessBasicInfoReq.setCompanyId(Dept.code(baseBusinessEntity.getCompanyName()).getCompanyId());
-			businessBasicInfoReq.setCompanyName(Dept.code(baseBusinessEntity.getCompanyName()).getCompanyName());
+			businessBasicInfoReq.setCompanyId(Dept.code(baseBusinessEntity.getCompanyName().trim()).getCompanyId());
+			businessBasicInfoReq.setCompanyName(Dept.code(baseBusinessEntity.getCompanyName().trim()).getCompanyName());
 			
 			CustomerInfoEntity main = getMainCustomer(baseBusinessEntity.getBusinessId(), list1);
 			List<CustomerInfoEntity> gongjie = getGongJieCustomer(baseBusinessEntity.getBusinessId(), list1);
@@ -272,8 +281,8 @@ public class ImportBusiness {
 			
 			gongjieReqs.add(mainCustomerInfoReq);
 			businessBasicInfoReq.setCustomerName(mainCustomerInfoReq.getCustomerName());
-			businessBasicInfoReq.setDistrictId(Dept.code(baseBusinessEntity.getCompanyName()).getDistrictId());
-			businessBasicInfoReq.setDistrictName(Dept.code(baseBusinessEntity.getCompanyName()).getDistrictName());
+			businessBasicInfoReq.setDistrictId(Dept.code(baseBusinessEntity.getCompanyName().trim()).getDistrictId());
+			businessBasicInfoReq.setDistrictName(Dept.code(baseBusinessEntity.getCompanyName().trim()).getDistrictName());
 			businessBasicInfoReq.setInputTime(baseBusinessEntity.getInputTime());
 			businessBasicInfoReq.setIsRenewBusiness(0);
 			businessBasicInfoReq.setOrgBusinessId(businessId);
@@ -297,8 +306,8 @@ public class ImportBusiness {
 			req.setRondmode(0);
 			req.setSmallNum(2);
 			
-			Result<PlanReturnInfoDto> creatRepayPlan = CreatRepayPlanRemoteApi.creatAndSaveRepayPlan(req);
-			
+			Result<PlanReturnInfoDto> creatRepayPlan = api.creatAndSaveRepayPlan(req);
+			System.out.println(JSON.toJSONString(creatRepayPlan));
 			buffer.append(baseBusinessEntity.getBusinessId()+"->"+req.getBusinessBasicInfoReq().getBusinessId()+"\r\n") ;
 		}
 		
@@ -310,7 +319,10 @@ public class ImportBusiness {
 	private String initBusinessId(BaseBusinessEntity baseBusinessEntity) {
 		StringBuffer businessId = new StringBuffer() ;
 		businessId.append(Type.desc(baseBusinessEntity.getBusinessType()).getDesc()) ;
-		businessId.append(Dept.code(baseBusinessEntity.getCompanyName()).getCode());
+		if (baseBusinessEntity.getBusinessId().equals("20")) {
+			System.out.println();
+		}
+		businessId.append(Dept.code(baseBusinessEntity.getCompanyName().trim()).getCode());
 		businessId.append(DateUtil.formatDate("yyyyMMdd", baseBusinessEntity.getInputTime()));
 		int selectCount = basicBusinessService.selectCount(new EntityWrapper<BasicBusiness>().like("business_id", businessId.toString()));
 		businessId.append(String.format("%02d", selectCount+1));

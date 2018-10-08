@@ -17,8 +17,5 @@ eureka:
     prefer-ip-address: true
   client:
       serviceUrl:
-        defaultZone: http://192.168.15.89:30101/eureka/  # 配置注册中心url
-#        defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
-ribbon:
-  ReadTimeout: 60000
-  ConnectTimeout: 60000
+#        defaultZone: http://192.168.15.89:30101/eureka/  # 配置注册中心url
+        defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
