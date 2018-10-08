@@ -468,7 +468,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	            	flow1.setAfterId(afterId);
 	            	flow1.setAmount(amount);
 	            	flow1.setExternalId(externalId);
-	            	flow1.setInOut(0);
+	            	flow1.setInOut(1);
 	            	flow1.setIssueId(issueId);
 	            	flow1.setMemo(memo);
 	            	flow1.setRemark(remark);
@@ -909,7 +909,6 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapTouZi.put("target_main_id", null);
 				 flowMapTouZi.put("target_main_type", 1);
 				 flowMapTouZi.put("target_account_name", "投资人");
-				 flowMapTouZi.put("inOut", "0");
 				 flowList.add(flowMapTouZi);
 			 }
 			//分公司流水
@@ -921,7 +920,6 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapCompany.put("target_main_id", null);
 				 flowMapCompany.put("target_main_type", 1);
 				 flowMapCompany.put("target_account_name", "广东鸿特信息咨询有限公司"+basicBusiness.getCompanyName());
-				 flowMapCompany.put("inOut", "0");
 				 flowList.add(flowMapCompany);
 			 }
 			//平台费
@@ -932,7 +930,6 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapPlatform.put("target_main_id", null);
 				 flowMapPlatform.put("target_main_type", 1);
 				 flowMapPlatform.put("target_account_name", "东莞团贷网互联网科技服务有限公司");
-				 flowMapPlatform.put("inOut", "0");
 				 flowList.add(flowMapPlatform);
 			 }
 			//担保公司
@@ -950,7 +947,6 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapDanbao.put("target_main_id", "45BC0637-412F-45AF-A44A-14348BEB400C");
 				 flowMapDanbao.put("target_main_type", 1);
 				 flowMapDanbao.put("target_account_name", "深圳市天大联合融资担保有限公司");
-				 flowMapDanbao.put("inOut", "0");
 				 flowList.add(flowMapDanbao);
 			 }
 			}
