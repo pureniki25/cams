@@ -1045,6 +1045,7 @@
 		t1.customer_name AS 'account_name',
 		t1.user_id AS 'open_bank',
 		t1.asset_type AS 'business_from',
+		t1.customer_name AS 'target_account_name',
 		t6.queryFullsuccessDate AS 'segmentation_date'
 		FROM 
 		tb_tdrepay_recharge_log t1

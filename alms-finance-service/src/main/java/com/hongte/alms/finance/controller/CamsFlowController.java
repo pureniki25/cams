@@ -27,6 +27,7 @@ import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.service.AccountantOverRepayLogService;
@@ -281,6 +282,7 @@ public class CamsFlowController {
             	Boolean personal = true;
             	int accountType = 0;
             	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
+            	flowAccountIdentifier.setAccountName(accountName);
             	flowAccountIdentifier.setAccountType(accountType);
             	flowAccountIdentifier.setDepositoryId(bankCardNo);
             	flowAccountIdentifier.setIdentifierId(identifierId);
@@ -290,8 +292,10 @@ public class CamsFlowController {
             	
             	accountType = 8;
             	personal = false;
+            	String targetAccountName = BusinessTypeEnum.getName(Integer.parseInt(businessTypeId))+"待充值账户";
             	//收入账号
             	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
+            	flowAccountIdentifier2.setAccountName(targetAccountName);
             	flowAccountIdentifier2.setAccountType(accountType);
             	flowAccountIdentifier2.setDepositoryId(targetBankCardNo);
             	flowAccountIdentifier2.setIdentifierId(tId);
