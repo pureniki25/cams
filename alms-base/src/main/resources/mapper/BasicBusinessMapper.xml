@@ -1004,7 +1004,7 @@
 		t1.project_id AS 'issue_id',
 		t1.after_id AS 'after_id',
 		'' AS 'exhibition_id',
-		t1.fact_repay_amount AS 'amount',
+		t1.recharge_amount AS 'amount',
 		'0' AS 'balance',
 		t1.user_id AS 'bank_card_no ',
 		'5' AS 'action_id',
