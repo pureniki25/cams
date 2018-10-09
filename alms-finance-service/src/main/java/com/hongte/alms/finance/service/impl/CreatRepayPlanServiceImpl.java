@@ -1063,12 +1063,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         
         
         List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
-        if(projInfoReqs.size()==0) {
-        	if(businessBasicInfoReq.getOutputPlatformid()==PaymentPlatformEnums.YUECAI.getValue()) {
-            	projInfoReqs= createProjInfoReqsList(businessBasicInfoReq, bizCusInfoReqs);
-            }
-          
-        }
+//        if(projInfoReqs.size()==0) {
+//        	if(businessBasicInfoReq.getOutputPlatformid()==PaymentPlatformEnums.YUECAI.getValue()) {
+//            	projInfoReqs= createProjInfoReqsList(businessBasicInfoReq, bizCusInfoReqs);
+//            }
+//          
+//        }
         
 
         ////////   传入的标信息  校验  开始   ///////////////////////////

@@ -192,18 +192,19 @@ public class BusinessBasicInfoReq {
      * 资金端类型，1：团贷网 2：你我金融 3：粤财
      */
     @ApiModelProperty(value = "资金端类型，1：团贷网 2：你我金融 3粤财")
-    private Integer outputPlatformid;
+    private Integer outputPlatformId;
     
     
 
 
   
-	public Integer getOutputPlatformid() {
-		return outputPlatformid;
+	
+	public Integer getOutputPlatformId() {
+		return outputPlatformId;
 	}
 
-	public void setOutputPlatformid(Integer outputPlatformid) {
-		this.outputPlatformid = outputPlatformid;
+	public void setOutputPlatformId(Integer outputPlatformId) {
+		this.outputPlatformId = outputPlatformId;
 	}
 
 	public String getBusinessId() {
