@@ -1,27 +1,28 @@
 <!DOCTYPE html>
+
 <!--suppress ALL -->
 <html lang="zh-cn">
 <!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport" />
 
     <title>财务跟单设置</title>
     <script src="/properties/config.js"></script>
-    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <link href="/src/css/themes/default.css" rel="stylesheet" type="text/css" />
     <!-- iview样式 -->
-    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <link href="/plugins/iview/css/iview.css" rel="stylesheet" type="text/css" />
     <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
     <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
     <!-- 引入layui样式 -->
-    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+    <link href="/plugins/layui/css/layui.css" media="all" rel="stylesheet" />
 
     <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
        <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
     <!-- 引入vue -->
-    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <script src="/plugins/vue/vue.min.js" type="text/javascript"></script>
     <!-- iview js -->
-    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <script src="/plugins/iview/js/iview.js" type="text/javascript"></script>
     <!--引入layui.js-->
     <script src="/plugins/layui/layui.js"></script>
     <!--引入axios.js 用于ajax调用-->
@@ -38,31 +39,30 @@
 <!--隐藏元素-->
 <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
-<div id="app" v-cloak>
+<div id="app" v-cloak="">
     <!--查询表单内容-->
     <row :gutter="16" style="margin-top:10px; padding:10px">
         <i-col span="3">
-            <button class="layui-btn layui-btn-sm" @click="assignSet" v-if="authValid('assignSet')"
-                    style="margin-left:15px" ht-auth="assignSet">
+            <button @click="assignSet" class="layui-btn layui-btn-sm" ht-auth="assignSet" style="margin-left:15px" v-if="authValid('assignSet')">
                         <span>
                             分配设置</span>
             </button>
             <!-- <i-button v-if="authValid('assignSet')" type="success" style="margin-left:15px" @click="assignSet"  ht-auth="assignSet">分配设置</i-button> -->
         </i-col>
         <i-col span="16">
-            <i-form ref="searchForm" :model="searchForm" label-position="right" :label-width="100" inline>
+            <i-form :label-width="100" :model="searchForm" inline="" label-position="right" ref="searchForm">
 
                 <form-item label="区域：" prop="areaId">
-                    <i-select v-model="searchForm.areaId" clearable filterable>
-                        <i-option v-for="item in areaList" :value="item.areaId" :key="item.areaId">{{ item.areaName }}
+                    <i-select clearable="" filterable="" v-model="searchForm.areaId">
+                        <i-option :key="item.areaId" :value="item.areaId" v-for="item in areaList">{{ item.areaName }}
                         </i-option>
                     </i-select>
                 </form-item>
 
 
                 <form-item label="分公司：" prop="companyId">
-                    <i-select v-model="searchForm.companyId" clearable filterable>
-                        <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ item.areaName
+                    <i-select clearable="" filterable="" v-model="searchForm.companyId">
+                        <i-option :key="item.areaId" :value="item.areaId" v-for="item in companyList">{{ item.areaName
                             }}
                         </i-option>
                     </i-select>
@@ -70,16 +70,16 @@
 
 
                 <form-item label="出纳：" prop="userName">
-                    <i-input v-model="searchForm.userName" placeholder="模糊搜索"></i-input>
+                    <i-input placeholder="模糊搜索" v-model="searchForm.userName"></i-input>
                 </form-item>
 
             </i-form>
         </i-col>
         <i-col span="5">
-            <button class="layui-btn layui-btn-sm" @click="toLoading" style="margin-right:10px"  v-if="authValid('personQuery')" ht-auth="personQuery">
+            <button @click="toLoading" class="layui-btn layui-btn-sm" ht-auth="personQuery" style="margin-right:10px" v-if="authValid('personQuery')">
                         <span v-if="!loading">
                             <i class="layui-icon">&#xe615;</i>查询</span>
-                <span v-else>
+                <span v-else="">
                             <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
             </button>
         </i-col>
@@ -91,39 +91,30 @@
         <i-col span="24">
             <!-- 使用方法渲染模式 -->
             <table id="listTable" lay-filter="listTable"></table>
-            <div style="display:none" id="barTools">
+            <div id="barTools" style="display:none">
                     <!-- <script type="text/html" id="barTools"> -->
                 <!--layui-btn layui-btn-xs-->
                 <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="userSet" v-if="authValid('singleSet')">设置</a>
-                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete"  v-if="authValid('del')">删除</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete" v-if="authValid('del')">删除</a>
             </div>
                     <!-- </script> -->
         </i-col>
     </row>
     <!-- 表单Grid，使用layerUI的表格组件 结束 -->
 
-    <Modal
-            v-model="editSingleCompanyCollectionUserSettingModal"
-            title="设置"
-            @on-ok="saveSingleCompanyCollectionUserSetting"
-            @on-cancel="toLoading">
-        <i-form ref="editCompanyCollectionUser.editCompanyCollectionForm"
-                :model="editCompanyCollectionUser.editCompanyCollectionForm" :label-width="100">
+    <Modal @on-cancel="toLoading" @on-ok="saveSingleCompanyCollectionUserSetting" title="设置" v-model="editSingleCompanyCollectionUserSettingModal">
+        <i-form :label-width="100" :model="editCompanyCollectionUser.editCompanyCollectionForm" ref="editCompanyCollectionUser.editCompanyCollectionForm">
 
             <form-item label="业务类型：">
-                <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.businessType" multiple clearable
-                          filterable disabled>
-                    <i-option v-for="item in editCompanyCollectionAssignSet.businessTypes" :value="item.businessTypeId"
-                              :key="item.businessTypeId">{{ item.businessTypeName }}
+                <i-select clearable="" disabled="" filterable="" multiple="" v-model="editCompanyCollectionUser.editCompanyCollectionForm.businessType">
+                    <i-option :key="item.businessTypeId" :value="item.businessTypeId" v-for="item in editCompanyCollectionAssignSet.businessTypes">{{ item.businessTypeName }}
                     </i-option>
                 </i-select>
             </form-item>
 
             <form-item label="出纳：" prop="collectionGroup1Users">
-                <i-select v-model="editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users" multiple
-                          filterable>
-                    <i-option v-for="item in editCompanyCollectionAssignSet.collectionGroup1AllUsers"
-                              :value="item.userId" :key="item.userId">{{ item.userName }}
+                <i-select filterable="" multiple="" v-model="editCompanyCollectionUser.editCompanyCollectionForm.collectionGroup1Users">
+                    <i-option :key="item.userId" :value="item.userId" v-for="item in editCompanyCollectionAssignSet.collectionGroup1AllUsers">{{ item.userName }}
                     </i-option>
                 </i-select>
             </form-item>
@@ -133,46 +124,32 @@
     <!--
         分配设置
     -->
-    <Modal
-            v-model="assignSetModal"
-            title="分配设置"
-            @on-ok="saveBatchPerson"
-            @on-cancel="toLoading">
-        <i-form ref="editCompanyCollectionAssignSet.editCompanyCollectionForm"
-                :model="editCompanyCollectionAssignSet.editCompanyCollectionForm" :label-width="100">
+    <Modal @on-cancel="toLoading" @on-ok="saveBatchPerson" title="分配设置" v-model="assignSetModal">
+        <i-form :label-width="100" :model="editCompanyCollectionAssignSet.editCompanyCollectionForm" ref="editCompanyCollectionAssignSet.editCompanyCollectionForm">
             <form-item label="区域：" prop="areaName">
-                <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName" multiple clearable
-                          disabled
-                          filterable style="width: 80%">
-                    <i-option v-for="item in editCompanyCollectionAssignSet.areaList" :value="item.areaId"
-                              :key="item.areaId">{{ item.areaName }}
+                <i-select clearable="" disabled="" filterable="" multiple="" style="width: 80%" v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.areaName">
+                    <i-option :key="item.areaId" :value="item.areaId" v-for="item in editCompanyCollectionAssignSet.areaList">{{ item.areaName }}
                     </i-option>
                 </i-select>
                 <i-span @click="selectArea">选择</i-span>
             </form-item>
 
             <form-item label="分公司：" prop="companyName">
-                <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId" multiple disabled
-                          clearable filterable style="width: 80%">
-                    <i-option v-for="item in editCompanyCollectionAssignSet.companyId" :value="item.areaId"
-                              :key="item.areaId">{{ item.areaName }}
+                <i-select clearable="" disabled="" filterable="" multiple="" style="width: 80%" v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.companyId">
+                    <i-option :key="item.areaId" :value="item.areaId" v-for="item in editCompanyCollectionAssignSet.companyId">{{ item.areaName }}
                     </i-option>
                 </i-select>
             </form-item>
             <form-item label="业务类型：" prop="businessType">
-                <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.businessType" multiple
-                          clearable filterable style="width: 80%">
-                    <i-option v-for="item in editCompanyCollectionAssignSet.businessTypes" :value="item.businessTypeId"
-                              :key="item.businessTypeId">{{ item.businessTypeName }}
+                <i-select clearable="" filterable="" multiple="" style="width: 80%" v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.businessType">
+                    <i-option :key="item.businessTypeId" :value="item.businessTypeId" v-for="item in editCompanyCollectionAssignSet.businessTypes">{{ item.businessTypeName }}
                     </i-option>
                 </i-select>
             </form-item>
 
             <form-item label="出纳：" prop="collectionGroup1Users">
-                <i-select v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup1Users"
-                          multiple clearable filterable style="width: 80%">
-                    <i-option v-for="item in editCompanyCollectionAssignSet.collectionGroup1AllUsers"
-                              :value="item.userId" :key="item.userId">{{ item.userName }}
+                <i-select clearable="" filterable="" multiple="" style="width: 80%" v-model="editCompanyCollectionAssignSet.editCompanyCollectionForm.collectionGroup1Users">
+                    <i-option :key="item.userId" :value="item.userId" v-for="item in editCompanyCollectionAssignSet.collectionGroup1AllUsers">{{ item.userName }}
                     </i-option>
                 </i-select>
             </form-item>
@@ -182,19 +159,14 @@
     <!--
     区域城市选择模块
     -->
-    <Modal
-            v-model="selectAreaAndCity"
-            title="选择分公司"
-            @on-ok="confirmSelect"
-            @on-cancel="">
+    <Modal @on-cancel="" @on-ok="confirmSelect" title="选择分公司" v-model="selectAreaAndCity">
         <div class="layui-row layui-col-space20">
             <div class="layui-col-md5">
-                <tree :data="areaAndCity.allAreas" @on-check-change="showCitys" @on-select-change="selectChild"
-                      ref="tree"></tree>
+                <tree :data="areaAndCity.allAreas" @on-check-change="showCitys" @on-select-change="selectChild" ref="tree"></tree>
             </div>
             <div class="layui-col-md6">
-                <checkbox-group v-model="areaAndCity.currentSelectedCitys" @on-change="getAllSelectedCitys">
-                    <checkbox v-for="item in areaAndCity.allCitys" :label="item.areaId" @on-change="">
+                <checkbox-group @on-change="getAllSelectedCitys" v-model="areaAndCity.currentSelectedCitys">
+                    <checkbox :label="item.areaId" @on-change="" v-for="item in areaAndCity.allCitys">
                         {{item.areaName}}
                     </checkbox>
                 </checkbox-group>
@@ -949,5 +921,5 @@
         ]
     };
 </script>
-</body>
-</html>
+
+</body></html>
