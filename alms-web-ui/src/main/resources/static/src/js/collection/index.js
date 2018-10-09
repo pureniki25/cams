@@ -528,8 +528,8 @@ window.layinit(function(htConfig){
                                 //     }
                                 // )
                             }
-
-                            if (authValid('deduction')) {
+  
+                            if (authValid('deduction')&&e.plateType == 1) {
                                 if(e.statusName != '已还款' && e.statusName != '已结清'){
                                     buttons.push(
                                         {

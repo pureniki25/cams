@@ -473,7 +473,7 @@ public class RepayPlanController {
 
             BusinessBasicInfoReq businessBasicInfoReq = ClassCopyUtil.copy(trailBizInfoReq,TrailBizInfoReq.class,BusinessBasicInfoReq.class);
             creatRepayPlanReq.setBusinessBasicInfoReq(businessBasicInfoReq);
-            businessBasicInfoReq.setBusinessId("111");
+//            businessBasicInfoReq.setBusinessId("111");
             businessBasicInfoReq.setOrgBusinessId(businessBasicInfoReq.getBusinessId());
 
 //            List<TrailProjInfoReq> trailProjInfoReqs = trailRepayPlanReq.getProjInfoReqs();
