@@ -1335,21 +1335,25 @@ public class RechargeServiceImpl implements RechargeService {
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("6")) {
+			outsideResult.setCode("-1");
 			log.setRepayStatus(0);
 			log.setRemark("订单不存在");
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("7")) {
+			outsideResult.setCode("-1");
 			log.setRepayStatus(0);
 			log.setRemark("调用存管接口失败");
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("9")) {
+			outsideResult.setCode("-1");
 			log.setRepayStatus(0);
 			log.setRemark("机构编号不存在");
 			log.setUpdateTime(new Date());
 			withholdingRepaymentLogService.updateById(log);
 		}else {
+			outsideResult.setCode("-1");
 			log.setRepayStatus(0);
 			log.setRemark(resultData.getResultMsg());
 			log.setUpdateTime(new Date());
