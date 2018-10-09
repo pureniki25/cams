@@ -967,17 +967,9 @@
     </delete>
     
     <select id="selectlPushFenFaBusiness" resultType="map">
-		SELECT t1.log_id as confirm_log_id,t2.business_id,t2.source_business_id,t4.repayment_batch_id,t2.asset_id,t2.create_time,t2.create_user,t2.company_id,t2.company_name,
-		t2.business_type,t3.business_type_name,t2.customer_name,t2.asset_id,
-		<![CDATA[
-		CASE 
-		WHEN t1.settle_type = 0 THEN '5' 
-		WHEN t1.settle_type = 10 THEN '3' 
-		WHEN t1.settle_type = 11 THEN '33' 
-		WHEN t1.settle_type = 20 THEN '34' 
-		WHEN t1.settle_type = 30 THEN '35'
-		ELSE -1 END  AS 'action_id',
-		]]>
+		SELECT t1.log_id as confirm_log_id,t1.orig_business_id as 'business_id',t2.source_business_id,t4.repayment_batch_id,t2.asset_id,t2.create_time,t2.create_user,t2.company_id,t2.company_name,
+		t1.business_type,t3.business_type_name,t2.customer_name,t2.asset_id,
+		'5' AS 'action_id',
 		'1' as businessFlag,
 		t1.asset_type as businessFrom
 		FROM tb_tdrepay_recharge_log t1
@@ -986,7 +978,11 @@
 		LEFT JOIN tb_repayment_biz_plan_list t5 ON t5.business_id = t1.orig_business_id AND t5.after_id = t1.after_id
 		LEFT JOIN tb_repayment_biz_plan t4 ON t5.plan_id = t4.plan_id
 		<where> 
+		(
 		t2.src_type = 2
+		or
+		t1.orig_business_id like 'YCD%'
+		)
 		AND t1.process_status = 2
 		AND t1.last_push_status in (0,2)
 		and t1.is_valid = 1
@@ -1011,15 +1007,7 @@
 		t1.fact_repay_amount AS 'amount',
 		'0' AS 'balance',
 		t1.user_id AS 'bank_card_no ',
-		<![CDATA[
-			CASE 
-			WHEN t1.settle_type = 0 THEN '5' 
-			WHEN t1.settle_type = 10 THEN '3' 
-			WHEN t1.settle_type = 11 THEN '33' 
-			WHEN t1.settle_type = 20 THEN '34' 
-			WHEN t1.settle_type = 30 THEN '35'
-			ELSE -1 END  AS 'action_id',
-		]]>
+		'5' AS 'action_id',
 		0 AS 'in_out',
 		t1.create_user AS 'create_user',
 		t1.create_time AS 'create_time',
