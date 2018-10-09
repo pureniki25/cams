@@ -292,7 +292,7 @@ public class CamsFlowController {
             	
             	accountType = 8;
             	personal = false;
-            	String targetAccountName = BusinessTypeEnum.getName(Integer.parseInt(businessTypeId))+"待充值账户";
+            	String targetAccountName = BusinessTypeEnum.getName(Integer.parseInt(businessTypeId))+"代充值账户";
             	//收入账号
             	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
             	flowAccountIdentifier2.setAccountName(targetAccountName);
@@ -330,8 +330,6 @@ public class CamsFlowController {
             	flow.setSegmentationDate(segmentationDate);
             	flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
             	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
-            
-            	//if(repayType != 7) {//|| listOnlineFlow.size() == 1
             	flows.add(flow);
             		
             	Flow flow1 = new Flow();
