@@ -330,8 +330,6 @@ public class CamsFlowController {
             	flow.setSegmentationDate(segmentationDate);
             	flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
             	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
-            
-            	//if(repayType != 7) {//|| listOnlineFlow.size() == 1
             	flows.add(flow);
             		
             	Flow flow1 = new Flow();
