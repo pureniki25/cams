@@ -354,7 +354,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
         	Date createTime = new Date();//(Date) businessMapInfo.get("create_time");
         	String createUser = businessMapInfo.get("create_user")==null?"":businessMapInfo.get("create_user").toString();
-        	String messageId = confirmLogId;
+        	String messageId = confirmLogId+"-"+actionId;
         	
         	String branchId = businessMapInfo.get("company_id")==null?"":businessMapInfo.get("company_id").toString();
         	String branchName = businessMapInfo.get("company_name")==null?"":businessMapInfo.get("company_name").toString();
@@ -411,6 +411,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
 	            	flowAccountIdentifier.setAccountType(accountType);
 	            	flowAccountIdentifier.setDepositoryId(bankCardNo);
+	            	flowAccountIdentifier.setBankCardNo(bankCardNo);
 	            	flowAccountIdentifier.setAccountName(accountName);
 	            	flowAccountIdentifier.setIdentifierId(identifierId);
 	            	flowAccountIdentifier.setPersonal(personal);
@@ -867,8 +868,40 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 8://垫付
 			pushFlowList = repaymentPlatformListService.selectPushAdvancePayFlowList(paramBusinessMap);
+			//平台还款 没有标的信息 从资金分发补充公司 业务 客户信息
+			for (Map<String, Object> pushFlowMap : pushFlowList) {
+				String projectId = null == pushFlowMap.get("project_id")?null:pushFlowMap.get("project_id").toString();
+				if(null == projectId) {
+					continue;
+				}
+				TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("process_status", 2));
+				if(null == tdrepayRechargeLog) {
+					continue;
+				}
+				pushFlowMap.put("business_id", tdrepayRechargeLog.getOrigBusinessId());
+				pushFlowMap.put("business_type", tdrepayRechargeLog.getBusinessType());
+				pushFlowMap.put("business_type_name", BusinessTypeEnum.getName(tdrepayRechargeLog.getBusinessType()));
+				pushFlowMap.put("customer_name", tdrepayRechargeLog.getCustomerName());
+				pushFlowMap.put("company_name", tdrepayRechargeLog.getCompanyName());
+			}
 			break;
 		case 81://还垫付
+			//平台还款 没有标的信息 从资金分发补充公司 业务 客户信息
+			for (Map<String, Object> pushFlowMap : pushFlowList) {
+				String projectId = null == pushFlowMap.get("project_id")?null:pushFlowMap.get("project_id").toString();
+				if(null == projectId) {
+					continue;
+				}
+				TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("process_status", 2));
+				if(null == tdrepayRechargeLog) {
+					continue;
+				}
+				pushFlowMap.put("business_id", tdrepayRechargeLog.getOrigBusinessId());
+				pushFlowMap.put("business_type", tdrepayRechargeLog.getBusinessType());
+				pushFlowMap.put("business_type_name", BusinessTypeEnum.getName(tdrepayRechargeLog.getBusinessType()));
+				pushFlowMap.put("customer_name", tdrepayRechargeLog.getCustomerName());
+				pushFlowMap.put("company_name", tdrepayRechargeLog.getCompanyName());
+			}
 			pushFlowList = repaymentPlatformListService.selectPushAdvanceRepayFlowList(paramBusinessMap);
 			break;
 		case 201://你我金融流水
