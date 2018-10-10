@@ -79,7 +79,7 @@ import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.ApiOperation;
 
-@CrossOrigin
+//@CrossOrigin
 @Controller
 @RequestMapping("/tdrepayRecharge")
 public class TdrepayRechargeController {
@@ -207,14 +207,17 @@ public class TdrepayRechargeController {
 			}
 
 			// 根据projectId查询平台还垫付信息
-//			Map<String, com.ht.ussp.core.Result> resultMap = tdrepayRechargeService
-//					.getAdvanceShareProfitAndProjectPayment(vo.getProjectId());
-//			com.ht.ussp.core.Result queryProjectPaymentResult = resultMap.get("queryProjectPaymentResult");
-//			com.ht.ussp.core.Result advanceShareProfitResult = resultMap.get("advanceShareProfitResult");
-//
-//			if (isPastPeriodAdvance(vo, queryProjectPaymentResult, advanceShareProfitResult)) {
-//				return Result.error("-99", "该标的号存在往期还垫付未结清记录");
-//			}
+			// Map<String, com.ht.ussp.core.Result> resultMap = tdrepayRechargeService
+			// .getAdvanceShareProfitAndProjectPayment(vo.getProjectId());
+			// com.ht.ussp.core.Result queryProjectPaymentResult =
+			// resultMap.get("queryProjectPaymentResult");
+			// com.ht.ussp.core.Result advanceShareProfitResult =
+			// resultMap.get("advanceShareProfitResult");
+			//
+			// if (isPastPeriodAdvance(vo, queryProjectPaymentResult,
+			// advanceShareProfitResult)) {
+			// return Result.error("-99", "该标的号存在往期还垫付未结清记录");
+			// }
 
 			tdrepayRechargeService.saveTdrepayRechargeInfo(vo);
 		} catch (ServiceRuntimeException e) {
@@ -1135,6 +1138,14 @@ public class TdrepayRechargeController {
 
 		List<TdGuaranteePaymentVO> vos = JSONObject.parseArray(
 				JSONObject.toJSONString(paramMap.get("guaranteePaymentDataList")), TdGuaranteePaymentVO.class);
+
+		if (CollectionUtils.isEmpty(vos)) {
+			return Result.error("未选择垫付记录");
+		}
+
+		/*
+		 * 是否计算滞纳金，0、不计算，2、计算
+		 */
 		int lateFeeFlag = (int) paramMap.get("lateFeeFlag");
 
 		for (TdGuaranteePaymentVO vo : vos) {
@@ -1153,9 +1164,11 @@ public class TdrepayRechargeController {
 			BigDecimal total = BigDecimal.valueOf(vo.getTotal());
 			BigDecimal overDueAmount = BigDecimal.ZERO;
 
+			// lateFeeFlag == 1 计算滞纳金
 			if (lateFeeFlag == 1) {
 				int diffDays = DateUtil.getDiffDays(DateUtil.getDate(vo.getAddDate()), new Date());
-				overDueAmount = BigDecimal.valueOf(diffDays * total.doubleValue() * 0.0006).setScale(2, BigDecimal.ROUND_HALF_UP);
+				overDueAmount = BigDecimal.valueOf(diffDays * total.doubleValue() * 0.0006).setScale(2,
+						BigDecimal.ROUND_HALF_UP);
 				total = total.add(overDueAmount);
 			}
 
