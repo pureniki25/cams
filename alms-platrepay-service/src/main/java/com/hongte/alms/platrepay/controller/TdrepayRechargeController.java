@@ -460,7 +460,7 @@ public class TdrepayRechargeController {
 						infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
 						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
 						infoVO.setPeriodTypeStr(TdrepayRechargePeriodTypeEnums.getValueByKey(infoVO.getSettleType()));
-
+ 
 						if (StringUtil.notEmpty(infoVO.getPlatStatus())) {
 							infoVO.setPlatformTypeStr(
 									PlatformStatusTypeEnum.getName(Integer.valueOf(infoVO.getPlatStatus())));
@@ -472,7 +472,7 @@ public class TdrepayRechargeController {
 				}
 				return PageResult.success(resultList, count);
 			}
-
+ 
 			return PageResult.success(0);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
