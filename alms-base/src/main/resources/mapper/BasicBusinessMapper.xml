@@ -967,8 +967,8 @@
     </delete>
     
     <select id="selectlPushFenFaBusiness" resultType="map">
-		SELECT t1.log_id as confirm_log_id,t1.orig_business_id as 'business_id',t2.source_business_id,t4.repayment_batch_id,t2.asset_id,t2.create_time,t2.create_user,t2.company_id,t2.company_name,
-		t1.business_type,t3.business_type_name,t2.customer_name,t2.asset_id,
+		SELECT t1.log_id as confirm_log_id,t1.orig_business_id as 'business_id',t2.source_business_id,t4.repayment_batch_id,t2.asset_id,t2.create_time,t2.create_user,t2.company_id,t1.company_name,
+		t1.business_type,t3.business_type_name,t1.customer_name,t2.asset_id,
 		'5' AS 'action_id',
 		'1' as businessFlag,
 		t1.asset_type as businessFrom

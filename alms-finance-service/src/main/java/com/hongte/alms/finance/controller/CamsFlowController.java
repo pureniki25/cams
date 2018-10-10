@@ -238,12 +238,16 @@ public class CamsFlowController {
         	String branchId = businessMapInfo.get("company_id")==null?"":businessMapInfo.get("company_id").toString();
         	String branchName = businessMapInfo.get("company_name")==null?"":businessMapInfo.get("company_name").toString();
         	String businessId = businessMapInfo.get("business_id")==null?"":businessMapInfo.get("business_id").toString();
+        	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();
         	String businessType = businessMapInfo.get("business_type_name")==null?"":businessMapInfo.get("business_type_name").toString();//business_type
         	String businessCtype = businessMapInfo.get("business_ctype")==null?"":businessMapInfo.get("business_ctype").toString();
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
-        	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();
+        	if(!StringUtils.isBlank(businessTypeId) && StringUtils.isBlank(businessCtype)) {
+        		businessType = BusinessTypeEnum.getName(Integer.parseInt(businessTypeId));
+        	}
+        	
         	String customerName = businessMapInfo.get("customer_name")==null?"":businessMapInfo.get("customer_name").toString();
         	String exhibitionId = businessMapInfo.get("business_id")==null?"":businessMapInfo.get("business_id").toString();
         	Business business = new Business();
