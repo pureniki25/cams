@@ -577,7 +577,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     		String tId = UUIDHtGenerator.getUUID();
     		//还款账号
         	FlowAccountIdentifier flowAccountIdentifier = new FlowAccountIdentifier();
-        	String accountName = flowMap.get("target_account_name")==null?"":flowMap.get("target_account_name").toString();
+        	String accountName = flowMap.get("account_name")==null?"":flowMap.get("account_name").toString();
         	String bankCardNo = flowMap.get("bank_card_no")==null?"":flowMap.get("bank_card_no").toString();
         	
         	String targetAccountId = flowMap.get("target_account_id")==null?"":flowMap.get("target_account_id").toString();
@@ -594,7 +594,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	flowAccountIdentifier.setAccountType(accountType);
         	flowAccountIdentifier.setDepositoryId(bankCardNo);
         	flowAccountIdentifier.setAccountName(accountName);
-        	flowAccountIdentifier.setIdentifierId(identifierId);
+        	flowAccountIdentifier.setIdentifierId(sId);
         	flowAccountIdentifier.setPersonal(personal);
         	if(!StringUtils.isBlank(mainId)) {
         		flowAccountIdentifier.setMainId(mainId);
@@ -603,16 +603,16 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	
         	int targetAccountType = null == flowMap.get("target_account_type")?1:Integer.parseInt(flowMap.get("target_account_type").toString());
         	String targetMainId = flowMap.get("target_main_id")==null?null:flowMap.get("target_main_id").toString();
-        	String targetAccountName = flowMap.get("account_name")==null?"":flowMap.get("account_name").toString();
+        	String targetAccountName = flowMap.get("target_account_name")==null?"":flowMap.get("target_account_name").toString();
         	personal = false;
         	//收入账号
         	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
         	flowAccountIdentifier2.setAccountName(targetAccountName);
         	flowAccountIdentifier2.setAccountType(targetAccountType);
         	flowAccountIdentifier2.setDepositoryId(targetBankCardNo);
-        	flowAccountIdentifier2.setIdentifierId(sId);
+        	flowAccountIdentifier2.setIdentifierId(tId);
         	flowAccountIdentifier2.setPersonal(personal);
-        	flowAccountIdentifier2.setAccountName(targetAccountId);
+        	flowAccountIdentifier2.setAccountName(targetAccountName);
         	if(!StringUtils.isBlank(targetMainId)) {
         		flowAccountIdentifier2.setMainId(targetMainId);
         	}
@@ -935,15 +935,12 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 Map<String, Object> flowMapTouZi = new HashMap<>();
 				 flowMapTouZi.putAll(flowMap);
 				 flowMapTouZi.put("amount", principalAndInterest);
-	//			 flowMapTouZi.put("main_id", value);
-	//			 flowMapTouZi.put("main_type", value);
 				 flowMapTouZi.put("in_out", 1);
 				 flowMapTouZi.put("target_main_id", mainIdTouZi);
 				 flowMapTouZi.put("target_bank_card_no", dMainIdTouZi);
 				 flowMapTouZi.put("target_main_type", 1);
 				 flowMapTouZi.put("target_account_name", "投资人");
 				 flowMapTouZi.put("target_account_type", "10");
-				 
 				 flowList.add(flowMapTouZi);
 			 }
 			//分公司流水
