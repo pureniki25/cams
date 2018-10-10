@@ -82,7 +82,12 @@
 <div id="app" v-cloak>
 	<Card>
 		<row>
-			<i-col span="5" offset="8">
+			<i-col span="5" offset="3">
+				分发日期：
+		    	<date-picker type="daterange" split-panels format="yyyy-MM-dd" placeholder="分发日期" 
+		    		@on-change="queryConditionModel.rechargeTimeStart=$event[0];queryConditionModel.rechargeTimeEnd=$event[1]" clearable />
+		    </i-col>
+			<i-col span="5">
 				财务确认日期：
 		    	<date-picker type="daterange" split-panels format="yyyy-MM-dd" placeholder="财务确认日期" 
 		    		@on-change="queryConditionModel.confirmTimeStart=$event[0];queryConditionModel.confirmTimeEnd=$event[1]" clearable />
@@ -108,9 +113,11 @@
 			<i-col span="3">
 				期数类型：
 				<i-select v-model="queryConditionModel.settleType" clearable filterable style="width:100px">
-      				<i-option :value="1">结清</i-option>
-      				<i-option :value="2">展期确认</i-option>
       				<i-option :value="0">正常还款</i-option>
+      				<i-option :value="10">正常结清</i-option>
+      				<i-option :value="11">逾期结清</i-option>
+      				<i-option :value="20">展期确认</i-option>
+      				<i-option :value="30">坏账结清</i-option>
   				</i-select>
 			</i-col>
 			<i-col span="1">
@@ -240,7 +247,7 @@
    		</row>
 	</Modal>
 	
-	<Modal v-model="infoFlag" width="95%" @on-visible-change="openInfoTabModal">
+	<Modal v-model="infoFlag" width="95%">
 		<Card style="margin-top:1.5rem">
             <div slot="title" >
                 <span>业务编号:</span>
@@ -253,7 +260,7 @@
                 <span class="marginRight">{{infoBasicData.amount?numeral(infoBasicData.amount).format('0,0.00') + '元' : ''}}</span>
             </div>
             
-	        <tabs value="fundDistributionRecord" :animated="true" @on-click="initFunction($event)">
+	        <tabs v-model="infoTabValue" :animated="true" @on-click="initFunction($event)">
 				<tab-pane label="资金分发记录" name="fundDistributionRecord">
 					<div style="width:100%; height:600px; overflow-y:scroll;">
 					
@@ -298,19 +305,35 @@
 				            <h3 style="color:red">Tips：数据均来源于团贷网后台接口，非鸿特本地数据</h3>
 				        </p>
 				    </row>
-					<row style="margin-top:1rem">
-						<p slot="title">
-				            <h3>标的应还计划</h3>
-				        </p>
-				    </row>
-					<i-table border :columns="platformRepaymentInfoColumns" :data="platformRepaymentInfoData" style="margin-top:1rem"></i-table>
-					
-					<row style="margin-top:1rem">
-						<p slot="title">
-				            <h3>标的实还计划</h3>
-				        </p>
-				    </row>
-					<i-table border :columns="platformActualRepaymentInfoColumns" :data="platformActualRepaymentInfoData" style="margin-top:1rem"></i-table>
+				    <tabs :animated="true" @on-click="initProjectFunction($event)">
+				    	<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
+							<row>
+								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
+								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
+								<i-col span='4'>账户余额：{{ platformRepaymentInfoaviMoney?numeral(platformRepaymentInfoaviMoney).format('0,0.00'):0 }}</i-col>
+								<i-col span='10' >
+									今天结清应还本息平台费：{{ platformPrincipalAndInterestAndPlatformCharge?numeral(platformPrincipalAndInterestAndPlatformCharge).format('0,0.00'):0 }}，
+									本金：{{ platformPrincipal?numeral(platformPrincipal).format('0,0.00'):0 }}，
+									利息：{{ platformInterest?numeral(platformInterest).format('0,0.00'):0 }}，
+									平台费：{{ platformRepaymentInfoPlatformCharge?numeral(platformRepaymentInfoPlatformCharge).format('0,0.00'):0 }}
+								</i-col>
+							</row>
+							
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>标的应还计划</h3>
+						        </p>
+						    </row>
+							<i-table border :columns="platformRepaymentInfoColumns" :data="platformRepaymentInfoData" style="margin-top:1rem"></i-table>
+							
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>标的实还计划</h3>
+						        </p>
+						    </row>
+							<i-table border :columns="platformActualRepaymentInfoColumns" :data="platformActualRepaymentInfoData" style="margin-top:1rem"></i-table>
+						</tab-pane>
+					</tabs>
 				</tab-pane>
 				
 				<tab-pane label="垫付记录" name="advancesRecord">
@@ -319,23 +342,34 @@
 				            <h3 style="color:red">Tips：数据均来源于团贷网后台接口，非鸿特本地数据</h3>
 				        </p>
 				    </row>
-					<row style="margin-top:1rem">
-						<p slot="title">
-				            <h3>还垫付记录</h3>
-				        </p>
-				    </row>
-					<row style="margin-top:1rem">
-						<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
-					</row>
-					
-					<row style="margin-top:1rem">
-						<p slot="title">
-				            <h3>担保公司垫付记录</h3>
-				        </p>
-				    </row>
-					<row style="margin-top:1rem">
-						<i-table border :columns="queryGuaranteePaymentColumns" :data="queryGuaranteePaymentData" style="margin-top:1rem"></i-table>
-					</row>
+				    <tabs :animated="true" @on-click="initAdvancePaymentFunction($event)">
+						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>还垫付记录</h3>
+						        </p>
+						    </row>
+							<row style="margin-top:1rem">
+								<i-table border :columns="advancePaymentInfoColumns" :data="advancePaymentInfoData" style="margin-top:1rem"></i-table>
+							</row>
+							
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>担保公司垫付记录</h3>
+						        </p>
+						    </row>
+						    
+							<row style="margin-top:1rem">
+								<i-button type="primary" @click="handleAdvancePayment" :loading="handleAdvancePaymentLoading" style="margin-right:1rem">执行还垫付</i-button>
+								<i-button type="primary" @click="handleAdvancePaymentLateFee" :loading="handleAdvancePaymentLateFeeLoading" style="margin-right:1rem">执行还垫付（含滞纳金）</i-button>
+							</row>
+							
+							<row style="margin-top:1rem">
+								<i-table border ref="guaranteePaymentData" :columns="queryGuaranteePaymentColumns" 
+										@on-selection-change="selectGuaranteePaymentData($event)" :data="queryGuaranteePaymentData" style="margin-top:1rem"></i-table>
+							</row>
+						</tab-pane>
+					</tabs>
 				</tab-pane>
 			</tabs>
         </Card>

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
@@ -36,7 +37,7 @@ public class QueryRechargeOrderJob extends IJobHandler {
 			if (CollectionUtils.isNotEmpty(logs)) {
 				for (AgencyRechargeLog agencyRechargeLog : logs) {
 					agencyRechargeLogService.queryRechargeOrder(agencyRechargeLog.getoIdPartner(),
-							agencyRechargeLog.getCmOrderNo(), "贷后定时任务");
+							agencyRechargeLog.getCmOrderNo(), "贷后定时任务", BusinessTypeEnum.getOrgTypeByName(agencyRechargeLog.getRechargeAccountType()));
 				}
 			}
 			long end = System.currentTimeMillis();

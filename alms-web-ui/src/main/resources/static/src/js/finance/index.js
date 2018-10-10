@@ -382,7 +382,10 @@ window.layinit(function (htConfig) {
                                 menu.push(confirmWithhold)
                                 menu.push(planSettle)
                                 menu.push(settle)
-                                menu.push(withhold)
+                              
+                            }
+                            if(p.row.srcType == 2 &&p.row.plateType==1){//是贷后系统生成并且资金端是团贷网的才能代扣
+                            	  menu.push(withhold)
                             }
                             
                             if (p.row.srcType == 2 && isFinalPeroid ) {

@@ -11,6 +11,16 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * 分发开始时间
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+	private Date rechargeTimeStart;
+	/**
+	 * 分发结束时间
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+	private Date rechargeTimeEnd;
+	/**
 	 * 财务确认开始时间
 	 */
 	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -58,8 +68,24 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 	 * 用户ID
 	 */
 	private String userId;
-	
+
 	private Integer needPermission = 1;
+
+	public Date getRechargeTimeStart() {
+		return rechargeTimeStart;
+	}
+
+	public void setRechargeTimeStart(Date rechargeTimeStart) {
+		this.rechargeTimeStart = rechargeTimeStart;
+	}
+
+	public Date getRechargeTimeEnd() {
+		return rechargeTimeEnd;
+	}
+
+	public void setRechargeTimeEnd(Date rechargeTimeEnd) {
+		this.rechargeTimeEnd = rechargeTimeEnd;
+	}
 
 	public Date getConfirmTimeStart() {
 		return confirmTimeStart;
@@ -148,7 +174,7 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	
+
 	public Integer getNeedPermission() {
 		return needPermission;
 	}
@@ -159,10 +185,12 @@ public class ComplianceRepaymentVO extends PageRequest implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ComplianceRepaymentVO [confirmTimeStart=" + confirmTimeStart + ", confirmTimeEnd=" + confirmTimeEnd
-				+ ", processStatus=" + processStatus + ", repaySource=" + repaySource + ", settleType=" + settleType
-				+ ", origBusinessId=" + origBusinessId + ", businessType=" + businessType + ", platStatus=" + platStatus
-				+ ", companyName=" + companyName + ", isExport=" + isExport + ", userId=" + userId + "]";
+		return "ComplianceRepaymentVO [rechargeTimeStart=" + rechargeTimeStart + ", rechargeTimeEnd=" + rechargeTimeEnd
+				+ ", confirmTimeStart=" + confirmTimeStart + ", confirmTimeEnd=" + confirmTimeEnd + ", processStatus="
+				+ processStatus + ", repaySource=" + repaySource + ", settleType=" + settleType + ", origBusinessId="
+				+ origBusinessId + ", businessType=" + businessType + ", platStatus=" + platStatus + ", companyName="
+				+ companyName + ", isExport=" + isExport + ", userId=" + userId + ", needPermission=" + needPermission
+				+ "]";
 	}
 
 }
