@@ -27,6 +27,8 @@ import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentPlatformList;
 import com.hongte.alms.base.entity.RepaymentPlatformListBorrower;
 import com.hongte.alms.base.entity.RepaymentPlatformListGuarantee;
+import com.hongte.alms.base.entity.TdrepayRechargeLog;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.feignClient.EipRemote;
@@ -40,6 +42,7 @@ import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentPlatformListBorrowerService;
 import com.hongte.alms.base.service.RepaymentPlatformListGuaranteeService;
 import com.hongte.alms.base.service.RepaymentPlatformListService;
+import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.util.UUIDHtGenerator;
 import com.hongte.alms.base.vo.cams.CamsMessage;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand;
@@ -104,6 +107,10 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     @Autowired
     @Qualifier("BasicBusinessService")
     BasicBusinessService basicBusinessService;
+    
+    @Autowired
+    @Qualifier("TdrepayRechargeLogService")
+    TdrepayRechargeLogService tdrepayRechargeLogService;
     
     @Autowired
     private FlowPushLogMapper flowPushLogMapper;
@@ -392,7 +399,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	
             	if(actionId != 201) {//你我金融没有账户信息
 	            	int accountType = Integer.parseInt(flowMap.get("account_type").toString());
-	            	String mainId = flowMap.get("main_id").toString();
+	            	String mainId = null==flowMap.get("main_id")?null:flowMap.get("main_id").toString();
 	            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
 	            	flowAccountIdentifier.setAccountType(accountType);
 	            	flowAccountIdentifier.setDepositoryId(bankCardNo);
@@ -415,7 +422,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	            	flowAccountIdentifier2.setPersonal(personal);
 	            	flowAccountIdentifier2.setAccountName(targetAccountId);
 	            	if(!StringUtils.isBlank(targetMainId)) {
-	            		flowAccountIdentifier.setMainId(targetMainId);
+	            		flowAccountIdentifier2.setMainId(targetMainId);
 	            	}
 	            	accountIdentifiers.add(flowAccountIdentifier2);
             	}
@@ -457,9 +464,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	flow.setSegmentationDate(segmentationDate);
             	flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
             	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
-            	if(actionId != 7) {
-            		flows.add(flow);
-            	}
+            	flows.add(flow);
             	
             	if(actionId != 201) {  //你我金融流水 不构建支出流水
 	            	//支出流水
@@ -476,7 +481,9 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	            	flow1.setSegmentationDate(segmentationDate);
 	            	flow1.setSourceAccountIdentifierId(sourceAccountIdentifierId);
 	            	flow1.setTargetAccountIdentifierId(targetAccountIdentifierId);
-	            	flows.add(flow1);
+	            	if(actionId != 7) {
+	            		flows.add(flow1);
+	            	}
             	}
             	
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
@@ -599,7 +606,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	flowAccountIdentifier2.setPersonal(personal);
         	flowAccountIdentifier2.setAccountName(targetAccountId);
         	if(!StringUtils.isBlank(targetMainId)) {
-        		flowAccountIdentifier.setMainId(targetMainId);
+        		flowAccountIdentifier2.setMainId(targetMainId);
         	}
         	accountIdentifiers.add(flowAccountIdentifier2);
         	
@@ -833,6 +840,22 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 		switch (actionId) {
 		case 7://平台还款
 			pushFlowList = repaymentPlatformListService.selectPushPlatformRepayFlowList(paramBusinessMap);
+			//平台还款 没有标的信息 从资金分发补充公司 业务 客户信息
+			for (Map<String, Object> pushFlowMap : pushFlowList) {
+				String projectId = null == pushFlowMap.get("project_id")?null:pushFlowMap.get("project_id").toString();
+				if(null == projectId) {
+					continue;
+				}
+				TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("process_status", 2));
+				if(null == tdrepayRechargeLog) {
+					continue;
+				}
+				pushFlowMap.put("business_id", tdrepayRechargeLog.getOrigBusinessId());
+				pushFlowMap.put("business_type", tdrepayRechargeLog.getBusinessType());
+				pushFlowMap.put("business_type_name", BusinessTypeEnum.getName(tdrepayRechargeLog.getBusinessType()));
+				pushFlowMap.put("customer_name", tdrepayRechargeLog.getCustomerName());
+				pushFlowMap.put("company_name", tdrepayRechargeLog.getCompanyName());
+			}
 			break;
 		case 8://垫付
 			pushFlowList = repaymentPlatformListService.selectPushAdvancePayFlowList(paramBusinessMap);
@@ -906,9 +929,11 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapTouZi.put("amount", principalAndInterest);
 	//			 flowMapTouZi.put("main_id", value);
 	//			 flowMapTouZi.put("main_type", value);
+				 flowMapTouZi.put("in_out", 1);
 				 flowMapTouZi.put("target_main_id", null);
 				 flowMapTouZi.put("target_main_type", 1);
 				 flowMapTouZi.put("target_account_name", "投资人");
+				 flowMapTouZi.put("target_account_type", "10");
 				 flowList.add(flowMapTouZi);
 			 }
 			//分公司流水
@@ -918,8 +943,12 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapCompany.putAll(flowMap);
 				 flowMapCompany.put("amount", orgAmount);
 				 flowMapCompany.put("target_main_id", null);
+				 flowMapCompany.put("in_out", 1);
 				 flowMapCompany.put("target_main_type", 1);
-				 flowMapCompany.put("target_account_name", "广东鸿特信息咨询有限公司"+basicBusiness.getCompanyName());
+				 flowMapCompany.put("target_account_type", "1");
+				 if(null != basicBusiness) {
+					 flowMapCompany.put("target_account_name", "广东鸿特信息咨询有限公司"+basicBusiness.getCompanyName());
+				 }
 				 flowList.add(flowMapCompany);
 			 }
 			//平台费
@@ -929,7 +958,9 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapPlatform.put("amount", tuandaiAmount);
 				 flowMapPlatform.put("target_main_id", null);
 				 flowMapPlatform.put("target_main_type", 1);
+				 flowMapPlatform.put("in_out", 1);
 				 flowMapPlatform.put("target_account_name", "东莞团贷网互联网科技服务有限公司");
+				 flowMapPlatform.put("target_account_type", "6");
 				 flowList.add(flowMapPlatform);
 			 }
 			//担保公司
@@ -946,7 +977,9 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapDanbao.put("amount", guaranteeAmount.add(penaltyAmount));
 				 flowMapDanbao.put("target_main_id", "45BC0637-412F-45AF-A44A-14348BEB400C");
 				 flowMapDanbao.put("target_main_type", 1);
+				 flowMapDanbao.put("in_out", 1);
 				 flowMapDanbao.put("target_account_name", "深圳市天大联合融资担保有限公司");
+				 flowMapDanbao.put("target_account_type", "3");
 				 flowList.add(flowMapDanbao);
 			 }
 			}
