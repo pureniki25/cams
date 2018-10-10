@@ -215,6 +215,7 @@
 		LEFT JOIN tb_basic_business t9 ON t9.business_id = t6.business_id
 		WHERE t1.id = #{confirmLogId}
 		and t1.last_push_status in (0,2)
+		and t1.total_amount != 0
 		ORDER BY t1.create_time
     </select>
     

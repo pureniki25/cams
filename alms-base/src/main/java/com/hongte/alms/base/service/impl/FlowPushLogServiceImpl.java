@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi.MD5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +116,12 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     
     @Autowired
     private FlowPushLogMapper flowPushLogMapper;
+    
+    private String mainIdTouZi = "97ff0bff-e93d-11e7-94ed-94c69109b34a";//投资人
+    private String dMainIdTouZi = "786fd138695a4c53a7a45f3f323c8b0e";
+    
+    private String mainIdPlatfrom = "91441900MA4ULXKB38";//平台
+    private String dMainIdPlatfrom = "51F2CBF5-9076-4AC9-9EC4-0373CF803070";
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowPushLogServiceImpl.class);
 	
@@ -930,10 +938,12 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	//			 flowMapTouZi.put("main_id", value);
 	//			 flowMapTouZi.put("main_type", value);
 				 flowMapTouZi.put("in_out", 1);
-				 flowMapTouZi.put("target_main_id", null);
+				 flowMapTouZi.put("target_main_id", mainIdTouZi);
+				 flowMapTouZi.put("target_bank_card_no", dMainIdTouZi);
 				 flowMapTouZi.put("target_main_type", 1);
 				 flowMapTouZi.put("target_account_name", "投资人");
 				 flowMapTouZi.put("target_account_type", "10");
+				 
 				 flowList.add(flowMapTouZi);
 			 }
 			//分公司流水
@@ -946,9 +956,11 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapCompany.put("in_out", 1);
 				 flowMapCompany.put("target_main_type", 1);
 				 flowMapCompany.put("target_account_type", "1");
-				 if(null != basicBusiness) {
-					 flowMapCompany.put("target_account_name", "广东鸿特信息咨询有限公司"+basicBusiness.getCompanyName());
+				 if(null != business.getBranchName()) {
+					 flowMapCompany.put("target_account_name", "广东鸿特信息咨询有限公司"+business.getBranchName());
+					 flowMapCompany.put("target_bank_card_no", DigestUtils.md5Hex(business.getBranchName()));
 				 }
+				 flowMapCompany.put("target_main_id", null);
 				 flowList.add(flowMapCompany);
 			 }
 			//平台费
@@ -959,6 +971,8 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapPlatform.put("target_main_id", null);
 				 flowMapPlatform.put("target_main_type", 1);
 				 flowMapPlatform.put("in_out", 1);
+				 flowMapPlatform.put("target_main_id", mainIdPlatfrom);
+				 flowMapPlatform.put("target_bank_card_no", dMainIdPlatfrom);
 				 flowMapPlatform.put("target_account_name", "东莞团贷网互联网科技服务有限公司");
 				 flowMapPlatform.put("target_account_type", "6");
 				 flowList.add(flowMapPlatform);
@@ -976,6 +990,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapDanbao.putAll(flowMap);
 				 flowMapDanbao.put("amount", guaranteeAmount.add(penaltyAmount));
 				 flowMapDanbao.put("target_main_id", "45BC0637-412F-45AF-A44A-14348BEB400C");
+				 flowMapDanbao.put("target_bank_card_no", "45BC0637-412F-45AF-A44A-14348BEB400C");
 				 flowMapDanbao.put("target_main_type", 1);
 				 flowMapDanbao.put("in_out", 1);
 				 flowMapDanbao.put("target_account_name", "深圳市天大联合融资担保有限公司");
