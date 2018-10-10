@@ -279,8 +279,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = { ServiceRuntimeException.class,
 			Exception.class })
 	@Override
-	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId,
-			Integer channel) {
+	public LitigationResponse sendTransferLitigationData(String businessId, String planListId, Integer channel) {
 		TransferOfLitigationVO transferLitigationData = null;
 		LitigationResponse litigationResponse = null;
 		if (StringUtil.isEmpty(businessId) || channel == null) {
@@ -366,7 +365,6 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				transferLitigationData.setHouseList(businessHouses);
 			}
 
-			LOG.info("移交法务诉讼系统地址：{}", sendUrl);
 			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
 			litigationResponse = litigationFeignClient.importLitigation(transferLitigationData);
 			String returnJson = JSONObject.toJSONString(litigationResponse);
@@ -521,7 +519,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveTransferLitigationHouse(TransferLitigationHouse req, String sendUrl, List<FileVo> files) {
+	public void saveTransferLitigationHouse(TransferLitigationHouse req, List<FileVo> files) {
 
 		if (!CollectionUtils.isEmpty(files)) {
 			for (FileVo file : files) {
@@ -563,7 +561,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveTransferLitigationCar(TransferLitigationCar req, String sendUrl, List<FileVo> files) {
+	public void saveTransferLitigationCar(TransferLitigationCar req, List<FileVo> files) {
 
 		if (req == null || StringUtil.isEmpty(req.getBusinessId())) {
 			throw new ServiceRuntimeException("参数不能空！");

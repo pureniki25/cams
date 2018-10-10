@@ -759,24 +759,27 @@
 			   -- AND t2.account_status = 0 
 			    AND t2.plan_item_type NOT IN (10, 20, 30, 50, 60)) otherFee,
 			  (SELECT 
-			    IFNULL(SUM(t.over_repay_money), 0) over_repay_money_1 
-			  FROM
-			    `tb_accountant_over_repay_log` t 
-			  LEFT JOIN tb_repayment_confirm_log rcl on rcl.surplus_ref_id = t.log_id 
-			  WHERE t.freeze_status != 1 
-			    AND t.money_type = 1 
-			    AND rcl.is_cancelled = 0 
-			    AND t.business_id = #{businessId,jdbcType=VARCHAR} 
-			    AND t.business_after_id = rbpl.after_id) - (SELECT 
-			    IFNULL(SUM(t.over_repay_money), 0) over_repay_money_1 
-			  FROM
-			    `tb_accountant_over_repay_log` t 
-			  LEFT JOIN tb_repayment_confirm_log rcl on rcl.surplus_ref_id = t.log_id 
-			  WHERE t.freeze_status != 1 
-			    AND t.money_type = 0 
-			    AND rcl.is_cancelled = 0 
-			    AND t.business_id = #{businessId,jdbcType=VARCHAR} 
-			    AND t.business_after_id = rbpl.after_id) surplus,
+			      IFNULL(SUM(t.over_repay_money), 0) over_repay_money_1 
+			    FROM
+			      `tb_accountant_over_repay_log` t 
+			      LEFT JOIN tb_repayment_confirm_log rcl 
+			        ON rcl.surplus_ref_id = t.log_id 
+			        AND rcl.is_cancelled = 0
+			    WHERE t.freeze_status != 1 
+			      AND t.money_type = 1 
+			      AND t.business_id = #{businessId,jdbcType=VARCHAR}
+			      AND t.business_after_id = rbpl.after_id) - 
+			    (SELECT 
+			      IFNULL(SUM(t.over_repay_money), 0) over_repay_money_1 
+			    FROM
+			      `tb_accountant_over_repay_log` t 
+			      LEFT JOIN tb_repayment_confirm_log rcl 
+			        ON rcl.surplus_ref_id = t.log_id 
+			        AND rcl.is_cancelled = 1 
+			    WHERE t.freeze_status != 1 
+			      AND t.money_type = 0 
+			      AND t.business_id = #{businessId,jdbcType=VARCHAR}
+			      AND t.business_after_id = rbpl.after_id) surplus,
 			  CASE
 			    rbpl.`current_status` 
 			    WHEN '已还款' 
@@ -795,7 +798,9 @@
 			  GROUP BY rbpl.`plan_list_id`
 			  -- GROUP BY rbpl.period 
 			  ) tab
-  			ORDER BY tab.period, tab.afterId
+  			ORDER BY tab.afterId,
+			  tab.repayment DESC, 
+			  tab.repaymentDate
     </select>
     
     <select id="queryPlanRepaymentProjInfoByPlanListId" resultType="com.hongte.alms.base.dto.RepaymentProjInfoDTO">

@@ -17,6 +17,6 @@ import com.hongte.alms.common.service.BaseService;
 @Service("TransferLitigationCarService")
 public interface TransferLitigationCarService extends BaseService<TransferLitigationCar> {
 	
-	void saveCarProcessApprovalResult(ProcessLogReq req, String sendUrl);
+	void saveCarProcessApprovalResult(ProcessLogReq req);
 
 }

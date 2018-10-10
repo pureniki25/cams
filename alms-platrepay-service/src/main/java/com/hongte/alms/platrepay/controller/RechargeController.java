@@ -30,7 +30,6 @@ import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.DepartmentBank;
 import com.hongte.alms.base.entity.SysParameter;
-import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
@@ -90,7 +89,7 @@ public class RechargeController {
 			return Result.success(departmentBankService.listDepartmentBank());
 		} catch (Exception e) {
 			LOG.error("获取所有的线下还款账户失败", e);
-			return Result.error("500", "获取所有的线下还款账户失败！");
+			return Result.error("获取所有的线下还款账户失败！");
 		}
 	}
 
@@ -369,23 +368,23 @@ public class RechargeController {
 		return agencyRechargeLog;
 	}
 
-	@SuppressWarnings("rawtypes")
-	@ApiOperation(value = "查询充值订单")
-	@GetMapping("/queryRechargeOrder")
-	@ResponseBody
-	public Result queryRechargeOrder(@RequestParam("oidPartner") String oidPartner,
-			@RequestParam("cmOrderNo") String cmOrderNo) {
-		try {
-			if (StringUtil.isEmpty(cmOrderNo) || StringUtil.isEmpty(oidPartner)) {
-				return Result.error("500", "订单号或资产端唯一编号不能为空");
-			}
-			agencyRechargeLogService.queryRechargeOrder(oidPartner, cmOrderNo, loginUserInfoHelper.getUserId());
-			return Result.success();
-		} catch (Exception e) {
-			LOG.error("查询充值订单失败", e);
-			return Result.error("500", "查询充值订单失败！");
-		}
-	}
+//	@SuppressWarnings("rawtypes")
+//	@ApiOperation(value = "查询充值订单")
+//	@GetMapping("/queryRechargeOrder")
+//	@ResponseBody
+//	public Result queryRechargeOrder(@RequestParam("oidPartner") String oidPartner,
+//			@RequestParam("cmOrderNo") String cmOrderNo) {
+//		try {
+//			if (StringUtil.isEmpty(cmOrderNo) || StringUtil.isEmpty(oidPartner)) {
+//				return Result.error("500", "订单号或资产端唯一编号不能为空");
+//			}
+//			agencyRechargeLogService.queryRechargeOrder(oidPartner, cmOrderNo, loginUserInfoHelper.getUserId());
+//			return Result.success();
+//		} catch (Exception e) {
+//			LOG.error("查询充值订单失败", e);
+//			return Result.error("500", "查询充值订单失败！");
+//		}
+//	}
 
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "对外提供充值接口")

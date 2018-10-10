@@ -335,6 +335,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			TdrepayRechargeLog tdrepayRechargeLog = new TdrepayRechargeLog();
 			tdrepayRechargeLog.setLogId(vo.getLogId());
 			tdrepayRechargeLog.setProcessStatus(processStatus); // 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
+			tdrepayRechargeLog.setProcessTime(new Date());
 			tdrepayRechargeLog.setUpdateTime(new Date());
 			tdrepayRechargeLog.setUpdateUser(userId);
 			rechargeLogs.add(tdrepayRechargeLog);
@@ -625,7 +626,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			if (CollectionUtils.isNotEmpty(rechargeLogs)) {
 				// list按照期次 Period 分组，并按照Period从小到大排序
 				Map<Integer, List<TdrepayRechargeLog>> map = repayChargeLogGroupByPeriod(rechargeLogs);
-				projectIdMap.put(rechargeLogs.get(0).getProjectId(), map);
+				projectIdMap.put(entry.getKey(), map);
 			}
 		}
 
