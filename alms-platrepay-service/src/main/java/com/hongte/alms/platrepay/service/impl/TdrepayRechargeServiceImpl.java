@@ -1607,6 +1607,10 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					DistributeFundRecordVO vo = BeanUtils.deepCopy(tdrepayRechargeLog, DistributeFundRecordVO.class);
+					TuandaiProjectInfo info = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("td_user_id", vo.getTdUserId()));
+					if (info != null) {
+						vo.setPerson(info.getRealName());
+					}
 					vo.setProcessStatusStr(ProcessStatusTypeEnum.getName(tdrepayRechargeLog.getProcessStatus()));
 					vo.setCreateTimeStr(DateUtil.formatDate(vo.getCreateTime()));
 					vo.setFactRepayDateStr(DateUtil.formatDate(vo.getFactRepayDate()));
