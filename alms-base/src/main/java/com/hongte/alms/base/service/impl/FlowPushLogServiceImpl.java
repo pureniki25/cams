@@ -949,7 +949,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			//分公司流水
 			 if(orgAmount != null && orgAmount.compareTo(new BigDecimal(0)) > 0) {
 				 Map<String, Object> flowMapCompany = new HashMap<>();
-				 BasicBusiness basicBusiness = basicBusinessService.selectById(business.getBusinessId());
+//				 BasicBusiness basicBusiness = basicBusinessService.selectById(business.getBusinessId());
 				 flowMapCompany.putAll(flowMap);
 				 flowMapCompany.put("amount", orgAmount);
 				 flowMapCompany.put("target_main_id", null);
