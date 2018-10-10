@@ -118,7 +118,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     private FlowPushLogMapper flowPushLogMapper;
     
     private String mainIdTouZi = "97ff0bff-e93d-11e7-94ed-94c69109b34a";//投资人
-    private String dMainIdTouZi = "786fd138695a4c53a7a45f3f323c8b0e";
+    private String dMainIdTouZi = "97ff0bff-e93d-11e7-94ed-94c69109b34a";
     
     private String mainIdPlatfrom = "91441900MA4ULXKB38";//平台
     private String dMainIdPlatfrom = "51F2CBF5-9076-4AC9-9EC4-0373CF803070";
