@@ -274,6 +274,7 @@
 				                <th>资金分发金额</th>
 				                <th>资金分发费用项</th>
 				                <th>费用项金额</th>
+				                <th>被充值账户</th>
 				                <th>处理结果</th>
 				                <th>备注</th>
 				            </tr>
@@ -291,6 +292,7 @@
 				                <td>
 				                    <div class="receive-inner-div"  v-for='(subItem, subIndex) in item.details' :key='subIndex'>{{ subItem.feeValue?numeral(subItem.feeValue).format('0,0.00'):0 }}</div>
 				                </td>
+				                <td style="text-align:center">{{ item.person }}</td>
 				                <td style="text-align:center">{{ item.processStatusStr }}</td>
 				                <td style="text-align:center">{{ item.remark }}</td>
 				            </tr>
