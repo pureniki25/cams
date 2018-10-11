@@ -576,7 +576,7 @@ window.layinit(function (htConfig) {
 				}
 				var that = this;
 				setTimeout(function(){
-                    that.paneHeight = "height:"+(that.tableHeight+1)+"px";
+                    that.paneHeight = "height:"+(that.tableHeight+2)+"px";
 				},500)
             },
             /*
