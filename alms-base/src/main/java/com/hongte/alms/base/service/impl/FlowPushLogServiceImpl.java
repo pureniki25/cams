@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi.MD5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
-import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentAdvanceRepayFlow;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -413,6 +411,12 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	            	int accountType = Integer.parseInt(flowMap.get("account_type").toString());
 	            	String mainId = null==flowMap.get("main_id")?null:flowMap.get("main_id").toString();
 	            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
+	            	if(actionId == 7) {//平台还款的客户为资金分发的用户
+	            		accountName = customerName;
+	            		mainId = null == businessMapInfo.get("td_user_id")?null:businessMapInfo.get("td_user_id").toString();
+	            		identifierId = mainId;
+	            	}
+	            	
 	            	flowAccountIdentifier.setAccountType(accountType);
 	            	flowAccountIdentifier.setDepositoryId(bankCardNo);
 	            	flowAccountIdentifier.setBankCardNo(bankCardNo);
@@ -427,7 +431,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	            	int targetAccountType = Integer.parseInt(flowMap.get("target_account_type").toString());
 	            	String targetMainId = flowMap.get("target_main_id").toString();
 	            	personal = false;
-	            	//收入账号
+	            	
 	            	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
 	            	flowAccountIdentifier2.setAccountType(targetAccountType);
 	            	flowAccountIdentifier2.setDepositoryId(targetBankCardNo);
@@ -868,6 +872,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				pushFlowMap.put("business_type_name", BusinessTypeEnum.getName(tdrepayRechargeLog.getBusinessType()));
 				pushFlowMap.put("customer_name", tdrepayRechargeLog.getCustomerName());
 				pushFlowMap.put("company_name", tdrepayRechargeLog.getCompanyName());
+				pushFlowMap.put("td_user_id", tdrepayRechargeLog.getTdUserId());
 			}
 			break;
 		case 8://垫付
