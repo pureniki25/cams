@@ -122,6 +122,10 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     
     private String mainIdPlatfrom = "91441900MA4ULXKB38";//平台
     private String dMainIdPlatfrom = "51F2CBF5-9076-4AC9-9EC4-0373CF803070";
+    
+    private String danbao = "深圳市天大联合融资担保有限公司";
+    private String mainIdDanbao = "45BC0637-412F-45AF-A44A-14348BEB400C";//深圳市天大联合融资担保有限公司
+    private String dMainIdDanbao = "45BC0637-412F-45AF-A44A-14348BEB400C";
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowPushLogServiceImpl.class);
 	
@@ -932,6 +936,28 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 8://垫付
 			flowList = repaymentPlatformListService.selectPushAdvancePayFlow(paramFlowMap);
+			if(flowList != null && !flowList.isEmpty()) {
+				//处理流水中的账户信息
+				for (Map<String, Object> flowMap : flowList) {
+				String projectId = null == flowMap.get("issue_id")?null:flowMap.get("issue_id").toString();
+				if(null == projectId) {
+					continue;
+				}
+				TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("process_status", 2));
+				if(null == tdrepayRechargeLog) {
+					continue;
+				}
+				flowMap.put("account_name", danbao);
+				flowMap.put("bank_card_no", dMainIdDanbao);
+				flowMap.put("account_type", 1);
+				flowMap.put("main_id", mainIdDanbao);
+				
+				flowMap.put("target_account_id", tdrepayRechargeLog.getCustomerName());
+				flowMap.put("target_bank_card_no", tdrepayRechargeLog.getTdUserId());
+				flowMap.put("target_account_type", 1);
+				flowMap.put("target_main_id", tdrepayRechargeLog.getTdUserId());
+				}
+			}
 			break;
 		case 81://还垫付
 			flowList = repaymentPlatformListService.selectPushAdvanceRepayFlow(paramFlowMap);
@@ -1026,7 +1052,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 flowMapDanbao.put("target_account_name", "深圳市天大联合融资担保有限公司");
 				 flowMapDanbao.put("target_account_type", "3");
 				 flowList.add(flowMapDanbao);
-			 }
+			  }
 			}
 			break;
 		default:
