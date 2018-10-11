@@ -33,6 +33,7 @@ window.layinit(function (htConfig) {
         	
         	projectInfoList: [], 	//  标信息LIST
             tableHeight:450,
+            paneHeight:"height:450px",
         	// 还款计划表头  -- start --
         	repayPlanColumns: [
         		{
@@ -553,17 +554,22 @@ window.layinit(function (htConfig) {
              * 初始化方法
              */
             initFunction: function(event){
-            	if (event == 'realRepaymentRecord') {
+                this.paneHeight="height:"+this.tableHeight+"px";
+                if (event == 'realRepaymentRecord') {
+                    this.paneHeight=null;
 					this.queryActualPaymentByBusinessId();
 				}else if (event == 'platformRealRepayment') {
+                    this.paneHeight=null;
 					if (this.firstProjectId != '') {
 						this.getProjectPayment(this.firstProjectId);
 					}
 				}else if (event == 'advancesRecord') {
+                    this.paneHeight=null;
 					if (this.firstProjectId != '') {
 						this.returnAdvanceShareProfit(this.firstProjectId);
 					}
 				}else if (event == 'fundDistributionRecord') {
+                    this.paneHeight=null;
 					if (this.firstProjectId != '') {
 						this.queryDistributeFundRecord(this.firstProjectId);
 					}
