@@ -556,24 +556,28 @@ window.layinit(function (htConfig) {
             initFunction: function(event){
                 this.paneHeight="height:"+this.tableHeight+"px";
                 if (event == 'realRepaymentRecord') {
-                    this.paneHeight=null;
-                    this.queryActualPaymentByBusinessId();
-                }else if (event == 'platformRealRepayment') {
-                    this.paneHeight=null;
-                    if (this.firstProjectId != '') {
-                        this.getProjectPayment(this.firstProjectId);
-                    }
-                }else if (event == 'advancesRecord') {
-                    this.paneHeight=null;
-                    if (this.firstProjectId != '') {
-                        this.returnAdvanceShareProfit(this.firstProjectId);
-                    }
-                }else if (event == 'fundDistributionRecord') {
-                    this.paneHeight=null;
-                    if (this.firstProjectId != '') {
-                        this.queryDistributeFundRecord(this.firstProjectId);
-                    }
-                }
+                    this.paneHeight="";
+					this.queryActualPaymentByBusinessId();
+				}else if (event == 'platformRealRepayment') {
+                    this.paneHeight="";
+					if (this.firstProjectId != '') {
+						this.getProjectPayment(this.firstProjectId);
+					}
+				}else if (event == 'advancesRecord') {
+                    this.paneHeight="";
+					if (this.firstProjectId != '') {
+						this.returnAdvanceShareProfit(this.firstProjectId);
+					}
+				}else if (event == 'fundDistributionRecord') {
+                    this.paneHeight="";
+					if (this.firstProjectId != '') {
+						this.queryDistributeFundRecord(this.firstProjectId);
+					}
+				}
+				var that = this;
+				setTimeout(function(){
+                    that.paneHeight = "height:"+(that.tableHeight+1)+"px";
+				},500)
             },
             /*
              * 标的初始化方法

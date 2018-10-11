@@ -8,7 +8,8 @@ layui.define(function (exports) {
 //     var base = "http://localhost:30111/";
     exports('ht_config', {
         app: "ALMS"
-        , basePath: base + "alms/"
+        // , basePath: base + "alms/"
+        , basePath: "http://localhost:30606/"
         , basePath1: base + "rp-app-service/"
         , gatewayUrl:base
         , loginPath: "/login"
@@ -31,12 +32,12 @@ layui.define(function (exports) {
          ,defaultUser:"0111130000"   //贷后中心清算一部主管
         //,defaultUser:"0111200049"//何靖
         // ,defaultUser:"test_leader"  //区域贷后主管
-        ,localBasePath:"http://localhost:30606/"
-        ,financeBasePath:"http://localhost:30621/"
-    	,platRepayBasePath:"http://localhost:30631/"
-        ,openBasePath:"http://localhost:30616/"
-        ,uiBasePath:"http://localhost:30601/"
-        ,withholdBasePath:"http://localhost:30626/"
+        ,localBasePath:"http://192.168.14.121:30606/"
+        ,financeBasePath:"http://192.168.14.121:30621/"
+    	,platRepayBasePath:"http://192.168.14.121:30631/"
+        ,openBasePath:"http://192.168.14.121:30616/"
+        ,uiBasePath:"http://192.168.14.121:30601/"
+        ,withholdBasePath:"http://192.168.14.121:30626/"
     	/*
     	Dev：http://172.16.200.110:30131/html/user/changePwdOther.html
     	Sit: http://172.16.200.112:30131/html/user/changePwdOther.html
