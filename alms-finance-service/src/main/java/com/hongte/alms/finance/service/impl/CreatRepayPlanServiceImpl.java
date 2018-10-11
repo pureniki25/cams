@@ -2621,7 +2621,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     	BigDecimal rate=BigDecimal.valueOf(11);
     	BigDecimal  monthRate = rate.divide(new BigDecimal(12),10,roundingMode);
     	System.out.println(monthRate);
-    }
+     }
 
 
 	
