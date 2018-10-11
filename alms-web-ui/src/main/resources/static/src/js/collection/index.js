@@ -292,7 +292,7 @@ window.layinit(function(htConfig){
                         }else if (d.plateType == 3) {
                         	color = '#666699'
                         	content = '粤'
-                        }else if (d.plateType == 4) {
+                        }else if (d.plateType == 0) {
                         	color = '#993300'
                         	content = '线'
                         }
