@@ -1245,13 +1245,25 @@ public class TdrepayRechargeController {
 
 			com.ht.ussp.core.Result result = null;
 			String dtoJsonStr = JSONObject.toJSONString(dto);
+			IssueSendOutsideLog issueSendOutsideLog = new IssueSendOutsideLog();
+			issueSendOutsideLog.setCreateUserId(loginUserInfoHelper.getUserId());
+			issueSendOutsideLog.setSendJson(JSONObject.toJSONString(dtoJsonStr));
+			issueSendOutsideLog.setInterfacecode(Constant.INTERFACE_CODE_ADVANCE_SHARE_PROFIT);
+			issueSendOutsideLog.setInterfacename(Constant.INTERFACE_NAME_ADVANCE_SHARE_PROFIT);
+			issueSendOutsideLog.setSystem(Constant.SYSTEM_CODE_EIP);
+			issueSendOutsideLog.setSendKey(projectId);
+			
 			try {
 				LOG.info("调用偿还垫付接口/eip/td/repayment/advanceShareProfit，参数：{}", dtoJsonStr);
 				result = eipRemote.advanceShareProfit(dto);
+				issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
 				LOG.info("调用偿还垫付接口/eip/td/repayment/advanceShareProfit，返回结果：{}", result);
 			} catch (Exception e) {
+				issueSendOutsideLog.setReturnJson(e.getMessage());
 				LOG.error(e.getMessage(), e);
 			}
+			
+			issueSendOutsideLogService.insert(issueSendOutsideLog);
 
 			if (result != null) {
 
