@@ -528,8 +528,12 @@ public class TdrepayRechargeController {
 			paramMap.put("projectId", projectId);
 
 			TuandaiProjectInfo info = tuandaiProjectInfoService.selectById(projectId);
-
-			paramMap2.put("userId", info.getTdUserId());
+			
+			if (info != null) {
+				paramMap2.put("userId", info.getTdUserId());
+			}
+			
+			
 			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment参数信息，{}", paramMap);
 			com.ht.ussp.core.Result resultActual = eipRemote.queryProjectPayment(paramMap);
 			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", resultActual);
