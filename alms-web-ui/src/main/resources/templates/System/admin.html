@@ -40,14 +40,14 @@
     <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
     <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
     <div id="app" v-cloak>
-    	<div style="margin-top:10px; margin-left:10px">
-		   	<i-lable>同步电催催收数据：</i-lable>
-		   	<i-button :loading="syncCollectionLoading" @click="syncCollection">
-		   		<i-span v-if="!syncCollectionLoading">同步</i-span>
-		   		<i-span v-else>同步中...</i-span>
-		   	</i-button>
-    	</div>
-    	<div style="margin-top:10px; margin-left:10px">
+    	<!--<div style="margin-top:10px; margin-left:10px">-->
+		   	<!--<i-lable>同步电催催收数据：</i-lable>-->
+		   	<!--<i-button :loading="syncCollectionLoading" @click="syncCollection">-->
+		   		<!--<i-span v-if="!syncCollectionLoading">同步</i-span>-->
+		   		<!--<i-span v-else>同步中...</i-span>-->
+		   	<!--</i-button>-->
+    	<!--</div>-->
+    	<!--<div style="margin-top:10px; margin-left:10px">
 			<i-lable>同步指定电催催收数据：</i-lable>
 			业务ID：
 			<div class="layui-inline">
@@ -101,7 +101,7 @@
 				<i-span v-if="!synOneListColLoading">同步指定催收数据</i-span>
 		   		<i-span v-else>同步中...</i-span>
 		   	</i-button>
-    	</div>
+    	</div>-->
     	<div style="margin-top:10px; margin-left:10px">
 		   	<i-lable>设置所有用户可访问业务对照关系：</i-lable>
 		   	<i-button :loading="setUserPermissonsLoading" @click="setUserPermissons">
