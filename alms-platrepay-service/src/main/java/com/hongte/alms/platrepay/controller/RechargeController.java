@@ -190,7 +190,7 @@ public class RechargeController {
 		vo.setRechargeUserId(rechargeUserId);
 		vo.setOperator(loginUserInfoHelper.getUserId());
 
-		Result reuslt = rechargeAmount(vo, oIdPartner);
+		Result reuslt = rechargeAmount(vo, oIdPartner, sysParameter.getParamType());
 		String resultJson = JSONObject.toJSONString(reuslt);
 		LOG.info("平台代充值接口返回结果：{}", resultJson);
 		return reuslt;
@@ -207,7 +207,7 @@ public class RechargeController {
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-	private Result rechargeAmount(RechargeModalVO vo, String oIdPartner) {
+	private Result rechargeAmount(RechargeModalVO vo, String oIdPartner, String rechargeAccountId) {
 		String cmOrderNo = UUID.randomUUID().toString();
 
 		RechargeModalDTO dto = new RechargeModalDTO();
@@ -219,7 +219,7 @@ public class RechargeController {
 		dto.setCmOrderNo(cmOrderNo);
 		dto.setOIdPartner(oIdPartner);
 		dto.setRechargeUserId(vo.getRechargeUserId());
-		dto.setOrgType(BusinessTypeEnum.getOrgTypeByName(vo.getRechargeAccountType()));
+		dto.setOrgType(BusinessTypeEnum.getOrgTypeByRechargeAccountId(Integer.valueOf(rechargeAccountId)));
 
 		AgencyRechargeLog agencyRechargeLog = handleAgencyRechargeLog(vo, cmOrderNo, dto, oIdPartner);
 
@@ -233,7 +233,7 @@ public class RechargeController {
 			LOG.info("代充值接口/eip/td/assetside/agencyRecharge返回信息，{}", JSONObject.toJSONString(result));
 
 			if (result == null) {
-				return Result.error("500", "接口调用失败！");
+				return Result.error("接口调用失败！");
 			}
 		} catch (Exception e) {
 			agencyRechargeLog.setResultJson(e.getMessage());
