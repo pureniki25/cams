@@ -303,7 +303,7 @@ window.layinit(function (htConfig) {
     		platformRepaymentInfoColumns:[
         		{
                     title: '期数',
-                    key: 'periods',
+                    key: 'period',
                     align: 'center',
                 },
                 {
@@ -313,7 +313,7 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '应还合计',
-                    key: 'total',
+                    key: 'totalAmount',
                     align: 'center',
                 },
                 {
@@ -327,8 +327,38 @@ window.layinit(function (htConfig) {
                     align: 'center',
                 },
                 {
-                    title: '还款状态（借款人还款状态）',
-                    key: 'statusStr',
+                	title: '保证金',
+                	key: 'depositAmount',
+                	align: 'center',
+                },
+                {
+                	title: '担保费',
+                	key: 'guaranteeAmount',
+                	align: 'center',
+                },
+                {
+                	title: '仲裁费',
+                	key: 'arbitrationAmount',
+                	align: 'center',
+                },
+                {
+                	title: '资产端服务费',
+                	key: 'orgAmount',
+                	align: 'center',
+                },
+                {
+                	title: '平台服务费',
+                	key: 'tuandaiAmount',
+                	align: 'center',
+                },
+                {
+                	title: '中介服务费',
+                	key: 'agencyAmount',
+                	align: 'center',
+                },
+                {
+                    title: '其他费用',
+                    key: 'otherAmount',
                     align: 'center',
                 },
             ],
@@ -820,7 +850,9 @@ window.layinit(function (htConfig) {
     	            if (res.data.data != null && res.data.code == 1) {
     	            	app.platformRepaymentInfoData = res.data.data.periodsList;
     	            	app.platformActualRepaymentInfoData = res.data.data.tdProjectPaymentDTOs;
-    	            	app.platformRepaymentInfoaviMoney = res.data.data.aviMoney.aviMoney;
+    	            	if (res.data.data.aviMoney != null) {
+    	            		app.platformRepaymentInfoaviMoney = res.data.data.aviMoney.aviMoney;
+						}
     	            	if (res.data.data.principal == null) {
     	            		res.data.data.principal = 0;
 						}
@@ -830,7 +862,8 @@ window.layinit(function (htConfig) {
     	            	if (res.data.data.platformCharge == null) {
     	            		res.data.data.platformCharge = 0;
 						}
-    	            	app.platformPrincipalAndInterest = res.data.data.principal + res.data.data.interest;
+    	            	app.platformPrincipal = res.data.data.principal;
+    	            	app.platformInterest = res.data.data.interest;
     	            	app.platformRepaymentInfoPlatformCharge = res.data.data.platformCharge;
     	            	app.platformPrincipalAndInterestAndPlatformCharge = res.data.data.principal + res.data.data.interest + res.data.data.platformCharge;
     	            } else {

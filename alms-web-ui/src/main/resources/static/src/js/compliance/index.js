@@ -1111,11 +1111,7 @@ window.layinit(function(htConfig) {
 	    	            }
 		            },
 		            error : function() {
-		                layer.confirm('Navbar error:AJAX请求出错!', function(index) {
-		                    top.location.href = loginUrl;
-		                    layer.close(index);
-		                });
-		                return false;
+		            	vm.$Modal.error("系统异常");
 		            }
 		        });
 			},
