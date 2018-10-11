@@ -315,6 +315,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             accountantOverRepayLog.setIsRefund(0);
             accountantOverRepayLog.setIsTemporary(0);
             accountantOverRepayLog.setMoneyType(1);
+            accountantOverRepayLog.setSrcType(2);
             accountantOverRepayLog.setOverRepayMoney(financeSettleBaseDto.getSurplusAmount());
             accountantOverRepayLog
                     .setRemark(String.format("收入于%s的%s期线下财务确认", financeSettleBaseDto.getBusinessId(), financeSettleBaseDto.getAfterId()));
@@ -899,6 +900,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 							if (planListDetailShowPayDto.getFeelId().equals(RepayPlanFeeTypeEnum.PRINCIPAL.getUuid())) {
 								financeSettleBaseDto.setLossSettle(true);
 								e = RepayPlanSettleStatusEnum.PAYED_BAD ;
+								break ;
 							}
 						}
 					}
@@ -1685,6 +1687,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             accountantOverRepayLog.setIsRefund(0);
             accountantOverRepayLog.setIsTemporary(0);
             accountantOverRepayLog.setMoneyType(0);
+            accountantOverRepayLog.setSrcType(2);
             accountantOverRepayLog.setOverRepayMoney(financeSettleReq.getSurplusFund());
             accountantOverRepayLog.setRemark(String.format("支出于%s的%s期线下财务結清", financeSettleReq.getBusinessId(), financeSettleReq.getAfterId()));
             accountantOverRepayLog.setLogId(UUID.randomUUID().toString());
@@ -1709,7 +1712,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
                 repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getLogId());
                 repaymentResource.insert();
                 if (mprIds.size() == 0) {
-                    financeSettleBaseDto.getRepaymentSettleLog().setRepayDate(repaymentResource.getRepayDate());
+                    financeSettleBaseDto.getRepaymentConfirmLog().setRepayDate(repaymentResource.getRepayDate());
                 }
 
             }
@@ -2408,6 +2411,14 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     				feesVO.setFeeId(factRepay.getFeeId());
     				feesVO.setAmount(factRepay.getFactAmount());
     				feesVO.setPlanItemName(factRepay.getPlanItemName());
+    				if (factRepay.getPlanItemType().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT.getValue())) {
+    					if (factRepay.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+    						feesVO.setPlanItemName(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getDesc());
+    					}
+    					if (factRepay.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+    						feesVO.setPlanItemName(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getDesc());
+    					}
+    				}
     				feesVOs.add(feesVO);
     			}
     		}
@@ -2416,7 +2427,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
     			remark.append(settleFeesVO.getAmount().setScale(2, RoundingMode.HALF_UP)).append("元").append(settleFeesVO.getPlanItemName()).append(",") ;
     		}
         	
-        	BigDecimal balance = accountantOverRepayLogService.caluCanUse(bizPlanList.getBusinessId(), bizPlanList.getAfterId());
+        	BigDecimal balance = BigDecimal.ZERO;
         	if (financeBaseDto.getRepaymentConfirmLog().getSurplusAmount()!=null) {
     			balance = balance.add(financeBaseDto.getRepaymentConfirmLog().getSurplusAmount());
     		}

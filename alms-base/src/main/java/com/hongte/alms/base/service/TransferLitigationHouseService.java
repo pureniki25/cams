@@ -14,5 +14,5 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface TransferLitigationHouseService extends BaseService<TransferLitigationHouse> {
 	
-	void saveHouseProcessApprovalResult(ProcessLogReq req, String sendUrl);
+	void saveHouseProcessApprovalResult(ProcessLogReq req);
 }

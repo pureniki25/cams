@@ -85,7 +85,7 @@ window.layinit(function (htConfig) {
 		            	date2:new Date()
 		            }],	//发送时间范围
 		            */
-		            dateRange:[new Date(new Date(new Date().toLocaleDateString()).getTime()-48*60*60*1000-1),new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1)],
+		            dateRange:[new Date(new Date(new Date().toLocaleDateString()).getTime()-72*60*60*1000+1),new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1)],
 		            repayStatus	:'',    //状态
 		            businessTypeId:'',//业务类型
             },
@@ -126,7 +126,7 @@ window.layinit(function (htConfig) {
                         console.log(vm.searchForm);
                              
                        var  dateObj = getData();
-                       getCountInfo();
+                       getCountInfo();debugger
                         table.reload('listTable', {
                         	 url: basePath +'RepaymentLogController/selectRepaymentLogList',
                             where: {
@@ -337,7 +337,7 @@ if(typeof(vm.searchForm.dateRange[0])=='undefined'){
 if(typeof(vm.searchForm.dateRange[1])=='undefined'){
 	dataObject.dateEnd="";
 }else if(vm.searchForm.dateRange[1]!=''){
-	dataObject.dateEnd=new Date(vm.searchForm.dateRange[1]).getTime();
+	dataObject.dateEnd=new Date(vm.searchForm.dateRange[1]).getTime()+24*60*60*1000-1;
 }
 
 //  if(dataObject.dateBegin==''){
@@ -476,8 +476,9 @@ var getData = function(){debugger
     	}
      	if(vm.searchForm.dateRange[1]!=null){
             var date =vm.searchForm.dateRange[1];
-            dataObject.dateEnd=date.getTime();
+            dataObject.dateEnd=date.getTime()+24*60*60*1000-1;
        	 vm.searchForm.dateEnd=date.getTime();
+       	 
    	   }else{
    		vm.searchForm.dateEnd="";
    	   }

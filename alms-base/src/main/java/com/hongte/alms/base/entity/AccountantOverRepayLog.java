@@ -78,6 +78,12 @@ public class AccountantOverRepayLog extends Model<AccountantOverRepayLog> {
 	@TableField("is_temporary")
 	@ApiModelProperty(required= true,value = "是否暂收款转结余(0:否，1:是)")
 	private Integer isTemporary;
+	
+	/**
+	 * 来源,1=信贷,2贷后
+	 */
+	@TableField("src_type")
+	private Integer srcType ;
     /**
      * 备注
      */
@@ -244,5 +250,13 @@ public class AccountantOverRepayLog extends Model<AccountantOverRepayLog> {
 			", updateTime=" + updateTime +
 			", updateUser=" + updateUser +
 			"}";
+	}
+
+	public Integer getSrcType() {
+		return srcType;
+	}
+
+	public void setSrcType(Integer srcType) {
+		this.srcType = srcType;
 	}
 }

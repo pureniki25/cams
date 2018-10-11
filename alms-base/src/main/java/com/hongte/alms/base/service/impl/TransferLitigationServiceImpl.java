@@ -73,6 +73,7 @@ import com.hongte.alms.base.vo.litigation.BusinessHouse;
 import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.LitigationResponse;
 import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
+import com.hongte.alms.base.vo.litigation.TransferLitigationPersonDTO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
@@ -278,8 +279,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = { ServiceRuntimeException.class,
 			Exception.class })
 	@Override
-	public LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId,
-			Integer channel) {
+	public LitigationResponse sendTransferLitigationData(String businessId, String planListId, Integer channel) {
 		TransferOfLitigationVO transferLitigationData = null;
 		LitigationResponse litigationResponse = null;
 		if (StringUtil.isEmpty(businessId) || channel == null) {
@@ -365,9 +365,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 				transferLitigationData.setHouseList(businessHouses);
 			}
 
-			LOG.info("移交法务诉讼系统地址：{}", sendUrl);
 			transferLitigationLog.setSendJson(JSON.toJSONString(transferLitigationData));
-//			litigationResponse = sendLitigation(transferLitigationData, sendUrl);
 			litigationResponse = litigationFeignClient.importLitigation(transferLitigationData);
 			String returnJson = JSONObject.toJSONString(litigationResponse);
 			transferLitigationLog.setResultJson(returnJson);
@@ -388,9 +386,12 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 								CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.AUTO_SET);
 					}
 				} else {
-					LOG.info("businessId：{}，发送诉讼系统成功！诉讼系统返回信息：{}", businessId, returnJson);
+					LOG.info("businessId：{}，发送诉讼系统失败！诉讼系统返回信息：{}", businessId, returnJson);
 					throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);
 				}
+			}else {
+				LOG.info("businessId：{}，发送诉讼系统失败！诉讼系统返回信息：{}", businessId, returnJson);
+				throw new ServiceRuntimeException("businessId：" + businessId + "，发送诉讼系统失败！诉讼系统返回信息：" + returnJson);
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -518,7 +519,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveTransferLitigationHouse(TransferLitigationHouse req, String sendUrl, List<FileVo> files) {
+	public void saveTransferLitigationHouse(TransferLitigationHouse req, List<FileVo> files) {
 
 		if (!CollectionUtils.isEmpty(files)) {
 			for (FileVo file : files) {
@@ -560,7 +561,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveTransferLitigationCar(TransferLitigationCar req, String sendUrl, List<FileVo> files) {
+	public void saveTransferLitigationCar(TransferLitigationCar req, List<FileVo> files) {
 
 		if (req == null || StringUtil.isEmpty(req.getBusinessId())) {
 			throw new ServiceRuntimeException("参数不能空！");

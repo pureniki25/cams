@@ -274,6 +274,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 accountantOverRepayLog.setIsRefund(0);
                 accountantOverRepayLog.setIsTemporary(0);
                 accountantOverRepayLog.setMoneyType(1);
+                accountantOverRepayLog.setSrcType(2);
                 accountantOverRepayLog.setOverRepayMoney(financeBaseDto.getSurplusAmount());
                 accountantOverRepayLog
                         .setRemark(String.format("收入于%s的%s期线下财务确认", req.getBusinessId(), req.getAfterId()));
@@ -443,6 +444,7 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             accountantOverRepayLog.setIsRefund(0);
             accountantOverRepayLog.setIsTemporary(0);
             accountantOverRepayLog.setMoneyType(0);
+            accountantOverRepayLog.setSrcType(2);
             accountantOverRepayLog.setOverRepayMoney(req.getSurplusFund());
             accountantOverRepayLog.setRemark(String.format("支出于%s的%s期线下财务确认", req.getBusinessId(), req.getAfterId()));
             accountantOverRepayLog.setLogId(UUID.randomUUID().toString());
@@ -1532,8 +1534,6 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				allFactRepay.addAll(factRepays);
 			}
 		}
-//    	allResource.addAll(financeBaseDto.getRepaymentResources());
-//    	allFactRepay.addAll(financeBaseDto.getProjFactRepayArray());
     	
     	StringBuffer remark = new StringBuffer() ;
     	remark.append("备注:\r\n");
@@ -1588,6 +1588,14 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 				feesVO.setFeeId(factRepay.getFeeId());
 				feesVO.setAmount(factRepay.getFactAmount());
 				feesVO.setPlanItemName(factRepay.getPlanItemName());
+				if (factRepay.getPlanItemType().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT.getValue())) {
+					if (factRepay.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getUuid())) {
+						feesVO.setPlanItemName(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getDesc());
+					}
+					if (factRepay.getFeeId().equals(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getUuid())) {
+						feesVO.setPlanItemName(RepayPlanFeeTypeEnum.OVER_DUE_AMONT_UNDERLINE.getDesc());
+					}
+				}
 				feesVOs.add(feesVO);
 			}
 		}
@@ -1596,12 +1604,12 @@ public class ShareProfitServiceImpl implements ShareProfitService {
 			remark.append(settleFeesVO.getAmount().setScale(2, RoundingMode.HALF_UP)).append("元").append(settleFeesVO.getPlanItemName()).append(",") ;
 		}
     	
-    	BigDecimal balance = accountantOverRepayLogService.caluCanUse(bizPlanList.getBusinessId(), bizPlanList.getAfterId());
+    	BigDecimal balance = BigDecimal.ZERO;
     	if (financeBaseDto.getConfirmLog().getSurplusAmount()!=null) {
 			balance = balance.add(financeBaseDto.getConfirmLog().getSurplusAmount());
 		}
     	if (balance.compareTo(BigDecimal.ZERO)>0) {
-			remark.append(balance).append("元").append("结余");
+			remark.append(balance.setScale(2, RoundingMode.HALF_UP)).append("元").append("结余");
 		}
     	remark.append(DateUtil.formatDate("yyyy-MM-dd HH:mm:ss", financeBaseDto.getConfirmLog().getCreateTime())) ;
     	

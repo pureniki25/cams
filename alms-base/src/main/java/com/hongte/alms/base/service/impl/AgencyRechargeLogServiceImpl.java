@@ -91,11 +91,12 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 	@Transactional(rollbackFor = Exception.class)
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void queryRechargeOrder(String oidPartner, String cmOrderNo, String updateUser) {
+	public void queryRechargeOrder(String oidPartner, String cmOrderNo, String updateUser, int orgType) {
 		try {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("oidPartner", oidPartner);
 			paramMap.put("cmOrderNo", cmOrderNo);
+			paramMap.put("orgType", orgType);
 			Result result = eipRemote.queryRechargeOrder(paramMap);
 			String resultJson = JSONObject.toJSONString(result);
 			LOG.info("查询快捷代充值订单，cmOrderNo = {}；返回结果：{}", cmOrderNo, resultJson);
@@ -103,15 +104,15 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				throw new ServiceRuntimeException("调用外联平台接口失败！");
 			}
 
-			String dataJson = JSONObject.toJSONString(result.getData());
-			Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
-			String status = (String) resultMap.get("status");
-			String orderId = (String) resultMap.get("orderId");
-			String message = (String) resultMap.get("message");
-
-			LOG.info("查询订单充值，状态：{}，订单号：{}，消息：{}", status, orderId, message);
 
 			if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+				String dataJson = JSONObject.toJSONString(result.getData());
+				Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
+				String status = (String) resultMap.get("status");
+				String orderId = (String) resultMap.get("orderId");
+				String message = (String) resultMap.get("message");
+				
+				LOG.info("查询订单充值，状态：{}，订单号：{}，消息：{}", status, orderId, message);
 				AgencyRechargeLog log = new AgencyRechargeLog();
 				log.setHandleStatus(status);
 				log.setUpdateTime(new Date());
@@ -181,26 +182,18 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 
 					if (StringUtil.notEmpty(handlerStatus)) {
 						switch (handlerStatus) {
-						case "0":
-							tdrepayRechargeLog.setProcessStatus(1);
-							break;
-						case "1":
-							tdrepayRechargeLog.setProcessStatus(1);
-							break;
 						case "2":
 							tdrepayRechargeLog.setProcessStatus(2);
 							break;
+							
 						case "3":
-							tdrepayRechargeLog.setProcessStatus(3);
-							break;
 						case "4":
-							tdrepayRechargeLog.setProcessStatus(3);
-							break;
 						case "500":
 							tdrepayRechargeLog.setProcessStatus(3);
 							break;
-
+							
 						default:
+							tdrepayRechargeLog.setProcessStatus(1);
 							break;
 						}
 						tdrepayRechargeLog.setUpdateTime(new Date());

@@ -120,7 +120,7 @@ public class TestController {
     @GetMapping("/searchStatus")
     public String searchStatus(@RequestParam String cmOrderNo) {
     	
-    	agencyRechargeLogService.queryRechargeOrder(oidPartner, cmOrderNo,null);
+//    	agencyRechargeLogService.queryRechargeOrder(oidPartner, cmOrderNo,null);
 		return "ok";
     }
     /**

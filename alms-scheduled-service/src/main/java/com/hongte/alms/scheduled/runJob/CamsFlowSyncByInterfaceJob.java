@@ -1,23 +1,16 @@
 package com.hongte.alms.scheduled.runJob;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.hongte.alms.base.service.BasicBusinessService;
-import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.scheduled.client.CamsFlowSyncByInterfaceJobClient;
-import com.hongte.alms.scheduled.client.WithholdingClient;
-import com.hongte.alms.scheduled.job.AutoSetCollectionJob;
 import com.ht.ussp.core.Result;
+import com.ht.ussp.util.DateUtil;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
@@ -44,19 +37,36 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
         	XxlJobLogger.log("同步流水到核心开始"+new Date().getTime());
         	
         	// 批量推送还款结清
-        	int retryTimes1 = 3;
-	    	while(retryTimes1 < 3) {
+        	int retryTimes1 = 1;
+	    	//while(retryTimes1 < 3) {
 	    		try {
-	    			camsFlowSyncByInterfaceJobClient.addBatchFlow();
-	    			camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
-	    			break;//跳出循环
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还款流水到核心开始");
+	    			Result<Object> ret1 = camsFlowSyncByInterfaceJobClient.addBatchFlow();
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还款流水到核心结束,"+JSONObject.toJSONString(ret1)+"等待30秒推送撤销流水");
+	    			
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步资金分发流水到核心开始");
+	    			Result<Object> ret4 = camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步资金分发流水到核心结束"+JSONObject.toJSONString(ret4));
+	    			
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步你我金融流水到核心开始");
+	    			Result<Object> ret3 = camsFlowSyncByInterfaceJobClient.pushNiWoRepayFlowToCams();
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步你我金融流水到核心结束"+JSONObject.toJSONString(ret3));
+	    			
+	    			Thread.sleep(30000);
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步撤销流水到核心开始");
+	    			Result<Object> ret2 = camsFlowSyncByInterfaceJobClient.cancelRepayFlow();
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步撤销流水到核心结束"+JSONObject.toJSONString(ret2));
+	    			
+	    			//break;//跳出循环
 	    			//camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
 	    			//camsFlowSyncByInterfaceJobClient.cancelFenFaFlow();
 	    		} catch (Exception e) {
+	    			XxlJobLogger.log(e.getMessage());
+	    			e.printStackTrace();
 	    			Thread.sleep(100);
 	    			retryTimes1++;
 				}
-	    	}
+	    	//}
         	XxlJobLogger.log("同步流水到核心结束"+new Date().getTime());
             logger.info("同步流水到核心结束");
             return SUCCESS;

@@ -408,12 +408,15 @@ public class RepayPlanController {
             RequestData requestData = new RequestData(
                     paramStr, "Api4Alms_UpdateRepaymentPlan");
             String ciphertext = XinDaiEncryptUtil.encryptPostData(JSON.toJSONString(requestData));
+            logger.info(ciphertext);
             CollectionXindaiService collectionXindaiService = Feign.builder().target(CollectionXindaiService.class, apiUrl);
             String respStr = collectionXindaiService.updateRepaymentPlan(ciphertext);
             // 返回数据解密
             ResponseData respData = XinDaiEncryptUtil.getRespData(respStr);
             if (respData == null || !Constant.LMS_SUCCESS_CODE.equals(respData.getReturnCode())) {
                 logger.info("[处理] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败：result=[{}]", JSON.toJSONString(respData));
+                logger.info("[处理] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败：ciphertext=[{}]", ciphertext);
+                logger.info("[处理] 还款计划-将指定业务的还款计划的变动通过信贷接口推送给信贷系统失败：paramStr=[{}]", paramStr);
                 /*
                 // 这里不再记录失败记录，让调用方去记录，避免微服务导致的多次调用 
                 try {

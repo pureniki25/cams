@@ -45,5 +45,11 @@ public interface CollectionStatusMapper extends SuperMapper<CollectionStatus> {
             ,@Param("colStatus") Integer colStatus
             ,@Param("crpType") Integer crpType
     );
+    /**
+     * 获取最近一次已分配催收的CollectionStatus
+     * @param businessId
+     * @return
+     */
+    public CollectionStatus  getRecentlyCollectionStatus(@Param("planId") String planId,@Param("pListId") String pListId,@Param("originalBusinessId") String originalBusinessId);
 
 }

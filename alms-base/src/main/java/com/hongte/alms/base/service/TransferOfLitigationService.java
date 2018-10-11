@@ -40,19 +40,19 @@ public interface TransferOfLitigationService {
 	 * @param channel 移交渠道（1、自动移交，2、手动移交）
 	 * @return
 	 */
-	LitigationResponse sendTransferLitigationData(String businessId, String sendUrl, String planListId, Integer channel);
+	LitigationResponse sendTransferLitigationData(String businessId, String planListId, Integer channel);
 	
 	/**
      * 保存房贷移交法务信息
      * @param req
      */
-    void saveTransferLitigationHouse(TransferLitigationHouse req, String sendUrl, List<FileVo> files);
+    void saveTransferLitigationHouse(TransferLitigationHouse req, List<FileVo> files);
     
     /**
      * 保存车贷移交法务信息
      * @param req
      */
-    void saveTransferLitigationCar(TransferLitigationCar req, String sendUrl, List<FileVo> files);
+    void saveTransferLitigationCar(TransferLitigationCar req, List<FileVo> files);
     
     /**
      * 车贷业务结清试算

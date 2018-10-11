@@ -8,8 +8,6 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-07-03
+ * @since 2018-09-25
  */
 @ApiModel
 @TableName("tb_tdrepay_recharge_log")
@@ -60,7 +58,6 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
     /**
      * 实还日期
      */
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
@@ -91,7 +88,6 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
     /**
      * 财务确认时间或成功代扣时间
      */
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@TableField("confirm_time")
 	@ApiModelProperty(required= true,value = "财务确认时间或成功代扣时间")
 	private Date confirmTime;
@@ -209,6 +205,12 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）")
 	private Integer processStatus;
     /**
+     * 分发时间
+     */
+	@TableField("process_time")
+	@ApiModelProperty(required= true,value = "分发时间")
+	private Date processTime;
+    /**
      * 资产端对团贷网通用合规化还款流程处理状态(0:未处理,1:处理中,2:成功,3:失败)
      */
 	@ApiModelProperty(required= true,value = "资产端对团贷网通用合规化还款流程处理状态(0:未处理,1:处理中,2:成功,3:失败)")
@@ -242,6 +244,24 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "更新时间")
 	private Date updateTime;
+    /**
+     * 最后推送状态0未推送1流水推送成功2推送失败3不需要推送4撤销推送成功5撤销推送失败
+     */
+	@TableField("last_push_status")
+	@ApiModelProperty(required= true,value = "最后推送状态0未推送1流水推送成功2推送失败3不需要推送4撤销推送成功5撤销推送失败")
+	private Integer lastPushStatus;
+    /**
+     * 最后推送时间
+     */
+	@TableField("last_push_datetime")
+	@ApiModelProperty(required= true,value = "最后推送时间")
+	private Date lastPushDatetime;
+    /**
+     * 最后推送备注
+     */
+	@TableField("last_push_remark")
+	@ApiModelProperty(required= true,value = "最后推送备注")
+	private String lastPushRemark;
 
 
 	public String getLogId() {
@@ -484,6 +504,14 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 		this.processStatus = processStatus;
 	}
 
+	public Date getProcessTime() {
+		return processTime;
+	}
+
+	public void setProcessTime(Date processTime) {
+		this.processTime = processTime;
+	}
+
 	public Integer getStatus() {
 		return status;
 	}
@@ -532,6 +560,30 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 		this.updateTime = updateTime;
 	}
 
+	public Integer getLastPushStatus() {
+		return lastPushStatus;
+	}
+
+	public void setLastPushStatus(Integer lastPushStatus) {
+		this.lastPushStatus = lastPushStatus;
+	}
+
+	public Date getLastPushDatetime() {
+		return lastPushDatetime;
+	}
+
+	public void setLastPushDatetime(Date lastPushDatetime) {
+		this.lastPushDatetime = lastPushDatetime;
+	}
+
+	public String getLastPushRemark() {
+		return lastPushRemark;
+	}
+
+	public void setLastPushRemark(String lastPushRemark) {
+		this.lastPushRemark = lastPushRemark;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.logId;
@@ -570,12 +622,16 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 			", platformRepayStatus=" + platformRepayStatus +
 			", isValid=" + isValid +
 			", processStatus=" + processStatus +
+			", processTime=" + processTime +
 			", status=" + status +
 			", remark=" + remark +
 			", createUser=" + createUser +
 			", createTime=" + createTime +
 			", updateUser=" + updateUser +
 			", updateTime=" + updateTime +
+			", lastPushStatus=" + lastPushStatus +
+			", lastPushDatetime=" + lastPushDatetime +
+			", lastPushRemark=" + lastPushRemark +
 			"}";
 	}
 }

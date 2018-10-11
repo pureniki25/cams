@@ -1,22 +1,31 @@
 package com.hongte.alms.base.service.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-
-import java.math.BigDecimal;
-import java.util.*;
-
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentResource;
-import com.hongte.alms.base.entity.SysBankLimit;
-import com.hongte.alms.base.enums.RepayCurrentStatusEnums;
-import com.hongte.alms.base.enums.RepayedFlag;
 import com.hongte.alms.base.feignClient.XindaiFeign;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
@@ -26,26 +35,17 @@ import com.hongte.alms.base.service.RepaymentResourceService;
 import com.hongte.alms.base.service.SysBankLimitService;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
-import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DESC;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.EncryptionResult;
 import com.hongte.alms.common.vo.PageResult;
-
 import com.hongte.alms.common.vo.RequestData;
 import com.hongte.alms.common.vo.ResponseData;
 import com.hongte.alms.common.vo.ResponseEncryptData;
-import feign.Feign;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import feign.Feign;
 
 /**
  * <p>
@@ -439,5 +439,10 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     public List<RepaymentBizPlanList> getPlanListForCalLateFee(String planListId) {
 
         return repaymentBizPlanListMapper.getPlanListForCalLateFee(planListId);
+    }
+    
+    @Override
+    public List<RepaymentBizPlanList> queryTransferOfLitigationData(Integer overDueDays, String origBusinessId) {
+    	return repaymentBizPlanListMapper.queryTransferOfLitigationData(overDueDays, origBusinessId);
     }
 }
