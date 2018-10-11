@@ -118,7 +118,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     private FlowPushLogMapper flowPushLogMapper;
     
     private String mainIdTouZi = "97ff0bff-e93d-11e7-94ed-94c69109b34a";//投资人
-    private String dMainIdTouZi = "786fd138695a4c53a7a45f3f323c8b0e";
+    private String dMainIdTouZi = "97ff0bff-e93d-11e7-94ed-94c69109b34a";
     
     private String mainIdPlatfrom = "91441900MA4ULXKB38";//平台
     private String dMainIdPlatfrom = "51F2CBF5-9076-4AC9-9EC4-0373CF803070";
@@ -354,7 +354,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
         	Date createTime = new Date();//(Date) businessMapInfo.get("create_time");
         	String createUser = businessMapInfo.get("create_user")==null?"":businessMapInfo.get("create_user").toString();
-        	String messageId = confirmLogId;
+        	String messageId = confirmLogId+"-"+actionId;
         	
         	String branchId = businessMapInfo.get("company_id")==null?"":businessMapInfo.get("company_id").toString();
         	String branchName = businessMapInfo.get("company_name")==null?"":businessMapInfo.get("company_name").toString();
@@ -411,6 +411,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
 	            	flowAccountIdentifier.setAccountType(accountType);
 	            	flowAccountIdentifier.setDepositoryId(bankCardNo);
+	            	flowAccountIdentifier.setBankCardNo(bankCardNo);
 	            	flowAccountIdentifier.setAccountName(accountName);
 	            	flowAccountIdentifier.setIdentifierId(identifierId);
 	            	flowAccountIdentifier.setPersonal(personal);
@@ -577,7 +578,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     		String tId = UUIDHtGenerator.getUUID();
     		//还款账号
         	FlowAccountIdentifier flowAccountIdentifier = new FlowAccountIdentifier();
-        	String accountName = flowMap.get("target_account_name")==null?"":flowMap.get("target_account_name").toString();
+        	String accountName = flowMap.get("account_name")==null?"":flowMap.get("account_name").toString();
         	String bankCardNo = flowMap.get("bank_card_no")==null?"":flowMap.get("bank_card_no").toString();
         	
         	String targetAccountId = flowMap.get("target_account_id")==null?"":flowMap.get("target_account_id").toString();
@@ -594,7 +595,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	flowAccountIdentifier.setAccountType(accountType);
         	flowAccountIdentifier.setDepositoryId(bankCardNo);
         	flowAccountIdentifier.setAccountName(accountName);
-        	flowAccountIdentifier.setIdentifierId(identifierId);
+        	flowAccountIdentifier.setIdentifierId(sId);
         	flowAccountIdentifier.setPersonal(personal);
         	if(!StringUtils.isBlank(mainId)) {
         		flowAccountIdentifier.setMainId(mainId);
@@ -603,16 +604,16 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	
         	int targetAccountType = null == flowMap.get("target_account_type")?1:Integer.parseInt(flowMap.get("target_account_type").toString());
         	String targetMainId = flowMap.get("target_main_id")==null?null:flowMap.get("target_main_id").toString();
-        	String targetAccountName = flowMap.get("account_name")==null?"":flowMap.get("account_name").toString();
+        	String targetAccountName = flowMap.get("target_account_name")==null?"":flowMap.get("target_account_name").toString();
         	personal = false;
         	//收入账号
         	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
         	flowAccountIdentifier2.setAccountName(targetAccountName);
         	flowAccountIdentifier2.setAccountType(targetAccountType);
         	flowAccountIdentifier2.setDepositoryId(targetBankCardNo);
-        	flowAccountIdentifier2.setIdentifierId(sId);
+        	flowAccountIdentifier2.setIdentifierId(tId);
         	flowAccountIdentifier2.setPersonal(personal);
-        	flowAccountIdentifier2.setAccountName(targetAccountId);
+        	flowAccountIdentifier2.setAccountName(targetAccountName);
         	if(!StringUtils.isBlank(targetMainId)) {
         		flowAccountIdentifier2.setMainId(targetMainId);
         	}
@@ -867,8 +868,40 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 8://垫付
 			pushFlowList = repaymentPlatformListService.selectPushAdvancePayFlowList(paramBusinessMap);
+			//平台还款 没有标的信息 从资金分发补充公司 业务 客户信息
+			for (Map<String, Object> pushFlowMap : pushFlowList) {
+				String projectId = null == pushFlowMap.get("project_id")?null:pushFlowMap.get("project_id").toString();
+				if(null == projectId) {
+					continue;
+				}
+				TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("process_status", 2));
+				if(null == tdrepayRechargeLog) {
+					continue;
+				}
+				pushFlowMap.put("business_id", tdrepayRechargeLog.getOrigBusinessId());
+				pushFlowMap.put("business_type", tdrepayRechargeLog.getBusinessType());
+				pushFlowMap.put("business_type_name", BusinessTypeEnum.getName(tdrepayRechargeLog.getBusinessType()));
+				pushFlowMap.put("customer_name", tdrepayRechargeLog.getCustomerName());
+				pushFlowMap.put("company_name", tdrepayRechargeLog.getCompanyName());
+			}
 			break;
 		case 81://还垫付
+			//平台还款 没有标的信息 从资金分发补充公司 业务 客户信息
+			for (Map<String, Object> pushFlowMap : pushFlowList) {
+				String projectId = null == pushFlowMap.get("project_id")?null:pushFlowMap.get("project_id").toString();
+				if(null == projectId) {
+					continue;
+				}
+				TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId).eq("process_status", 2));
+				if(null == tdrepayRechargeLog) {
+					continue;
+				}
+				pushFlowMap.put("business_id", tdrepayRechargeLog.getOrigBusinessId());
+				pushFlowMap.put("business_type", tdrepayRechargeLog.getBusinessType());
+				pushFlowMap.put("business_type_name", BusinessTypeEnum.getName(tdrepayRechargeLog.getBusinessType()));
+				pushFlowMap.put("customer_name", tdrepayRechargeLog.getCustomerName());
+				pushFlowMap.put("company_name", tdrepayRechargeLog.getCompanyName());
+			}
 			pushFlowList = repaymentPlatformListService.selectPushAdvanceRepayFlowList(paramBusinessMap);
 			break;
 		case 201://你我金融流水
@@ -935,15 +968,12 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				 Map<String, Object> flowMapTouZi = new HashMap<>();
 				 flowMapTouZi.putAll(flowMap);
 				 flowMapTouZi.put("amount", principalAndInterest);
-	//			 flowMapTouZi.put("main_id", value);
-	//			 flowMapTouZi.put("main_type", value);
 				 flowMapTouZi.put("in_out", 1);
 				 flowMapTouZi.put("target_main_id", mainIdTouZi);
 				 flowMapTouZi.put("target_bank_card_no", dMainIdTouZi);
 				 flowMapTouZi.put("target_main_type", 1);
 				 flowMapTouZi.put("target_account_name", "投资人");
 				 flowMapTouZi.put("target_account_type", "10");
-				 
 				 flowList.add(flowMapTouZi);
 			 }
 			//分公司流水
