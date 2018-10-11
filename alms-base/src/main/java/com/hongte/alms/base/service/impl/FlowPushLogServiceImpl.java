@@ -411,7 +411,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	            	int accountType = Integer.parseInt(flowMap.get("account_type").toString());
 	            	String mainId = null==flowMap.get("main_id")?null:flowMap.get("main_id").toString();
 	            	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
-	            	if(actionId == 7) {//平台还款的客户为资金分发的用户
+	            	if(actionId == 7 || actionId == 81) {//平台还款的客户为资金分发的用户
 	            		accountName = customerName;
 	            		mainId = null == businessMapInfo.get("td_user_id")?null:businessMapInfo.get("td_user_id").toString();
 	            		identifierId = mainId;
