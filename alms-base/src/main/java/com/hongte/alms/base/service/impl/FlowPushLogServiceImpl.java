@@ -414,7 +414,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	            	if(actionId == 7 || actionId == 81) {//平台还款的客户为资金分发的用户
 	            		accountName = customerName;
 	            		mainId = null == businessMapInfo.get("td_user_id")?null:businessMapInfo.get("td_user_id").toString();
-	            		identifierId = mainId;
+	            		bankCardNo = mainId;
 	            	}
 	            	
 	            	flowAccountIdentifier.setAccountType(accountType);
@@ -897,6 +897,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 			break;
 		case 81://还垫付
 			//平台还款 没有标的信息 从资金分发补充公司 业务 客户信息
+			pushFlowList = repaymentPlatformListService.selectPushAdvanceRepayFlowList(paramBusinessMap);
 			for (Map<String, Object> pushFlowMap : pushFlowList) {
 				String projectId = null == pushFlowMap.get("project_id")?null:pushFlowMap.get("project_id").toString();
 				if(null == projectId) {
@@ -913,7 +914,6 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				pushFlowMap.put("company_name", tdrepayRechargeLog.getCompanyName());
 				pushFlowMap.put("td_user_id", tdrepayRechargeLog.getTdUserId());
 			}
-			pushFlowList = repaymentPlatformListService.selectPushAdvanceRepayFlowList(paramBusinessMap);
 			break;
 		case 201://你我金融流水
 			pushFlowList = repaymentPlatformListService.selectPushNiWoRepayFlowList(paramBusinessMap);
