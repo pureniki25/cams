@@ -573,11 +573,13 @@ window.layinit(function (htConfig) {
 					if (this.firstProjectId != '') {
 						this.queryDistributeFundRecord(this.firstProjectId);
 					}
+				}else{
+                    var that = this;
+                    setTimeout(function(){
+                        that.paneHeight = "height:"+(that.tableHeight+2)+"px";
+                    },500)
 				}
-				var that = this;
-				setTimeout(function(){
-                    that.paneHeight = "height:"+(that.tableHeight+2)+"px";
-				},500)
+
             },
             /*
              * 标的初始化方法
