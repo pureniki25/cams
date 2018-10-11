@@ -1252,6 +1252,7 @@ public class TdrepayRechargeController {
 			issueSendOutsideLog.setInterfacename(Constant.INTERFACE_NAME_ADVANCE_SHARE_PROFIT);
 			issueSendOutsideLog.setSystem(Constant.SYSTEM_CODE_EIP);
 			issueSendOutsideLog.setSendKey(projectId);
+			issueSendOutsideLog.setCreateTime(new Date());
 			
 			try {
 				LOG.info("调用偿还垫付接口/eip/td/repayment/advanceShareProfit，参数：{}", dtoJsonStr);
