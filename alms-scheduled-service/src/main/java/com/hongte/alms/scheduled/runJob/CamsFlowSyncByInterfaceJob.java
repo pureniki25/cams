@@ -42,7 +42,7 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
 	    		try {
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还款流水到核心开始");
 	    			Result<Object> ret1 = camsFlowSyncByInterfaceJobClient.addBatchFlow();
-	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还款流水到核心结束,"+JSONObject.toJSONString(ret1)+"等待30秒推送撤销流水");
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还款流水到核心结束,"+JSONObject.toJSONString(ret1));
 	    			
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步资金分发流水到核心开始");
 	    			Result<Object> ret4 = camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
@@ -52,6 +52,11 @@ public class CamsFlowSyncByInterfaceJob extends IJobHandler  {
 	    			Result<Object> ret3 = camsFlowSyncByInterfaceJobClient.pushNiWoRepayFlowToCams();
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步你我金融流水到核心结束"+JSONObject.toJSONString(ret3));
 	    			
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步充值流水到核心开始");
+	    			Result<Object> ret5 = camsFlowSyncByInterfaceJobClient.pushRechargeFlowToCams();
+	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步充值流水到核心结束"+JSONObject.toJSONString(ret5));
+	    			
+	    			XxlJobLogger.log("等待30秒推送撤销流水");
 	    			Thread.sleep(30000);
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步撤销流水到核心开始");
 	    			Result<Object> ret2 = camsFlowSyncByInterfaceJobClient.cancelRepayFlow();

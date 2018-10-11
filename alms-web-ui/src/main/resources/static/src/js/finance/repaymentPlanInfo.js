@@ -24,7 +24,7 @@ window.layinit(function (htConfig) {
         	repayOtherFeeFlag: false, // 其他费用弹窗控制标识(业务维度)
         	repayProjOtherFeeFlag: false, // 其他费用弹窗控制标识（标维度）
         	businessSurplus:0, // 用户账户结余
-        	plateTypeFlag: '', // 数据来源：1、团贷网；2、你我金融
+        	plateTypeFlag: '', // 数据来源：1、团贷网；2、你我金融；0、线下出款；
         	
         	// -- 实还流水 --
         	actualPaymentRecordList: [],

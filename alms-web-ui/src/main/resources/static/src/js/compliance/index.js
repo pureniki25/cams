@@ -960,7 +960,9 @@ window.layinit(function(htConfig) {
     	            if (res.data.data != null && res.data.code == 1) {
     	            	vm.platformRepaymentInfoData = res.data.data.periodsList;
     	            	vm.platformActualRepaymentInfoData = res.data.data.tdProjectPaymentDTOs;
-    	            	vm.platformRepaymentInfoaviMoney = res.data.data.aviMoney.aviMoney;
+    	            	if (res.data.data.aviMoney != null) {
+    	            		vm.platformRepaymentInfoaviMoney = res.data.data.aviMoney.aviMoney;
+						}
     	            	if (res.data.data.principal == null) {
     	            		res.data.data.principal = 0;
 						}
@@ -1094,10 +1096,13 @@ window.layinit(function(htConfig) {
 		            success : function(data) {
 		            	console.log(data)
 		            	if (data.data != null && data.code == 1) {
-	    	            	vm.projectInfoList = data.data;
 	    	            	if (data.data.length > 0) {
+	    	            		vm.projectInfoList = data.data;
 	    	            		vm.firstProjectId = data.data[0].projectId;
 	    	            		vm.firstTdUserId = data.data[0].tdUserId;
+							}else {
+								vm.projectInfoList.push(vm.projectId);
+								vm.firstProjectId = vm.projectId;
 							}
 	    	            	vm.queryDistributeFundRecord();
 	    	            	vm.openInfoModal(obj.data);
