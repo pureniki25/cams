@@ -24,7 +24,7 @@ window.layinit(function (htConfig) {
         	repayOtherFeeFlag: false, // 其他费用弹窗控制标识(业务维度)
         	repayProjOtherFeeFlag: false, // 其他费用弹窗控制标识（标维度）
         	businessSurplus:0, // 用户账户结余
-        	plateTypeFlag: '', // 数据来源：1、团贷网；2、你我金融
+        	plateTypeFlag: '', // 数据来源：1、团贷网；2、你我金融；0、线下出款；
         	
         	// -- 实还流水 --
         	actualPaymentRecordList: [],
@@ -33,6 +33,7 @@ window.layinit(function (htConfig) {
         	
         	projectInfoList: [], 	//  标信息LIST
             tableHeight:450,
+            paneHeight:"height:450px",
         	// 还款计划表头  -- start --
         	repayPlanColumns: [
         		{
@@ -553,21 +554,30 @@ window.layinit(function (htConfig) {
              * 初始化方法
              */
             initFunction: function(event){
-            	if (event == 'realRepaymentRecord') {
+                this.paneHeight="height:"+this.tableHeight+"px";
+                if (event == 'realRepaymentRecord') {
+                    this.paneHeight="";
 					this.queryActualPaymentByBusinessId();
 				}else if (event == 'platformRealRepayment') {
+                    this.paneHeight="";
 					if (this.firstProjectId != '') {
 						this.getProjectPayment(this.firstProjectId);
 					}
 				}else if (event == 'advancesRecord') {
+                    this.paneHeight="";
 					if (this.firstProjectId != '') {
 						this.returnAdvanceShareProfit(this.firstProjectId);
 					}
 				}else if (event == 'fundDistributionRecord') {
+                    this.paneHeight="";
 					if (this.firstProjectId != '') {
 						this.queryDistributeFundRecord(this.firstProjectId);
 					}
 				}
+				var that = this;
+				setTimeout(function(){
+                    that.paneHeight = "height:"+(that.tableHeight+2)+"px";
+				},500)
             },
             /*
              * 标的初始化方法
