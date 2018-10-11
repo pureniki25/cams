@@ -892,6 +892,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				pushFlowMap.put("business_type_name", BusinessTypeEnum.getName(tdrepayRechargeLog.getBusinessType()));
 				pushFlowMap.put("customer_name", tdrepayRechargeLog.getCustomerName());
 				pushFlowMap.put("company_name", tdrepayRechargeLog.getCompanyName());
+				pushFlowMap.put("td_user_id", tdrepayRechargeLog.getTdUserId());
 			}
 			break;
 		case 81://还垫付
@@ -910,6 +911,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 				pushFlowMap.put("business_type_name", BusinessTypeEnum.getName(tdrepayRechargeLog.getBusinessType()));
 				pushFlowMap.put("customer_name", tdrepayRechargeLog.getCustomerName());
 				pushFlowMap.put("company_name", tdrepayRechargeLog.getCompanyName());
+				pushFlowMap.put("td_user_id", tdrepayRechargeLog.getTdUserId());
 			}
 			pushFlowList = repaymentPlatformListService.selectPushAdvanceRepayFlowList(paramBusinessMap);
 			break;
