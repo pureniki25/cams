@@ -144,7 +144,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    	 Map<String,Object> retData = (Map<String, Object>) queryProjectPaymentResult.getData();
 	    	 String message = retData.get("message").toString();
 	    	 //标的ID
-	    	 String projectId1 = retData.get("projectId").toString();
+	    	 String projectId1 = projectId;//retData.get("projectId").toString();
 	    	 int status = Integer.parseInt(retData.get("status").toString());
 	    	 //projectPayment还款信息list
 	    	 List<Map<String,Object>> projectPayments = (List<Map<String, Object>>) retData.get("projectPayments");
