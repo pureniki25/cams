@@ -233,7 +233,7 @@ public class CamsFlowController {
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
         	Date createTime = new Date();//(Date) businessMapInfo.get("create_time");
         	String createUser = businessMapInfo.get("create_user")==null?"":businessMapInfo.get("create_user").toString();
-        	String messageId = confirmLogId;
+        	String messageId = confirmLogId+"-5";
         	
         	String branchId = businessMapInfo.get("company_id")==null?"":businessMapInfo.get("company_id").toString();
         	String branchName = businessMapInfo.get("company_name")==null?"":businessMapInfo.get("company_name").toString();

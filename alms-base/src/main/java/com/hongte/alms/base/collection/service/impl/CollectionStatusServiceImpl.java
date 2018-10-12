@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Executor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,9 +45,11 @@ import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.SysUser;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
-import com.hongte.alms.base.feignClient.AlmsCoreServiceFeignClient;
 import com.hongte.alms.base.feignClient.CollectionSynceToXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.LitigationFeignClient;
+import com.hongte.alms.base.process.entity.Process;
+import com.hongte.alms.base.process.enums.ProcessTypeEnums;
+import com.hongte.alms.base.process.service.ProcessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.SysUserPermissionService;
@@ -129,14 +130,12 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     SysUserRoleService sysUserRoleService;
     
     @Autowired
-    private Executor cunshouThreadAsync;
-    
-    @Autowired
-    private AlmsCoreServiceFeignClient almsCoreServiceFeignClient;
-    
-    @Autowired
     @Qualifier("SysUserService")
     SysUserService sysUserService;
+    
+    @Autowired
+    @Qualifier("ProcessService")
+    private ProcessService processService;
 
     /**
      * 设置电催/人员(界面手动设置)
@@ -1005,8 +1004,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
 
 	public void setOneRepaymentBizPlanToLaw(RepaymentBizPlanList planList) {
+		String origBusinessId = "";
 		try {
-			String origBusinessId = planList.getOrigBusinessId();
+			origBusinessId = planList.getOrigBusinessId();
 			Result result = litigationFeignClient.isImportLitigation(origBusinessId);
 			logger.info("调用诉讼系统查询接口，参数：{}；返回信息：{}", origBusinessId, JSONObject.toJSONString(result));
 			// 调用诉讼系统查询接口，若调用失败或者非成功状态，则这条数据暂时不处理
@@ -1016,19 +1016,31 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 				// 若调用成功，且状态是true，说明移交过法务
 				if (!(Boolean) result.getData()) {
 					// 调用移交诉讼接口
-					transferLitigationService.sendTransferLitigationData(origBusinessId, sendUrl, null, 1);
+					transferLitigationService.sendTransferLitigationData(origBusinessId, null, 1);
 				}
 			}
-
-			List<StaffBusinessVo> voList = new LinkedList<>();
-			StaffBusinessVo vo = new StaffBusinessVo();
-			vo.setCrpId(planList.getPlanListId());
-			vo.setBusinessId(origBusinessId);
-			voList.add(vo);
-
 		} catch (Exception e) {
 			logger.error("自動移交法务异常", e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
+		}
+		
+		try {
+			String[] typeCodes = {ProcessTypeEnums.CAR_LOAN_LITIGATION.getTypeId(), ProcessTypeEnums.HOUSE_LOAN_LITIGATION.getTypeId()};
+			List<Process> processes = processService.selectList(new EntityWrapper<Process>().eq("business_id", origBusinessId).in("process_typeid", typeCodes));
+			if (CollectionUtils.isNotEmpty(processes)) {
+				for (Process process : processes) {
+					process.setProcessDesc("已自动移交法务，结束审批流程");
+					process.setStatus(2);
+					process.setProcessResult(1);
+					process.setApproveUserId(null);
+					process.setCurrentStep(null);
+					process.setBackStep(null);
+					process.setUpdateTime(new Date());
+				}
+				processService.updateBatchById(processes);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 

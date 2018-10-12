@@ -22,10 +22,11 @@ import java.util.List;
 /**
  * @author zengkun
  * @since 2018/7/12
- * 定时任务，用于更新失败的电催分配数据
+ * 定时任务，用于更新失败的电催分配数据,
+ * 数据库查询效率太低，停止定时更新信贷推送的电催分配数据  曾坤  2018-10-8
  */
-@JobHandler(value = "syncUpdateFailCollectionInfoJobHandler")
-@Component
+//@JobHandler(value = "syncUpdateFailCollectionInfoJobHandler")
+//@Component
 public class SyncUpdateFailCollectionInfoJob extends IJobHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SyncRechargeResultJob.class);

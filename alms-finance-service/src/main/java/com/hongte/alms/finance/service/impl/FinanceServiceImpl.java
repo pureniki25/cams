@@ -80,6 +80,7 @@ import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
 import com.hongte.alms.base.process.entity.Process;
 import com.hongte.alms.base.process.mapper.ProcessMapper;
 import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
+import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentProjPlanListService;
@@ -154,6 +155,10 @@ public class FinanceServiceImpl implements FinanceService {
 	@Autowired
 	@Qualifier("RepaymentProjPlanListService")
 	private RepaymentProjPlanListService repaymentProjPlanListService ;
+	
+	@Autowired
+	@Qualifier("RepaymentBizPlanListService")
+	private RepaymentBizPlanListService repaymentBizPlanListService ;
 	
 	@Autowired
 	private TransferOfLitigationMapper transferOfLitigationMapper;
@@ -1439,10 +1444,14 @@ public class FinanceServiceImpl implements FinanceService {
 	@Override
 	public Map<String, Object> queryRepaymentPlanInfoByBusinessId(String businessId) {
 		try {
+			RepaymentBizPlanList repaymentBizPlanList = repaymentBizPlanListService
+					.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId));
+			String origBusinessId = repaymentBizPlanList.getOrigBusinessId();
+			
 			Map<String, Object> resultMap = new HashMap<>();
 
 			List<RepaymentPlanInfoDTO> repaymentPlanInfoDTOs = repaymentBizPlanListMapper
-					.queryRepaymentPlanInfoByBusinessId(businessId);
+					.queryRepaymentPlanInfoByBusinessId(origBusinessId);
 
 			if (CollectionUtils.isNotEmpty(repaymentPlanInfoDTOs)) {
 
@@ -1491,7 +1500,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 					List<RepaymentPlanInfoDTO> resultList = new ArrayList<>();
 					
-					Double businessSurplus = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId);
+					Double businessSurplus = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(origBusinessId);
 
 					for (Entry<String, List<RepaymentPlanInfoDTO>> entry : map.entrySet()) {
 

@@ -31,7 +31,7 @@ public interface AgencyRechargeLogService extends BaseService<AgencyRechargeLog>
 	 * @param updateUser更新人
 	 * @return
 	 */
-	void queryRechargeOrder(String oidPartner, String cmOrderNo, String updateUser);
+	void queryRechargeOrder(String oidPartner, String cmOrderNo, String updateUser, int orgType);
 	
 	/**
 	 * 资金分发订单查询

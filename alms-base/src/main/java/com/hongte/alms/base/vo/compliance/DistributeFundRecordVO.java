@@ -30,6 +30,11 @@ public class DistributeFundRecordVO extends TdrepayRechargeLog implements Serial
 	 */
 	private String createTimeStr;
 
+	/**
+	 * 被充值人姓名
+	 */
+	private String person;
+
 	public List<TdrepayRechargeDetail> getDetails() {
 		return details;
 	}
@@ -62,10 +67,19 @@ public class DistributeFundRecordVO extends TdrepayRechargeLog implements Serial
 		this.createTimeStr = createTimeStr;
 	}
 
+	public String getPerson() {
+		return person;
+	}
+
+	public void setPerson(String person) {
+		this.person = person;
+	}
+
 	@Override
 	public String toString() {
 		return "DistributeFundRecordVO [details=" + details + ", processStatusStr=" + processStatusStr
-				+ ", factRepayDateStr=" + factRepayDateStr + ", createTimeStr=" + createTimeStr + "]";
+				+ ", factRepayDateStr=" + factRepayDateStr + ", createTimeStr=" + createTimeStr + ", person=" + person
+				+ "]";
 	}
 
 }

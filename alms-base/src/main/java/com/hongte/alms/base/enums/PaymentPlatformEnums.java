@@ -11,10 +11,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum PaymentPlatformEnums implements IEnum {
 
+	XIANXIA(0, "线下出款"),
     TUANDAI(1, "团贷网"),
     NIWO(2, "你我金融"),
     YUECAI(3, "粤财"),	
-    XIANXIA(4, "线下出款"),
     ;		
 
     private int value;	// 资金端编号

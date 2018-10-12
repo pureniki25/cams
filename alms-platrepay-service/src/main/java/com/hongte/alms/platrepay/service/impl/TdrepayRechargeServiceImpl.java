@@ -335,6 +335,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			TdrepayRechargeLog tdrepayRechargeLog = new TdrepayRechargeLog();
 			tdrepayRechargeLog.setLogId(vo.getLogId());
 			tdrepayRechargeLog.setProcessStatus(processStatus); // 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
+			tdrepayRechargeLog.setProcessTime(new Date());
 			tdrepayRechargeLog.setUpdateTime(new Date());
 			tdrepayRechargeLog.setUpdateUser(userId);
 			rechargeLogs.add(tdrepayRechargeLog);
@@ -625,7 +626,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			if (CollectionUtils.isNotEmpty(rechargeLogs)) {
 				// list按照期次 Period 分组，并按照Period从小到大排序
 				Map<Integer, List<TdrepayRechargeLog>> map = repayChargeLogGroupByPeriod(rechargeLogs);
-				projectIdMap.put(rechargeLogs.get(0).getProjectId(), map);
+				projectIdMap.put(entry.getKey(), map);
 			}
 		}
 
@@ -1606,6 +1607,10 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					DistributeFundRecordVO vo = BeanUtils.deepCopy(tdrepayRechargeLog, DistributeFundRecordVO.class);
+					TuandaiProjectInfo info = tuandaiProjectInfoService.selectOne(new EntityWrapper<TuandaiProjectInfo>().eq("td_user_id", vo.getTdUserId()));
+					if (info != null) {
+						vo.setPerson(info.getRealName());
+					}
 					vo.setProcessStatusStr(ProcessStatusTypeEnum.getName(tdrepayRechargeLog.getProcessStatus()));
 					vo.setCreateTimeStr(DateUtil.formatDate(vo.getCreateTime()));
 					vo.setFactRepayDateStr(DateUtil.formatDate(vo.getFactRepayDate()));
