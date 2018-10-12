@@ -50,4 +50,8 @@ public interface CamsFlowSyncByInterfaceJobClient {
     @RequestMapping(value = "/camsFlowSync/pushNiWoRepayFlowToCams",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
 	public Result<Object> pushNiWoRepayFlowToCams();
     
+    //充值流水
+    @RequestMapping(value = "/camsFlowSync/pushRechargeFlowToCams",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+	public Result<Object> pushRechargeFlowToCams();
+    
 }

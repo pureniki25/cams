@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
+import com.hongte.alms.base.entity.SysParameter;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
+import com.hongte.alms.base.service.SysParameterService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
@@ -26,6 +29,10 @@ public class QueryRechargeOrderJob extends IJobHandler {
 	@Qualifier("AgencyRechargeLogService")
 	private AgencyRechargeLogService agencyRechargeLogService;
 
+	@Autowired
+	@Qualifier("SysParameterService")
+	private SysParameterService sysParameterService;
+
 	@Override
 	public ReturnT<String> execute(String arg0) throws Exception {
 		try {
@@ -35,8 +42,11 @@ public class QueryRechargeOrderJob extends IJobHandler {
 					.selectList(new EntityWrapper<AgencyRechargeLog>().eq("handle_status", "1").eq("charge_type", "3"));
 			if (CollectionUtils.isNotEmpty(logs)) {
 				for (AgencyRechargeLog agencyRechargeLog : logs) {
+					SysParameter sysParameter = sysParameterService
+							.queryRechargeAccountSysParams(agencyRechargeLog.getRechargeAccountType());
 					agencyRechargeLogService.queryRechargeOrder(agencyRechargeLog.getoIdPartner(),
-							agencyRechargeLog.getCmOrderNo(), "贷后定时任务");
+							agencyRechargeLog.getCmOrderNo(), "贷后定时任务", BusinessTypeEnum
+									.getOrgTypeByRechargeAccountId(Integer.valueOf(sysParameter.getParamType())));
 				}
 			}
 			long end = System.currentTimeMillis();

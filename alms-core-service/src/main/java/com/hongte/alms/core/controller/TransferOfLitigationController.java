@@ -93,9 +93,6 @@ public class TransferOfLitigationController {
 	@Qualifier("ProcessTypeStepService")
 	private ProcessTypeStepService processTypeStepService;
 
-	@Value("${ht.litigation.url:http://172.16.200.110:30906/api/importLitigation}")
-	private String sendUrl;
-
 	@Autowired
 	@Qualifier("CollectionStatusService")
 	private CollectionStatusService collectionStatusService;
@@ -253,7 +250,7 @@ public class TransferOfLitigationController {
 				return Result.error("-99", "该业务编号已移交诉讼系统！");
 			}
 
-			transferOfLitigationService.saveTransferLitigationHouse(transferLitigationHouse, sendUrl, files);
+			transferOfLitigationService.saveTransferLitigationHouse(transferLitigationHouse, files);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage(), ex);
@@ -301,7 +298,7 @@ public class TransferOfLitigationController {
 
 			transferLitigationCar.setHouseAddress(houseAddress.toString());
 
-			transferOfLitigationService.saveTransferLitigationCar(transferLitigationCar, sendUrl, files);
+			transferOfLitigationService.saveTransferLitigationCar(transferLitigationCar, files);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage(), ex);
@@ -314,7 +311,7 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<String> saveHouseApprovalLogInfo(@RequestBody ProcessLogReq req) {
 		try {
-			transferLitigationHouseService.saveHouseProcessApprovalResult(req, sendUrl);
+			transferLitigationHouseService.saveHouseProcessApprovalResult(req);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage(), ex);
@@ -328,7 +325,7 @@ public class TransferOfLitigationController {
 	@ResponseBody
 	public Result<String> saveCarApprovalLogInfo(@RequestBody ProcessLogReq req) {
 		try {
-			transferLitigationCarService.saveCarProcessApprovalResult(req, sendUrl);
+			transferLitigationCarService.saveCarProcessApprovalResult(req);
 			return Result.success();
 		} catch (Exception ex) {
 			LOG.error(ex.getMessage(), ex);
@@ -385,7 +382,7 @@ public class TransferOfLitigationController {
 			if (paramMap == null || paramMap.isEmpty()) {
 				return Result.error("参数不能为空");
 			}
-			transferOfLitigationService.sendTransferLitigationData((String) paramMap.get("businessId"), sendUrl, null,
+			transferOfLitigationService.sendTransferLitigationData((String) paramMap.get("businessId"), null,
 					(Integer) paramMap.get("channel"));
 			return Result.success();
 		} catch (Exception e) {
