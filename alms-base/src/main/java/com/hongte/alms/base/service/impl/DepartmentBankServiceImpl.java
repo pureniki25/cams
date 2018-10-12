@@ -38,7 +38,7 @@ public class DepartmentBankServiceImpl extends BaseServiceImpl<DepartmentBankMap
 			throw new RuntimeException("business was not found");
 		}
 		EntityWrapper<DepartmentBank> ew = new EntityWrapper<>() ;
-		ew.eq("dept_id", basicBusiness.getCompanyId()).orderBy("finance_name") ;
+		ew.eq("dept_id", basicBusiness.getCompanyName()).orderBy("finance_name") ;
 		List<DepartmentBank> list = departmentBankMapper.selectList(ew);
 		List<DepartmentBankVO> voList = new ArrayList<>() ;
 		for (DepartmentBank departmentBank : list) {

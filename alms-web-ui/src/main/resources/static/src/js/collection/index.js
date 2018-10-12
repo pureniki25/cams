@@ -292,7 +292,7 @@ window.layinit(function(htConfig){
                         }else if (d.plateType == 3) {
                         	color = '#666699'
                         	content = '粤'
-                        }else if (d.plateType == 4) {
+                        }else if (d.plateType == 0) {
                         	color = '#993300'
                         	content = '线'
                         }
@@ -477,7 +477,9 @@ window.layinit(function(htConfig){
                             if (authValid('applyDerate')) {
                                 if(e.statusName != '已还款' && e.statusName != '已结清'
                                     &&  e.afterColStatusName!='已移交法务' &&
-                                    e.repaymentTypeId!=9 && e.repaymentTypeId!=4){
+                                    e.repaymentTypeId!=9 && e.repaymentTypeId!=4
+                                        //你我金融的单，不需要申请减免
+                                && e.plateType != 2){
                                     buttons.push(
                                         {
 
@@ -528,9 +530,11 @@ window.layinit(function(htConfig){
                                 //     }
                                 // )
                             }
-
+  
                             if (authValid('deduction')) {
-                                if(e.statusName != '已还款' && e.statusName != '已结清'){
+                                if(e.statusName != '已还款' && e.statusName != '已结清'
+                                    //只有团贷网的单才需要执行代扣
+                                    && e.plateType == 1){
                                     buttons.push(
                                         {
                                             "name": "执行代扣", click: function (e, currentItem) {
@@ -571,25 +575,33 @@ window.layinit(function(htConfig){
                             }
                             if (authValid('repaymentRegister')) {
                                 // if(e.statusName != '已还款' && e.statusName != '已结清') {
-                                buttons.push(
-                                    {
-                                        "name": "客户还款登记", click: function (e, currentItem) {
-                                        var url = '/collectionUI/repaymentRegister?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
-                                        showOneLineOprLayer(url, "客户还款登记")
-                                    }
-                                    }
-                                )
+                                if( e.plateType != 2)    //你我金融的单，不需要客户还款登记
+                                {
+                                    buttons.push(
+                                        {
+                                            "name": "客户还款登记", click: function (e, currentItem) {
+                                            var url = '/collectionUI/repaymentRegister?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
+                                            showOneLineOprLayer(url, "客户还款登记")
+                                        }
+                                        }
+                                    )
+                                }
+
                                 // }
                             }
                             if (authValid('checkFundPool')) {
-                                buttons.push(
-                                    {
-                                        "name": "查看款项池", click: function (e, currentItem) {
-                                        var url = '/collectionUI/checkFundPool?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
-                                        showOneLineOprLayer(url, "查看款项池")
-                                    }
-                                    }
-                                )
+                                if( e.plateType != 2)    //你我金融的单，不需要查看款项池
+                                {
+                                    buttons.push(
+                                        {
+                                            "name": "查看款项池", click: function (e, currentItem) {
+                                            var url = '/collectionUI/checkFundPool?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId
+                                            showOneLineOprLayer(url, "查看款项池")
+                                        }
+                                        }
+                                    )
+                                }
+
                             }
 
                             if (authValid('checkDoc')) {
@@ -630,7 +642,9 @@ window.layinit(function(htConfig){
 
                             if (authValid('carLoanBilling')) {
                             	if (e.businessTypeId == 1 || e.businessTypeId == 9
-                            			|| e.businessTypeId == 2 || e.businessTypeId == 11) {
+                            			|| e.businessTypeId == 2 || e.businessTypeId == 11
+                                  && e.plateType != 2   //你我金融的单，不需要结清试算
+                                ) {
                             		buttons.push(
                             				{
                             					"name": "结清试算", click: function (e, currentItem) {

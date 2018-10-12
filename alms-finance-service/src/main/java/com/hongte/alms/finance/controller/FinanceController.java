@@ -1132,6 +1132,8 @@ public class FinanceController {
         //查询用户
         //List<SysUser> users = sysUserService.selectList(new EntityWrapper<>());
         List<SysUser> users = sysUserService.selectUsersByRole(SysRoleEnums.DH_CASHIER.getKey());
+        List<SysUser> users_yc = sysUserService.selectUsersByRole(SysRoleEnums.DH_YC_FINANCE.getKey());
+        users.addAll(users_yc);
         retMap.put("users", (JSONArray) JSON.toJSON(users, JsonUtil.getMapping()));
 
         logger.info("@getOrderSetSearchInfo@查找财务人员跟单设置查询相关信息--结束[{}]", JSON.toJSONString(retMap));
