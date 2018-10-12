@@ -148,11 +148,11 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    	 int status = Integer.parseInt(retData.get("status").toString());
 	    	 //projectPayment还款信息list
 	    	 List<Map<String,Object>> projectPayments = (List<Map<String, Object>>) retData.get("projectPayments");
-	    	 RepaymentPlatformList repaymentPlatformList = null;
-	    	 RepaymentPlatformListBorrower repaymentPlatformListBorrower = null;
-	    	 RepaymentPlatformListGuarantee repaymentPlatformListGuarantee = null;
 	    	 if(null != projectPayments) {
 	    		 for (Map<String, Object> map : projectPayments) {
+	    	    	 RepaymentPlatformList repaymentPlatformList = null;
+	    	    	 RepaymentPlatformListBorrower repaymentPlatformListBorrower = null;
+	    	    	 RepaymentPlatformListGuarantee repaymentPlatformListGuarantee = null;
 	    			//还款状态1 已结清 0逾期
 	    			 
 	    			 BigDecimal totalAmountRepay = new BigDecimal(0);
