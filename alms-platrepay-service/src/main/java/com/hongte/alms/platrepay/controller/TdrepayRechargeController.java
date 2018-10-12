@@ -1160,7 +1160,11 @@ public class TdrepayRechargeController {
 
 			String projectId = vo.getProjectId();
 			int period = vo.getPeriod();
+			BigDecimal penaltyAmount = vo.getPenaltyAmount();
 			BigDecimal principalAndInterest = vo.getPrincipalAndInterest();
+			if (BigDecimal.ZERO.compareTo(penaltyAmount) < 0) {
+				principalAndInterest = principalAndInterest.add(penaltyAmount);
+			}
 			BigDecimal tuandaiAmount = vo.getTuandaiAmount();
 			BigDecimal orgAmount = vo.getOrgAmount();
 			BigDecimal guaranteeAmount = vo.getGuaranteeAmount();
@@ -1172,7 +1176,7 @@ public class TdrepayRechargeController {
 			if (lateFeeFlag == 1) {
 				int diffDays = DateUtil.getDiffDays(DateUtil.getDate(vo.getAddDate()), new Date());
 				overDueAmount = BigDecimal.valueOf(diffDays * total.doubleValue() * 0.0006).setScale(2,
-						BigDecimal.ROUND_HALF_UP);
+						BigDecimal.ROUND_FLOOR);
 				total = total.add(overDueAmount);
 			}
 
@@ -1252,6 +1256,7 @@ public class TdrepayRechargeController {
 			issueSendOutsideLog.setInterfacename(Constant.INTERFACE_NAME_ADVANCE_SHARE_PROFIT);
 			issueSendOutsideLog.setSystem(Constant.SYSTEM_CODE_EIP);
 			issueSendOutsideLog.setSendKey(projectId);
+			issueSendOutsideLog.setCreateTime(new Date());
 			
 			try {
 				LOG.info("调用偿还垫付接口/eip/td/repayment/advanceShareProfit，参数：{}", dtoJsonStr);

@@ -63,7 +63,7 @@ public class Main {
 	@Test
 	public void run () {
 		
-//		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>().where(" project_id in ('ecec4bf8-6fdd-4967-b11d-1d1a6c879dab','7a268783-0825-4783-ba7d-b6e7bc39b52f','09956521-a3fa-431b-8493-e41b6d6d6e4e')  ").orderBy("create_time"));
+//		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>().where(" project_id in ('aba2c781-dbab-4886-abb6-ba6d6609f88c')  ").orderBy("create_time"));
 		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>().where(" plate_type = 1 and DATE( create_time ) >= '2018-06-28' ").orderBy("create_time"));
 		for (TuandaiProjectInfo tuandaiProjectInfo : selectList) {
 			Req req = new Req() ; 
@@ -114,7 +114,7 @@ public class Main {
 			req.setAmount(tuandaiProjectInfo.getFullBorrowMoney());
 			req.setContractNo(tuandaiProjectInfo.getBusinessId());
 			req.setDeadline(tuandaiProjectInfo.getBorrowLimit());
-			req.setInterestRate(tuandaiProjectInfo.getInterestRate().multiply(new BigDecimal(100)));
+			req.setInterestRate(basicBusiness.getBorrowRate());
 //			接口 ==> 0：商贸贷 1：业主贷 2：家装分期 3：商贸共借 4：业主共借，5：房贷，6：车贷，7：扶贫贷，8：二手车，9：车全，10：一点车贷，11：房贷共借
 //			本地 ==>  '业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)'
 			req.setOrgType(BusinessTypeEnum.getOrgTypeByValue(businessType)+"");
