@@ -298,6 +298,9 @@ public class CamsFlowController {
             	personal = false;
             	String targetAccountName = BusinessTypeEnum.getName(Integer.parseInt(businessTypeId))+"代充值账户";
             	//收入账号
+            	if(!StringUtils.isBlank(targetAccountName)) {
+            		targetAccountName = targetAccountName.replace("共借", "");
+            	}
             	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
             	flowAccountIdentifier2.setAccountName(targetAccountName);
             	flowAccountIdentifier2.setAccountType(accountType);

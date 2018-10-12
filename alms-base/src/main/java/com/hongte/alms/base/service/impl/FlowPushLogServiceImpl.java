@@ -144,22 +144,33 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    	 Map<String,Object> retData = (Map<String, Object>) queryProjectPaymentResult.getData();
 	    	 String message = retData.get("message").toString();
 	    	 //标的ID
-	    	 String projectId1 = retData.get("projectId").toString();
+	    	 String projectId1 = projectId;//retData.get("projectId").toString();
 	    	 int status = Integer.parseInt(retData.get("status").toString());
 	    	 //projectPayment还款信息list
 	    	 List<Map<String,Object>> projectPayments = (List<Map<String, Object>>) retData.get("projectPayments");
 	    	 if(null != projectPayments) {
 	    		 for (Map<String, Object> map : projectPayments) {
+	    	    	 RepaymentPlatformList repaymentPlatformList = null;
+	    	    	 RepaymentPlatformListBorrower repaymentPlatformListBorrower = null;
+	    	    	 RepaymentPlatformListGuarantee repaymentPlatformListGuarantee = null;
 	    			//还款状态1 已结清 0逾期
+	    			 
+	    			 BigDecimal totalAmountRepay = new BigDecimal(0);
+	    			 BigDecimal totalAmountBorrower = new BigDecimal(0);
+	    			 BigDecimal totalAmountGuarantee = new BigDecimal(0);
+	    			 
 	    			 int projectPaymentsStatus = Integer.parseInt(map.get("status").toString());
 	    			 if(projectPaymentsStatus == 1 || projectPaymentsStatus == 0) {
-	    			 RepaymentPlatformList repaymentPlatformList = new RepaymentPlatformList();
+	    			 repaymentPlatformList = new RepaymentPlatformList();
 	    			 //期数
 	    			 int period = Integer.parseInt(map.get("period").toString());
 	    			 //还款日期 yyyy-MM-dd
 	    			 String addDate =  map.get("addDate").toString();
 	    			 //实还总金额
 	    			 BigDecimal totalAmount = null == map.get("totalAmount")?null:new BigDecimal(map.get("totalAmount").toString());
+	    			 if(null != totalAmount) {
+	    				 totalAmountRepay = totalAmount;
+	    			 }
 	    			 //borrowerPayment借款人还款信息
 	    			 //实还本息
 	    			 BigDecimal principalAndInterest = null == map.get("principalAndInterest")?null:new BigDecimal(map.get("principalAndInterest").toString());
@@ -194,39 +205,54 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    			 repaymentPlatformList.setInsuranceAmount(insuranceAmount);
 	    			 repaymentPlatformList.setPrivilegePackageAmount(privilegePackageAmount);
 	    			 repaymentPlatformList.setPenaltyAmount(penaltyAmount);
-	    			 //通过标号和期号取平台还款记录 ,如果有比较总金额 相同则不改 不同则修改 没有记录则插入
-	    			 RepaymentPlatformList repaymentPlatformListOld = repaymentPlatformListService.selectOne(new EntityWrapper<RepaymentPlatformList>().eq("project_id", projectId1).eq("period", period));
-	    			 int updateType = 0;
-	    			 if(repaymentPlatformListOld == null) {
-	    				 updateType = 1;
-	    				 repaymentPlatformList.setCreateMan("平台接口获取");
-		    			 repaymentPlatformList.setCreateTime(new Date());
-	    				 repaymentPlatformListService.insert(repaymentPlatformList);
-	    			 }
 	    			 
 	    			 //borrowerPayment借款人还款信息list，字段描述
 	    			 Map<String,Object> borrowerPaymentMap = (Map<String, Object>) map.get("borrowerPayment");
-	    			 if(null != borrowerPaymentMap && 0 != updateType) {
+	    			 if(null != borrowerPaymentMap) {
 	    				 //实还本息
 		    			 BigDecimal principalAndInterestBorrower = null == borrowerPaymentMap.get("principalAndInterest")?null:new BigDecimal(borrowerPaymentMap.get("principalAndInterest").toString());
+		    			 if(null != principalAndInterestBorrower) {
+		    				 totalAmountBorrower = totalAmountBorrower.add(principalAndInterestBorrower);
+	    				 }
 		    			 //实还平台服务费
 		    			 BigDecimal tuandaiAmountBorrower = null == borrowerPaymentMap.get("tuandaiAmount")?null:new BigDecimal(borrowerPaymentMap.get("tuandaiAmount").toString());
+		    			 if(null != tuandaiAmountBorrower) {
+		    				 totalAmountBorrower = totalAmountBorrower.add(tuandaiAmountBorrower);
+	    				 }
 		    			 //实还资产端服务费
 		    			 BigDecimal orgAmountBorrower = null == borrowerPaymentMap.get("orgAmount")?null:new BigDecimal(borrowerPaymentMap.get("orgAmount").toString());
+		    			 if(null != principalAndInterestBorrower) {
+		    				 tuandaiAmountBorrower = totalAmountBorrower.add(principalAndInterestBorrower);
+	    				 }
 		    			 //实还担保公司服务费
 		    			 BigDecimal guaranteeAmountBorrower = null == borrowerPaymentMap.get("guaranteeAmount")?null:new BigDecimal(borrowerPaymentMap.get("guaranteeAmount").toString());
+		    			 if(null != guaranteeAmountBorrower) {
+		    				 totalAmountBorrower = totalAmountBorrower.add(guaranteeAmountBorrower);
+	    				 }
 		    			 //实还仲裁服务费
 		    			 BigDecimal arbitrationAmountBorrower = null == borrowerPaymentMap.get("arbitrationAmount")?null:new BigDecimal(borrowerPaymentMap.get("arbitrationAmount").toString());
+		    			 if(null != arbitrationAmountBorrower) {
+		    				 totalAmountBorrower = totalAmountBorrower.add(arbitrationAmountBorrower);
+	    				 }
 		    			 //实还中介服务费
 		    			 BigDecimal agencyAmountBorrower = null == borrowerPaymentMap.get("agencyAmount")?null:new BigDecimal(borrowerPaymentMap.get("agencyAmount").toString());
+		    			 if(null != agencyAmountBorrower) {
+		    				 totalAmountBorrower = totalAmountBorrower.add(agencyAmountBorrower);
+	    				 }
 		    			 //保险费
 		    			 BigDecimal insuranceAmountBorrower = null == borrowerPaymentMap.get("insuranceAmount")?null:new BigDecimal(borrowerPaymentMap.get("insuranceAmount").toString());
+		    			 if(null != insuranceAmountBorrower) {
+		    				 totalAmountBorrower = totalAmountBorrower.add(insuranceAmountBorrower);
+	    				 }
 		    			 //特权包
 		    			 BigDecimal privilegePackageAmountBorrower = null == borrowerPaymentMap.get("privilegePackageAmount")?null:new BigDecimal(borrowerPaymentMap.get("privilegePackageAmount").toString());
-		    			 RepaymentPlatformListBorrower repaymentPlatformListBorrower = new RepaymentPlatformListBorrower();
+		    			 if(null != privilegePackageAmountBorrower) {
+		    				 totalAmountBorrower = totalAmountBorrower.add(privilegePackageAmountBorrower);
+	    				 }
+		    			 
+		    			 repaymentPlatformListBorrower = new RepaymentPlatformListBorrower();
 		    			 repaymentPlatformListBorrower.setProjectId(projectId1);
 		    			 repaymentPlatformListBorrower.setPeriod(period);
-		    			 repaymentPlatformListBorrower.setRepayId(repaymentPlatformList.getId());
 		    			 repaymentPlatformListBorrower.setRepayStatus(status);
 		    			 repaymentPlatformListBorrower.setAddDate(addDate);
 		    			 repaymentPlatformListBorrower.setPrincipalAndinterest(principalAndInterestBorrower);
@@ -239,13 +265,12 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 		    			 repaymentPlatformListBorrower.setPrivilegePackageAmount(privilegePackageAmountBorrower);
 		    			 repaymentPlatformListBorrower.setCreateMan("平台接口获取");
 		    			 repaymentPlatformListBorrower.setCreateTime(new Date());
-		    			 repaymentPlatformListBorrowerService.insert(repaymentPlatformListBorrower);
 	    			 }
 	    			 
 	    			//guaranteePayment担保公司垫付信息，字段描述
 	    			 Map<String,Object> guaranteePaymentMap = (Map<String, Object>) map.get("guaranteePayment");
-	    			 if(null != guaranteePaymentMap && 0 != updateType) {
-	    				 BigDecimal totalAmountGuarantee = new BigDecimal(0);
+	    			 if(null != guaranteePaymentMap) {
+	    				
 	    				 //本金利息
 	    				 BigDecimal principalAndInterestGuarantee = null == guaranteePaymentMap.get("principalAndInterest")?null:new BigDecimal(guaranteePaymentMap.get("principalAndInterest").toString());
 	    				 if(null != principalAndInterestGuarantee) {
@@ -281,11 +306,11 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    				 if(null != agencyAmountGuarantee) {
 	    					 totalAmountGuarantee = totalAmountGuarantee.add(agencyAmountGuarantee);
 	    				 }
-	    				 RepaymentPlatformListGuarantee repaymentPlatformListGuarantee = new RepaymentPlatformListGuarantee();
+	    				 repaymentPlatformListGuarantee = new RepaymentPlatformListGuarantee();
 	    				 repaymentPlatformListGuarantee.setProjectId(projectId1);
 	    				 repaymentPlatformListGuarantee.setPeriod(period);
-	    				 repaymentPlatformListGuarantee.setRepayId(repaymentPlatformList.getId());
 	    				 repaymentPlatformListGuarantee.setRepayStatus(status);
+	    				 repaymentPlatformListGuarantee.setAddDate(addDate);
 	    				 repaymentPlatformListGuarantee.setPrincipalAndinterest(principalAndInterestGuarantee);
 	    				 repaymentPlatformListGuarantee.setPenaltyAmount(penaltyAmountGuarantee);
 	    				 repaymentPlatformListGuarantee.setTuandaiAmount(tuandaiAmountGuarantee);
@@ -296,9 +321,34 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    				 repaymentPlatformListGuarantee.setCreateMan("平台接口获取");
 	    				 repaymentPlatformListGuarantee.setCreateTime(new Date());
 	    				 repaymentPlatformListGuarantee.setTotalAmount(totalAmountGuarantee);
+	    			 }
+	    			 
+	    			//通过标号和期号取平台还款记录 ,如果有比较总金额 相同则不改 不同则修改 没有记录则插入
+	    			 RepaymentPlatformList repaymentPlatformListOld = repaymentPlatformListService.selectOne(new EntityWrapper<RepaymentPlatformList>().eq("project_id", projectId1).eq("period", period));
+	    			 int updateType = 0;
+	    			 
+	    			 //如果平台还款 总金额 》 还款+垫付金额 暂不记录  totalAmountRepay.compareTo(totalAmountBorrower.add(totalAmountGuarantee)
+	    			 if(totalAmountBorrower.compareTo(new BigDecimal(0)) == 0 
+	    					 && totalAmountGuarantee.compareTo(new BigDecimal(0)) == 0) {
+	    				 updateType = 2;
+	    			 }
+	    			 
+	    			 if(repaymentPlatformListOld == null && 2 != updateType) {
+	    				 updateType = 1;
+	    				 repaymentPlatformList.setCreateMan("平台接口获取");
+		    			 repaymentPlatformList.setCreateTime(new Date());
+	    				 repaymentPlatformListService.insert(repaymentPlatformList);
+	    			 }
+	    			 if(null != repaymentPlatformListBorrower && 1 == updateType) {
+	    				 repaymentPlatformListBorrower.setRepayId(repaymentPlatformList.getId());
+	    				 repaymentPlatformListBorrowerService.insert(repaymentPlatformListBorrower);
+	    			 }
+	    			 if(null != repaymentPlatformListGuarantee && 1 == updateType) {
+	    				 repaymentPlatformListGuarantee.setRepayId(repaymentPlatformList.getId());
+	    				 System.err.println(JSONObject.toJSONString(repaymentPlatformListGuarantee));
 	    				 repaymentPlatformListGuaranteeService.insert(repaymentPlatformListGuarantee);
 	    			 }
-	    		 }
+	    			}
 	    		 }
 	    	 }
 	      }
@@ -1217,7 +1267,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    	 Map<String,Object> retData = (Map<String, Object>) advanceShareProfitResult.getData();
 	    	 String message = retData.get("message").toString();
 	    	 //标的ID
-	    	 String projectId1 = retData.get("projectId").toString();
+	    	 String projectId1 = projectId;//retData.get("projectId").toString();
 	    	 int status = Integer.parseInt(retData.get("status").toString());
 	    	 //projectPayment还款信息list
 	    	 List<Map<String,Object>> returnAdvanceShareProfits = (List<Map<String, Object>>) retData.get("returnAdvanceShareProfits");
