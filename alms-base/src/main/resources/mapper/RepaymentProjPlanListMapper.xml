@@ -217,7 +217,8 @@ WHERE (creat_sys_type = 2 AND plate_type!=2 and current_status <![CDATA[ <>  ]]>
 		from tb_repayment_proj_plan rpp 
 		left join tb_repayment_proj_plan_list rppl on rppl.proj_plan_id  = rpp. proj_plan_id 
 		where rpp.project_id = #{projectId} 
-		-- and (rppl.repay_status is null or rppl.repay_status = 1 ) 
+		and (rppl.repay_status is null or rppl.repay_status = 1 ) 
+		and rppl.current_status = '还款中'
 		order by rppl.period
 	</select>
 </mapper>
