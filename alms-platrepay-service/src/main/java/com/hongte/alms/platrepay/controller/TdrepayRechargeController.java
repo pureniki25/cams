@@ -1162,7 +1162,7 @@ public class TdrepayRechargeController {
 			int period = vo.getPeriod();
 			BigDecimal penaltyAmount = vo.getPenaltyAmount();
 			BigDecimal principalAndInterest = vo.getPrincipalAndInterest();
-			if (BigDecimal.ZERO.compareTo(penaltyAmount) > 0) {
+			if (BigDecimal.ZERO.compareTo(penaltyAmount) < 0) {
 				principalAndInterest = principalAndInterest.add(penaltyAmount);
 			}
 			BigDecimal tuandaiAmount = vo.getTuandaiAmount();
