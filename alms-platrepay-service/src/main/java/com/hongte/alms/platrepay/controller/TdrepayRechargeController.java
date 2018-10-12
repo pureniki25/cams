@@ -1176,7 +1176,7 @@ public class TdrepayRechargeController {
 			if (lateFeeFlag == 1) {
 				int diffDays = DateUtil.getDiffDays(DateUtil.getDate(vo.getAddDate()), new Date());
 				overDueAmount = BigDecimal.valueOf(diffDays * total.doubleValue() * 0.0006).setScale(2,
-						BigDecimal.ROUND_HALF_UP);
+						BigDecimal.ROUND_HALF_DOWN);
 				total = total.add(overDueAmount);
 			}
 
