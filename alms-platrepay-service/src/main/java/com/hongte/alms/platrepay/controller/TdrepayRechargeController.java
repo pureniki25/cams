@@ -1115,7 +1115,8 @@ public class TdrepayRechargeController {
 							.in("status", arrStatus)
 							.eq("is_valid", 1)
 							.eq("project_id",alsoToPayProjectId)
-							.eq("after_id",alsoToPayAfterId));
+							.eq("after_id",alsoToPayAfterId)
+							.eq("process_status", 2));
 
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 
@@ -1144,7 +1145,7 @@ public class TdrepayRechargeController {
 		// 1、查出所有偿还垫付失败和未偿还垫付的数据
 		Integer[] arrStatus = { 0, 3 };
 		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-				.selectList(new EntityWrapper<TdrepayRechargeLog>().in("status", arrStatus).eq("is_valid", 1));
+				.selectList(new EntityWrapper<TdrepayRechargeLog>().in("status", arrStatus).eq("is_valid", 1).eq("process_status", 2));
 
 		
 		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
