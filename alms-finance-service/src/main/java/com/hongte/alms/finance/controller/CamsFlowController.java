@@ -1047,11 +1047,9 @@ public class CamsFlowController {
     		for(Map<String,Object> map:listProjs) {
     			String pushProjectId = map.get("project_id").toString();
     			if(StringUtils.isNoneBlank(pushProjectId)) {
-    				ret = flowPushLogService.queryDistributeFundRecord(pushProjectId);
+    				ret = flowPushLogService.queryDistributeFundRecord(map);
     			}
     		}
-    	}else {
-    		ret = flowPushLogService.queryDistributeFundRecord(projectId);
     	}
     	return Result.buildSuccess(ret);
     }
@@ -1071,11 +1069,9 @@ public class CamsFlowController {
     		for(Map<String,Object> map:listProjs) {
     			String pushProjectId = map.get("project_id").toString();
     			if(StringUtils.isNoneBlank(pushProjectId)) {
-    				ret = flowPushLogService.pullAdvanceRepayInfo(pushProjectId);
+    				ret = flowPushLogService.pullAdvanceRepayInfo(map);
     			}
     		}
-    	}else {
-    		ret = flowPushLogService.pullAdvanceRepayInfo(projectId);
     	}
     	return Result.buildSuccess(ret);
     }
