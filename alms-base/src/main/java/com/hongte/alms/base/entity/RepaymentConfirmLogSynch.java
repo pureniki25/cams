@@ -8,6 +8,11 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+
+import cn.afterturn.easypoi.excel.annotation.Excel;
+import cn.afterturn.easypoi.excel.annotation.ExcelIgnore;
+import cn.afterturn.easypoi.excel.annotation.ExcelTarget;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,160 +26,200 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @ApiModel
 @TableName("tb_repayment_confirm_log_synch")
+@ExcelTarget("RepaymentConfirmLogSynch")
 public class RepaymentConfirmLogSynch extends Model<RepaymentConfirmLogSynch> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId("confirm_log_id")
 	@ApiModelProperty(required= true,value = "")
+    @ExcelIgnore
 	private String confirmLogId;
 	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="业务编号")
 	private String businessId;
 	@TableField("org_business_id")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private String orgBusinessId;
 	@TableField("after_id")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="期数")
 	private String afterId;
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private Integer period;
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private Integer idx;
 	@TableField("can_revoke")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private Integer canRevoke;
 	@TableField("is_cancelled")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private Integer isCancelled;
 	@TableField("proj_plan_json")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private String projPlanJson;
 	@TableField("repay_date")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="实还日期",format="yyyy-MM-dd")
 	private Date repayDate;
 	@TableField("fact_amount")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="实还金额")
 	private BigDecimal factAmount;
 	@TableField("repay_source")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private Integer repaySource;
 	@TableField("surplus_amount")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="结余金额")
 	private BigDecimal surplusAmount;
 	@TableField("surplus_ref_id")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private String surplusRefId;
 	@TableField("surplus_use_ref_id")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private String surplusUseRefId;
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="财务确认日期",format="yyyy-MM-dd")
 	private Date createTime;
 	@TableField("create_user")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="操作人员")
 	private String createUser;
 	@TableField("update_time")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private Date updateTime;
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private String updateUser;
 	@TableField("create_user_name")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private String createUserName;
 	@TableField("last_push_status")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private Integer lastPushStatus;
 	@TableField("last_push_datetime")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private Date lastPushDatetime;
 	@TableField("last_push_remark")
 	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
 	private String lastPushRemark;
 	@TableField("ext_business_ctype")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="业务类型")
 	private String extBusinessCtype;
 	@TableField("ext_company_name")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="所属分公司")
 	private String extCompanyName;
 	@TableField("ext_customer_name")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="客户姓名")
 	private String extCustomerName;
 	@TableField("ext_platform")
 	@ApiModelProperty(required= true,value = "")
+	@Excel(name="所属投资端")
 	private String extPlatform;
     /**
      * 还款方式
      */
 	@TableField("ext_repay_type")
 	@ApiModelProperty(required= true,value = "还款方式")
+	@Excel(name="还款方式")
 	private String extRepayType;
     /**
      * 本金
      */
 	@TableField("ext_item10")
 	@ApiModelProperty(required= true,value = "本金")
+	@Excel(name="本金")
 	private BigDecimal extItem10;
     /**
      * 利息
      */
 	@TableField("ext_item20")
 	@ApiModelProperty(required= true,value = "利息")
+	@Excel(name="利息")
 	private BigDecimal extItem20;
     /**
      * 服务费
      */
 	@TableField("ext_item30")
 	@ApiModelProperty(required= true,value = "服务费")
+	@Excel(name="服务费")
 	private BigDecimal extItem30;
     /**
      * 平台费
      */
 	@TableField("ext_item50")
 	@ApiModelProperty(required= true,value = "平台费")
+	@Excel(name="平台费")
 	private BigDecimal extItem50;
     /**
      * 线上滞纳金
      */
 	@TableField("ext_item60online")
 	@ApiModelProperty(required= true,value = "线上滞纳金")
+	@Excel(name="线上滞纳金")
 	private BigDecimal extItem60online;
     /**
      * 线下滞纳金
      */
 	@TableField("ext_item60offline")
 	@ApiModelProperty(required= true,value = "线下滞纳金")
+	@Excel(name="线下滞纳金")
 	private BigDecimal extItem60offline;
     /**
      * 本金违约金
      */
 	@TableField("ext_item70_bj")
 	@ApiModelProperty(required= true,value = "本金违约金")
+	@Excel(name="本金违约金")
 	private BigDecimal extItem70Bj;
     /**
      * 平台违约金
      */
 	@TableField("ext_item70_pt")
 	@ApiModelProperty(required= true,value = "平台违约金")
+	@Excel(name="平台违约金")
 	private BigDecimal extItem70Pt;
     /**
      * 服务费违约金
      */
 	@TableField("ext_item70_fw")
 	@ApiModelProperty(required= true,value = "服务费违约金")
+	@Excel(name="服务费违约金")
 	private BigDecimal extItem70Fw;
     /**
      * 其他费用合计
      */
 	@TableField("ext_other_fee")
 	@ApiModelProperty(required= true,value = "其他费用合计")
+	@Excel(name="其他费用合计")
 	private BigDecimal extOtherFee;
     /**
      * 备注
      */
 	@TableField("ext_remark")
 	@ApiModelProperty(required= true,value = "备注")
+	@Excel(name="备注")
 	private String extRemark;
 
 
