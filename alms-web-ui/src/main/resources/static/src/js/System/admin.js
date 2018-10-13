@@ -35,7 +35,10 @@ window.layinit(function (htConfig) {
            autoRepayLoading:false,
            tdrepyChargeLoading:false,	// 合规化还款加载标识
            retryRepaymentLoading:false,	// 重试平台还款接口加载标识
+           alsoToPayOneProjectPaying:false, //还垫付执行标志位
 		   // --- 按钮控制标识 end---
+
+
 
 		   onePListCollogBId:"",
            onePListCollogAfterId:"",
@@ -64,10 +67,34 @@ window.layinit(function (htConfig) {
            logId:"",
 
            //需移交法务的业务id
-           toLawBusinessId:''
+           toLawBusinessId:'',
+
+           // 还垫付标的Id
+           alsoToPayProjectId:"",
+           //还垫付期数Id
+           alsoToPayAfterId:""
 
 	   },
 	   methods: {
+	       //指定标的，指定期数还垫付触发按钮
+           alsoToPayOneProjectPayClick:function(){
+               this.alsoToPayOneProjectPaying = true;
+               axios.get(platRepayBasePath +"tdrepayRecharge/alsoToPayOneProject?alsoToPayProjectId="+vm.alsoToPayProjectId+"&alsoToPayAfterId="+vm.alsoToPayAfterId,{timeout: 0})
+                   .then(function (res) {
+                       vm.alsoToPayOneProjectPaying = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.alsoToPayOneProjectPaying = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
 	       //推送指定业务的还款计划到信贷
            pushOneBizRepayPlanToXD:function(){
                this.oneRepayPlanPushing = true;
