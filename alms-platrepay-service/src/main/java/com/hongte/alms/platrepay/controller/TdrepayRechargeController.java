@@ -1235,7 +1235,7 @@ public class TdrepayRechargeController {
 							penaltyAmount = guaranteePayment.getPenaltyAmount() == null ? penaltyAmount
 									: guaranteePayment.getPenaltyAmount();
 							// 若担保公司垫付了滞纳金，则需要将滞纳金计算到本息上
-							if (BigDecimal.ZERO.compareTo(penaltyAmount) > 0) {
+							if (BigDecimal.ZERO.compareTo(penaltyAmount) <= 0) {
 								principalAndInterest = principalAndInterest.add(penaltyAmount);
 							}
 							tuandaiAmount = guaranteePayment.getTuandaiAmount() == null ? tuandaiAmount
@@ -1290,7 +1290,7 @@ public class TdrepayRechargeController {
 			arbitrationAmount3 = arbitrationAmount.subtract(arbitrationAmount2);
 			totalAmount = totalAmount.add(arbitrationAmount3);
 
-			if (BigDecimal.ZERO.compareTo(totalAmount) < 1) {
+			if (BigDecimal.ZERO.compareTo(totalAmount) >= 0) {
 				throw new ServiceRuntimeException(
 						"标的号：" + projectId + "，在平台期数：" + period + "没有未还垫付记录。totalAmount = " + totalAmount);
 			}
@@ -1331,6 +1331,27 @@ public class TdrepayRechargeController {
 						advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
 								orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
 					}else {
+						if (aviMoney.compareTo(principalAndInterest3) > 0) {
+							aviMoney = aviMoney.subtract(principalAndInterest3);
+							if (aviMoney.compareTo(tuandaiAmount3) > 0) {
+								aviMoney = aviMoney.subtract(tuandaiAmount3);
+								if (aviMoney.compareTo(guaranteeAmount3) > 0) {
+									orgAmount3 = aviMoney.subtract(guaranteeAmount3);
+								}else {
+									guaranteeAmount3 = aviMoney;
+									orgAmount3 = BigDecimal.ZERO;
+								}
+							}else {
+								tuandaiAmount3 = aviMoney;
+								guaranteeAmount3 = BigDecimal.ZERO;
+								orgAmount3 = BigDecimal.ZERO;
+							}
+						}else {
+							principalAndInterest3 = aviMoney;
+							tuandaiAmount3 = BigDecimal.ZERO;
+							guaranteeAmount3 = BigDecimal.ZERO;
+							orgAmount3 = BigDecimal.ZERO;
+						}
 						advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
 								orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 0);
 					}
@@ -1343,6 +1364,27 @@ public class TdrepayRechargeController {
 					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
 							orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
 				}else {
+					if (aviMoney.compareTo(principalAndInterest3) > 0) {
+						aviMoney = aviMoney.subtract(principalAndInterest3);
+						if (aviMoney.compareTo(tuandaiAmount3) > 0) {
+							aviMoney = aviMoney.subtract(tuandaiAmount3);
+							if (aviMoney.compareTo(guaranteeAmount3) > 0) {
+								orgAmount3 = aviMoney.subtract(guaranteeAmount3);
+							}else {
+								guaranteeAmount3 = aviMoney;
+								orgAmount3 = BigDecimal.ZERO;
+							}
+						}else {
+							tuandaiAmount3 = aviMoney;
+							guaranteeAmount3 = BigDecimal.ZERO;
+							orgAmount3 = BigDecimal.ZERO;
+						}
+					}else {
+						principalAndInterest3 = aviMoney;
+						tuandaiAmount3 = BigDecimal.ZERO;
+						guaranteeAmount3 = BigDecimal.ZERO;
+						orgAmount3 = BigDecimal.ZERO;
+					}
 					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
 							orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 0);
 				}
@@ -1380,6 +1422,7 @@ public class TdrepayRechargeController {
 		paramDTO.setOrgAmount(orgAmount3);
 		paramDTO.setGuaranteeAmount(guaranteeAmount3);
 		paramDTO.setArbitrationAmount(arbitrationAmount3);
+		paramDTO.setOrgType(BusinessTypeEnum.getOrgTypeByValue(tdrepayRechargeLog.getBusinessType()));
 		paramDTO.setStatus(status);
 
 		// 第三方接口调用日志
@@ -1413,6 +1456,7 @@ public class TdrepayRechargeController {
 		tdrepayRechargeLog.setUpdateTime(new Date());
 		tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
 		tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+		issueSendOutsideLogService.insert(issueSendOutsideLog);
 	}
 	
 	/**
@@ -1424,17 +1468,17 @@ public class TdrepayRechargeController {
 	private BigDecimal queryUserAviMoney(String tdUserId) {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userId", tdUserId);
-		LOG.info("查询用户账户余额/eip/xiaodai/QueryUserAviMoney参数信息，{}", paramMap);
-		com.ht.ussp.core.Result resultUserAviMoney = eipRemote.queryUserAviMoney(paramMap); // 查询用户余额
-		LOG.info("查询用户账户余额/eip/xiaodai/QueryUserAviMoney返回信息，{}", resultUserAviMoney);
+		LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet参数信息，{}", paramMap);
+		com.ht.ussp.core.Result result = eipRemote.queryUserAviMoneyForNet(paramMap);
+		LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet返回信息，{}", result);
 		
-		if (resultUserAviMoney != null
-				&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(resultUserAviMoney.getReturnCode())
-				&& resultUserAviMoney.getData() != null) {
-			Map map = JSONObject.parseObject(JSONObject.toJSONString(resultUserAviMoney.getData()),
+		if (result != null
+				&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+				&& result.getData() != null) {
+			Map map = JSONObject.parseObject(JSONObject.toJSONString(result.getData()),
 					Map.class);
 			if (map != null) {
-				return map.get("aviMoney") == null ? BigDecimal.ZERO : new BigDecimal((String)map.get("aviMoney"));
+				return map.get("AviMoney") == null ? BigDecimal.ZERO : (BigDecimal) map.get("AviMoney");
 			}
 		}
 		return BigDecimal.ZERO;
