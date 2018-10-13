@@ -676,7 +676,7 @@ public class PlatformRepaymentController {
 				if (sysApiCallFailureRecord.getRetrySuccess() == 1) {
 					continue;
 				}
-				paramMap.put("refId", sysApiCallFailureRecord.getRefId());
+				paramMap.put("projPlanListId", sysApiCallFailureRecord.getRefId());
 				Result result = repayment(paramMap);
 				SysApiCallFailureRecord record = new SysApiCallFailureRecord();
 				record.setApiCode(sysApiCallFailureRecord.getApiCode());
