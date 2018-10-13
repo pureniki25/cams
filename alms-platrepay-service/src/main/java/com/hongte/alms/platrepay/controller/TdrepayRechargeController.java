@@ -1291,8 +1291,10 @@ public class TdrepayRechargeController {
 			totalAmount = totalAmount.add(arbitrationAmount3);
 
 			if (totalAmount.compareTo(BigDecimal.ZERO) < 1) {
+				
 				throw new ServiceRuntimeException(
 						"标的号：" + projectId + "，在平台期数：" + period + "没有未还垫付记录。totalAmount = " + totalAmount);
+				
 			}
 
 			/*
