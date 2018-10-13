@@ -1109,7 +1109,7 @@ public class TdrepayRechargeController {
 				return Result.error("-99", "标ID和afterId不能为空");
 			}
 
-			Integer[] arrStatus = { 0, 3 };
+			Integer[] arrStatus = { 0, 3, 4 };
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
 					.selectList(new EntityWrapper<TdrepayRechargeLog>()
 							.in("status", arrStatus)
@@ -1143,7 +1143,7 @@ public class TdrepayRechargeController {
 	@ResponseBody
 	public Result advanceShareProfit() {
 		// 1、查出所有偿还垫付失败和未偿还垫付的数据
-		Integer[] arrStatus = { 0, 3 };
+		Integer[] arrStatus = { 0, 3, 4 };
 		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
 				.selectList(new EntityWrapper<TdrepayRechargeLog>().in("status", arrStatus).eq("is_valid", 1).eq("process_status", 2));
 
@@ -1453,7 +1453,7 @@ public class TdrepayRechargeController {
 			com.ht.ussp.core.Result advanceShareProfitResult = eipRemote.returnAdvanceShareProfit(paramMap); // 还垫付信息
 			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}", advanceShareProfitResult);
 
-			int logStatus = 3;
+			int logStatus = 4;
 			
 			if (advanceShareProfitResult != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(advanceShareProfitResult.getReturnCode())
 					&& advanceShareProfitResult.getData() != null) {
@@ -1469,10 +1469,10 @@ public class TdrepayRechargeController {
 									logStatus = 2;
 								}
 							}
+						}else {
+							logStatus = 4;
 						}
 					}
-			}else {
-				logStatus = 4;
 			}
 			tdrepayRechargeLog.setStatus(logStatus);
 			tdrepayRechargeLog.setRemark(result.getCodeDesc());
