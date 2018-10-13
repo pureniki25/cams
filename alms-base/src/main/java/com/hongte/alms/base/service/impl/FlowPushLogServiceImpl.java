@@ -168,7 +168,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    			 //期数
 	    			 int period = Integer.parseInt(map.get("period").toString());
 	    			 
-	    			 if(!periodQueryParam.equals(period)) {
+	    			 if(!periodQueryParam.equals(period+"")) {
 	    				 continue;
 	    			 }
 	    			 
@@ -1286,7 +1286,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    			 RepaymentAdvanceRepayFlow repaymentAdvanceRepayFlow = new RepaymentAdvanceRepayFlow();
 	    			 //期数
 	    			 int period = Integer.parseInt(map.get("period").toString());
-	    			 if(!periodQueryParam.equals(period)) {
+	    			 if(!periodQueryParam.equals(period+"")) {
 	    				 continue;
 	    			 }
 	    			 //还款日期 格式：yyyy-MM-dd HH:mm:ss
