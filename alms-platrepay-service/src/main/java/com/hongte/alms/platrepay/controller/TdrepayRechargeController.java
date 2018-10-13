@@ -45,6 +45,7 @@ import com.hongte.alms.base.entity.IssueSendOutsideLog;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.SysUserRole;
+import com.hongte.alms.base.entity.TdrepayAdvanceLog;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BankEnum;
@@ -56,6 +57,7 @@ import com.hongte.alms.base.service.BasicCompanyService;
 import com.hongte.alms.base.service.IssueSendOutsideLogService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.SysUserRoleService;
+import com.hongte.alms.base.service.TdrepayAdvanceLogService;
 import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeService;
 import com.hongte.alms.base.service.TuandaiProjectInfoService;
@@ -123,6 +125,10 @@ public class TdrepayRechargeController {
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
 	private AgencyRechargeLogService agencyRechargeLogService;
+	
+	@Autowired
+	@Qualifier("TdrepayAdvanceLogService")
+	private TdrepayAdvanceLogService tdrepayAdvanceLogService;
 
 	@Autowired
 	@Qualifier("SysUserRoleService")
@@ -1440,6 +1446,20 @@ public class TdrepayRechargeController {
 		issueSendOutsideLog.setInterfacename(Constant.INTERFACE_NAME_ADVANCE_SHARE_PROFIT);
 		issueSendOutsideLog.setSystem(Constant.SYSTEM_CODE_EIP);
 		issueSendOutsideLog.setSendKey(projectId);
+		
+		// 偿还垫付记录
+		TdrepayAdvanceLog tdrepayAdvanceLog = new TdrepayAdvanceLog();
+		tdrepayAdvanceLog.setProjectId(projectId);
+		tdrepayAdvanceLog.setPeriod(period);
+		tdrepayAdvanceLog.setStatus(status);
+		tdrepayAdvanceLog.setTotalAmount(totalAmount);
+		tdrepayAdvanceLog.setPrincipalAndInterest(principalAndInterest3);
+		tdrepayAdvanceLog.setTuandaiAmount(tuandaiAmount3);
+		tdrepayAdvanceLog.setOrgAmount(orgAmount3);
+		tdrepayAdvanceLog.setGuaranteeAmount(guaranteeAmount3);
+		tdrepayAdvanceLog.setArbitrationAmount(arbitrationAmount3);
+		tdrepayAdvanceLog.setCreateTime(new Date());
+		tdrepayAdvanceLog.setCreateUser(loginUserInfoHelper.getUserId());
 
 		// 调用偿还垫付接口
 		LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit参数信息，{}", paramDTO);
@@ -1476,6 +1496,11 @@ public class TdrepayRechargeController {
 						}
 					}
 			}
+			if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+				tdrepayAdvanceLog.setAdvanceStatus(1);
+			}else {
+				tdrepayAdvanceLog.setAdvanceStatus(2);
+			}
 			tdrepayRechargeLog.setStatus(logStatus);
 			tdrepayRechargeLog.setRemark(result.getCodeDesc());
 		} else {
@@ -1486,6 +1511,7 @@ public class TdrepayRechargeController {
 		tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
 		tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
 		issueSendOutsideLogService.insert(issueSendOutsideLog);
+		tdrepayAdvanceLogService.insert(tdrepayAdvanceLog);
 	}
 	
 	/**
