@@ -1333,6 +1333,7 @@ public class TdrepayRechargeController {
 						advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
 								orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
 					}else {
+						totalAmount = aviMoney;
 						if (aviMoney.compareTo(principalAndInterest3) > 0) {
 							aviMoney = aviMoney.subtract(principalAndInterest3);
 							if (aviMoney.compareTo(tuandaiAmount3) > 0) {
@@ -1366,6 +1367,7 @@ public class TdrepayRechargeController {
 					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
 							orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
 				}else {
+					totalAmount = aviMoney;
 					if (aviMoney.compareTo(principalAndInterest3) > 0) {
 						aviMoney = aviMoney.subtract(principalAndInterest3);
 						if (aviMoney.compareTo(tuandaiAmount3) > 0) {
