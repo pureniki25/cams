@@ -20,10 +20,10 @@ public class VersionAdapter {
 	final String ALMS_CORE_SERVICE = "(finance)0929 14:06" ;
 	final String ALMS_FINANCE_SERVICE = "(finance)0929 21:40" ;
 	final String ALMS_OPEN_SERVICE = "0913" ;
-	final String ALMS_PLATREPAY_SERVICE = "092710:26:27" ;
+	final String ALMS_PLATREPAY_SERVICE = "（PRDbug）1013 19:40" ;
 	final String ALMS_SCHEDULED_SERVICE = "(ALMS-finance)0929 16:50" ;
 
-	final String ALMS_WEBUI = "(finance)2018-09-13 11:33" ; 
+	final String ALMS_WEBUI = "（PRDbug）1013 19:40" ; 
 	final String ALMS_WITHHOLD_SERVICE = "(finance)0926 22:16" ;
 	
 	@RequestMapping("/version")
