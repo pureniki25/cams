@@ -1444,16 +1444,42 @@ public class TdrepayRechargeController {
 		LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit返回信息，{}", result);
 
 		issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("projectId", projectId);
+		LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit参数信息，{}", paramMap);
+		com.ht.ussp.core.Result advanceShareProfitResult = eipRemote.returnAdvanceShareProfit(paramMap); // 还垫付信息
+		LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}", advanceShareProfitResult);
 
+		int logStatus = 3;
+		
+		if (advanceShareProfitResult != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(advanceShareProfitResult.getReturnCode())
+				&& advanceShareProfitResult.getData() != null) {
+				JSONObject parseObject = (JSONObject) JSONObject.toJSON(advanceShareProfitResult.getData());
+				if (parseObject.get("returnAdvanceShareProfits") != null) {
+					List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = JSONObject.parseArray(
+							JSONObject.toJSONString(parseObject.get("returnAdvanceShareProfits")),
+							TdReturnAdvanceShareProfitDTO.class);
+					if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
+						for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
+							if (tdReturnAdvanceShareProfitDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()
+									&& tdReturnAdvanceShareProfitDTO.getStatus() == 1) {
+								logStatus = 2;
+							}
+						}
+					}
+				}
+		}
+		
 		if (result != null) {
 			tdrepayRechargeLog.setRemark(result.getCodeDesc());
 			if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
-				tdrepayRechargeLog.setStatus(2);
+				tdrepayRechargeLog.setStatus(logStatus);
 			} else {
-				tdrepayRechargeLog.setStatus(3);
+				tdrepayRechargeLog.setStatus(logStatus);
 			}
 		} else {
-			tdrepayRechargeLog.setStatus(3);
+			tdrepayRechargeLog.setStatus(logStatus);
 			tdrepayRechargeLog.setRemark("eip偿还垫付接口调用异常");
 		}
 		tdrepayRechargeLog.setUpdateTime(new Date());
