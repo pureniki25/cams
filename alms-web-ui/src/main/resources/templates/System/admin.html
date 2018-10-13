@@ -246,6 +246,13 @@
 				<i-span v-else>执行中...</i-span>
 			</i-button>
 		</div>
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>偿还垫付：</i-lable>
+			<i-button :loading="advanceShareProfitLoading" @click="advanceShareProfit">
+				<i-span v-if="!advanceShareProfitLoading">执行</i-span>
+				<i-span v-else>执行中...</i-span>
+			</i-button>
+		</div>
 
 	</div>
 

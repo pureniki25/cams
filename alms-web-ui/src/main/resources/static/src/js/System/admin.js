@@ -36,6 +36,7 @@ window.layinit(function (htConfig) {
            tdrepyChargeLoading:false,	// 合规化还款加载标识
            retryRepaymentLoading:false,	// 重试平台还款接口加载标识
            alsoToPayOneProjectPaying:false, //还垫付执行标志位
+           advanceShareProfitLoading:false, // 偿还垫付处理状态
 		   // --- 按钮控制标识 end---
 
 
@@ -454,6 +455,21 @@ window.layinit(function (htConfig) {
         	   })
         	   .catch(function (error) {
         		   vm.retryRepaymentLoading = false;
+        		   vm.$Modal.error({content: '接口调用异常!'});
+        	   });
+           },
+           // 偿还垫付
+           advanceShareProfit:function(){
+        	   this.advanceShareProfitLoading = true;
+        	   axios.get(platRepayBasePath +"tdrepayRecharge/advanceShareProfit")
+        	   .then(function (res) {
+        		   vm.advanceShareProfitLoading = false;
+        		   vm.$Modal.success({
+        			   content: res.data.msg
+        		   });
+        	   })
+        	   .catch(function (error) {
+        		   vm.advanceShareProfitLoading = false;
         		   vm.$Modal.error({content: '接口调用异常!'});
         	   });
            },
