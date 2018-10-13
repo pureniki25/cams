@@ -227,7 +227,6 @@ public class TdrepayRechargeController {
 			LOG.error(e.getMessage(), e);
 			return Result.error("-500", "系统异常，接口调用失败");
 		}
-
 		return Result.success();
 	}
 
