@@ -1120,7 +1120,6 @@ public class TdrepayRechargeController {
 
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 
-
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					oneLogAdvanceShareProfit(tdrepayRechargeLog);
 				}
@@ -1153,7 +1152,11 @@ public class TdrepayRechargeController {
 			
 			
 			for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
-				oneLogAdvanceShareProfit(tdrepayRechargeLog);
+				try {
+					oneLogAdvanceShareProfit(tdrepayRechargeLog);
+				} catch (Exception e) {
+					LOG.error(e.getMessage(), e);
+				}
 			}
 		}
 		return Result.success();
@@ -1287,20 +1290,23 @@ public class TdrepayRechargeController {
 			arbitrationAmount3 = arbitrationAmount.subtract(arbitrationAmount2);
 			totalAmount = totalAmount.add(arbitrationAmount3);
 
-			BigDecimal aviMoney = null;
+			if (BigDecimal.ZERO.compareTo(totalAmount) < 1) {
+				throw new ServiceRuntimeException(
+						"标的号：" + projectId + "，在平台期数：" + period + "没有未还垫付记录。totalAmount = " + totalAmount);
+			}
 
-					/*
-					 *  6、根据 tdUserId 查询存管账户余额, 比较应还垫付总额与客户存管账户余额记录
-					 *   a.若是主借标，则只查询主借款人账户余额；
-					 *   b.若是共借标：
-					 *   	若共借人存管账户余额若大于或等于应还垫付总额，则传结清状态给平台，调用偿还垫付接口
-					 *   	若共借人存管账户余额若小于应还垫付总额，则还需查询主借人存管账户余额：
-					 *   		若主、共借人存管账户余额之和大于或等于应还垫付总额，则传结清状态给平台，调用偿还垫付接口
-					 *   		若主、共借人存管账户余额之和小于应还垫付总额，则传结非清状态给平台，调用偿还垫付接口
-					 */
+			/*
+			 *  6、根据 tdUserId 查询存管账户余额, 比较应还垫付总额与客户存管账户余额记录
+			 *   a.若是主借标，则只查询主借款人账户余额；
+			 *   b.若是共借标：
+			 *   	若共借人存管账户余额若大于或等于应还垫付总额，则传结清状态给平台，调用偿还垫付接口
+			 *   	若共借人存管账户余额若小于应还垫付总额，则还需查询主借人存管账户余额：
+			 *   		若主、共借人存管账户余额之和大于或等于应还垫付总额，则传结清状态给平台，调用偿还垫付接口
+			 *   		若主、共借人存管账户余额之和小于应还垫付总额，则传结非清状态给平台，调用偿还垫付接口
+			 */
 
 			// 查询客户存管账户余额
-			aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
+			BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
 
 			Set<Integer> businessTypes = new HashSet<>();
 			businessTypes.add(28);	// 商贸贷共借
@@ -1343,7 +1349,7 @@ public class TdrepayRechargeController {
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return Result.error("-99",e.getMessage());
+			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 		return  Result.success();
 	}
