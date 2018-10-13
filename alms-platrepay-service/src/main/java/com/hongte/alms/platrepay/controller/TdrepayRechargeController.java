@@ -1290,7 +1290,7 @@ public class TdrepayRechargeController {
 			arbitrationAmount3 = arbitrationAmount.subtract(arbitrationAmount2);
 			totalAmount = totalAmount.add(arbitrationAmount3);
 
-			if (BigDecimal.ZERO.compareTo(totalAmount) < 1) {
+			if (totalAmount.compareTo(BigDecimal.ZERO) < 1) {
 				throw new ServiceRuntimeException(
 						"标的号：" + projectId + "，在平台期数：" + period + "没有未还垫付记录。totalAmount = " + totalAmount);
 			}
@@ -1441,6 +1441,9 @@ public class TdrepayRechargeController {
 	}
 
 	public static void main(String[] args) throws Exception {
+
+
+
 		FileInputStream inStream = new FileInputStream(
 				new File("C:\\Users\\Administrator\\Desktop\\ALMS_source_data.json"));
 
@@ -1482,3 +1485,4 @@ public class TdrepayRechargeController {
 	}
 
 }
+
