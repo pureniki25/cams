@@ -33,6 +33,8 @@ import cn.afterturn.easypoi.entity.vo.NormalExcelConstants;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import cn.afterturn.easypoi.view.PoiBaseView;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * <p>
@@ -44,6 +46,7 @@ import cn.afterturn.easypoi.view.PoiBaseView;
  */
 @Controller
 @RequestMapping("/factRepay")
+@Api(tags = "RepaymentConfirmLogSynchController", description = "实还记录")
 public class RepaymentConfirmLogSynchController {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(RepaymentConfirmLogSynchController.class);
@@ -57,6 +60,7 @@ public class RepaymentConfirmLogSynchController {
 	
 	@PostMapping("/list")
 	@ResponseBody
+	@ApiOperation(value = "获取实还纪录")
 	public Page<RepaymentConfirmLogSynch> list (@RequestBody FactRepayReq req){
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("@factRepay@list--开始{}",JSON.toJSONString(req));
@@ -65,6 +69,7 @@ public class RepaymentConfirmLogSynchController {
 	}
 	
 	@RequestMapping("/export")
+	@ApiOperation(value = "导出实还纪录")
     public void download(ModelMap modelMap ,@RequestBody FactRepayReq req ,  HttpServletRequest request,HttpServletResponse response) {
 		req.setCurPage(0);
         List<RepaymentConfirmLogSynch> repaymentConfirmLogSynchs = synchService.select(req);
@@ -81,6 +86,7 @@ public class RepaymentConfirmLogSynchController {
 	
 	@RequestMapping("/synch")
 	@ResponseBody
+	@ApiOperation(value = "同步实还纪录")
 	public Result synch() {
 		msgThreadAsync.execute(new Runnable() {
 			@Override
