@@ -230,6 +230,19 @@
 			</i-button>
 			（注：若填写标的期数ID，则重试当期；否则重发全部未成功数据）
 		</div>
+		<div style="margin-top:10px; margin-left:10px">
+			<i-lable>推送指定期数的资金分发数据：</i-lable>
+			标的期数ID：
+			<div class="layui-inline">
+				<input v-model="rechargeRepaymentProjPlanListId" class="layui-input" name="id" id="rechargeRepaymentProjPlanListId">
+			</div>
+			<i-button :loading="rechargeRepaymentLoading" @click="rechargerRepayment">
+				<i-span v-if="!rechargeRepaymentLoading">执行</i-span>
+				<i-span v-else>执行中...</i-span>
+			</i-button>
+			（注：需确定确实没有资金分发数据才能触发推送，否则会重复推送）
+		</div>
+
 
 		<div style="margin-top:10px; margin-left:10px">
 			<i-lable>指定标的指定期数还垫付：</i-lable>
