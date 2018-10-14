@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,6 +26,7 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.dto.FactRepayReq;
 import com.hongte.alms.base.entity.RepaymentConfirmLogSynch;
 import com.hongte.alms.base.service.RepaymentConfirmLogSynchService;
+import com.hongte.alms.common.result.Result;
 
 import cn.afterturn.easypoi.entity.vo.MapExcelConstants;
 import cn.afterturn.easypoi.entity.vo.NormalExcelConstants;
@@ -50,6 +52,9 @@ public class RepaymentConfirmLogSynchController {
 	@Qualifier("RepaymentConfirmLogSynchService")
 	private RepaymentConfirmLogSynchService synchService ;
 	
+	@Autowired
+    private Executor msgThreadAsync;
+	
 	@PostMapping("/list")
 	@ResponseBody
 	public Page<RepaymentConfirmLogSynch> list (@RequestBody FactRepayReq req){
@@ -60,14 +65,10 @@ public class RepaymentConfirmLogSynchController {
 	}
 	
 	@RequestMapping("/export")
-    public void download(ModelMap modelMap , HttpServletRequest request,HttpServletResponse response) {
-		FactRepayReq req = new FactRepayReq() ;
+    public void download(ModelMap modelMap ,@RequestBody FactRepayReq req ,  HttpServletRequest request,HttpServletResponse response) {
 		req.setCurPage(0);
         List<RepaymentConfirmLogSynch> repaymentConfirmLogSynchs = synchService.select(req);
-
-        
         ExportParams params = new ExportParams("导出文件", "测试", ExcelType.XSSF);
-        
         modelMap.put(NormalExcelConstants.DATA_LIST, repaymentConfirmLogSynchs); 
         modelMap.put(NormalExcelConstants.CLASS, RepaymentConfirmLogSynch.class);
         modelMap.put(NormalExcelConstants.PARAMS, params);//参数
@@ -77,5 +78,17 @@ public class RepaymentConfirmLogSynchController {
 //        return MapExcelConstants.EASYPOI_MAP_EXCEL_VIEW;//View名称
 
     }
+	
+	@RequestMapping("/synch")
+	@ResponseBody
+	public Result synch() {
+		msgThreadAsync.execute(new Runnable() {
+			@Override
+			public void run() {
+				int synch = synchService.synch() ;
+			}
+		});
+		return Result.success();
+	}
 }
 

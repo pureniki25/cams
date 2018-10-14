@@ -162,7 +162,9 @@
 		s.`plan_id` = l.`plan_id`,
 		s.`create_time` =
 		l.`create_time`,
-		s.`create_user` = l.`create_user`,
+		s.`create_user` = (
+			SELECT user_name from tb_sys_user where user_id = l.`create_user` limit 1 
+		),
 		s.`update_time` =
 		l.`update_time`,
 		s.`update_user` = l.`update_user`,
@@ -447,29 +449,29 @@
 		FROM
 		tb_repayment_confirm_log_synch s
 		WHERE 1=1 
-		<if test="req.key != null ">
-			and ( s.business_id like '#{req.key}' or s.ext_customer_name like '#{req.key}%' )
+		<if test="req.key != null and req.key neq '' ">
+			and ( s.business_id like '${req.key}%' or s.ext_customer_name like '${req.key}%' )
 		</if>
-		<if test="req.repayType != null and req.repayType neq '混合代扣' ">
+		<if test="req.repayType != null and req.repayType neq ''  and req.repayType neq '混合代扣' ">
 			and s.ext_repay_type = #{req.repayType}
 		</if>
-		<if test="req.confirmStart != null">
+		<if test="req.confirmStart != null and req.confirmStart neq '' ">
 			and #{req.confirmStart} &lt;= DATE(s.create_time)
 		</if>
-		<if test="req.confirmEnd != null">
+		<if test="req.confirmEnd != null and req.confirmEnd neq ''">
 			and #{req.confirmEnd} &gt;= DATE(s.create_time)
 		</if>
-		<if test="req.companyId != null">
+		<if test="req.companyId != null and req.companyId neq ''">
 			and #{req.companyId} = s.ext_company_name
 		</if>
-		<if test="req.businessType != null">
+		<if test="req.businessType != null and req.businessType neq ''">
 			and #{req.businessType} = s.ext_business_ctype
 		</if>
-		<if test="req.srcType != null">
+		<if test="req.srcType != null and req.srcType neq ''">
 			and #{req.srcType} = s.ext_platform
 		</if>
 		GROUP BY s.business_id,s.after_id, DATE( s.create_time ) 
-		<if test="req.repayType != null and req.repayType eq '混合代扣' ">
+		<if test="req.repayType != null and req.srcType neq '' and req.repayType eq '混合代扣' ">
 			HAVING count( DISTINCT s.ext_repay_type ) > 1
 		</if>
 		) temp
@@ -480,34 +482,34 @@
 		SELECT
 		<include refid="Base_Column_List"></include>
 		FROM
-		tb_repayment_confirm_log_synch 
+		tb_repayment_confirm_log_synch s
 		WHERE 1=1 
-		<if test="req.key != null ">
-			and ( business_id like '#{req.key}' or ext_customer_name like '#{req.key}%' )
+		<if test="req.key != null and req.key neq '' ">
+			and ( s.business_id like '${req.key}%' or s.ext_customer_name like '${req.key}%' )
 		</if>
-		<if test="req.repayType != null and req.repayType neq '混合代扣' ">
-			and ext_repay_type = #{req.repayType}
+		<if test="req.repayType != null and req.repayType neq ''  and req.repayType neq '混合代扣' ">
+			and s.ext_repay_type = #{req.repayType}
 		</if>
-		<if test="req.confirmStart != null">
-			and #{req.confirmStart} &lt;= DATE(create_time)
+		<if test="req.confirmStart != null and req.confirmStart neq '' ">
+			and #{req.confirmStart} &lt;= DATE(s.create_time)
 		</if>
-		<if test="req.confirmEnd != null">
-			and #{req.confirmEnd} &gt;= DATE(create_time)
+		<if test="req.confirmEnd != null and req.confirmEnd neq ''">
+			and #{req.confirmEnd} &gt;= DATE(s.create_time)
 		</if>
-		<if test="req.companyId != null">
-			and #{req.companyId} = ext_company_name
+		<if test="req.companyId != null and req.companyId neq ''">
+			and #{req.companyId} = s.ext_company_name
 		</if>
-		<if test="req.businessType != null">
-			and #{req.businessType} = ext_business_ctype
+		<if test="req.businessType != null and req.businessType neq ''">
+			and #{req.businessType} = s.ext_business_ctype
 		</if>
-		<if test="req.srcType != null">
-			and #{req.srcType} = ext_platform
+		<if test="req.srcType != null and req.srcType neq ''">
+			and #{req.srcType} = s.ext_platform
 		</if>
-		GROUP BY business_id,after_id, DATE( create_time ) 
-		<if test="req.repayType != null and req.repayType eq '混合代扣' ">
-			HAVING count( DISTINCT ext_repay_type ) > 1
+		GROUP BY s.business_id,s.after_id, DATE( s.create_time ) 
+		<if test="req.repayType != null and req.srcType neq '' and req.repayType eq '混合代扣' ">
+			HAVING count( DISTINCT s.ext_repay_type ) > 1
 		</if>
-		ORDER BY create_time 
+		ORDER BY s.create_time 
 		<if test="req.curPage != null and req.curPage != 0">
 			LIMIT ${(req.curPage-1)*req.pageSize} , ${req.pageSize}
 		</if>
