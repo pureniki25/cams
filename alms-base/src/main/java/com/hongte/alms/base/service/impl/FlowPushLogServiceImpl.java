@@ -128,7 +128,10 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowPushLogServiceImpl.class);
 	
 	@Override
-	public Result queryDistributeFundRecord(String projectId) {
+	public Result queryDistributeFundRecord(Map<String, Object> queryParam) {
+		String projectId = queryParam.get("project_id").toString();
+		String periodQueryParam = null == queryParam.get("period")?"":queryParam.get("period").toString();
+		
 		Result queryProjectPaymentResult = null;
 	    Result advanceShareProfitResult = null;
 	    
@@ -153,7 +156,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    	    	 RepaymentPlatformList repaymentPlatformList = null;
 	    	    	 RepaymentPlatformListBorrower repaymentPlatformListBorrower = null;
 	    	    	 RepaymentPlatformListGuarantee repaymentPlatformListGuarantee = null;
-	    			//还款状态1 已结清 0逾期
+	    			 //还款状态1 已结清 0逾期
 	    			 
 	    			 BigDecimal totalAmountRepay = new BigDecimal(0);
 	    			 BigDecimal totalAmountBorrower = new BigDecimal(0);
@@ -164,6 +167,11 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    			 repaymentPlatformList = new RepaymentPlatformList();
 	    			 //期数
 	    			 int period = Integer.parseInt(map.get("period").toString());
+	    			 
+	    			 if(!periodQueryParam.equals(period+"")) {
+	    				 continue;
+	    			 }
+	    			 
 	    			 //还款日期 yyyy-MM-dd
 	    			 String addDate =  map.get("addDate").toString();
 	    			 //实还总金额
@@ -1252,9 +1260,11 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	}
 
 	@Override
-	public Result pullAdvanceRepayInfo(String projectId) {
+	public Result pullAdvanceRepayInfo(Map<String, Object> queryParam) {
+		String projectId = queryParam.get("project_id").toString();
+		String periodQueryParam = null == queryParam.get("period")?"":queryParam.get("period").toString();
+		
 		Result advanceShareProfitResult = null;
-	    
 	    Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("projectId", projectId);
 		DistributeFundRecordVO distributeFundRecordVO = new DistributeFundRecordVO();
@@ -1276,6 +1286,9 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
 	    			 RepaymentAdvanceRepayFlow repaymentAdvanceRepayFlow = new RepaymentAdvanceRepayFlow();
 	    			 //期数
 	    			 int period = Integer.parseInt(map.get("period").toString());
+	    			 if(!periodQueryParam.equals(period+"")) {
+	    				 continue;
+	    			 }
 	    			 //还款日期 格式：yyyy-MM-dd HH:mm:ss
 	    			 String refundDate =  map.get("refundDate").toString();
 	    			 //还款状态1 已结清 0 未结清

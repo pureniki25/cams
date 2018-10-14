@@ -24,7 +24,7 @@
     </sql>
     
 	<select id="selectPushProjectList" resultType="map">
-		SELECT DISTINCT t1.project_id FROM tb_tdrepay_recharge_log t1 
+		SELECT DISTINCT t1.project_id,t1.after_id,t1.period FROM tb_tdrepay_recharge_log t1 
 		WHERE t1.process_status = 2 AND t1.project_id IS NOT NULL
     </select>
 </mapper>
