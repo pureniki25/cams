@@ -1006,7 +1006,7 @@
 		'' AS 'exhibition_id',
 		t1.recharge_amount AS 'amount',
 		'0' AS 'balance',
-		t1.td_user_id AS 'bank_card_no ',
+		t1.td_user_id AS 'bank_card_no',
 		'5' AS 'action_id',
 		0 AS 'in_out',
 		t1.create_user AS 'create_user',
