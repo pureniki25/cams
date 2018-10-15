@@ -95,8 +95,8 @@ public class RepaymentConfirmLogSynchController {
 		long end = System.currentTimeMillis();
 		JSONObject result = new JSONObject() ;
 		result.put("total", synch);
-		result.put("time", (end-synch)/1000 );
-		return Result.success(synch);
+		result.put("time", (end-synch)/1000 % 60 );
+		return Result.success(result);
 	}
 	
 	@RequestMapping("/synchForScheduled")
