@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public enum PlatformEnum implements IEnum {
 
-    YB_FORM(0,"易宝绑卡"),
+    YB_FORM(0,"易宝代扣"),
     YS_FORM(1,"银盛绑卡"),
     FY_FORM(2,"富友绑卡"),
     BF_FORM(3,"宝付代扣"),
