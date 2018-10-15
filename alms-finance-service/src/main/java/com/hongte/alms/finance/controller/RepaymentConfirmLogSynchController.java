@@ -22,11 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.dto.FactRepayReq;
 import com.hongte.alms.base.entity.RepaymentConfirmLogSynch;
 import com.hongte.alms.base.service.RepaymentConfirmLogSynchService;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
 
 import cn.afterturn.easypoi.entity.vo.MapExcelConstants;
 import cn.afterturn.easypoi.entity.vo.NormalExcelConstants;
@@ -88,6 +90,18 @@ public class RepaymentConfirmLogSynchController {
 	@ResponseBody
 	@ApiOperation(value = "同步实还纪录")
 	public Result synch() {
+		long start = System.currentTimeMillis();
+		int synch = synchService.synch() ;
+		long end = System.currentTimeMillis();
+		JSONObject result = new JSONObject() ;
+		result.put("total", synch);
+		result.put("time", (end-synch)/1000 );
+		return Result.success(synch);
+	}
+	
+	@RequestMapping("/synchForScheduled")
+	@ResponseBody
+	public Result synchForScheduled() {
 		msgThreadAsync.execute(new Runnable() {
 			@Override
 			public void run() {

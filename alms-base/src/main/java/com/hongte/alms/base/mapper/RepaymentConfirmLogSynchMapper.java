@@ -18,6 +18,8 @@ import com.hongte.alms.common.mapper.SuperMapper;
  */
 public interface RepaymentConfirmLogSynchMapper extends SuperMapper<RepaymentConfirmLogSynch> {
 
+	public int countNeedSynch();
+	
 	public int addRepaymentConfirmLogSynch();
 
 	public int updateRepaymentConfirmLog();
