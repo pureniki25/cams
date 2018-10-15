@@ -425,24 +425,43 @@ public class CamsFlowController {
             	
             	int retryTimes = 0;
             	String retStr = "";
-            	while(retryTimes < 3) {
+            	//while(retryTimes < 3) {
             		try {
+            			
+            			TdrepayRechargeLog tdrepayRechargeLogNew = tdrepayRechargeLogService.selectById(batchId);
+                		int newStatus = tdrepayRechargeLogNew.getLastPushStatus();
+            			if(newStatus == 1 || newStatus == 4) {
+            				LOGGER.error("该流水已推送过"+batchId); 
+            				return;
+            			}
+            			
                 		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
-                		System.err.println(JSON.toJSONString(camsMessage));
-                    	System.err.println(JSONObject.toJSONString(ret));
+                		LOGGER.debug(JSON.toJSONString(camsMessage));
+                		LOGGER.debug(JSONObject.toJSONString(ret));
                     	retStr = JSON.toJSONString(ret);
-                		break;//跳出循环
+                    	
+                    	tdrepayRechargeLog.setLastPushStatus(1);
+                    	tdrepayRechargeLog.setLastPushRemark(retStr);
+                		flowPushLog.setPushStatus(1);
+                		//break;//跳出循环
             		} catch (Exception e) {
+            			tdrepayRechargeLog.setLastPushStatus(2);
+            			tdrepayRechargeLog.setLastPushRemark(retStr);
+                		flowPushLog.setPushStatus(2);
+            			
             			retStr = e.getMessage();
+            			e.printStackTrace();
+            			LOGGER.debug(JSON.toJSONString(camsMessage));
+            			LOGGER.debug(JSON.toJSONString(retStr));
             			System.err.println(e.getMessage());
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
 						}
-            			retryTimes++;
+            			//retryTimes++;
     				}
-            	}
+            	//}
             	
             	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
             	  tdrepayRechargeLog.setLastPushStatus(1);
@@ -462,6 +481,9 @@ public class CamsFlowController {
             	//记录推送日志
             	flowPushLog.setPushEndtime(new Date());
             	flowPushLogService.insert(flowPushLog);
+            	
+            	
+            	
         	}
 	}
 	

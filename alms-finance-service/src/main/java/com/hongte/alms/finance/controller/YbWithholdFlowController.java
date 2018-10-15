@@ -8,6 +8,8 @@ import com.hongte.alms.base.entity.WithholdingFlowRecord;
 import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.service.WithholdingFlowRecordService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
+import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordVo;
+import com.hongte.alms.base.vo.withhold.WithholdingFlowyYbRecordVo;
 import com.hongte.alms.common.vo.PageResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,12 +52,12 @@ public class YbWithholdFlowController {
     @ResponseBody
     // public PageResult<List<YbWithholdFlowVo>>
     // getYbWithholdFlowPageList(WithholdFlowReq withholdFlowReq) {
-    public PageResult<List<WithholdingFlowRecord>> getYbWithholdFlowPageList(WithholdFlowReq withholdFlowReq) {
+    public PageResult<List<WithholdingFlowRecordVo>> getYbWithholdFlowPageList(WithholdFlowReq withholdFlowReq) {
         LOGGER.info("====>>>>>易宝代扣流水列表[{}]", JSON.toJSONString(withholdFlowReq));
         try {
             // Page<YbWithholdFlowVo> pages =
             // withholdingRepaymentLogService.getYbWithholdFlowPageList(withholdFlowReq);
-            EntityWrapper<WithholdingFlowRecord> ew = new EntityWrapper<>();
+            EntityWrapper<WithholdingFlowyYbRecordVo> ew = new EntityWrapper<>();
             ew.eq("withholding_platform", PlatformEnum.YB_FORM.getValue());
             if (StringUtils.isNotBlank(withholdFlowReq.getStartTime()))
                 ew.ge("liquidation_date", withholdFlowReq.getStartTime());
@@ -63,10 +65,9 @@ public class YbWithholdFlowController {
                 ew.le("liquidation_date", withholdFlowReq.getEndTime());
 
             ew.orderBy("liquidation_date", false);
-
-            Page<WithholdingFlowRecord> pages = new Page<>(withholdFlowReq.getPage(), withholdFlowReq.getLimit());
-            withholdingFlowRecordService.selectByPage(pages, ew);
-
+            withholdFlowReq.setWithholdingPlatform(PlatformEnum.YB_FORM.getPlatformId());
+            // 查分页数据
+            Page<WithholdingFlowRecordVo> pages=withholdingFlowRecordService.selectFlowBfRecordPage(withholdFlowReq);
             return PageResult.success(pages.getRecords(), pages.getTotal());
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
