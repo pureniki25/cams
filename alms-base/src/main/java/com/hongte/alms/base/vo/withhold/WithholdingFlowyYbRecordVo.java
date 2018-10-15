@@ -25,8 +25,8 @@ import org.jeecgframework.poi.excel.annotation.ExcelTarget;
  */
 
 @ApiModel
-@ExcelTarget("WithholdingFlowRecordVo")
-public class WithholdingFlowRecordVo  {
+@ExcelTarget("WithholdingFlowyYbRecordVo")
+public class WithholdingFlowyYbRecordVo  {
 
 
     /**
@@ -72,7 +72,7 @@ public class WithholdingFlowRecordVo  {
      * 交易订单号
      */
 	@ApiModelProperty(required= true,value = "交易订单号")
-	@Excel(name = "宝付订单号", orderNum = "1",  isImportField = "true_st")
+	@Excel(name = "交易订单号", orderNum = "1",  isImportField = "true_st")
 	private String tradeOrderNo;
     /**
      * 交易流水号
@@ -95,6 +95,7 @@ public class WithholdingFlowRecordVo  {
      */
 	@TableField("service_charge")
 	@ApiModelProperty(required= true,value = "手续费")
+	@Excel(name = "手续费", orderNum = "10",  isImportField = "true_st")
 	private BigDecimal serviceCharge;
     /**
      * 支付卡类型
@@ -110,7 +111,8 @@ public class WithholdingFlowRecordVo  {
      * 清算日期
      */
 	@ApiModelProperty(required= true,value = "清算日期")
-	@Excel(name = "清算日期", orderNum = "10",  isImportField = "true_st")
+    @Excel(name = "清算日期", orderNum = "11",   databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
+	 
 	private String liquidationDate;
     /**
      * 代扣状态(1:成功,0:失败;2:处理中)

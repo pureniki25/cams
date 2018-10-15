@@ -111,18 +111,18 @@ window.layinit(function (htConfig) {
                                 // field: 'repayStatus',
                                 field: 'tradeType',
                                 title: '交易类型',
-                                templet: function (d) {
-                                    /*  var content = "";
-                                     if (d.repayStatus == 0) {
-                                         content = '代扣失败'
-                                     } else if (d.repayStatus == 1) {
-                                         content = '代扣成功'
-                                     } else if (d.repayStatus == 2) {
-                                         content = '处理中'
-                                     }
-                                     return content */
-                                    return d.tradeType + d.withholdingStatus;
-                                }
+//                                templet: function (d) {
+//                                    /*  var content = "";
+//                                     if (d.repayStatus == 0) {
+//                                         content = '代扣失败'
+//                                     } else if (d.repayStatus == 1) {
+//                                         content = '代扣成功'
+//                                     } else if (d.repayStatus == 2) {
+//                                         content = '处理中'
+//                                     }
+//                                     return content */
+//                                    return d.tradeType + d.withholdingStatus;
+//                                }
                             },
                             {
                                 // field: 'currentAmount',

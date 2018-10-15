@@ -9,6 +9,7 @@ import com.hongte.alms.base.enums.PlatformEnum;
 import com.hongte.alms.base.service.WithholdingFlowRecordService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordVo;
+import com.hongte.alms.base.vo.withhold.WithholdingFlowyYbRecordVo;
 import com.hongte.alms.common.vo.PageResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -56,7 +57,7 @@ public class YbWithholdFlowController {
         try {
             // Page<YbWithholdFlowVo> pages =
             // withholdingRepaymentLogService.getYbWithholdFlowPageList(withholdFlowReq);
-            EntityWrapper<WithholdingFlowRecord> ew = new EntityWrapper<>();
+            EntityWrapper<WithholdingFlowyYbRecordVo> ew = new EntityWrapper<>();
             ew.eq("withholding_platform", PlatformEnum.YB_FORM.getValue());
             if (StringUtils.isNotBlank(withholdFlowReq.getStartTime()))
                 ew.ge("liquidation_date", withholdFlowReq.getStartTime());
