@@ -62,6 +62,21 @@ window.layinit(function (htConfig) {
                                 title: '易宝商户号',
                             },
                             {
+                                // field: 'thirdOrderId',
+                                field: 'originalBusinessId',
+                                title: '业务编号'
+                            },
+                            {
+                                // field: 'thirdOrderId',
+                                field: 'custName',
+                                title: '客户姓名'
+                            },
+                            {
+                                // field: 'thirdOrderId',
+                                field: 'afterId',
+                                title: '期数'
+                            },
+                            {
                                 // field: 'merchOrderId',
                                 field: 'merchantOrderNo',
                                 title: '商户订单号'
@@ -100,6 +115,18 @@ window.layinit(function (htConfig) {
                                 field: 'liquidationDate',
                                 title: '清算日期',
 
+                            },
+                            {
+                                // field: 'createTime',
+                                field: 'productName',
+                                title: '商品名称',
+
+                            },
+                            {
+                                // field: 'createTime',
+                                field: 'paymentCardType',
+                                title: '支付卡类型',
+
                             }
                         ]], //设置表头
                         url: financePath + 'customer/getYbWithholdFlowPageList',
@@ -136,6 +163,20 @@ window.layinit(function (htConfig) {
             endTime: function (endtime) {
                 this.searchForm.endTime = endtime;
             },
+            clickExport() {//导出Excel表格
+
+                layui.use(['layer', 'table','ht_config'], function () {debugger
+                    vm.$refs['searchForm'].validate((valid) => {
+                        if (valid) {debugger
+                            vm.exporting = true;
+                            expoertExcel(financePath + "customer/saveExcel",vm.searchForm,"易宝流水.xlsx");
+
+                            vm.exporting = false;
+
+                        }
+                    })
+                });
+            }
 
 
         },

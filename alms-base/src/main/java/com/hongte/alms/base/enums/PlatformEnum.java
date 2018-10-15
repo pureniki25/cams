@@ -32,7 +32,9 @@ public enum PlatformEnum implements IEnum {
     public Serializable getValue() {
         return this.value;
     }
-
+    public Integer getPlatformId(){
+        return this.value;
+    }
     @JsonValue
     public String getName(){
         return this.name;
