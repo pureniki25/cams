@@ -43,33 +43,56 @@ public class CamsPlatformFlowSyncByInterfaceJob extends IJobHandler  {
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步平台还款流水到贷后开始");
 	    			Result<Object> ret1 = camsFlowSyncByInterfaceJobClient.pullPlatformRepayInfo();
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步平台还款流水到贷后结束,"+JSONObject.toJSONString(ret1)+"等待30秒推送撤销流水");
-	    			
+	    		} catch (Exception e) {
+	    			XxlJobLogger.log(e.getMessage());
+	    			e.printStackTrace();
+	    		}
+	    		
+	    		try {
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还垫付流水到贷后开始");
 	    			Result<Object> ret2 = camsFlowSyncByInterfaceJobClient.pullAdvanceRepayInfo();
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步还垫付流水到贷后结束"+JSONObject.toJSONString(ret2));
+	    		} catch (Exception e) {
+	    			XxlJobLogger.log(e.getMessage());
+	    			e.printStackTrace();
+	    		}
 	    			
+	    		try {
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步平台还款流水到核心开始");
 	    			Result<Object> ret3 = camsFlowSyncByInterfaceJobClient.pushPlatformRepayFlowToCams();
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步平台还款流水到核心结束"+JSONObject.toJSONString(ret3));
-	    			
+	    		} catch (Exception e) {
+	    			XxlJobLogger.log(e.getMessage());
+	    			e.printStackTrace();
+	    		}
+	    		
+	    		try {
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步平台垫付流水到核心开始");
 	    			Result<Object> ret4 = camsFlowSyncByInterfaceJobClient.pushAdvancePayFlowToCams();
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步平台垫付流水到核心结束"+JSONObject.toJSONString(ret4));
+	    		} catch (Exception e) {
+	    			XxlJobLogger.log(e.getMessage());
+	    			e.printStackTrace();
+	    		}
 	    			
+	    		try {
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步平台还垫付流水到核心开始");
 	    			Result<Object> ret5 = camsFlowSyncByInterfaceJobClient.pushAdvanceRepayFlowToCams();
 	    			XxlJobLogger.log(DateUtil.formatDate(DateUtil.FULL_TIME_FORMAT, new Date())+"同步平台还垫付流水到核心结束"+JSONObject.toJSONString(ret5));
-	    			
+	    		} catch (Exception e) {
+	    			XxlJobLogger.log(e.getMessage());
+	    			e.printStackTrace();
+	    		}	
 	    			
 	    			//break;//跳出循环
 	    			//camsFlowSyncByInterfaceJobClient.addBatchFenFaFlow();
 	    			//camsFlowSyncByInterfaceJobClient.cancelFenFaFlow();
-	    		} catch (Exception e) {
-	    			XxlJobLogger.log(e.getMessage());
-	    			e.printStackTrace();
-	    			Thread.sleep(100);
-	    			retryTimes1++;
-				}
+//	    		} catch (Exception e) {
+//	    			XxlJobLogger.log(e.getMessage());
+//	    			e.printStackTrace();
+//	    			Thread.sleep(100);
+//	    			retryTimes1++;
+//				}
 	    	//}
         	XxlJobLogger.log("同步流水到核心结束"+new Date().getTime());
             logger.info("同步流水到核心结束");
