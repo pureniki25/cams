@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,12 +26,15 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.dto.FactRepayReq;
 import com.hongte.alms.base.entity.RepaymentConfirmLogSynch;
 import com.hongte.alms.base.service.RepaymentConfirmLogSynchService;
+import com.hongte.alms.common.result.Result;
 
 import cn.afterturn.easypoi.entity.vo.MapExcelConstants;
 import cn.afterturn.easypoi.entity.vo.NormalExcelConstants;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import cn.afterturn.easypoi.view.PoiBaseView;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * <p>
@@ -42,6 +46,7 @@ import cn.afterturn.easypoi.view.PoiBaseView;
  */
 @Controller
 @RequestMapping("/factRepay")
+@Api(tags = "RepaymentConfirmLogSynchController", description = "实还记录")
 public class RepaymentConfirmLogSynchController {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(RepaymentConfirmLogSynchController.class);
@@ -50,8 +55,12 @@ public class RepaymentConfirmLogSynchController {
 	@Qualifier("RepaymentConfirmLogSynchService")
 	private RepaymentConfirmLogSynchService synchService ;
 	
+	@Autowired
+    private Executor msgThreadAsync;
+	
 	@PostMapping("/list")
 	@ResponseBody
+	@ApiOperation(value = "获取实还纪录")
 	public Page<RepaymentConfirmLogSynch> list (@RequestBody FactRepayReq req){
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("@factRepay@list--开始{}",JSON.toJSONString(req));
@@ -60,14 +69,11 @@ public class RepaymentConfirmLogSynchController {
 	}
 	
 	@RequestMapping("/export")
-    public void download(ModelMap modelMap , HttpServletRequest request,HttpServletResponse response) {
-		FactRepayReq req = new FactRepayReq() ;
+	@ApiOperation(value = "导出实还纪录")
+    public void download(ModelMap modelMap ,@RequestBody FactRepayReq req ,  HttpServletRequest request,HttpServletResponse response) {
 		req.setCurPage(0);
         List<RepaymentConfirmLogSynch> repaymentConfirmLogSynchs = synchService.select(req);
-
-        
         ExportParams params = new ExportParams("导出文件", "测试", ExcelType.XSSF);
-        
         modelMap.put(NormalExcelConstants.DATA_LIST, repaymentConfirmLogSynchs); 
         modelMap.put(NormalExcelConstants.CLASS, RepaymentConfirmLogSynch.class);
         modelMap.put(NormalExcelConstants.PARAMS, params);//参数
@@ -77,5 +83,18 @@ public class RepaymentConfirmLogSynchController {
 //        return MapExcelConstants.EASYPOI_MAP_EXCEL_VIEW;//View名称
 
     }
+	
+	@RequestMapping("/synch")
+	@ResponseBody
+	@ApiOperation(value = "同步实还纪录")
+	public Result synch() {
+		msgThreadAsync.execute(new Runnable() {
+			@Override
+			public void run() {
+				int synch = synchService.synch() ;
+			}
+		});
+		return Result.success();
+	}
 }
 

@@ -17,6 +17,8 @@ import com.hongte.alms.common.service.BaseService;
  */
 public interface RepaymentConfirmLogSynchService extends BaseService<RepaymentConfirmLogSynch> {
 
+	public int synch () ;
+	
 	public int addRepaymentConfirmLogSynch();
 
 	public int updateRepaymentConfirmLog();
