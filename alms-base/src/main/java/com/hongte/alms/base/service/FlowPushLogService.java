@@ -17,9 +17,9 @@ import com.ht.ussp.core.Result;
  */
 public interface FlowPushLogService extends BaseService<FlowPushLog> {
 
-	Result queryDistributeFundRecord(String projectId);
-
-	Result pullAdvanceRepayInfo(String projectId);
+	Result queryDistributeFundRecord(Map<String, Object> map);
+	
+	Result pullAdvanceRepayInfo(Map<String, Object> map);
 
 	void pushPlatformRepayFlowToCams(String projectId);
 
@@ -32,5 +32,7 @@ public interface FlowPushLogService extends BaseService<FlowPushLog> {
 	void pushNiWoRepayFlowToCams(String planListId);
 
 	void pushRechargeFlowToCams(String logId);
+
+	
 
 }

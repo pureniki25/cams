@@ -48,7 +48,4 @@ public class ScheduledServiceApplication {
 		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    scheduled-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
 	}
 
-
-
-
 }

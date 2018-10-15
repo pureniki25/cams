@@ -18,10 +18,10 @@ public class VersionAdapter {
 	/*Cservice="2018-08-27 08:45:00"*/
 	/*Dservice="1"*/
 	final String ALMS_CORE_SERVICE = "(finance)1010 15:20" ;
-	final String ALMS_FINANCE_SERVICE = "(finance)1010 15:20" ;
+	final String ALMS_FINANCE_SERVICE = "(finance)1015 15:20" ;
 	final String ALMS_OPEN_SERVICE = "0913" ;
 	final String ALMS_PLATREPAY_SERVICE = "(finance)1010 15:20" ;
-	final String ALMS_SCHEDULED_SERVICE = "(finance)1010 15:20" ;
+	final String ALMS_SCHEDULED_SERVICE = "(finance)1015 15:20" ;
 
 	final String ALMS_WEBUI = "(finance)1010 15:20" ; 
 	final String ALMS_WITHHOLD_SERVICE = "(finance)0926 22:16" ;

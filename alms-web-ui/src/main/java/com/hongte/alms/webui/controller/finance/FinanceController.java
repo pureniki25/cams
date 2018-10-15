@@ -106,5 +106,9 @@ public class FinanceController {
 	public String orderSet(){return "financeOrder";	}
 
 
+	@RequestMapping("/factRepay")
+	public String factRepayLog() {
+		return "/finance/factRepay" ;
+	}
 	
 }
