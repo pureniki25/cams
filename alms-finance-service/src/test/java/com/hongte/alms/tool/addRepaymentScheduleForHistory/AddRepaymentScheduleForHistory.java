@@ -19,4 +19,12 @@ import com.ht.ussp.core.Result;
 public interface AddRepaymentScheduleForHistory {
 	@RequestMapping(value = "/eip/td/repayment/addRepaymentScheduleForHistory",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
 	public Result addRepaymentScheduleForHistory(Req req) ;
+	
+	
+	@RequestMapping(value = "/eip/td/repayment/queryProjectPayment",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	public Result queryProjectPayment(Map<String, String> param);
+	
+	
+	@RequestMapping(value = "/eip/td/repayment/queryRepaymentSchedule",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	public Result queryRepaymentSchedule(Map<String, String> param);
 }

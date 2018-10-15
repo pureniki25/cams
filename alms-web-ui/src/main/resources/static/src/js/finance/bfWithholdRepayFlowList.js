@@ -79,6 +79,21 @@ window.layinit(function (htConfig) {
                             },
                             {
                                 // field: 'thirdOrderId',
+                                field: 'originalBusinessId',
+                                title: '业务编号'
+                            },
+                            {
+                                // field: 'thirdOrderId',
+                                field: 'custName',
+                                title: '客户姓名'
+                            },
+                            {
+                                // field: 'thirdOrderId',
+                                field: 'afterId',
+                                title: '期数'
+                            },
+                            {
+                                // field: 'thirdOrderId',
                                 field: 'merchantOrderNo',
                                 title: '商户支付订单号'
                             },
@@ -96,18 +111,18 @@ window.layinit(function (htConfig) {
                                 // field: 'repayStatus',
                                 field: 'tradeType',
                                 title: '交易类型',
-                                templet: function (d) {
-                                    /*  var content = "";
-                                     if (d.repayStatus == 0) {
-                                         content = '代扣失败'
-                                     } else if (d.repayStatus == 1) {
-                                         content = '代扣成功'
-                                     } else if (d.repayStatus == 2) {
-                                         content = '处理中'
-                                     }
-                                     return content */
-                                    return d.tradeType + d.withholdingStatus;
-                                }
+//                                templet: function (d) {
+//                                    /*  var content = "";
+//                                     if (d.repayStatus == 0) {
+//                                         content = '代扣失败'
+//                                     } else if (d.repayStatus == 1) {
+//                                         content = '代扣成功'
+//                                     } else if (d.repayStatus == 2) {
+//                                         content = '处理中'
+//                                     }
+//                                     return content */
+//                                    return d.tradeType + d.withholdingStatus;
+//                                }
                             },
                             {
                                 // field: 'currentAmount',
@@ -155,7 +170,21 @@ window.layinit(function (htConfig) {
             endTime: function (endtime) {
                 this.searchForm.endTime = endtime;
             },
+            clickExport() {//导出Excel表格
 
+                layui.use(['layer', 'table','ht_config'], function () {debugger
+                    vm.$refs['searchForm'].validate((valid) => {
+                        if (valid) {debugger
+                            vm.exporting = true;
+                            expoertExcel(financePath + "customer/saveExcel",vm.searchForm,"宝付流水.xlsx");
+
+                            vm.exporting = false;
+
+                        }
+                    })
+                });
+            }
+          
 
         },
         mounted: function () {
