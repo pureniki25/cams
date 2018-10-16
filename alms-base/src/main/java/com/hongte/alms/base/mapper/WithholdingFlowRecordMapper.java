@@ -7,6 +7,7 @@ import com.hongte.alms.base.customer.vo.WithholdFlowReq;
 import com.hongte.alms.base.entity.WithholdingFlowRecord;
 import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordSummaryVo;
 import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordVo;
+import com.hongte.alms.base.vo.withhold.WithholdingFlowyYbRecordVo;
 import com.hongte.alms.common.mapper.SuperMapper;
 
 /**
@@ -20,4 +21,5 @@ import com.hongte.alms.common.mapper.SuperMapper;
 public interface WithholdingFlowRecordMapper extends SuperMapper<WithholdingFlowRecord> {
     WithholdingFlowRecordSummaryVo querySummary(WithholdFlowReq withholdFlowReq);
     List<WithholdingFlowRecordVo> selectFlowBfRecordPage(Pagination pages,WithholdFlowReq req);
+    List<WithholdingFlowyYbRecordVo> selectFlowYbRecordPage(Pagination pages,WithholdFlowReq req);
 }

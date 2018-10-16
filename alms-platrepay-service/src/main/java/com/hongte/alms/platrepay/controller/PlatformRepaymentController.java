@@ -225,19 +225,32 @@ public class PlatformRepaymentController {
 				LOGGER.info("@对接合规还款接口@  查不到标的还款计划信息 输入参数 projPlanListId:[{}]  ", projPlanListId);
 				return Result.error("查不到标的还款计划信息");
 			}
+			
+			Integer settleType = null; // 结清类型
+			// 标的还款计划结清状态
+			settleType = handleSettleType(settleType, projPlan.getPlanStatus());
+
+			if (settleType == null) {
+				Result.error("标的还款计划结清状态值错误");
+			}
+			
+			TdrepayRechargeInfoVO vo = new TdrepayRechargeInfoVO();
+			String projectId = projPlan.getProjectId();
+			// 判断是否提前结清
+			boolean isSettle = isSettle(projectId, settleType);
+			
+			vo.setSettleType(settleType);
 
 			/*
 			 * 1）资产端内部在分润后将先还完线上部分之后再进行合规化还款，即部分还款子状态为2或者3时 2）repayStatus
 			 * 部分还款状态子状态,null:未还款,1:部分还款,2:线上已还款,3:全部已还款
 			 */
 			Integer repayStatus = projPlanList.getRepayStatus();
-			if (repayStatus == null || repayStatus.intValue() == 1) {
+			if (settleType.intValue() != 30 && (repayStatus == null || repayStatus.intValue() == 1)) {
 				LOGGER.info("@对接合规还款接口@  应该在还完线上部分后再调用合规化还款接口 输入参数 projPlanListId:[{}]  ", projPlanListId);
 				return Result.error("应该在还完线上部分后再调用合规化还款接口");
 			}
 
-			TdrepayRechargeInfoVO vo = new TdrepayRechargeInfoVO();
-			String projectId = projPlan.getProjectId();
 			vo.setProjectId(projectId);
 			// 业务所属资产端，1、鸿特信息，2、 一点车贷
 			vo.setAssetType(1);
@@ -296,21 +309,7 @@ public class PlatformRepaymentController {
 			
 			vo.setAfterId(projPlanList.getAfterId());
 			vo.setPeriod(projPlanList.getPeriod());
-
 			
-			Integer settleType = null; // 结清类型
-			// 标的还款计划结清状态
-			settleType = handleSettleType(settleType, projPlan.getPlanStatus());
-
-			if (settleType == null) {
-				Result.error("标的还款计划结清状态值错误");
-			}
-			
-			// 判断是否提前结清
-			boolean isSettle = isSettle(projectId, settleType);
-			
-			vo.setSettleType(settleType);
-
 			/*
 			 * 肖莹环提出充值金额计算规则：利息以平台应还利息为准，其他费用项以资产端数据为准。 说明：有垫付则按垫付传费用项，否则按查询的标的还未计划信息传费用项
 			 * 2018-09-14 充值金额修改规则：本金以平台本金为准
@@ -630,7 +629,7 @@ public class PlatformRepaymentController {
 			tempProjPlanStatus = 10;
 			break;
 		case 30:
-		case 40:
+		case 31:
 			tempProjPlanStatus = 30;
 			break;
 		case 50:

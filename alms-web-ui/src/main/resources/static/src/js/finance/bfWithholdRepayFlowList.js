@@ -19,6 +19,7 @@ window.layinit(function (htConfig) {
             searchForm: {
                 startTime: '', //完成日期开始时间
                 endTime: '', //完成日期开始时间
+                withholdingPlatform:3
             },
             summary: {
                 totalNumber: 0.00,
@@ -128,6 +129,11 @@ window.layinit(function (htConfig) {
                                 // field: 'currentAmount',
                                 field: 'amount',
                                 title: '金额(元)',
+                            },
+                            {
+                                // field: 'currentAmount',
+                                field: 'serviceCharge',
+                                title: '手续费(元)',
                             },
                             {
                                 // field: 'createTime',

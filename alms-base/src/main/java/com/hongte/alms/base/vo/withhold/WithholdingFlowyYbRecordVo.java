@@ -43,24 +43,24 @@ public class WithholdingFlowyYbRecordVo  {
      * 商户号
      */
 	@ApiModelProperty(required= true,value = "商户号")
-	@Excel(name = "商户号", orderNum = "6",  isImportField = "true_st")
+	@Excel(name = "易宝商户号", orderNum = "1",  isImportField = "true_st")
 	private String merchantNo;
     /**
      * 终端号
      */
 	@ApiModelProperty(required= true,value = "终端号")
-	@Excel(name = "终端号", orderNum = "7",  isImportField = "true_st")
 	private String terminalNo;
     /**
      * 交易类型
      */
 	@ApiModelProperty(required= true,value = "交易类型")
-	@Excel(name = "交易类型", orderNum = "8",  isImportField = "true_st")
+	@Excel(name = "交易类型", orderNum = "7",  isImportField = "true_st")
 	private String tradeType;
     /**
      * 商品名称
      */
 	@ApiModelProperty(required= true,value = "商品名称")
+	@Excel(name = "商品名称", orderNum = "10",  isImportField = "true_st")
 	private String productName;
     /**
      * 商户订单号
@@ -72,12 +72,13 @@ public class WithholdingFlowyYbRecordVo  {
      * 交易订单号
      */
 	@ApiModelProperty(required= true,value = "交易订单号")
-	@Excel(name = "交易订单号", orderNum = "1",  isImportField = "true_st")
+
 	private String tradeOrderNo;
     /**
      * 交易流水号
      */
-	@ApiModelProperty(required= true,value = "交易流水号")
+	@ApiModelProperty(required= true,value = "易宝付交易流水号")
+	@Excel(name = "易宝付交易流水号", orderNum = "6",  isImportField = "true_st")
 	private String tradeWaterNo;
     /**
      * 交易时间
@@ -88,19 +89,19 @@ public class WithholdingFlowyYbRecordVo  {
      * 代扣金额
      */
 	@ApiModelProperty(required= true,value = "代扣金额")
-	@Excel(name = "金额", orderNum = "9",  isImportField = "true_st")
+	@Excel(name = "金额", orderNum = "8",  isImportField = "true_st")
 	private BigDecimal amount;
     /**
      * 手续费
      */
 	@TableField("service_charge")
 	@ApiModelProperty(required= true,value = "手续费")
-	@Excel(name = "手续费", orderNum = "10",  isImportField = "true_st")
 	private BigDecimal serviceCharge;
     /**
      * 支付卡类型
      */
 	@ApiModelProperty(required= true,value = "支付卡类型")
+	@Excel(name = "支付卡类型", orderNum = "11",  isImportField = "true_st")
 	private String paymentCardType;
 	/**
      * 支付卡号
@@ -111,7 +112,7 @@ public class WithholdingFlowyYbRecordVo  {
      * 清算日期
      */
 	@ApiModelProperty(required= true,value = "清算日期")
-    @Excel(name = "清算日期", orderNum = "11",   databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
+    @Excel(name = "清算日期", orderNum = "9",   databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
 	 
 	private String liquidationDate;
     /**
