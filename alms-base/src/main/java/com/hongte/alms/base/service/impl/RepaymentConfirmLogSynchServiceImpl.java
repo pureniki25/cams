@@ -106,8 +106,8 @@ public class RepaymentConfirmLogSynchServiceImpl extends BaseServiceImpl<Repayme
 	}
 	@Override
 	public int synch() {
-		Integer count = synchMapper.selectCount(new EntityWrapper<>());
-		if (count==0) {
+		Integer count = synchMapper.countNeedSynch();
+		if (count>0) {
 			addRepaymentConfirmLogSynch();
 		}
 		int updateRepaymentConfirmLog = updateRepaymentConfirmLog();

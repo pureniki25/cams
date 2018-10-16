@@ -75,5 +75,5 @@ public interface RepaymentProjPlanListMapper extends SuperMapper<RepaymentProjPl
      * @param projectId
      * @return
      */
-    List<RepaymentProjPlanList> selectForAddRepaymentScheduleForHistory(@Param("projectId")String projectId);
+    RepaymentProjPlanList selectByProjectIdAndPeriod(@Param("projectId")String projectId,@Param("period") Integer period);
 }

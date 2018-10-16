@@ -5,7 +5,10 @@ package com.hongte.alms.tool.addRepaymentScheduleForHistory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,18 +19,25 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.CollectionUtils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.dto.compliance.TdPlatformPlanRepaymentDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.feignClient.dto.TdProjectPaymentDTO;
 import com.hongte.alms.base.mapper.BasicBusinessMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListDetailMapper;
 import com.hongte.alms.base.mapper.RepaymentProjPlanListMapper;
 import com.hongte.alms.base.mapper.TuandaiProjectInfoMapper;
+import com.hongte.alms.common.util.Constant;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.finance.FinanceServiceApplication;
 import com.ht.ussp.core.Result;
 import com.ht.ussp.core.ReturnCodeEnum;
@@ -63,7 +73,7 @@ public class Main {
 	@Test
 	public void run () {
 		
-//		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>().where(" project_id in ('aba2c781-dbab-4886-abb6-ba6d6609f88c')  ").orderBy("create_time"));
+//		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>().where(" project_id in ('84fcf55e-9748-49fc-a5ca-054530479aab')  ").orderBy("create_time"));
 		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>().where(" plate_type = 1 and DATE( create_time ) >= '2018-06-28' ").orderBy("create_time"));
 		for (TuandaiProjectInfo tuandaiProjectInfo : selectList) {
 			Req req = new Req() ; 
@@ -122,32 +132,86 @@ public class Main {
 			req.setProjectId(tuandaiProjectInfo.getProjectId());
 			req.setRepaymentType(tuandaiProjectInfo.getRepaymentType());
 
-			List<RepaymentProjPlanList> selectForAddRepaymentScheduleForHistory = repaymentProjPlanListMapper.selectForAddRepaymentScheduleForHistory(tuandaiProjectInfo.getProjectId());
-			if (selectForAddRepaymentScheduleForHistory.size()==0) {
-				logger.info("selectForAddRepaymentScheduleForHistory = 0 ");
-				continue ;
+			Map<String, String> param = new HashMap<>() ;
+			param.put("projectId", tuandaiProjectInfo.getProjectId()) ;
+			Result queryProjectPaymentResult = api.queryProjectPayment(param);
+			Result queryRepaymentSchedule = api.queryRepaymentSchedule(param);
+			
+			if (!queryRepaymentSchedule.getReturnCode().equals(Constant.REMOTE_EIP_SUCCESS_CODE)) {
+				continue;
 			}
 			
-			req.setPeriods(selectForAddRepaymentScheduleForHistory.size());
+			
+			List<TdPlatformPlanRepaymentDTO> dtos = new ArrayList<>();
+			JSONObject parseObject = (JSONObject) JSONObject.toJSON(queryRepaymentSchedule.getData());
+			if (parseObject.get("repaymentScheduleList") != null) {
+				dtos = JSONObject.parseArray(
+						JSONObject.toJSONString(parseObject.get("repaymentScheduleList")), TdPlatformPlanRepaymentDTO.class);
+			}
+			
+			if (CollectionUtils.isEmpty(dtos)) {
+				continue ;
+			}
 			req.setRepaymentSchedules(new ArrayList<>());
-			for (RepaymentProjPlanList repaymentProjPlanList : selectForAddRepaymentScheduleForHistory) {
-				RepaymentSchedule schedule = new RepaymentSchedule() ;
-				schedule.setPeriod(repaymentProjPlanList.getPeriod());
+			for (TdPlatformPlanRepaymentDTO tdProjectPaymentDTO : dtos) {
+				Date date = DateUtil.getDate(tdProjectPaymentDTO.getCycDate());
+				int diffDays = DateUtil.getDiffDays(date, new Date());
+				if (diffDays>0) {
+					continue;
+				}
 				
-				List<RepaymentProjPlanListDetail> item10 = repaymentProjPlanListDetailMapper.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", repaymentProjPlanList.getProjPlanListId()).eq("plan_item_type", 10));
-				List<RepaymentProjPlanListDetail> item20 = repaymentProjPlanListDetailMapper.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", repaymentProjPlanList.getProjPlanListId()).eq("plan_item_type", 20));
+				if (tdProjectPaymentDTO.getPeriod()==0) {
+					continue;
+				}
+				
+				
+				RepaymentProjPlanList projPlanList = repaymentProjPlanListMapper.selectByProjectIdAndPeriod(tuandaiProjectInfo.getProjectId(), tdProjectPaymentDTO.getPeriod());
+				
+				if (projPlanList==null) {
+					System.err.println(tuandaiProjectInfo.getProjectId()+" "+tdProjectPaymentDTO.getPeriod()+" projPlanList is null");
+					continue;
+				}
+				
+				RepaymentSchedule schedule = new RepaymentSchedule() ;
+				schedule.setPeriod(tdProjectPaymentDTO.getPeriod());
+				
+				List<RepaymentProjPlanListDetail> item10 = repaymentProjPlanListDetailMapper.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPlanList.getProjPlanListId()).eq("fee_id", RepayPlanFeeTypeEnum.PRINCIPAL.getUuid()));
+				List<RepaymentProjPlanListDetail> item20 = repaymentProjPlanListDetailMapper.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPlanList.getProjPlanListId()).eq("fee_id", RepayPlanFeeTypeEnum.INTEREST.getUuid()));
 				
 				schedule.setAmount(item10.get(0).getProjPlanAmount());
 				schedule.setInterestAmount(item20.get(0).getProjPlanAmount());
 				req.getRepaymentSchedules().add(schedule);
 			}
-			System.out.println(JSON.toJSONString(req));
+			req.setPeriods(req.getRepaymentSchedules().size());
+			
+			
+			if (req.getPeriods().equals(0)) {
+				continue;
+			}
 			Result result = api.addRepaymentScheduleForHistory(req);
 			if (result.getReturnCode().equals(ReturnCodeEnum.SUCCESS.getReturnCode())) {
-				System.out.println(JSON.toJSONString(result));
+//				System.out.println(JSON.toJSONString(result));
 			}else {
+				System.err.println(JSON.toJSONString(queryProjectPaymentResult.getData()));
+				System.err.println(JSON.toJSONString(queryRepaymentSchedule.getData()));
+				System.err.println(JSON.toJSONString(req));
 				System.err.println(JSON.toJSONString(result));
 			}
 		}
+	}
+	
+	private boolean hasRepaid(List<TdProjectPaymentDTO> tdProjectPaymentDTOs,TdPlatformPlanRepaymentDTO tdPlatformPlanRepaymentDTO) {
+		for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
+			if (tdPlatformPlanRepaymentDTO.getPeriod() == tdProjectPaymentDTO.getPeriod()) {
+				if (tdProjectPaymentDTO.getStatus()==1) {
+					return true ;
+				}else {
+					return false ;
+				}
+			}
+		}
+		
+		return false;
+		
 	}
 }

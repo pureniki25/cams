@@ -134,6 +134,17 @@
 		ISNULL( s.confirm_log_id )
 		)
 	</insert>
+	
+	<select id="countNeedSynch" resultType="int">
+		SELECT COUNT(1)
+		FROM
+		tb_repayment_confirm_log_synch s
+		RIGHT JOIN
+		tb_repayment_confirm_log l ON l.confirm_log_id =
+		s.confirm_log_id
+		WHERE
+		ISNULL( s.confirm_log_id )
+	</select>
 
 	<update id="updateRepaymentConfirmLog">
 		UPDATE tb_repayment_confirm_log_synch s,
@@ -385,11 +396,10 @@
 		SELECT
 		CASE
 		bind_platform_id
-		WHEN
-		bind_platform_id = 0 OR ISNULL( bind_platform_id ) THEN '易宝代扣'
+		WHEN 0 THEN '易宝代扣' 
+		WHEN ISNULL( bind_platform_id ) THEN '易宝代扣' 
 		WHEN 3 THEN '宝付代扣'
 		WHEN 5 THEN '银行代扣'
-		ELSE bind_platform_id
 		END
 		FROM
 		tb_withholding_repayment_log
@@ -448,7 +458,7 @@
 		`ext_remark`
 		FROM
 		tb_repayment_confirm_log_synch s
-		WHERE 1=1 
+		WHERE s.is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
 			and ( s.business_id like '${req.key}%' or s.ext_customer_name like '${req.key}%' )
 		</if>
@@ -483,7 +493,7 @@
 		<include refid="Base_Column_List"></include>
 		FROM
 		tb_repayment_confirm_log_synch s
-		WHERE 1=1 
+		WHERE s.is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
 			and ( s.business_id like '${req.key}%' or s.ext_customer_name like '${req.key}%' )
 		</if>

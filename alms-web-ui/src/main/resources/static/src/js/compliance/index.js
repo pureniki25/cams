@@ -153,22 +153,12 @@ window.layinit(function(htConfig) {
                 },
                 {
                     title: '还款利息',
-                    key: 'interestAmout',
+                    key: 'interestAmount',
                     align: 'center',
                 },
                 {
-                	title: '保证金',
-                	key: 'depositAmount',
-                	align: 'center',
-                },
-                {
-                	title: '担保费',
-                	key: 'guaranteeAmount',
-                	align: 'center',
-                },
-                {
-                	title: '仲裁费',
-                	key: 'arbitrationAmount',
+                	title: '平台服务费',
+                	key: 'tuandaiAmount',
                 	align: 'center',
                 },
                 {
@@ -177,8 +167,23 @@ window.layinit(function(htConfig) {
                 	align: 'center',
                 },
                 {
-                	title: '平台服务费',
-                	key: 'tuandaiAmount',
+                	title: '担保费',
+                	key: 'guaranteeAmount',
+                	align: 'center',
+                },
+                {
+                	title: '滞纳金',
+                	key: 'agencyAmount',
+                	align: 'center',
+                },
+                {
+                	title: '保证金',
+                	key: 'depositAmount',
+                	align: 'center',
+                },
+                {
+                	title: '仲裁费',
+                	key: 'arbitrationAmount',
                 	align: 'center',
                 },
                 {
@@ -237,6 +242,11 @@ window.layinit(function(htConfig) {
             		align: 'center',
             	},
             	{
+            		title: '滞纳金',
+            		key: 'penaltyAmount',
+            		align: 'center',
+            	},
+            	{
             		title: '仲裁服务费',
             		key: 'arbitrationAmount',
             		align: 'center',
@@ -244,11 +254,6 @@ window.layinit(function(htConfig) {
             	{
             		title: '中介服务费',
             		key: 'agencyAmount',
-            		align: 'center',
-            	},
-            	{
-            		title: '滞纳金',
-            		key: 'penaltyAmount',
             		align: 'center',
             	},
             	{
@@ -692,7 +697,7 @@ window.layinit(function(htConfig) {
 							width:100
 			    		},{
 			    			field: 'periodTypeStr',
-			    			title: '状态',
+			    			title: '期数类型',
 			    			align: 'center',
 							width:100
 			    		},{
