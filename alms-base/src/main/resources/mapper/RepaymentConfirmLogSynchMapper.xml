@@ -458,7 +458,7 @@
 		`ext_remark`
 		FROM
 		tb_repayment_confirm_log_synch s
-		WHERE 1=1 
+		WHERE s.is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
 			and ( s.business_id like '${req.key}%' or s.ext_customer_name like '${req.key}%' )
 		</if>
@@ -493,7 +493,7 @@
 		<include refid="Base_Column_List"></include>
 		FROM
 		tb_repayment_confirm_log_synch s
-		WHERE 1=1 
+		WHERE s.is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
 			and ( s.business_id like '${req.key}%' or s.ext_customer_name like '${req.key}%' )
 		</if>
