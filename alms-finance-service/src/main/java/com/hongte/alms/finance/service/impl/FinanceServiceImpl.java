@@ -1452,6 +1452,8 @@ public class FinanceServiceImpl implements FinanceService {
 
 			List<RepaymentPlanInfoDTO> repaymentPlanInfoDTOs = repaymentBizPlanListMapper
 					.queryRepaymentPlanInfoByBusinessId(origBusinessId);
+			
+			List<RepaymentPlanInfoDTO> zqDTOs = new ArrayList<>();
 
 			if (CollectionUtils.isNotEmpty(repaymentPlanInfoDTOs)) {
 
@@ -1491,7 +1493,6 @@ public class FinanceServiceImpl implements FinanceService {
 						map.put(afterId, dtos);
 					} else {
 						dtos.add(repaymentPlanInfoDTO);
-						map.put(afterId, dtos);
 					}
 
 				}
@@ -1540,6 +1541,7 @@ public class FinanceServiceImpl implements FinanceService {
 						balanceRepayment.setRepayment("差额");
 						balanceRepayment.setAfterId(planInfoDTO.getAfterId());
 						balanceRepayment.setPlanListId(planInfoDTO.getPlanListId());
+						balanceRepayment.setIsOrig(planInfoDTO.getIsOrig());
 						if (factInfoDTO.getRepaymentDate() != null) {
 							balanceRepayment
 									.setAccrual(BigDecimal.valueOf(planInfoDTO.getAccrual() - factInfoDTO.getAccrual())
@@ -1571,9 +1573,19 @@ public class FinanceServiceImpl implements FinanceService {
 						
 						infoDTOs.add(balanceRepayment);
 						resultList.addAll(infoDTOs);
-						resultMap.put("resultList", resultList);
-						resultMap.put("businessSurplus", businessSurplus);
 					}
+					
+					if (!resultList.isEmpty()) {
+						for (RepaymentPlanInfoDTO repaymentPlanInfoDTO : resultList) {
+							if (repaymentPlanInfoDTO.getIsOrig() == 0) {
+								zqDTOs.add(repaymentPlanInfoDTO);
+							}
+						}
+						resultList.removeAll(zqDTOs);
+						resultList.addAll(zqDTOs);
+					}
+					resultMap.put("resultList", resultList);
+					resultMap.put("businessSurplus", businessSurplus);
 					return resultMap;
 				}
 			}
