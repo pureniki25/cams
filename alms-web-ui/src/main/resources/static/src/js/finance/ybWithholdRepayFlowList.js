@@ -19,6 +19,7 @@ window.layinit(function (htConfig) {
             searchForm: {
                 startTime: '', //完成日期开始时间
                 endTime: '', //完成日期开始时间
+                withholdingPlatform:0
             },
 
         },
