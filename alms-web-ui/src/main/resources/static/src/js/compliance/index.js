@@ -697,7 +697,7 @@ window.layinit(function(htConfig) {
 							width:100
 			    		},{
 			    			field: 'periodTypeStr',
-			    			title: '状态',
+			    			title: '期数类型',
 			    			align: 'center',
 							width:100
 			    		},{
