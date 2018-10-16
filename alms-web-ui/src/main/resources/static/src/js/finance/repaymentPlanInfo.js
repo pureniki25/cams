@@ -301,7 +301,7 @@ window.layinit(function (htConfig) {
     		 * 平台标的应还计划
     		 */
     		platformRepaymentInfoColumns:[
-        		{
+    			{
                     title: '期数',
                     key: 'period',
                     align: 'center',
@@ -323,22 +323,12 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '还款利息',
-                    key: 'interestAmout',
+                    key: 'interestAmount',
                     align: 'center',
                 },
                 {
-                	title: '保证金',
-                	key: 'depositAmount',
-                	align: 'center',
-                },
-                {
-                	title: '担保费',
-                	key: 'guaranteeAmount',
-                	align: 'center',
-                },
-                {
-                	title: '仲裁费',
-                	key: 'arbitrationAmount',
+                	title: '平台服务费',
+                	key: 'tuandaiAmount',
                 	align: 'center',
                 },
                 {
@@ -347,8 +337,23 @@ window.layinit(function (htConfig) {
                 	align: 'center',
                 },
                 {
-                	title: '平台服务费',
-                	key: 'tuandaiAmount',
+                	title: '担保费',
+                	key: 'guaranteeAmount',
+                	align: 'center',
+                },
+                {
+                	title: '滞纳金',
+                	key: 'agencyAmount',
+                	align: 'center',
+                },
+                {
+                	title: '保证金',
+                	key: 'depositAmount',
+                	align: 'center',
+                },
+                {
+                	title: '仲裁费',
+                	key: 'arbitrationAmount',
                 	align: 'center',
                 },
                 {
