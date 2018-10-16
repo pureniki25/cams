@@ -54,10 +54,10 @@
     <sql id="ComplianceRepaymentDataCondition">
     	t.`is_valid` = 1 
 		<if test="rechargeTimeStart != null">
-		    AND t.`create_time` <![CDATA[ >= ]]> #{rechargeTimeStart,jdbcType=DATE}
+		    AND t.`process_time` <![CDATA[ >= ]]> #{rechargeTimeStart,jdbcType=DATE}
 		</if>
 		<if test="rechargeTimeEnd != null">
-			AND t.`create_time` <![CDATA[ < ]]> #{rechargeTimeEnd,jdbcType=DATE}
+			AND t.`process_time` <![CDATA[ < ]]> #{rechargeTimeEnd,jdbcType=DATE}
 		</if>
 		<if test="confirmTimeStart != null">
 		    AND t.`confirm_time` <![CDATA[ >= ]]> #{confirmTimeStart,jdbcType=DATE}
