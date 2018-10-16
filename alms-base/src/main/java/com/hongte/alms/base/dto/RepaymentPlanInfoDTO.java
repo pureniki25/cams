@@ -5,6 +5,11 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.Data;
+import lombok.ToString;
+
+@Data
+@ToString
 public class RepaymentPlanInfoDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -93,184 +98,8 @@ public class RepaymentPlanInfoDTO implements Serializable {
 	 * 财务确认状态
 	 */
 	private String confirmFlagStr;
-
-	public String getPlanListId() {
-		return planListId;
-	}
-
-	public void setPlanListId(String planListId) {
-		this.planListId = planListId;
-	}
-
-	public String getRepayment() {
-		return repayment;
-	}
-
-	public void setRepayment(String repayment) {
-		this.repayment = repayment;
-	}
-
-	public String getAfterId() {
-		return afterId;
-	}
-
-	public void setAfterId(String afterId) {
-		this.afterId = afterId;
-	}
-
-	public String getPeriod() {
-		return period;
-	}
-
-	public void setPeriod(String period) {
-		this.period = period;
-	}
-
-	public Date getRepaymentDate() {
-		return repaymentDate;
-	}
-
-	public void setRepaymentDate(Date repaymentDate) {
-		this.repaymentDate = repaymentDate;
-	}
-
-	public double getPrincipal() {
-		return principal;
-	}
-
-	public void setPrincipal(double principal) {
-		this.principal = principal;
-	}
-
-	public double getAccrual() {
-		return accrual;
-	}
-
-	public void setAccrual(double accrual) {
-		this.accrual = accrual;
-	}
-
-	public double getServiceCharge() {
-		return serviceCharge;
-	}
-
-	public void setServiceCharge(double serviceCharge) {
-		this.serviceCharge = serviceCharge;
-	}
-
-	public double getPlatformCharge() {
-		return platformCharge;
-	}
-
-	public void setPlatformCharge(double platformCharge) {
-		this.platformCharge = platformCharge;
-	}
-
-	public double getOtherFee() {
-		return otherFee;
-	}
-
-	public void setOtherFee(double otherFee) {
-		this.otherFee = otherFee;
-	}
-
-	public double getSubtotal() {
-		return subtotal;
-	}
-
-	public void setSubtotal(double subtotal) {
-		this.subtotal = subtotal;
-	}
-
-	public double getOverdueDays() {
-		return overdueDays;
-	}
-
-	public void setOverdueDays(double overdueDays) {
-		this.overdueDays = overdueDays;
-	}
-
-	public double getOnlineLateFee() {
-		return onlineLateFee;
-	}
-
-	public void setOnlineLateFee(double onlineLateFee) {
-		this.onlineLateFee = onlineLateFee;
-	}
-
-	public double getOfflineLateFee() {
-		return offlineLateFee;
-	}
-
-	public void setOfflineLateFee(double offlineLateFee) {
-		this.offlineLateFee = offlineLateFee;
-	}
-
-	public double getOnlineDerateAmount() {
-		return onlineDerateAmount;
-	}
-
-	public void setOnlineDerateAmount(double onlineDerateAmount) {
-		this.onlineDerateAmount = onlineDerateAmount;
-	}
-
-	public double getOfflineDerateAmount() {
-		return offlineDerateAmount;
-	}
-
-	public void setOfflineDerateAmount(double offlineDerateAmount) {
-		this.offlineDerateAmount = offlineDerateAmount;
-	}
-
-	public double getSurplus() {
-		return surplus;
-	}
-
-	public void setSurplus(double surplus) {
-		this.surplus = surplus;
-	}
-
-	public double getTotal() {
-		return total;
-	}
-
-	public void setTotal(double total) {
-		this.total = total;
-	}
-
-	public double getAmount() {
-		return amount;
-	}
-
-	public void setAmount(double amount) {
-		this.amount = amount;
-	}
-
-	public int getConfirmFlag() {
-		return confirmFlag;
-	}
-
-	public void setConfirmFlag(int confirmFlag) {
-		this.confirmFlag = confirmFlag;
-	}
-
-	public String getConfirmFlagStr() {
-		return confirmFlagStr;
-	}
-
-	public void setConfirmFlagStr(String confirmFlagStr) {
-		this.confirmFlagStr = confirmFlagStr;
-	}
-
-	@Override
-	public String toString() {
-		return "RepaymentPlanInfoDTO [planListId=" + planListId + ", repayment=" + repayment + ", afterId=" + afterId
-				+ ", period=" + period + ", repaymentDate=" + repaymentDate + ", principal=" + principal + ", accrual="
-				+ accrual + ", serviceCharge=" + serviceCharge + ", platformCharge=" + platformCharge + ", otherFee="
-				+ otherFee + ", subtotal=" + subtotal + ", overdueDays=" + overdueDays + ", onlineLateFee="
-				+ onlineLateFee + ", offlineLateFee=" + offlineLateFee + ", onlineDerateAmount=" + onlineDerateAmount
-				+ ", offlineDerateAmount=" + offlineDerateAmount + ", surplus=" + surplus + ", total=" + total
-				+ ", amount=" + amount + ", confirmFlag=" + confirmFlag + ", confirmFlagStr=" + confirmFlagStr + "]";
-	}
-
+	/**
+	 * 是否原业务 1、是；2、否
+	 */
+	private int isOrig;
 }
