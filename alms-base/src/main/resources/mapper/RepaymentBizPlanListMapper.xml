@@ -798,9 +798,10 @@
 			  GROUP BY rbpl.`plan_list_id`
 			  -- GROUP BY rbpl.period 
 			  ) tab
-  			ORDER BY tab.afterId,
-			  tab.repayment DESC, 
-			  tab.repaymentDate
+  			ORDER BY tab.period,
+			  tab.afterId,
+			  tab.repayment DESC,
+			  tab.repaymentDate 
     </select>
     
     <select id="queryPlanRepaymentProjInfoByPlanListId" resultType="com.hongte.alms.base.dto.RepaymentProjInfoDTO">

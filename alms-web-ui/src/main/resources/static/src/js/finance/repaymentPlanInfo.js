@@ -931,6 +931,7 @@ window.layinit(function (htConfig) {
         mounted: function() {
 
             this.tableHeight = window.innerHeight-180;
+            this.paneHeight = "height:"+this.tableHeight+"px";
 		}
     })
 })

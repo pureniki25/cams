@@ -23,7 +23,7 @@
                 <i-form ref="form" show-message label-width="90" label-position="right" inline autocomplete="off" model="form"
                     style="text-align: right;">
                     <form-item label="关键字">
-                        <i-input v-model="form.key" placeholder="请输入业务编号或客户名称" ></i-input>
+                        <i-input v-model="form.key" placeholder="请输入业务编号或客户名称"></i-input>
                     </form-item>
                     <form-item label="还款方式">
                         <i-select v-model="form.repayType" placeholder="--请选择--" filterable style="width: 180px;text-align: left"
@@ -36,7 +36,8 @@
                         </i-select>
                     </form-item>
                     <form-item label="财务确认时间">
-                        <date-picker type="daterange" v-model="form.confirmTime" style="width: 180px;text-align: left" placeholder="--请选择时间范围--" ></date-picker>
+                        <date-picker type="daterange" element-id="datePicker" @on-change="form.confirmTime=$event"
+                            style="width: 180px;text-align: left" :options="dateOptions" placeholder="--请选择时间范围--"></date-picker>
                     </form-item>
                     <form-item label="分公司">
                         <i-select v-model="form.companyId" placeholder="--请选择--" filterable style="width: 180px;text-align: left"
@@ -52,8 +53,8 @@
                     </form-item>
                     <form-item label="所属投资端：" prop="srcType" style="width: 180px;text-align: left">
                         <i-select v-model="form.srcType" clearable filterable placeholder="--请选择--">
-                                <i-option v-for="item in paymentPlatformList " :value="item" :key="item" >{{item}}</i-option>
-                                <!-- <i-option value="团贷网">团贷网</i-option>
+                            <i-option v-for="item in paymentPlatformList " :value="item" :key="item">{{item}}</i-option>
+                            <!-- <i-option value="团贷网">团贷网</i-option>
                                 <i-option value="你我金融">你我金融</i-option>
                                 <i-option value="粤财">粤财</i-option>
                                 <i-option value="线下出款">线下出款</i-option> -->
@@ -61,11 +62,28 @@
                         </i-select>
                     </form-item>
                     <form-item>
-                        <i-button type="primary" @click="paging(1)">
+                        <i-button type="primary" @click="refresh" :disabled="syncing">
+                            同步数据
+                        </i-button>
+                        <i-button type="primary" @click="paging(1)" :disabled="syncing">
                             查询
                         </i-button>
-                        <i-button type="primary" @click="exportExcel" >
+                        <i-button type="primary" @click="exportExcel" :disabled="syncing">
                             导出
+                        </i-button>
+                    </form-item>
+                    <form-item>
+                        <i-button type="primary" @click="today" :disabled="syncing">
+                            今天
+                        </i-button>
+                        <i-button type="primary" @click="yesterday" :disabled="syncing">
+                            昨天
+                        </i-button>
+                        <i-button type="primary" @click="thisMonth" :disabled="syncing">
+                            本月
+                        </i-button>
+                        <i-button type="primary" @click="lastMonth" :disabled="syncing">
+                            上个月
                         </i-button>
                     </form-item>
                 </i-form>
@@ -88,6 +106,7 @@
     <script type="text/javascript" src="/src/js/comm.js"></script>
     <script type="text/javascript" src="/properties/config.js"></script>
     <script type="text/javascript" src="/build/js/appToken.js"></script>
+    <script src="/src/js/moment.min.js"></script>
     <script type="text/javascript" src="/src/js/finance/factRepay.js"></script>
 </body>
 
