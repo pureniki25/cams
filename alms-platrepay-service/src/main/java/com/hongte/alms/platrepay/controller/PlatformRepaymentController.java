@@ -629,7 +629,7 @@ public class PlatformRepaymentController {
 			tempProjPlanStatus = 10;
 			break;
 		case 30:
-		case 40:
+		case 31:
 			tempProjPlanStatus = 30;
 			break;
 		case 50:
