@@ -543,7 +543,7 @@
 		tb_repayment_confirm_log_synch 
 		WHERE is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
-			and ( s.business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
+			and ( business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
 		</if>
 		<if test="req.repayType != null and req.repayType neq ''  and req.repayType neq '混合代扣' ">
 			and ext_repay_type = #{req.repayType}
