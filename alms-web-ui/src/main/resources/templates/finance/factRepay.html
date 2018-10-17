@@ -48,7 +48,7 @@
                     <form-item label="业务类型">
                         <i-select v-model="form.businessType" placeholder="--请选择--" style="width: 180px;text-align: left"
                             filterable clearable>
-                            <i-option v-for="item in businessTypes" :value="item.businessTypeName">{{item.businessTypeName}}</i-option>
+                            <i-option v-for="item in businessTypes" :value="item.businessTypeId">{{item.businessTypeName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="所属投资端：" prop="srcType" style="width: 180px;text-align: left">

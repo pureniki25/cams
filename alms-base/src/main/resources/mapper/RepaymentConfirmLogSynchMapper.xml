@@ -29,6 +29,7 @@
 		<result column="last_push_status" property="lastPushStatus" />
 		<result column="last_push_datetime" property="lastPushDatetime" />
 		<result column="last_push_remark" property="lastPushRemark" />
+		<result column="ext_business_type" property="extBusinessType" />
 		<result column="ext_business_ctype" property="extBusinessCtype" />
 		<result column="ext_company_name" property="extCompanyName" />
 		<result column="ext_customer_name" property="extCustomerName" />
@@ -60,7 +61,7 @@
 		create_time AS createTime, create_user AS createUser, update_time AS
 		updateTime, update_user AS updateUser, create_user_name AS
 		createUserName, last_push_status AS lastPushStatus, last_push_datetime
-		AS lastPushDatetime, last_push_remark AS lastPushRemark,
+		AS lastPushDatetime, last_push_remark AS lastPushRemark,ext_business_type AS extBusinessType,
 		ext_business_ctype AS extBusinessCtype, ext_company_name AS
 		extCompanyName, ext_customer_name AS extCustomerName, ext_platform AS
 		extPlatform, ext_repay_type AS extRepayType, ext_item10 AS extItem10,
@@ -250,19 +251,19 @@
 		SET s.ext_business_ctype = b.business_ctype,
 		s.ext_customer_name = b.customer_name,
 		s.ext_company_name =
-		b.company_name,
-		s.ext_platform = ( CASE b.output_platform_id
+		b.company_name
+		<!-- s.ext_platform = ( CASE b.output_platform_id
 		WHEN 0 THEN
 		'线下出款'
 		WHEN 1 THEN '团贷网'
 		WHEN 2 THEN '你我金融'
-		WHEN 3 THEN '粤财' END )
+		WHEN 3 THEN '粤财' END ) -->
 		WHERE
 		s.business_id = b.business_id
 		AND (
 		IFNULL(
-		s.ext_business_ctype, 0 ) !=
-		IFNULL( b.business_ctype, 0 )
+		s.ext_business_type, 0 ) !=
+		IFNULL( b.business_type, 0 )
 		OR IFNULL(
 		s.ext_customer_name, 0 ) !=
 		IFNULL( b.customer_name, 0 )
@@ -496,7 +497,7 @@
 			and #{req.companyId} = s.ext_company_name
 		</if>
 		<if test="req.businessType != null and req.businessType neq ''">
-			and #{req.businessType} = s.ext_business_ctype
+			and #{req.businessType} = s.ext_business_type
 		</if>
 		<if test="req.srcType != null and req.srcType neq ''">
 			and #{req.srcType} = s.ext_platform
@@ -531,7 +532,7 @@
 			and #{req.companyId} = s.ext_company_name
 		</if>
 		<if test="req.businessType != null and req.businessType neq ''">
-			and #{req.businessType} = s.ext_business_ctype
+			and #{req.businessType} = s.ext_business_type
 		</if>
 		<if test="req.srcType != null and req.srcType neq ''">
 			and #{req.srcType} = s.ext_platform

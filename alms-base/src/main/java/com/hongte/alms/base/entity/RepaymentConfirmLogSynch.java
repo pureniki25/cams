@@ -121,6 +121,12 @@ public class RepaymentConfirmLogSynch extends Model<RepaymentConfirmLogSynch> {
 	@ApiModelProperty(required= true,value = "")
 	@ExcelIgnore
 	private String lastPushRemark;
+	
+	@TableField("ext_business_type")
+	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
+	private String extBusinessType;
+	
 	@TableField("ext_business_ctype")
 	@ApiModelProperty(required= true,value = "")
 	@Excel(name="业务类型")
