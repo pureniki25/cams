@@ -1863,14 +1863,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         Map<Integer,Map<String,BigDecimal>>  retMap  = new HashMap<>();
 
         BigDecimal monthRate = getMonthRate(rate,rateUnit);
-
+        BigDecimal yearRate = getYearRate(rate, rateUnit);
         switch (repayType){
             case PAY_LAST:  //到期还本息
-            calcPrincipalLast(fullBorrowMoney,monthRate
+            calcPrincipalLast(fullBorrowMoney,yearRate
             ,periodMonth,retMap);
             break;
             case PRINCIPAL_LAST:  //先息后本
-                calcPrincipalLast(fullBorrowMoney,monthRate
+                calcPrincipalLast(fullBorrowMoney,yearRate
                 ,periodMonth,retMap);
                 break;
             case INT_AND_PRIN_EQUAL://等额本息
