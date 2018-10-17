@@ -321,7 +321,8 @@
 		SET
 		s.ext_item30 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
 		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
-		AND fee_id = '3df61688-d5a0-49c5-9c32-46b30855310a' )
+		AND plan_item_type = 30 )
+		<!-- AND fee_id = '3df61688-d5a0-49c5-9c32-46b30855310a' ) -->
 		WHERE
 		ISNULL(
 		s.ext_item30 );
@@ -332,7 +333,8 @@
 		SET
 		s.ext_item50 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
 		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
-		AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' )
+		AND plan_item_type = 30 )
+		<!-- AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' ) -->
 		WHERE
 		ISNULL(
 		s.ext_item50 );
