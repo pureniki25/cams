@@ -518,7 +518,7 @@
 		orgBusinessId, after_id AS afterId, period, idx,
 		can_revoke AS
 		canRevoke, is_cancelled AS isCancelled, proj_plan_json AS
-		projPlanJson, repay_date AS repayDate, fact_amount AS factAmount,
+		projPlanJson, repay_date AS repayDate, SUM(fact_amount) AS factAmount,
 		repay_source AS repaySource, surplus_amount AS surplusAmount,
 		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
 		create_time AS createTime, create_user AS createUser, update_time AS
