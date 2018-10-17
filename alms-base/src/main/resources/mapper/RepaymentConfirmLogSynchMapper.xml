@@ -291,7 +291,7 @@
 		END
 		)
 		WHERE
-		ISNULL( s.ext_platform );
+		ISNULL( s.ext_platform ) AND s.business_id = p.business_id ;
 	</update>
 
 	<update id="updateItem10">
@@ -513,36 +513,61 @@
 	
 	<select id="select" resultType="com.hongte.alms.base.entity.RepaymentConfirmLogSynch">
 		SELECT
-		<include refid="Base_Column_List"></include>
+		confirm_log_id AS confirmLogId, business_id AS businessId,
+		org_business_id AS
+		orgBusinessId, after_id AS afterId, period, idx,
+		can_revoke AS
+		canRevoke, is_cancelled AS isCancelled, proj_plan_json AS
+		projPlanJson, repay_date AS repayDate, fact_amount AS factAmount,
+		repay_source AS repaySource, surplus_amount AS surplusAmount,
+		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
+		create_time AS createTime, create_user AS createUser, update_time AS
+		updateTime, update_user AS updateUser, create_user_name AS
+		createUserName, last_push_status AS lastPushStatus, last_push_datetime
+		AS lastPushDatetime, last_push_remark AS lastPushRemark,ext_business_type AS extBusinessType,
+		ext_business_ctype AS extBusinessCtype, ext_company_name AS
+		extCompanyName, ext_customer_name AS extCustomerName, ext_platform AS
+		extPlatform, ext_repay_type AS extRepayType, 
+		SUM(ext_item10) AS extItem10,
+		SUM(ext_item20) AS extItem20, 
+		SUM(ext_item30) AS extItem30, 
+		SUM(ext_item50) AS extItem50, 
+		SUM(ext_item60online) AS extItem60online, 
+		SUM(ext_item60offline) AS extItem60offline, 
+		SUM(ext_item70_bj) AS extItem70Bj, 
+		SUM(ext_item70_pt) AS extItem70Pt, 
+		SUM(ext_item70_fw) AS extItem70Fw, 
+		SUM(ext_other_fee) AS extOtherFee, 
+		ext_remark AS extRemark
 		FROM
-		tb_repayment_confirm_log_synch s
-		WHERE s.is_cancelled = 0 
+		tb_repayment_confirm_log_synch 
+		WHERE is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
-			and ( s.business_id like '${req.key}%' or s.ext_customer_name like '${req.key}%' )
+			and ( s.business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
 		</if>
 		<if test="req.repayType != null and req.repayType neq ''  and req.repayType neq '混合代扣' ">
-			and s.ext_repay_type = #{req.repayType}
+			and ext_repay_type = #{req.repayType}
 		</if>
 		<if test="req.confirmStart != null and req.confirmStart neq '' ">
-			and #{req.confirmStart} &lt;= DATE(s.create_time)
+			and #{req.confirmStart} &lt;= DATE(create_time)
 		</if>
 		<if test="req.confirmEnd != null and req.confirmEnd neq ''">
-			and #{req.confirmEnd} &gt;= DATE(s.create_time)
+			and #{req.confirmEnd} &gt;= DATE(create_time)
 		</if>
 		<if test="req.companyId != null and req.companyId neq ''">
-			and #{req.companyId} = s.ext_company_name
+			and #{req.companyId} = ext_company_name
 		</if>
 		<if test="req.businessType != null and req.businessType neq ''">
-			and #{req.businessType} = s.ext_business_type
+			and #{req.businessType} = ext_business_type
 		</if>
 		<if test="req.srcType != null and req.srcType neq ''">
-			and #{req.srcType} = s.ext_platform
+			and #{req.srcType} = ext_platform
 		</if>
-		GROUP BY s.business_id,s.after_id, DATE( s.create_time ) 
+		GROUP BY business_id,after_id, DATE( create_time ) 
 		<if test="req.repayType != null and req.srcType neq '' and req.repayType eq '混合代扣' ">
-			HAVING count( DISTINCT s.ext_repay_type ) > 1
+			HAVING count( DISTINCT ext_repay_type ) > 1
 		</if>
-		ORDER BY s.create_time 
+		ORDER BY create_time 
 		<if test="req.curPage != null and req.curPage != 0">
 			LIMIT ${(req.curPage-1)*req.pageSize} , ${req.pageSize}
 		</if>
