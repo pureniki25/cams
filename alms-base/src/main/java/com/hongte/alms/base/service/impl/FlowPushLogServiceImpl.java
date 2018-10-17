@@ -400,7 +400,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     		
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
-        	String batchId = confirmLogId+"-"+actionId;
+        	String batchId = confirmLogId;
         	FlowPushLog flowPushLog = new FlowPushLog();
         	flowPushLog.setPushKey(batchId);
         	flowPushLog.setPushLogType(realActionId);
