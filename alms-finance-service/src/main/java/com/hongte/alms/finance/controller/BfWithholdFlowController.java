@@ -22,6 +22,7 @@ import com.hongte.alms.base.service.WithholdingFlowRecordService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordSummaryVo;
 import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordVo;
+import com.hongte.alms.base.vo.withhold.WithholdingFlowyYbRecordVo;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.EasyPoiExcelExportUtil;
 import com.hongte.alms.common.util.StringUtil;
@@ -104,12 +105,21 @@ public class BfWithholdFlowController {
     public Result saveExcel(HttpServletRequest request, HttpServletResponse response,@RequestBody WithholdFlowReq req) throws Exception {
 
         logger.info("@宝付流水--存储Excel--开始[{}]" , req);
-    	req.setWithholdingPlatform(PlatformEnum.BF_FORM.getPlatformId());
+    	req.setWithholdingPlatform(req.getWithholdingPlatform());
     	req.setLimit(10000);
         // 查分页数据
-        Page<WithholdingFlowRecordVo> pages=withholdingFlowRecordService.selectFlowBfRecordPage(req);
-        Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams(), WithholdingFlowRecordVo.class, pages.getRecords());
+    	 Page pages=null;
+    	   Workbook workbook =null;
+    	if(req.getWithholdingPlatform()==PlatformEnum.BF_FORM.getPlatformId()) {
+    		pages=withholdingFlowRecordService.selectFlowBfRecordPage(req);
+    		workbook=ExcelExportUtil.exportExcel(new ExportParams(), WithholdingFlowRecordVo.class, pages.getRecords());
 
+    	}
+    	if(req.getWithholdingPlatform()==PlatformEnum.YB_FORM.getPlatformId()) {
+    		pages=withholdingFlowRecordService.selectFlowYbRecordPage(req);
+    		workbook=ExcelExportUtil.exportExcel(new ExportParams(), WithholdingFlowyYbRecordVo.class, pages.getRecords());
+    	}
+ 
         String fileName =  UUID.randomUUID().toString()+".xls";
         System.out.println(fileName);
 

@@ -66,7 +66,7 @@ public class WithholdingFlowRecordVo  {
      * 商户订单号
      */
 	@ApiModelProperty(required= true,value = "商户订单号")
-	@Excel(name = "商户订单号", orderNum = "5",  isImportField = "true_st")
+	@Excel(name = "商户支付订单号", orderNum = "5",  isImportField = "true_st")
 	private String merchantOrderNo;
     /**
      * 交易订单号
@@ -95,6 +95,7 @@ public class WithholdingFlowRecordVo  {
      */
 	@TableField("service_charge")
 	@ApiModelProperty(required= true,value = "手续费")
+	@Excel(name = "手续费", orderNum = "10",  isImportField = "true_st")
 	private BigDecimal serviceCharge;
     /**
      * 支付卡类型
@@ -110,7 +111,7 @@ public class WithholdingFlowRecordVo  {
      * 清算日期
      */
 	@ApiModelProperty(required= true,value = "清算日期")
-	@Excel(name = "清算日期", orderNum = "10",  isImportField = "true_st")
+	@Excel(name = "清算日期", orderNum = "11",  isImportField = "true_st")
 	private String liquidationDate;
     /**
      * 代扣状态(1:成功,0:失败;2:处理中)
