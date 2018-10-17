@@ -21,6 +21,38 @@ window.layinit(function (htConfig) {
                 srcType: null,
             },
             dateOptions:{
+                shortcuts:[
+                    {
+                        text:'今天',
+                        value(){
+                            let today = moment().format("YYYY-MM-DD");
+                            return [today,today];
+                        }
+                    },
+                    {
+                        text:'昨天',
+                        value(){
+                            let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
+                            return [yesterday,yesterday];
+                        }
+                    },
+                    {
+                        text:'本月',
+                        value(){
+                            let start = moment().add('month', 0).format('YYYY-MM') + '-01'
+                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                            return [start,end];
+                        }
+                    },
+                    {
+                        text:'上个月',
+                        value(){
+                            let start = moment().add('month', -1).format('YYYY-MM') + '-01'
+                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                            return [start,end];
+                        }
+                    }
+                ],
                 disabledDate: function (date) {
                     return date > new Date();
                 },
@@ -60,6 +92,10 @@ window.layinit(function (htConfig) {
                     {
                         title: '实收日期',
                         key: 'repayDate'
+                    },
+                    {
+                        title: '确认日期',
+                        key: 'createTime'
                     },
                     {
                         title: '实收金额',
@@ -136,9 +172,13 @@ window.layinit(function (htConfig) {
                 if (this.form.confirmTime) {
                     if (this.form.confirmTime[0] && this.form.confirmTime[0] != "") {
                         this.form.confirmStart = this.form.confirmTime[0];
+                    }else{
+                        this.form.confirmStart = null;
                     }
                     if (this.form.confirmTime[1] && this.form.confirmTime[1] != "") {
                         this.form.confirmEnd = this.form.confirmTime[1];
+                    }else{
+                        this.form.confirmEnd = null;
                     }
                 }
                 vm.table.loading = true;
@@ -161,9 +201,13 @@ window.layinit(function (htConfig) {
                 if (this.form.confirmTime) {
                     if (this.form.confirmTime[0] && this.form.confirmTime[0] != "") {
                         this.form.confirmStart = this.form.confirmTime[0];
+                    }else{
+                        this.form.confirmStart = null;
                     }
-                    if (this.form.confirmTime[0] && this.form.confirmTime[0] != "") {
+                    if (this.form.confirmTime[1] && this.form.confirmTime[1] != "") {
                         this.form.confirmEnd = this.form.confirmTime[1];
+                    }else{
+                        this.form.confirmEnd = null;
                     }
                 }
                 axios.post(basePath + 'factRepay/export', this.form, {
@@ -258,7 +302,7 @@ window.layinit(function (htConfig) {
                         vm.syncing = false
                         if (res.data.code == '1') {
                             vm.$Modal.success({
-                                content: '同步成功,更新' + res.data.data.total + '条数据'
+                                content: '同步成功'
                             })
                         } else {
                             vm.$Modal.error({
