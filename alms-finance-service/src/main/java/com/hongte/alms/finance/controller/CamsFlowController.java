@@ -218,7 +218,7 @@ public class CamsFlowController {
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
         	int actionId = Integer.parseInt(businessMapInfo.get("action_id").toString());
-        	String batchId = confirmLogId+"-5";
+        	String batchId = confirmLogId;
         	TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("log_id", confirmLogId));
         	FlowPushLog flowPushLog = new FlowPushLog();
         	flowPushLog.setPushKey(batchId);
@@ -495,8 +495,8 @@ public class CamsFlowController {
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
         	int actionId = Integer.parseInt(businessMapInfo.get("action_id").toString());
-        	String batchId = confirmLogId+"-2";
-        	RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(batchId);
+        	String batchId = confirmLogId;
+        	RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(confirmLogId);
         	//是否业务交易明细,1是,0否
         	int businessFlag = Integer.parseInt(businessMapInfo.get("businessFlag").toString());
         	//所属资产端
