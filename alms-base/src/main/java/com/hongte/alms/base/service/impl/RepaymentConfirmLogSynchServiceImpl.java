@@ -94,6 +94,8 @@ public class RepaymentConfirmLogSynchServiceImpl extends BaseServiceImpl<Repayme
 		return synchMapper.select(req);
 	}
 	
+	
+	
 	@Override
 	public Page<RepaymentConfirmLogSynch> page(FactRepayReq req) {
 		Page<RepaymentConfirmLogSynch> page = new Page<>(req.getCurPage(), req.getPageSize());
@@ -124,7 +126,7 @@ public class RepaymentConfirmLogSynchServiceImpl extends BaseServiceImpl<Repayme
 		int updateOtherFee = updateOtherFee();
 		int updateRemark = updateRemark();
 		int updateRepayType = updateRepayType();
-		
+		int updatePlateType = updatePlateType() ;
 		List<Integer> list = Arrays.asList(
 				updateRepaymentConfirmLog
 				,updateBaiscBusiness
@@ -140,9 +142,13 @@ public class RepaymentConfirmLogSynchServiceImpl extends BaseServiceImpl<Repayme
 				,updateItem70pt
 				,updateOtherFee
 				,updateRemark
-				,updateRepayType);
+				,updateRepayType,updatePlateType);
 		Integer max = Collections.max(list);
 		return max;
+	}
+	@Override
+	public int updatePlateType() {
+		return synchMapper.updatePlateType();
 	}
 
 }

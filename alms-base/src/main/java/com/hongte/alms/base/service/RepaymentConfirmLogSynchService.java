@@ -49,6 +49,8 @@ public interface RepaymentConfirmLogSynchService extends BaseService<RepaymentCo
 	
 	public int updateRepayType() ;
 	
+	public int updatePlateType();
+	
 	public List<RepaymentConfirmLogSynch> select(FactRepayReq req) ;
 	
 	public Page<RepaymentConfirmLogSynch> page(FactRepayReq req) ;

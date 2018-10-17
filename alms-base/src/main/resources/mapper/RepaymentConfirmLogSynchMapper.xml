@@ -271,6 +271,27 @@
 		)
 	</update>
 
+	<update id="updatePlateType">
+		UPDATE tb_repayment_confirm_log_synch s,
+		tb_tuandai_project_info p
+		SET s.ext_platform = (
+		CASE
+		p.plate_type
+		WHEN 0 THEN
+		'线下出款'
+		WHEN 1 THEN
+		'团贷网'
+		WHEN 2 THEN
+		'你我金融'
+		WHEN 3 THEN
+		'粤财'
+		ELSE '线下出款'
+		END
+		)
+		WHERE
+		ISNULL( s.ext_platform );
+	</update>
+
 	<update id="updateItem10">
 		UPDATE tb_repayment_confirm_log_synch s
 		SET

@@ -26,6 +26,8 @@ public interface RepaymentConfirmLogSynchMapper extends SuperMapper<RepaymentCon
 
 	public int updateBaiscBusiness();
 	
+	public int updatePlateType();
+	
 	public int updateUser() ;
 
 	public int updateItem10();
