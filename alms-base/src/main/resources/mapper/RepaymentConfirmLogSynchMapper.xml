@@ -249,6 +249,7 @@
 		UPDATE tb_repayment_confirm_log_synch s,
 		tb_basic_business b
 		SET s.ext_business_ctype = b.business_ctype,
+		s.ext_business_type = b.business_type,
 		s.ext_customer_name = b.customer_name,
 		s.ext_company_name =
 		b.company_name
