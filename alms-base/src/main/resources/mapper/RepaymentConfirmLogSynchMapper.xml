@@ -333,7 +333,7 @@
 		SET
 		s.ext_item50 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
 		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
-		AND plan_item_type = 30 )
+		AND plan_item_type = 50 )
 		<!-- AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' ) -->
 		WHERE
 		ISNULL(
