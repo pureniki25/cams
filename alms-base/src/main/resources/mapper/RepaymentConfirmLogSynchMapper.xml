@@ -222,8 +222,8 @@
 		0 ) != IFNULL( s.`plan_id`, 0 )
 		OR IFNULL( l.`create_time`, 0 ) !=
 		IFNULL( s.`create_time`, 0 )
-		OR IFNULL( l.`create_user`, 0 ) != IFNULL(
-		s.`create_user`, 0 )
+		<!-- OR IFNULL( l.`create_user`, 0 ) != IFNULL(
+		s.`create_user`, 0 ) -->
 		OR IFNULL( l.`update_time`, 0 ) != IFNULL(
 		s.`update_time`, 0 )
 		OR IFNULL( l.`update_user`, 0 ) != IFNULL(
