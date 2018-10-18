@@ -92,6 +92,7 @@
 		`type`,
 		`plan_id`,
 		`create_time`,
+		`create_user`,
 		`update_time`,
 		`update_user`,
 		`create_user_name`,
@@ -118,6 +119,7 @@
 		l.`type`,
 		l.`plan_id`,
 		l.`create_time`,
+		l.`create_user`,
 		l.`update_time`,
 		l.`update_user`,
 		l.`create_user_name`,
@@ -172,9 +174,7 @@
 		s.`plan_id` = l.`plan_id`,
 		s.`create_time` =
 		l.`create_time`,
-		s.`create_user` = IFNULL(
-			(SELECT user_name from tb_sys_user where user_id = l.`create_user` limit 1 ),'系统自动代扣'
-		),
+		s.`create_user` = l.`create_user`,
 		s.`update_time` =
 		l.`update_time`,
 		s.`update_user` = l.`update_user`,
@@ -222,8 +222,8 @@
 		0 ) != IFNULL( s.`plan_id`, 0 )
 		OR IFNULL( l.`create_time`, 0 ) !=
 		IFNULL( s.`create_time`, 0 )
-		<!-- OR IFNULL( l.`create_user`, 0 ) != IFNULL(
-		s.`create_user`, 0 ) -->
+		OR IFNULL( l.`create_user`, 0 ) != IFNULL(
+		s.`create_user`, 0 )
 		OR IFNULL( l.`update_time`, 0 ) != IFNULL(
 		s.`update_time`, 0 )
 		OR IFNULL( l.`update_user`, 0 ) != IFNULL(
@@ -521,7 +521,9 @@
 		projPlanJson, repay_date AS repayDate, SUM(fact_amount) AS factAmount,
 		repay_source AS repaySource, surplus_amount AS surplusAmount,
 		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
-		create_time AS createTime, create_user AS createUser, update_time AS
+		create_time AS createTime, 
+		IFNULL(u.user_name,'系统自动代扣') as create_user, 
+		update_time AS
 		updateTime, update_user AS updateUser, create_user_name AS
 		createUserName, last_push_status AS lastPushStatus, last_push_datetime
 		AS lastPushDatetime, last_push_remark AS lastPushRemark,ext_business_type AS extBusinessType,
@@ -541,6 +543,7 @@
 		ext_remark AS extRemark
 		FROM
 		tb_repayment_confirm_log_synch 
+		left join tb_sys_user u on u.user_id = create_user
 		WHERE is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
 			and ( business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
