@@ -567,7 +567,7 @@
 		<if test="req.repayType != null and req.srcType neq '' and req.repayType eq '混合代扣' ">
 			HAVING count( DISTINCT ext_repay_type ) > 1
 		</if>
-		ORDER BY create_time 
+		ORDER BY repay_date desc
 		<if test="req.curPage != null and req.curPage != 0">
 			LIMIT ${(req.curPage-1)*req.pageSize} , ${req.pageSize}
 		</if>
