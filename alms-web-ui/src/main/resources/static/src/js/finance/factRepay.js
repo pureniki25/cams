@@ -79,6 +79,7 @@ window.layinit(function (htConfig) {
                 loading: false,
                 total: 0,
                 data: [],
+                current:1,
                 col: [{
                         title: '业务编号',
                         key: 'businessId'
@@ -158,7 +159,7 @@ window.layinit(function (htConfig) {
         },
         watch:{
             'form.confirmTime':function(){
-                vm.paging(1)
+                vm.form.curPage = 1
             }
         },
         methods: {
@@ -212,9 +213,11 @@ window.layinit(function (htConfig) {
                         vm.$Message.error({
                             content: '查询实还记录失败'
                         })
+                        vm.table.current = 1
                     } else {
                         vm.table.data = res.data.records
                         vm.table.total = res.data.total
+                        vm.table.current = res.data.current
                     }
 
                     vm.table.loading = false;
