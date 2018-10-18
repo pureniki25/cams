@@ -1022,6 +1022,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 		                	for (RepaymentProjPlanListDto afterProjPlanListDto : repaymentProjPlanSettleDto.getAfterProjPlanListDtos()) {
 		                		afterProjPlanListDto.getRepaymentProjPlanList().setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
 		                		afterProjPlanListDto.getRepaymentProjPlanList().setRepayFlag(PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue());
+		                		afterProjPlanListDto.getRepaymentProjPlanList().setFactRepayDate(financeSettleBaseDto.getRepaymentResources().get(financeSettleBaseDto.getRepaymentResources().size()-1).getRepayDate());
 		                		afterProjPlanListDto.getRepaymentProjPlanList().updateAllColumnById();
 							}
 		                	
@@ -1094,6 +1095,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 	                	for (RepaymentBizPlanListDto bizPlanListDto : bizPlanSettleDto.getAfterBizPlanListDtos()) {
 	                		bizPlanListDto.getRepaymentBizPlanList().setCurrentStatus(RepayCurrentStatusEnums.已还款.toString());
 	                		bizPlanListDto.getRepaymentBizPlanList().setRepayFlag(PepayPlanRepayFlagStatusEnum.UNDERLINE_ALL_SETTLE.getValue());
+	                		bizPlanListDto.getRepaymentBizPlanList().setFactRepayDate(financeSettleBaseDto.getRepaymentResources().get(financeSettleBaseDto.getRepaymentResources().size()-1).getRepayDate());
 	                		bizPlanListDto.getRepaymentBizPlanList().updateAllColumnById();
 						}
 					}

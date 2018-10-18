@@ -3,12 +3,14 @@ package com.hongte.alms.platrepay.controller;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
+import com.hongte.alms.base.entity.*;
+import com.hongte.alms.base.enums.repayPlan.*;
+import com.hongte.alms.base.service.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -28,11 +30,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.hongte.alms.base.dto.ActualPaymentLogDTO;
 import com.hongte.alms.base.dto.compliance.TdPlatformPlanRepaymentDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
-import com.hongte.alms.base.entity.ProfitFeeSet;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
-import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
@@ -41,14 +42,12 @@ import com.hongte.alms.base.entity.SysApiCallFailureRecord;
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.AlmsServiceNameEnums;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
-import com.hongte.alms.base.enums.repayPlan.RepayPlanRepaySrcEnum;
+import com.hongte.alms.base.feignClient.AlmsFinanceServiceFeignClient;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.service.ProfitFeeSetService;
-import com.hongte.alms.base.service.RepaymentBizPlanListDetailService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
@@ -66,8 +65,6 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.platrepay.dto.TdGuaranteePaymentDTO;
-import com.hongte.alms.platrepay.dto.TdProjectPaymentDTO;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.Api;
@@ -88,6 +85,10 @@ public class PlatformRepaymentController {
 
 	@Autowired
 	private EipRemote eipRemote;
+
+	@Autowired
+	@Qualifier("IssueSendOutsideLogService")
+	private IssueSendOutsideLogService issueSendOutsideLogService ;
 
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
@@ -154,17 +155,20 @@ public class PlatformRepaymentController {
 	RepaymentConfirmPlatRepayLogService repaymentConfirmPlatRepayLogService;
 
 	@Autowired
-	private LoginUserInfoHelper loginUserInfoHelper;
-
-	static final ConcurrentMap<Integer, String> FEE_TYPE_MAP;
-
-	@Autowired
 	@Qualifier("ProfitFeeSetService")
 	private ProfitFeeSetService profitFeeSetService;
 
 	@Autowired
 	@Qualifier("RepaymentProjPlanListDetailService")
 	private RepaymentProjPlanListDetailService repaymentProjPlanListDetailService;
+
+	@Autowired
+	private LoginUserInfoHelper loginUserInfoHelper;
+
+	@Autowired
+	private AlmsFinanceServiceFeignClient almsFinanceServiceFeignClient;
+
+	static final ConcurrentMap<Integer, String> FEE_TYPE_MAP;
 
 	static {
 
@@ -196,15 +200,15 @@ public class PlatformRepaymentController {
 	@PostMapping("/repayment")
 	@ResponseBody
 	public Result repayment(@RequestBody Map<String, Object> paramMap) {
-		
+
 		if (paramMap == null || StringUtils.isBlank((String) paramMap.get("projPlanListId"))) {
 			return Result.error("参数不能为空");
 		}
-		
+
 		String projPlanListId = (String) paramMap.get("projPlanListId");
-		
+
 		LOGGER.info("@对接合规还款接口 开始 @输入参数 projPlanListId:[{}] ", projPlanListId);
-		
+
 		try {
 			/*
 			 * 获取当期的标的还款信息列表信息
@@ -225,7 +229,7 @@ public class PlatformRepaymentController {
 				LOGGER.info("@对接合规还款接口@  查不到标的还款计划信息 输入参数 projPlanListId:[{}]  ", projPlanListId);
 				return Result.error("查不到标的还款计划信息");
 			}
-			
+
 			Integer settleType = null; // 结清类型
 			// 标的还款计划结清状态
 			settleType = handleSettleType(settleType, projPlan.getPlanStatus());
@@ -233,12 +237,12 @@ public class PlatformRepaymentController {
 			if (settleType == null) {
 				Result.error("标的还款计划结清状态值错误");
 			}
-			
+
 			TdrepayRechargeInfoVO vo = new TdrepayRechargeInfoVO();
 			String projectId = projPlan.getProjectId();
 			// 判断是否提前结清
 			boolean isSettle = isSettle(projectId, settleType);
-			
+
 			vo.setSettleType(settleType);
 
 			/*
@@ -270,14 +274,14 @@ public class PlatformRepaymentController {
 			if (basicBusiness == null) {
 				return Result.error("查不到业务基础信息");
 			}
-			
+
 			// 查询团贷网平台业务上标信息
 			TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService.selectById(projectId);
 			if (tuandaiProjectInfo == null) {
 				LOGGER.info("@对接合规还款接口@  查不到平台的上标信息 输入参数 projPlanListId:[{}]  ", projPlanListId);
 				return Result.error("查不到平台的上标信息");
 			}
-			
+
 			// 处理业务类型
 			Integer businessType = handleBusinessType(basicBusiness, tuandaiProjectInfo);
 			if (businessType == null) {
@@ -300,16 +304,16 @@ public class PlatformRepaymentController {
 			if (bizPlanList == null) {
 				return Result.error("查不到业务维度的还款计划列表信息");
 			}
-			
+
 			if (bizPlanList.getFinanceComfirmDate() != null) {
 				vo.setConfirmTime(bizPlanList.getFinanceComfirmDate());
 			} else {
 				return Result.error("财务确认还款操作日期为空");
 			}
-			
+
 			vo.setAfterId(projPlanList.getAfterId());
 			vo.setPeriod(projPlanList.getPeriod());
-			
+
 			/*
 			 * 肖莹环提出充值金额计算规则：利息以平台应还利息为准，其他费用项以资产端数据为准。 说明：有垫付则按垫付传费用项，否则按查询的标的还未计划信息传费用项
 			 * 2018-09-14 充值金额修改规则：本金以平台本金为准
@@ -321,9 +325,9 @@ public class PlatformRepaymentController {
 			BigDecimal interestAmount = BigDecimal.ZERO; // 平台利息
 
 			if (isSettle) {
-				
-				// 若是提前结清，则取平台本息金额 
-				
+
+				// 若是提前结清，则取平台本息金额
+
 				Map<String, Object> params = Maps.newHashMap();
 				params.put("projectId", projectId);
 				com.ht.ussp.core.Result queryRepaymentEarlierResult = eipRemote.queryRepaymentEarlier(params);
@@ -343,7 +347,7 @@ public class PlatformRepaymentController {
 					return Result.error("提前结清平台费用查询出错");
 				}
 			}
-			
+
 			/*
 			 * 根据 projPlanListId 获取实还明细
 			 */
@@ -377,14 +381,14 @@ public class PlatformRepaymentController {
 				Map<String, Integer> notShaPrMap = getNotShareProfitFeeIds(projPlanListId);
 				boolean amountFlag = false;
 				boolean interestAmountFlag = false;
-				
+
 				Map<Integer, Boolean> map = new HashMap<>();
 
 				for (RepaymentProjFactRepay r : projFactRepayList) {
-					
+
 					BigDecimal factAmount = r.getFactAmount() == null ? BigDecimal.ZERO : r.getFactAmount();
 					Integer planItemType = r.getPlanItemType();
-					
+
 					// 累计实还金额，包含线下和线上费用
 					factRepayAmount = factRepayAmount.add(factAmount);
 					/*
@@ -445,25 +449,25 @@ public class PlatformRepaymentController {
 					}
 					detailFee.setFeeType(feeType);
 					detailFee.setFeeName(r.getPlanItemName());
-					
+
 					if (feeType.intValue() == 10) {
 						if (!amountFlag) {
 							detailFee.setFeeValue(factAmount);
 							amountFlag = true;
-						}else {
+						} else {
 							detailFee.setFeeValue(BigDecimal.ZERO);
 						}
-					}else if (feeType.intValue() == 20) {
+					} else if (feeType.intValue() == 20) {
 						if (!interestAmountFlag) {
 							detailFee.setFeeValue(factAmount);
 							interestAmountFlag = true;
-						}else {
+						} else {
 							detailFee.setFeeValue(BigDecimal.ZERO);
 						}
-					}else {
+					} else {
 						detailFee.setFeeValue(factAmount);
 					}
-					
+
 					if (r.getRepaySource() != null) {
 						if ((r.getRepaySource().intValue() != 30) && (r.getRepaySource().intValue() != 31)) {
 							if (map.containsKey(feeType)) {
@@ -471,7 +475,7 @@ public class PlatformRepaymentController {
 									rechargeAmount = rechargeAmount.add(factAmount);
 									map.put(feeType, true);
 								}
-							}else {
+							} else {
 								rechargeAmount = rechargeAmount.add(factAmount);
 							}
 						}
@@ -492,8 +496,7 @@ public class PlatformRepaymentController {
 					vo.setRechargeAmount(vo.getFactRepayAmount());
 				}
 
-				// 用实还赋值流水金额
-				vo.setResourceAmount(factRepayAmount);
+				vo.setResourceAmount(BigDecimal.valueOf(handelResourceAmount(projectId, vo.getAfterId())));
 				vo.setDetailList(detailFeeList);
 
 			}
@@ -529,7 +532,7 @@ public class PlatformRepaymentController {
 							.selectOne(new EntityWrapper<TuandaiProjectInfo>().where("project_id = master_issue_id")
 									.eq("business_id", tuandaiProjectInfo.getBusinessId()));
 					vo.setTdUserId(masterInfo.getTdUserId());
-				}else {
+				} else {
 					vo.setTdUserId(tuandaiProjectInfo.getTdUserId());
 				}
 			}
@@ -551,7 +554,47 @@ public class PlatformRepaymentController {
 	}
 
 	/**
+	 * 处理流水金额
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	private double handelResourceAmount(String projectId, String afterId) {
+		try {
+			
+			TuandaiProjectInfo info = tuandaiProjectInfoService.selectById(projectId);
+			if (info == null) {
+				return 0;
+			}
+			
+			Result result = almsFinanceServiceFeignClient.queryActualPaymentByBusinessId(info.getBusinessId());
+			if (result != null && result.getData() != null && Constant.LMS_SUCCESS_CODE.equals(result.getCode())) {
+				Map map = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), Map.class);
+				if (map != null && !map.isEmpty()) {
+					List<ActualPaymentLogDTO> actualPaymentLogDTOs = JSONObject.parseArray(
+							JSONObject.toJSONString(map.get("actualPaymentLogDTOs")), ActualPaymentLogDTO.class);
+
+					if (CollectionUtils.isNotEmpty(actualPaymentLogDTOs)) {
+
+						for (ActualPaymentLogDTO actualPaymentLogDTO : actualPaymentLogDTOs) {
+							if (afterId.equals(actualPaymentLogDTO.getAfterId())) {
+								return actualPaymentLogDTO.getReceivedTotal();
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			return 0;
+		}
+
+		return 0;
+	}
+
+	/**
 	 * 判断是否是提前结清
+	 * 
 	 * @param projectId
 	 * @param settleType
 	 * @return
@@ -561,23 +604,24 @@ public class PlatformRepaymentController {
 		boolean isSettle = false;
 
 		if (settleType.intValue() != 0) {
-			
+
 			List<TdPlatformPlanRepaymentDTO> dtos = remotePlatformRepaymentPlan(projectId);
-			
+
 			if (CollectionUtils.isNotEmpty(dtos)) {
-				
+
 				// 获取最后一期的平台还款计划的应还日期，与当期日期进行对比
 				String cycDate = dtos.get(dtos.size() - 1).getCycDate();
-				
+
 				// 区分是提前结清、正常结清、逾期结清
 				isSettle = DateUtil.getDate(cycDate).after(new Date());
 			}
 		}
 		return isSettle;
 	}
-	
+
 	/**
 	 * 从平台获取还款计划
+	 * 
 	 * @param projectId
 	 */
 	@SuppressWarnings("rawtypes")
@@ -603,11 +647,12 @@ public class PlatformRepaymentController {
 		}
 
 		return Lists.newArrayList();
-		 
+
 	}
 
 	/**
 	 * 处理结清状态
+	 * 
 	 * @param tempProjPlanStatus
 	 * @param planStatus
 	 * @return
@@ -643,12 +688,13 @@ public class PlatformRepaymentController {
 
 	/**
 	 * 处理业务类型
+	 * 
 	 * @param basicBusiness
 	 * @param tuandaiProjectInfo
 	 * @return
 	 */
 	private Integer handleBusinessType(BasicBusiness basicBusiness, TuandaiProjectInfo tuandaiProjectInfo) {
-		
+
 		Integer businessType = basicBusiness.getBusinessType();
 		if (businessType == null) {
 			return businessType;
@@ -718,48 +764,160 @@ public class PlatformRepaymentController {
 	@ResponseBody
 	public Result retryRepayment(@RequestParam("projPlanListId") String projPlanListId) {
 		try {
-			List<SysApiCallFailureRecord> sysApiCallFailureRecords = sysApiCallFailureRecordService
-					.queryRetryMaxCntFailData(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT,
-							AlmsServiceNameEnums.FINANCE.getName(), projPlanListId);
-			if (CollectionUtils.isEmpty(sysApiCallFailureRecords)) {
-				return Result.success();
-			}
-			Map<String, Object> paramMap = new HashMap<>();
-			for (SysApiCallFailureRecord sysApiCallFailureRecord : sysApiCallFailureRecords) {
-				if (sysApiCallFailureRecord.getRetrySuccess() == 1) {
-					continue;
+
+			if(projPlanListId.equals("")){
+				List<SysApiCallFailureRecord> sysApiCallFailureRecords = sysApiCallFailureRecordService
+						.queryRetryMaxCntFailData(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT,
+								AlmsServiceNameEnums.FINANCE.getName(), projPlanListId);
+				if (CollectionUtils.isEmpty(sysApiCallFailureRecords)) {
+					return Result.error("-99", "没找到可推送的信息");
 				}
-				paramMap.put("refId", sysApiCallFailureRecord.getRefId());
+				Map<String, Object> paramMap = new HashMap<>();
+				for (SysApiCallFailureRecord sysApiCallFailureRecord : sysApiCallFailureRecords) {
+					if (sysApiCallFailureRecord.getRetrySuccess() == 1) {
+						continue;
+					}
+					paramMap.put("projPlanListId", sysApiCallFailureRecord.getRefId());
+					Result result = repayment(paramMap);
+					SysApiCallFailureRecord record = new SysApiCallFailureRecord();
+					record.setApiCode(sysApiCallFailureRecord.getApiCode());
+					record.setApiName(sysApiCallFailureRecord.getApiName());
+					record.setApiParamCiphertext(sysApiCallFailureRecord.getApiParamCiphertext());
+					record.setApiParamPlaintext(sysApiCallFailureRecord.getApiParamPlaintext());
+					record.setApiReturnInfo(JSONObject.toJSONString(result));
+					record.setModuleName(sysApiCallFailureRecord.getModuleName());
+					record.setRefId(sysApiCallFailureRecord.getRefId());
+					record.setRetryCount(sysApiCallFailureRecord.getRetryCount() + 1);
+					record.setRetryTime(new Date());
+					record.setTargetUrl(sysApiCallFailureRecord.getTargetUrl());
+					record.setUpdateTime(new Date());
+					record.setUpdateUser(loginUserInfoHelper.getUserId());
+					if (result != null && "1".equals(result.getCode())) {
+						record.setRetrySuccess(1);
+					} else {
+						record.setRetrySuccess(0);
+					}
+					sysApiCallFailureRecordService.insert(record);
+				}
+			}else{
+				Map<String, Object> paramMap = new HashMap<>();
+				paramMap.put("projPlanListId", projPlanListId);
 				Result result = repayment(paramMap);
-				SysApiCallFailureRecord record = new SysApiCallFailureRecord();
-				record.setApiCode(sysApiCallFailureRecord.getApiCode());
-				record.setApiName(sysApiCallFailureRecord.getApiName());
-				record.setApiParamCiphertext(sysApiCallFailureRecord.getApiParamCiphertext());
-				record.setApiParamPlaintext(sysApiCallFailureRecord.getApiParamPlaintext());
-				record.setApiReturnInfo(JSONObject.toJSONString(result));
-				record.setModuleName(sysApiCallFailureRecord.getModuleName());
-				record.setRefId(sysApiCallFailureRecord.getRefId());
-				record.setRetryCount(sysApiCallFailureRecord.getRetryCount() + 1);
-				record.setRetryTime(new Date());
-				record.setTargetUrl(sysApiCallFailureRecord.getTargetUrl());
-				record.setUpdateTime(new Date());
-				record.setUpdateUser(loginUserInfoHelper.getUserId());
-				if (result != null && "1".equals(result.getCode())) {
-					record.setRetrySuccess(1);
-				} else {
-					record.setRetrySuccess(0);
-				}
-				sysApiCallFailureRecordService.insert(record);
 			}
+
+
+
+
 			return Result.success();
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			return Result.error("-99", e.getMessage());
 		}
 	}
-	
-	public static void main(String[] args) {
-		String str = "2018-10-10";
-		System.out.println(DateUtil.getDate(str).after(new Date()));
+
+
+	@RequestMapping("/tdrepayRecharge")
+	@ApiOperation(value = "根据标的还款计划Listid 重推资金分发数据")
+	private Result tdrepayRecharge(String projRepaymentId){
+
+		List<String> idList = new LinkedList<>();
+		idList.add(projRepaymentId);
+
+		RepaymentProjPlanList  repaymentProjPlanList= repaymentProjPlanListService.selectById(projRepaymentId);
+
+		if(repaymentProjPlanList == null){
+			return Result.error("-99","找不到此标的还款计划");
+		}
+
+		if(!repaymentProjPlanList.getCreatSysType().equals(RepayPlanCreateSysEnum.ALMS.getValue())){
+			return Result.error("-99","此标的不是贷后系统还款的标的");
+		}
+
+		if(repaymentProjPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ONLINE_REPAID.getKey())
+				|| repaymentProjPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ALL_REPAID.getKey())
+				|| repaymentProjPlanList.getCurrentStatus().equals(RepayPlanStatus.REPAYED.getName())){
+			List<RepaymentProjPlanList>  rlist = new LinkedList<RepaymentProjPlanList>();
+			rlist.add(repaymentProjPlanList);
+			tdrepayRecharge(rlist);
+
+		}else{
+			return Result.error("-99","此标的没有还完款");
+		}
+
+		return Result.success();
 	}
+
+
+	public void tdrepayRecharge(List<RepaymentProjPlanList> projPlanLists) {
+
+		if(projPlanLists==null||projPlanLists.size()==0){
+			LOGGER.info("开始调用平台合规化还款接口，参数：{}", projPlanLists);
+			return;
+		}
+//        //睡一下，让还款的信息先存完。
+//        try {
+//            Thread.sleep(500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+		for(RepaymentProjPlanList repaymentProjPlanList : projPlanLists){
+			SysApiCallFailureRecord record = new SysApiCallFailureRecord();
+			IssueSendOutsideLog issueSendOutsideLog = null ;
+			Result result = null;
+			try {
+				record.setModuleName(AlmsServiceNameEnums.FINANCE.getName());
+				record.setApiCode(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
+				record.setApiName(Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT);
+				record.setRefId(repaymentProjPlanList.getProjPlanListId());
+				record.setCreateUser(
+						StringUtil.isEmpty(loginUserInfoHelper.getUserId()) ? "null" : loginUserInfoHelper.getUserId());
+				record.setCraeteTime(new Date());
+				record.setTargetUrl(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT);
+
+				RepaymentProjPlan plan = null;
+
+				if (repaymentProjPlanList != null) {
+					plan = repaymentProjPlanService.selectById(repaymentProjPlanList.getProjPlanId());
+				}
+
+				if (plan != null) {
+
+					Map<String, Object> paramMap = new HashMap<>();
+					paramMap.put("projPlanListId",repaymentProjPlanList.getProjPlanListId());
+
+
+					record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
+//                    sysApiCallFailureRecordService.insert(record);
+
+					issueSendOutsideLog = issueSendOutsideLogService.createIssueSendOutsideLog(
+							loginUserInfoHelper.getUserId(),
+							JSON.toJSONString(paramMap),
+							Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT,
+							Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT,
+							Constant.SYSTEM_CODE_EIP) ;
+					issueSendOutsideLog.setBusinessId(repaymentProjPlanList.getBusinessId());
+					issueSendOutsideLog.setSendKey(repaymentProjPlanList.getProjPlanListId());
+
+					// 平台合规化还款接口
+					result = repayment(paramMap);
+					if (result != null) {
+						issueSendOutsideLog.setReturnJson(JSON.toJSONString(result));
+						record.setApiReturnInfo(JSONObject.toJSONString(result));
+					}
+					issueSendOutsideLogService.save(issueSendOutsideLog);
+				}
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage(), e);
+				record.setApiReturnInfo(e.getMessage());
+				issueSendOutsideLog.setReturnJson(e.getMessage());
+				issueSendOutsideLogService.save(issueSendOutsideLog);
+			}
+			LOGGER.info("平台合规化还款接口返回结果：{}", JSONObject.toJSONString(result));
+			if (result == null || !"1".equals(result.getCode())) {
+				sysApiCallFailureRecordService.insert(record);
+			}
+		}
+
+	}
+
 }

@@ -48,7 +48,7 @@
                     <form-item label="业务类型">
                         <i-select v-model="form.businessType" placeholder="--请选择--" style="width: 180px;text-align: left"
                             filterable clearable>
-                            <i-option v-for="item in businessTypes" :value="item.businessTypeName">{{item.businessTypeName}}</i-option>
+                            <i-option v-for="item in businessTypes" :value="item.businessTypeId">{{item.businessTypeName}}</i-option>
                         </i-select>
                     </form-item>
                     <form-item label="所属投资端：" prop="srcType" style="width: 180px;text-align: left">
@@ -72,7 +72,7 @@
                             导出
                         </i-button>
                     </form-item>
-                    <form-item>
+                    <!-- <form-item>
                         <i-button type="primary" @click="today" :disabled="syncing">
                             今天
                         </i-button>
@@ -85,7 +85,7 @@
                         <i-button type="primary" @click="lastMonth" :disabled="syncing">
                             上个月
                         </i-button>
-                    </form-item>
+                    </form-item> -->
                 </i-form>
             </Header>
             <Content>

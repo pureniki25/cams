@@ -29,6 +29,7 @@
 		<result column="last_push_status" property="lastPushStatus" />
 		<result column="last_push_datetime" property="lastPushDatetime" />
 		<result column="last_push_remark" property="lastPushRemark" />
+		<result column="ext_business_type" property="extBusinessType" />
 		<result column="ext_business_ctype" property="extBusinessCtype" />
 		<result column="ext_company_name" property="extCompanyName" />
 		<result column="ext_customer_name" property="extCustomerName" />
@@ -60,7 +61,7 @@
 		create_time AS createTime, create_user AS createUser, update_time AS
 		updateTime, update_user AS updateUser, create_user_name AS
 		createUserName, last_push_status AS lastPushStatus, last_push_datetime
-		AS lastPushDatetime, last_push_remark AS lastPushRemark,
+		AS lastPushDatetime, last_push_remark AS lastPushRemark,ext_business_type AS extBusinessType,
 		ext_business_ctype AS extBusinessCtype, ext_company_name AS
 		extCompanyName, ext_customer_name AS extCustomerName, ext_platform AS
 		extPlatform, ext_repay_type AS extRepayType, ext_item10 AS extItem10,
@@ -173,9 +174,7 @@
 		s.`plan_id` = l.`plan_id`,
 		s.`create_time` =
 		l.`create_time`,
-		s.`create_user` = (
-			SELECT user_name from tb_sys_user where user_id = l.`create_user` limit 1 
-		),
+		s.`create_user` = l.`create_user`,
 		s.`update_time` =
 		l.`update_time`,
 		s.`update_user` = l.`update_user`,
@@ -248,27 +247,49 @@
 		UPDATE tb_repayment_confirm_log_synch s,
 		tb_basic_business b
 		SET s.ext_business_ctype = b.business_ctype,
+		s.ext_business_type = b.business_type,
 		s.ext_customer_name = b.customer_name,
 		s.ext_company_name =
-		b.company_name,
-		s.ext_platform = ( CASE b.output_platform_id
+		b.company_name
+		<!-- s.ext_platform = ( CASE b.output_platform_id
 		WHEN 0 THEN
 		'线下出款'
 		WHEN 1 THEN '团贷网'
 		WHEN 2 THEN '你我金融'
-		WHEN 3 THEN '粤财' END )
+		WHEN 3 THEN '粤财' END ) -->
 		WHERE
 		s.business_id = b.business_id
 		AND (
 		IFNULL(
-		s.ext_business_ctype, 0 ) !=
-		IFNULL( b.business_ctype, 0 )
+		s.ext_business_type, 0 ) !=
+		IFNULL( b.business_type, 0 )
 		OR IFNULL(
 		s.ext_customer_name, 0 ) !=
 		IFNULL( b.customer_name, 0 )
 		OR ISNULL(
 		s.ext_business_ctype )
 		)
+	</update>
+
+	<update id="updatePlateType">
+		UPDATE tb_repayment_confirm_log_synch s,
+		tb_tuandai_project_info p
+		SET s.ext_platform = (
+		CASE
+		p.plate_type
+		WHEN 0 THEN
+		'线下出款'
+		WHEN 1 THEN
+		'团贷网'
+		WHEN 2 THEN
+		'你我金融'
+		WHEN 3 THEN
+		'粤财'
+		ELSE '线下出款'
+		END
+		)
+		WHERE
+		ISNULL( s.ext_platform ) AND s.business_id = p.business_id ;
 	</update>
 
 	<update id="updateItem10">
@@ -298,7 +319,8 @@
 		SET
 		s.ext_item30 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
 		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
-		AND fee_id = '3df61688-d5a0-49c5-9c32-46b30855310a' )
+		AND plan_item_type = 30 )
+		<!-- AND fee_id = '3df61688-d5a0-49c5-9c32-46b30855310a' ) -->
 		WHERE
 		ISNULL(
 		s.ext_item30 );
@@ -309,7 +331,8 @@
 		SET
 		s.ext_item50 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
 		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
-		AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' )
+		AND plan_item_type = 50 )
+		<!-- AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' ) -->
 		WHERE
 		ISNULL(
 		s.ext_item50 );
@@ -475,7 +498,7 @@
 			and #{req.companyId} = s.ext_company_name
 		</if>
 		<if test="req.businessType != null and req.businessType neq ''">
-			and #{req.businessType} = s.ext_business_ctype
+			and #{req.businessType} = s.ext_business_type
 		</if>
 		<if test="req.srcType != null and req.srcType neq ''">
 			and #{req.srcType} = s.ext_platform
@@ -490,36 +513,64 @@
 	
 	<select id="select" resultType="com.hongte.alms.base.entity.RepaymentConfirmLogSynch">
 		SELECT
-		<include refid="Base_Column_List"></include>
+		confirm_log_id AS confirmLogId, business_id AS businessId,
+		org_business_id AS
+		orgBusinessId, after_id AS afterId, period, idx,
+		can_revoke AS
+		canRevoke, is_cancelled AS isCancelled, proj_plan_json AS
+		projPlanJson, repay_date AS repayDate, SUM(fact_amount) AS factAmount,
+		repay_source AS repaySource, surplus_amount AS surplusAmount,
+		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
+		create_time AS createTime, 
+		IFNULL(u.user_name,'系统自动代扣') as create_user, 
+		update_time AS
+		updateTime, update_user AS updateUser, create_user_name AS
+		createUserName, last_push_status AS lastPushStatus, last_push_datetime
+		AS lastPushDatetime, last_push_remark AS lastPushRemark,ext_business_type AS extBusinessType,
+		ext_business_ctype AS extBusinessCtype, ext_company_name AS
+		extCompanyName, ext_customer_name AS extCustomerName, ext_platform AS
+		extPlatform, ext_repay_type AS extRepayType, 
+		SUM(ext_item10) AS extItem10,
+		SUM(ext_item20) AS extItem20, 
+		SUM(ext_item30) AS extItem30, 
+		SUM(ext_item50) AS extItem50, 
+		SUM(ext_item60online) AS extItem60online, 
+		SUM(ext_item60offline) AS extItem60offline, 
+		SUM(ext_item70_bj) AS extItem70Bj, 
+		SUM(ext_item70_pt) AS extItem70Pt, 
+		SUM(ext_item70_fw) AS extItem70Fw, 
+		SUM(ext_other_fee) AS extOtherFee, 
+		ext_remark AS extRemark
 		FROM
-		tb_repayment_confirm_log_synch s
-		WHERE s.is_cancelled = 0 
+		tb_repayment_confirm_log_synch 
+		left join tb_sys_user u on u.user_id = create_user
+		WHERE is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
-			and ( s.business_id like '${req.key}%' or s.ext_customer_name like '${req.key}%' )
+			and ( business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
 		</if>
 		<if test="req.repayType != null and req.repayType neq ''  and req.repayType neq '混合代扣' ">
-			and s.ext_repay_type = #{req.repayType}
+			and ext_repay_type = #{req.repayType}
 		</if>
 		<if test="req.confirmStart != null and req.confirmStart neq '' ">
-			and #{req.confirmStart} &lt;= DATE(s.create_time)
+			and #{req.confirmStart} &lt;= DATE(create_time)
 		</if>
 		<if test="req.confirmEnd != null and req.confirmEnd neq ''">
-			and #{req.confirmEnd} &gt;= DATE(s.create_time)
+			and #{req.confirmEnd} &gt;= DATE(create_time)
 		</if>
 		<if test="req.companyId != null and req.companyId neq ''">
-			and #{req.companyId} = s.ext_company_name
+			and #{req.companyId} = ext_company_name
 		</if>
 		<if test="req.businessType != null and req.businessType neq ''">
-			and #{req.businessType} = s.ext_business_ctype
+			and #{req.businessType} = ext_business_type
 		</if>
 		<if test="req.srcType != null and req.srcType neq ''">
-			and #{req.srcType} = s.ext_platform
+			and #{req.srcType} = ext_platform
 		</if>
-		GROUP BY s.business_id,s.after_id, DATE( s.create_time ) 
+		GROUP BY business_id,after_id, DATE( create_time ) 
 		<if test="req.repayType != null and req.srcType neq '' and req.repayType eq '混合代扣' ">
-			HAVING count( DISTINCT s.ext_repay_type ) > 1
+			HAVING count( DISTINCT ext_repay_type ) > 1
 		</if>
-		ORDER BY s.create_time 
+		ORDER BY repay_date desc
 		<if test="req.curPage != null and req.curPage != 0">
 			LIMIT ${(req.curPage-1)*req.pageSize} , ${req.pageSize}
 		</if>

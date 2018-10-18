@@ -1863,14 +1863,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         Map<Integer,Map<String,BigDecimal>>  retMap  = new HashMap<>();
 
         BigDecimal monthRate = getMonthRate(rate,rateUnit);
-
+        BigDecimal yearRate = getYearRate(rate, rateUnit);
         switch (repayType){
             case PAY_LAST:  //到期还本息
-            calcPrincipalLast(fullBorrowMoney,monthRate
+            calcPrincipalLast(fullBorrowMoney,yearRate
             ,periodMonth,retMap);
             break;
             case PRINCIPAL_LAST:  //先息后本
-                calcPrincipalLast(fullBorrowMoney,monthRate
+                calcPrincipalLast(fullBorrowMoney,yearRate
                 ,periodMonth,retMap);
                 break;
             case INT_AND_PRIN_EQUAL://等额本息
@@ -1898,20 +1898,35 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      * @param periodMonth
      * @param retMap
      */
-    private void calcPrincipalLast(BigDecimal fullBorrowMoney,BigDecimal monthRate,
+    private void calcPrincipalLast(BigDecimal fullBorrowMoney,BigDecimal yearRate,
                                    Integer periodMonth ,Map<Integer,Map<String,BigDecimal>>  retMap )
     {
-        //每月利息
-        BigDecimal interest =  fullBorrowMoney.multiply(monthRate);
-        for (int i=0;i<periodMonth;i++){
-            //每月本金
-            BigDecimal priciple = new BigDecimal(0);
-            //如果是最后一期
-            if(i==periodMonth-1){
-                priciple = fullBorrowMoney;
+//        //每月利息
+//        BigDecimal interest =  fullBorrowMoney.multiply(monthRate);
+//        for (int i=0;i<periodMonth;i++){
+//            //每月本金
+//            BigDecimal priciple = new BigDecimal(0);
+//            //如果是最后一期
+//            if(i==periodMonth-1){
+//                priciple = fullBorrowMoney;
+//            }
+//            addPAndIToList(priciple,interest,retMap,i);
+//        }
+        /*2018-10-16 根据平台RepaymentDifferenceService修改以下代码 wangjiguang*/
+        BigDecimal interestTemp = BigDecimal.ZERO;
+        BigDecimal interestTotal = fullBorrowMoney.multiply(yearRate).multiply(BigDecimal.valueOf(periodMonth)).divide(BigDecimal.valueOf(12),2,BigDecimal.ROUND_HALF_UP);
+        BigDecimal interest = fullBorrowMoney.multiply(yearRate).divide(BigDecimal.valueOf(12),2,BigDecimal.ROUND_HALF_UP);
+        for (int i = 0; i < periodMonth; i++) {
+        	BigDecimal principal = BigDecimal.ZERO;
+            if (i == periodMonth-1) {
+            	principal = fullBorrowMoney ;
+            	interest = interestTotal.subtract(interestTemp);
+            } else {
+                interestTemp = interestTemp.add(interest);
             }
-            addPAndIToList(priciple,interest,retMap,i);
+            addPAndIToList(principal, interest, retMap, i);
         }
+        
     }
 
     /**
@@ -1932,7 +1947,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         BigDecimal rateMi = monthRate.add(new BigDecimal(1)).pow(periodMonth);
 
         BigDecimal monthTotalRepay =  fullBorrowMoney.multiply(monthRate).multiply(rateMi)
-                .divide((rateMi.subtract(new BigDecimal(1))),smallNum,roundingMode);
+                .divide((rateMi.subtract(new BigDecimal(1))),2,RoundingMode.HALF_UP);
 //        BigDecimal monthTotalRepay =  fullBorrowMoney.multiply(monthRate).multiply(monthRate.add(new BigDecimal(1))).pow(periodMonth)
 //                .divide(((monthRate.add(new BigDecimal(1))).pow(periodMonth).subtract(new BigDecimal(1))));
 
@@ -1946,7 +1961,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                    本金=贷款金额*月利率*（1+月利率）^(第N次还款-1)/（(（1+月利率）^贷款期限)-1）
                 BigDecimal rateNtimes = monthRate.add(new BigDecimal(1)).pow(i+1-1);
                 priciple = fullBorrowMoney.multiply(monthRate).multiply(rateNtimes)
-                        .divide((rateMi.subtract(new BigDecimal(1))),smallNum,roundingMode);
+                        .divide((rateMi.subtract(new BigDecimal(1))),2,RoundingMode.HALF_UP);
                 payedPriciple = payedPriciple.add(priciple);
             }else{
                 //是最后一期
@@ -1957,6 +1972,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             BigDecimal interest = monthTotalRepay.subtract(priciple);
             addPAndIToList(priciple,interest,retList,i);
         }
+    	
     }
 
     /**

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import cn.afterturn.easypoi.excel.annotation.ExcelIgnore;
@@ -68,6 +69,7 @@ public class RepaymentConfirmLogSynch extends Model<RepaymentConfirmLogSynch> {
 	@TableField("repay_date")
 	@ApiModelProperty(required= true,value = "")
 	@Excel(name="实还日期",format="yyyy-MM-dd")
+	@JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
 	private Date repayDate;
 	@TableField("fact_amount")
 	@ApiModelProperty(required= true,value = "")
@@ -92,6 +94,7 @@ public class RepaymentConfirmLogSynch extends Model<RepaymentConfirmLogSynch> {
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "")
 	@Excel(name="财务确认日期",format="yyyy-MM-dd")
+	@JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
 	private Date createTime;
 	@TableField("create_user")
 	@ApiModelProperty(required= true,value = "")
@@ -121,6 +124,12 @@ public class RepaymentConfirmLogSynch extends Model<RepaymentConfirmLogSynch> {
 	@ApiModelProperty(required= true,value = "")
 	@ExcelIgnore
 	private String lastPushRemark;
+	
+	@TableField("ext_business_type")
+	@ApiModelProperty(required= true,value = "")
+	@ExcelIgnore
+	private String extBusinessType;
+	
 	@TableField("ext_business_ctype")
 	@ApiModelProperty(required= true,value = "")
 	@Excel(name="业务类型")

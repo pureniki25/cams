@@ -27,4 +27,7 @@ public interface AddRepaymentScheduleForHistory {
 	
 	@RequestMapping(value = "/eip/td/repayment/queryRepaymentSchedule",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
 	public Result queryRepaymentSchedule(Map<String, String> param);
+	
+	@RequestMapping(value="/eip/td/assetside/getProjectPayment",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
+	public Result getProjectPayment(Map<String, String> param);
 }
