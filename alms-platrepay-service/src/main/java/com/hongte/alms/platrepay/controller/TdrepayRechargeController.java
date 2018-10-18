@@ -1617,6 +1617,9 @@ public class TdrepayRechargeController {
 			BigDecimal principalAndInterest3, BigDecimal tuandaiAmount3, BigDecimal orgAmount3,
 			BigDecimal guaranteeAmount3, BigDecimal arbitrationAmount3, BigDecimal totalAmount, Integer period,
 			Integer status) {
+		if (BigDecimal.ZERO.compareTo(totalAmount) >= 0) {
+			return;
+		}
 		// 参数DTO
 		TdAdvanceShareProfitDTO paramDTO = new TdAdvanceShareProfitDTO();
 		paramDTO.setProjectId(projectId);
