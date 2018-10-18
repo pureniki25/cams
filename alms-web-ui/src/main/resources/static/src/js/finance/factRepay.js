@@ -27,6 +27,10 @@ window.layinit(function (htConfig) {
                         value(){
                             let today = moment().format("YYYY-MM-DD");
                             return [today,today];
+                        },
+                        onClick(dp){
+                            let today = moment().format("YYYY-MM-DD");
+                            vm.form.confirmTime=[today,today]
                         }
                     },
                     {
@@ -34,6 +38,10 @@ window.layinit(function (htConfig) {
                         value(){
                             let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
                             return [yesterday,yesterday];
+                        },
+                        onClick(dp){
+                            let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
+                            vm.form.confirmTime=[yesterday,yesterday]
                         }
                     },
                     {
@@ -42,6 +50,11 @@ window.layinit(function (htConfig) {
                             let start = moment().add('month', 0).format('YYYY-MM') + '-01'
                             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
                             return [start,end];
+                        },
+                        onClick(dp){
+                            let start = moment().add('month', 0).format('YYYY-MM') + '-01'
+                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                            vm.form.confirmTime=[start,end]
                         }
                     },
                     {
@@ -50,6 +63,11 @@ window.layinit(function (htConfig) {
                             let start = moment().add('month', -1).format('YYYY-MM') + '-01'
                             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
                             return [start,end];
+                        },
+                        onClick(dp){
+                            let start = moment().add('month', -1).format('YYYY-MM') + '-01'
+                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                            vm.form.confirmTime=[start,end]
                         }
                     }
                 ],
@@ -138,30 +156,35 @@ window.layinit(function (htConfig) {
             businessTypes: [],
             paymentPlatformList: []
         },
+        watch:{
+            'form.confirmTime':function(){
+                vm.paging(1)
+            }
+        },
         methods: {
-            today: function () {
-                let today = moment().format("YYYY-MM-DD");
-                // $ref
-                vm.form.confirmTime=[today,today]
-                vm.paging(1)
-            },
-            yesterday: function () {
-                let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
-                vm.form.confirmTime=[yesterday,yesterday]
-                vm.paging(1)
-            },
-            thisMonth: function () {
-                let start = moment().add('month', 0).format('YYYY-MM') + '-01'
-                let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                vm.form.confirmTime=[start,end]
-                vm.paging(1)
-            },
-            lastMonth: function () {
-                let start = moment().add('month', -1).format('YYYY-MM') + '-01'
-                let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                vm.form.confirmTime=[start,end]
-                vm.paging(1)
-            },
+            // today: function () {
+            //     let today = moment().format("YYYY-MM-DD");
+            //     // $ref
+            //     vm.form.confirmTime=[today,today]
+            //     vm.paging(1)
+            // },
+            // yesterday: function () {
+            //     let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
+            //     vm.form.confirmTime=[yesterday,yesterday]
+            //     vm.paging(1)
+            // },
+            // thisMonth: function () {
+            //     let start = moment().add('month', 0).format('YYYY-MM') + '-01'
+            //     let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+            //     vm.form.confirmTime=[start,end]
+            //     vm.paging(1)
+            // },
+            // lastMonth: function () {
+            //     let start = moment().add('month', -1).format('YYYY-MM') + '-01'
+            //     let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+            //     vm.form.confirmTime=[start,end]
+            //     vm.paging(1)
+            // },
             paging: function (page) {
                 if (this.syncing) {
                     return;
