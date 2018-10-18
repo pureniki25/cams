@@ -172,8 +172,8 @@
 		s.`plan_id` = l.`plan_id`,
 		s.`create_time` =
 		l.`create_time`,
-		s.`create_user` = (
-			SELECT user_name from tb_sys_user where user_id = l.`create_user` limit 1 
+		s.`create_user` = IFNULL(
+			SELECT user_name from tb_sys_user where user_id = l.`create_user` limit 1 ,'系统自动代扣'
 		),
 		s.`update_time` =
 		l.`update_time`,
