@@ -519,7 +519,7 @@
 		can_revoke AS
 		canRevoke, is_cancelled AS isCancelled, proj_plan_json AS
 		projPlanJson, repay_date AS repayDate, SUM(fact_amount) AS factAmount,
-		repay_source AS repaySource, surplus_amount AS surplusAmount,
+		repay_source AS repaySource, SUM(IFNULL(surplus_amount,0)) AS surplusAmount,
 		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
 		create_time AS createTime, 
 		IFNULL(u.user_name,'系统自动代扣') as create_user, 

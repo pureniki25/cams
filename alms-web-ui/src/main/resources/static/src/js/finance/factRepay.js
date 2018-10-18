@@ -213,6 +213,13 @@ window.layinit(function (htConfig) {
                 axios.post(basePath + 'factRepay/export', this.form, {
                     responseType: 'blob'
                 }).then(res => {
+                    console.log(res);
+
+                    if(res.data && res.data.size==0){
+                        vm.$Message.error({content:'下载失败,请调整查询参数'})
+                        return ;
+                    }
+
                     let blob = new Blob([res.data], {
                         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
                     })

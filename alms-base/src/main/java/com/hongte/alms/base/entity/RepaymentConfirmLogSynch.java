@@ -73,7 +73,7 @@ public class RepaymentConfirmLogSynch extends Model<RepaymentConfirmLogSynch> {
 	private Date repayDate;
 	@TableField("fact_amount")
 	@ApiModelProperty(required= true,value = "")
-	@Excel(name="实还金额")
+	@Excel(name="实还金额",type=10)
 	private BigDecimal factAmount;
 	@TableField("repay_source")
 	@ApiModelProperty(required= true,value = "")
@@ -81,7 +81,7 @@ public class RepaymentConfirmLogSynch extends Model<RepaymentConfirmLogSynch> {
 	private Integer repaySource;
 	@TableField("surplus_amount")
 	@ApiModelProperty(required= true,value = "")
-	@Excel(name="结余金额")
+	@Excel(name="结余金额",type=10)
 	private BigDecimal surplusAmount;
 	@TableField("surplus_ref_id")
 	@ApiModelProperty(required= true,value = "")
@@ -158,70 +158,70 @@ public class RepaymentConfirmLogSynch extends Model<RepaymentConfirmLogSynch> {
      */
 	@TableField("ext_item10")
 	@ApiModelProperty(required= true,value = "本金")
-	@Excel(name="本金")
+	@Excel(name="本金",type=10)
 	private BigDecimal extItem10;
     /**
      * 利息
      */
 	@TableField("ext_item20")
 	@ApiModelProperty(required= true,value = "利息")
-	@Excel(name="利息")
+	@Excel(name="利息",type=10)
 	private BigDecimal extItem20;
     /**
      * 服务费
      */
 	@TableField("ext_item30")
 	@ApiModelProperty(required= true,value = "服务费")
-	@Excel(name="服务费")
+	@Excel(name="服务费",type=10)
 	private BigDecimal extItem30;
     /**
      * 平台费
      */
 	@TableField("ext_item50")
 	@ApiModelProperty(required= true,value = "平台费")
-	@Excel(name="平台费")
+	@Excel(name="平台费",type=10)
 	private BigDecimal extItem50;
     /**
      * 线上滞纳金
      */
 	@TableField("ext_item60online")
 	@ApiModelProperty(required= true,value = "线上滞纳金")
-	@Excel(name="线上滞纳金")
+	@Excel(name="线上滞纳金",type=10)
 	private BigDecimal extItem60online;
     /**
      * 线下滞纳金
      */
 	@TableField("ext_item60offline")
 	@ApiModelProperty(required= true,value = "线下滞纳金")
-	@Excel(name="线下滞纳金")
+	@Excel(name="线下滞纳金",type=10)
 	private BigDecimal extItem60offline;
     /**
      * 本金违约金
      */
 	@TableField("ext_item70_bj")
 	@ApiModelProperty(required= true,value = "本金违约金")
-	@Excel(name="本金违约金")
+	@Excel(name="本金违约金",type=10)
 	private BigDecimal extItem70Bj;
     /**
      * 平台违约金
      */
 	@TableField("ext_item70_pt")
 	@ApiModelProperty(required= true,value = "平台违约金")
-	@Excel(name="平台违约金")
+	@Excel(name="平台违约金",type=10)
 	private BigDecimal extItem70Pt;
     /**
      * 服务费违约金
      */
 	@TableField("ext_item70_fw")
 	@ApiModelProperty(required= true,value = "服务费违约金")
-	@Excel(name="服务费违约金")
+	@Excel(name="服务费违约金",type=10)
 	private BigDecimal extItem70Fw;
     /**
      * 其他费用合计
      */
 	@TableField("ext_other_fee")
 	@ApiModelProperty(required= true,value = "其他费用合计")
-	@Excel(name="其他费用合计")
+	@Excel(name="其他费用合计",type=10)
 	private BigDecimal extOtherFee;
     /**
      * 备注
