@@ -514,6 +514,10 @@ window.layinit(function (htConfig) {
             // },
             'factRepaymentInfo.repayAccount': function (n) {
                 app.previewSettle()
+            },
+            'thisTimeRepaymentInfo.otherFees':function(n,o){
+                console.log(o);
+                console.log(n)
             }
         },
         methods: {
@@ -697,7 +701,7 @@ window.layinit(function (htConfig) {
             },
             reGetSttleInfo(){
                 let param = {}
-                if(app.thisTimeRepaymentInfo.otherFees){
+                if(app.thisTimeRepaymentInfo.otherFees&&app.thisTimeRepaymentInfo.otherFees.length>0){
                     param.otherFees = app.thisTimeRepaymentInfo.otherFees
                 }
                 if(app.factRepaymentInfo.repayDate){
@@ -743,7 +747,7 @@ window.layinit(function (htConfig) {
                                 app.factRepaymentInfo.repayDate = data.moneyPoolRepayDates[0] 
                             }
 
-                            if(param.otherFees){
+                            if(param.otherFees&&param.otherFees.length>0){
                                 app.thisTimeRepaymentInfo.otherFees = data.otherFees
                             }
                             console.log(res.data);
