@@ -350,6 +350,7 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
         repaymentConfirmLog.setAfterId(financeSettleBaseDto.getAfterId());
         repaymentConfirmLog.setPeriod(financeSettleBaseDto.getCurrentPeriods().get(0).getCurrBizPlanListDto().getRepaymentBizPlanList().getPeriod());
         repaymentConfirmLog.setCreateTime(new Date());
+        repaymentConfirmLog.setCreateUser(loginUserInfoHelper.getUserId());
         repaymentConfirmLog.setRepaySource(10);
         repaymentConfirmLog.setType(2);//还款日志类型，1=还款日志，2=结清日志
         repaymentConfirmLog.setPlanId(financeSettleBaseDto.getPlanId());
