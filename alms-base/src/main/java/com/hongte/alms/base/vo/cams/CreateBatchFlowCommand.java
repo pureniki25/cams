@@ -50,7 +50,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
     }
     
     public void setBatchId(String batchId) {
-		this.batchId = batchId+"-"+this.getClientId();
+		this.batchId = batchId+"-"+this.getActionId();
 	}
 
 //    @JsonIgnore

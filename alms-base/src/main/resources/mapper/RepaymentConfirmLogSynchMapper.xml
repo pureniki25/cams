@@ -92,7 +92,6 @@
 		`type`,
 		`plan_id`,
 		`create_time`,
-		`create_user`,
 		`update_time`,
 		`update_user`,
 		`create_user_name`,
@@ -119,7 +118,6 @@
 		l.`type`,
 		l.`plan_id`,
 		l.`create_time`,
-		l.`create_user`,
 		l.`update_time`,
 		l.`update_user`,
 		l.`create_user_name`,
@@ -174,8 +172,8 @@
 		s.`plan_id` = l.`plan_id`,
 		s.`create_time` =
 		l.`create_time`,
-		s.`create_user` = (
-			SELECT user_name from tb_sys_user where user_id = l.`create_user` limit 1 
+		s.`create_user` = IFNULL(
+			(SELECT user_name from tb_sys_user where user_id = l.`create_user` limit 1 ),'系统自动代扣'
 		),
 		s.`update_time` =
 		l.`update_time`,
@@ -321,7 +319,8 @@
 		SET
 		s.ext_item30 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
 		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
-		AND fee_id = '3df61688-d5a0-49c5-9c32-46b30855310a' )
+		AND plan_item_type = 30 )
+		<!-- AND fee_id = '3df61688-d5a0-49c5-9c32-46b30855310a' ) -->
 		WHERE
 		ISNULL(
 		s.ext_item30 );
@@ -332,7 +331,8 @@
 		SET
 		s.ext_item50 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
 		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
-		AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' )
+		AND plan_item_type = 50 )
+		<!-- AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' ) -->
 		WHERE
 		ISNULL(
 		s.ext_item50 );
@@ -518,7 +518,7 @@
 		orgBusinessId, after_id AS afterId, period, idx,
 		can_revoke AS
 		canRevoke, is_cancelled AS isCancelled, proj_plan_json AS
-		projPlanJson, repay_date AS repayDate, fact_amount AS factAmount,
+		projPlanJson, repay_date AS repayDate, SUM(fact_amount) AS factAmount,
 		repay_source AS repaySource, surplus_amount AS surplusAmount,
 		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
 		create_time AS createTime, create_user AS createUser, update_time AS
@@ -543,7 +543,7 @@
 		tb_repayment_confirm_log_synch 
 		WHERE is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
-			and ( s.business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
+			and ( business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
 		</if>
 		<if test="req.repayType != null and req.repayType neq ''  and req.repayType neq '混合代扣' ">
 			and ext_repay_type = #{req.repayType}
@@ -567,7 +567,7 @@
 		<if test="req.repayType != null and req.srcType neq '' and req.repayType eq '混合代扣' ">
 			HAVING count( DISTINCT ext_repay_type ) > 1
 		</if>
-		ORDER BY create_time 
+		ORDER BY repay_date desc
 		<if test="req.curPage != null and req.curPage != 0">
 			LIMIT ${(req.curPage-1)*req.pageSize} , ${req.pageSize}
 		</if>
