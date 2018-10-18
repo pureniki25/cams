@@ -139,7 +139,8 @@ window.layinit(function (htConfig) {
                     {
                         title: '滞纳金',
                         render: function (h, p) {
-                            return h('span', p.row.extItem60offline + p.row.extItem60online)
+                           
+                            return h('span',  accAdd(p.row.extItem60offline,p.row.extItem60online))
                         }
                     },
                     {
