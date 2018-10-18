@@ -25,6 +25,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.dto.compliance.TdPlatformPlanRepaymentDTO;
+import com.hongte.alms.base.dto.compliance.TdProjectPaymentInfoResult;
+import com.hongte.alms.base.dto.compliance.TdRefundMonthInfoDTO;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentProjPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlanListDetail;
@@ -44,8 +46,7 @@ import com.ht.ussp.core.ReturnCodeEnum;
 import com.thoughtworks.xstream.mapper.Mapper;
 
 /**
- * @author 王继光
- * 2018年9月25日 上午10:12:48
+ * @author 王继光 2018年9月25日 上午10:12:48
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FinanceServiceApplication.class)
@@ -53,41 +54,44 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class Main {
 	@Autowired
 	@Qualifier("api")
-	AddRepaymentScheduleForHistory api ;
-	
+	AddRepaymentScheduleForHistory api;
+
 	@Autowired
-	TuandaiProjectInfoMapper tuandaiProjectInfoMapper ; 
-	
+	TuandaiProjectInfoMapper tuandaiProjectInfoMapper;
+
 	@Autowired
-	RepaymentProjPlanListMapper repaymentProjPlanListMapper ;
-	
-	
+	RepaymentProjPlanListMapper repaymentProjPlanListMapper;
+
 	@Autowired
-	RepaymentProjPlanListDetailMapper repaymentProjPlanListDetailMapper ;
-	
+	RepaymentProjPlanListDetailMapper repaymentProjPlanListDetailMapper;
+
 	@Autowired
-	BasicBusinessMapper basicBusinessMapper ;
-	
+	BasicBusinessMapper basicBusinessMapper;
+
 	private Logger logger = LoggerFactory.getLogger(Main.class);
-	
+
 	@Test
-	public void run () {
-		
-//		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>().where(" project_id in ('84fcf55e-9748-49fc-a5ca-054530479aab')  ").orderBy("create_time"));
-		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>().where(" plate_type = 1 and DATE( create_time ) >= '2018-06-28' ").orderBy("create_time"));
+	public void run() {
+
+		// List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new
+		// EntityWrapper<TuandaiProjectInfo>().where(" project_id in
+		// ('84fcf55e-9748-49fc-a5ca-054530479aab') ").orderBy("create_time"));
+		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper
+				.selectList(new EntityWrapper<TuandaiProjectInfo>()
+						.where(" plate_type = 1 and DATE( create_time ) >= '2018-06-28' ").orderBy("create_time"));
 		for (TuandaiProjectInfo tuandaiProjectInfo : selectList) {
-			Req req = new Req() ; 
-			
+			Req req = new Req();
+
 			BasicBusiness basicBusiness = basicBusinessMapper.selectById(tuandaiProjectInfo.getBusinessId());
 			if (basicBusiness == null) {
 				logger.error("没有找到业务");
-				continue ;
+				continue;
 			}
-			
+
 			Integer businessType = basicBusiness.getBusinessType();
 			if (businessType == null) {
 				logger.error("没有找到业务类型");
-				continue ;
+				continue;
 			}
 
 			// 25 信用贷 特殊处理
@@ -120,98 +124,95 @@ public class Main {
 					&& !tuandaiProjectInfo.getProjectId().equals(tuandaiProjectInfo.getMasterIssueId())) {
 				businessType = 33;
 			}
-		
+
 			req.setAmount(tuandaiProjectInfo.getFullBorrowMoney());
 			req.setContractNo(tuandaiProjectInfo.getBusinessId());
 			req.setDeadline(tuandaiProjectInfo.getBorrowLimit());
 			req.setInterestRate(basicBusiness.getBorrowRate());
-//			接口 ==> 0：商贸贷 1：业主贷 2：家装分期 3：商贸共借 4：业主共借，5：房贷，6：车贷，7：扶贫贷，8：二手车，9：车全，10：一点车贷，11：房贷共借
-//			本地 ==>  '业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷  39 车全 47 闪贷 48 扶贫贷)'
-			req.setOrgType(BusinessTypeEnum.getOrgTypeByValue(businessType)+"");
-//			req.setOrgType(BusinessTypeEnum.getOrgTypeByValue(tuandaiProjectInfo.getProjectType())+"");
+			// 接口 ==> 0：商贸贷 1：业主贷 2：家装分期 3：商贸共借
+			// 4：业主共借，5：房贷，6：车贷，7：扶贫贷，8：二手车，9：车全，10：一点车贷，11：房贷共借
+			// 本地 ==> '业务类型(9:车贷 11:房贷 35:信用贷 32:共借项目 36 农饲贷 41 二手车商贷 39 车全 47 闪贷 48 扶贫贷)'
+			req.setOrgType(BusinessTypeEnum.getOrgTypeByValue(businessType) + "");
+			// req.setOrgType(BusinessTypeEnum.getOrgTypeByValue(tuandaiProjectInfo.getProjectType())+"");
 			req.setProjectId(tuandaiProjectInfo.getProjectId());
 			req.setRepaymentType(tuandaiProjectInfo.getRepaymentType());
 
-			Map<String, String> param = new HashMap<>() ;
-			param.put("projectId", tuandaiProjectInfo.getProjectId()) ;
-			Result queryProjectPaymentResult = api.queryProjectPayment(param);
-			Result queryRepaymentSchedule = api.queryRepaymentSchedule(param);
-			
-			if (!queryRepaymentSchedule.getReturnCode().equals(Constant.REMOTE_EIP_SUCCESS_CODE)) {
-				continue;
-			}
-			
-			
-			List<TdPlatformPlanRepaymentDTO> dtos = new ArrayList<>();
-			JSONObject parseObject = (JSONObject) JSONObject.toJSON(queryRepaymentSchedule.getData());
-			if (parseObject.get("repaymentScheduleList") != null) {
-				dtos = JSONObject.parseArray(
-						JSONObject.toJSONString(parseObject.get("repaymentScheduleList")), TdPlatformPlanRepaymentDTO.class);
-			}
-			
-			if (CollectionUtils.isEmpty(dtos)) {
-				continue ;
-			}
+			Map<String, String> param = new HashMap<>();
+			param.put("projectId", tuandaiProjectInfo.getProjectId());
+			Result result = api.getProjectPayment(param);
+			// Result queryRepaymentSchedule = api.queryRepaymentSchedule(param);
 			req.setRepaymentSchedules(new ArrayList<>());
-			for (TdPlatformPlanRepaymentDTO tdProjectPaymentDTO : dtos) {
-				Date date = DateUtil.getDate(tdProjectPaymentDTO.getCycDate());
-				int diffDays = DateUtil.getDiffDays(date, new Date());
-				if (diffDays>0) {
-					continue;
+			if (result != null && result.getData() != null
+					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+
+				if (result.getData() != null) {
+					// 标的还款信息
+					TdProjectPaymentInfoResult tdProjectPaymentInfoResult = JSONObject
+							.parseObject(JSONObject.toJSONString(result.getData()), TdProjectPaymentInfoResult.class);
+
+					List<TdRefundMonthInfoDTO> periodsList = tdProjectPaymentInfoResult.getPeriodsList();
+					if (CollectionUtils.isEmpty(periodsList)) {
+						continue;
+					}
+					for (TdRefundMonthInfoDTO tdRefundMonthInfoDTO : periodsList) {
+						if (tdRefundMonthInfoDTO.getStatus() == 3) {
+							RepaymentProjPlanList projPlanList = repaymentProjPlanListMapper.selectByProjectIdAndPeriod(
+									tuandaiProjectInfo.getProjectId(), tdRefundMonthInfoDTO.getPeriods());
+
+							if (projPlanList == null) {
+								System.err.println(tuandaiProjectInfo.getProjectId() + " "
+										+ tdRefundMonthInfoDTO.getPeriods() + " projPlanList is null");
+								continue;
+							}
+
+							RepaymentSchedule schedule = new RepaymentSchedule();
+							schedule.setPeriod(tdRefundMonthInfoDTO.getPeriods());
+
+							List<RepaymentProjPlanListDetail> item10 = repaymentProjPlanListDetailMapper
+									.selectList(new EntityWrapper<RepaymentProjPlanListDetail>()
+											.eq("proj_plan_list_id", projPlanList.getProjPlanListId())
+											.eq("fee_id", RepayPlanFeeTypeEnum.PRINCIPAL.getUuid()));
+							List<RepaymentProjPlanListDetail> item20 = repaymentProjPlanListDetailMapper
+									.selectList(new EntityWrapper<RepaymentProjPlanListDetail>()
+											.eq("proj_plan_list_id", projPlanList.getProjPlanListId())
+											.eq("fee_id", RepayPlanFeeTypeEnum.INTEREST.getUuid()));
+
+							schedule.setAmount(item10.get(0).getProjPlanAmount());
+							schedule.setInterestAmount(item20.get(0).getProjPlanAmount());
+							req.getRepaymentSchedules().add(schedule);
+						}
+					}
 				}
-				
-				if (tdProjectPaymentDTO.getPeriod()==0) {
-					continue;
-				}
-				
-				
-				RepaymentProjPlanList projPlanList = repaymentProjPlanListMapper.selectByProjectIdAndPeriod(tuandaiProjectInfo.getProjectId(), tdProjectPaymentDTO.getPeriod());
-				
-				if (projPlanList==null) {
-					System.err.println(tuandaiProjectInfo.getProjectId()+" "+tdProjectPaymentDTO.getPeriod()+" projPlanList is null");
-					continue;
-				}
-				
-				RepaymentSchedule schedule = new RepaymentSchedule() ;
-				schedule.setPeriod(tdProjectPaymentDTO.getPeriod());
-				
-				List<RepaymentProjPlanListDetail> item10 = repaymentProjPlanListDetailMapper.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPlanList.getProjPlanListId()).eq("fee_id", RepayPlanFeeTypeEnum.PRINCIPAL.getUuid()));
-				List<RepaymentProjPlanListDetail> item20 = repaymentProjPlanListDetailMapper.selectList(new EntityWrapper<RepaymentProjPlanListDetail>().eq("proj_plan_list_id", projPlanList.getProjPlanListId()).eq("fee_id", RepayPlanFeeTypeEnum.INTEREST.getUuid()));
-				
-				schedule.setAmount(item10.get(0).getProjPlanAmount());
-				schedule.setInterestAmount(item20.get(0).getProjPlanAmount());
-				req.getRepaymentSchedules().add(schedule);
 			}
-			req.setPeriods(req.getRepaymentSchedules().size());
-			
-			
-			if (req.getPeriods().equals(0)) {
-				continue;
-			}
-			Result result = api.addRepaymentScheduleForHistory(req);
-			if (result.getReturnCode().equals(ReturnCodeEnum.SUCCESS.getReturnCode())) {
-//				System.out.println(JSON.toJSONString(result));
-			}else {
-				System.err.println(JSON.toJSONString(queryProjectPaymentResult.getData()));
-				System.err.println(JSON.toJSONString(queryRepaymentSchedule.getData()));
-				System.err.println(JSON.toJSONString(req));
-				System.err.println(JSON.toJSONString(result));
-			}
+		req.setPeriods(req.getRepaymentSchedules().size());
+		if (req.getPeriods().equals(0)) {
+			continue;
+		}
+		Result res = api.addRepaymentScheduleForHistory(req);
+		if (res.getReturnCode().equals(ReturnCodeEnum.SUCCESS.getReturnCode())) {
+			// System.out.println(JSON.toJSONString(result));
+		} else {
+			System.err.println(JSON.toJSONString(result.getData()));
+			System.err.println(JSON.toJSONString(req));
+			System.err.println(JSON.toJSONString(res));
 		}
 	}
-	
-	private boolean hasRepaid(List<TdProjectPaymentDTO> tdProjectPaymentDTOs,TdPlatformPlanRepaymentDTO tdPlatformPlanRepaymentDTO) {
+
+	}
+
+	private boolean hasRepaid(List<TdProjectPaymentDTO> tdProjectPaymentDTOs,
+			TdPlatformPlanRepaymentDTO tdPlatformPlanRepaymentDTO) {
 		for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
 			if (tdPlatformPlanRepaymentDTO.getPeriod() == tdProjectPaymentDTO.getPeriod()) {
-				if (tdProjectPaymentDTO.getStatus()==1) {
-					return true ;
-				}else {
-					return false ;
+				if (tdProjectPaymentDTO.getStatus() == 1) {
+					return true;
+				} else {
+					return false;
 				}
 			}
 		}
-		
+
 		return false;
-		
+
 	}
 }
