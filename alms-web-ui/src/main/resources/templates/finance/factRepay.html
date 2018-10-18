@@ -36,7 +36,7 @@
                         </i-select>
                     </form-item>
                     <form-item label="财务确认时间">
-                        <date-picker type="daterange"
+                        <date-picker type="daterange" @on-change="vm.form.confirmTime=$event"
                             style="width: 180px;text-align: left" :options="dateOptions" placeholder="--请选择时间范围--"></date-picker>
                     </form-item>
                     <form-item label="分公司">

@@ -21,56 +21,56 @@ window.layinit(function (htConfig) {
                 srcType: null,
             },
             dateOptions:{
-                shortcuts:[
-                    {
-                        text:'今天',
-                        value(){
-                            let today = moment().format("YYYY-MM-DD");
-                            return [today,today];
-                        },
-                        onClick(dp){
-                            let today = moment().format("YYYY-MM-DD");
-                            vm.form.confirmTime=[today,today]
-                        }
-                    },
-                    {
-                        text:'昨天',
-                        value(){
-                            let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
-                            return [yesterday,yesterday];
-                        },
-                        onClick(dp){
-                            let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
-                            vm.form.confirmTime=[yesterday,yesterday]
-                        }
-                    },
-                    {
-                        text:'本月',
-                        value(){
-                            let start = moment().add('month', 0).format('YYYY-MM') + '-01'
-                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                            return [start,end];
-                        },
-                        onClick(dp){
-                            let start = moment().add('month', 0).format('YYYY-MM') + '-01'
-                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                            vm.form.confirmTime=[start,end]
-                        }
-                    },
-                    {
-                        text:'上个月',
-                        value(){
-                            let start = moment().add('month', -1).format('YYYY-MM') + '-01'
-                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                            return [start,end];
-                        },
-                        onClick(dp){
-                            let start = moment().add('month', -1).format('YYYY-MM') + '-01'
-                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                            vm.form.confirmTime=[start,end]
-                        }
-                    }
-                ],
+                // shortcuts:[
+                //     {
+                //         text:'今天',
+                //         value(){
+                //             let today = moment().format("YYYY-MM-DD");
+                //             return [today,today];
+                //         },
+                //         onClick(dp){
+                //             let today = moment().format("YYYY-MM-DD");
+                //             vm.form.confirmTime=[today,today]
+                //         }
+                //     },
+                //     {
+                //         text:'昨天',
+                //         value(){
+                //             let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
+                //             return [yesterday,yesterday];
+                //         },
+                //         onClick(dp){
+                //             let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
+                //             vm.form.confirmTime=[yesterday,yesterday]
+                //         }
+                //     },
+                //     {
+                //         text:'本月',
+                //         value(){
+                //             let start = moment().add('month', 0).format('YYYY-MM') + '-01'
+                //             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                //             return [start,end];
+                //         },
+                //         onClick(dp){
+                //             let start = moment().add('month', 0).format('YYYY-MM') + '-01'
+                //             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                //             vm.form.confirmTime=[start,end]
+                //         }
+                //     },
+                //     {
+                //         text:'上个月',
+                //         value(){
+                //             let start = moment().add('month', -1).format('YYYY-MM') + '-01'
+                //             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                //             return [start,end];
+                //         },
+                //         onClick(dp){
+                //             let start = moment().add('month', -1).format('YYYY-MM') + '-01'
+                //             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                //             vm.form.confirmTime=[start,end]
+                //         }
+                //     }
+                // ],
                 disabledDate: function (date) {
                     return date > new Date();
                 },
