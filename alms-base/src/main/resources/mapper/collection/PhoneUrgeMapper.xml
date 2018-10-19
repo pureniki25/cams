@@ -375,7 +375,7 @@
 		(SELECT tpi.plate_type 
 			  FROM
 			    `tb_tuandai_project_info` tpi 
-			  WHERE tpi.business_id = pList.business_id 
+			  WHERE tpi.business_id = pList.orig_business_id 
 			  LIMIT 1) plateType,
 		(
 		select brt.repayment_type_name from tb_basic_repayment_type brt where brt.repayment_type_id = pList.repayment_type_id_ext
