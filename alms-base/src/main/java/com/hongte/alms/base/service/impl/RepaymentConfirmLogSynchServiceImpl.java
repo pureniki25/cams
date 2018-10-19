@@ -153,7 +153,10 @@ public class RepaymentConfirmLogSynchServiceImpl extends BaseServiceImpl<Repayme
 	}
 	@Override
 	public int updateUser() {
-		return synchMapper.updateUser();
+		synchMapper.updateRepaysource10();
+		synchMapper.updateRepaysource2030();
+		synchMapper.updateRepaysource2131();
+		return 1;
 	}
 
 }

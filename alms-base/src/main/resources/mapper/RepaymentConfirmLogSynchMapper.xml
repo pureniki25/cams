@@ -246,10 +246,31 @@
 	<update id="updateUser">
 		update tb_repayment_confirm_log_synch s 
 		right join tb_repayment_resource r on r.confirm_log_id = s.confirm_log_id
+		
 		left join tb_sys_user u on u.user_id = r.create_user
 		set s.create_user_name = u.user_name
 		where s.create_user_name is null ;
 	</update>
+	
+	<update id="updateRepaysource10">
+		update tb_repayment_confirm_log_synch s , tb_sys_user u 
+		set s.create_user_name = u.user_name 
+		where s.create_user_name is null and (s.repay_source = 10 or s.repay_source=11) and s.create_user = u.user_id ;
+	</update>
+	
+	<update id="updateRepaysource2030">
+		update tb_repayment_confirm_log_synch s 
+		set s.create_user_name = '系统自动代扣'
+		where s.create_user_name is null and (s.repay_source = 20 or s.repay_source=30) ;
+	</update>
+	
+	<update id="updateRepaysource2131">
+		update tb_repayment_confirm_log_synch s , tb_repayment_resource r , tb_withholding_repayment_log l ,tb_sys_user u
+		set s.create_user_name = u.user_name
+		where s.create_user_name is null and ( s.repay_source = 21 or s.repay_source = 31 ) and s.confirm_log_id = r.confirm_log_id and r.repay_source_ref_id = l.log_id and u.user_id = l.create_user ;
+	</update>
+	
+	
 	<update id="updateBaiscBusiness">
 		UPDATE tb_repayment_confirm_log_synch s,
 		tb_basic_business b
@@ -553,7 +574,7 @@
 		ext_remark AS extRemark
 		FROM
 		tb_repayment_confirm_log_synch 
-		left join tb_sys_user u on u.user_id = create_user
+		<!-- left join tb_sys_user u on u.user_id = create_user -->
 		WHERE is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
 			and ( business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
