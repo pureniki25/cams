@@ -243,6 +243,13 @@
 		)
 	</update>
 
+	<update id="updateUser">
+		update tb_repayment_confirm_log_synch s 
+		right join tb_repayment_resource r on r.confirm_log_id = s.confirm_log_id
+		left join tb_sys_user u on u.user_id = r.create_user
+		set s.create_user_name = u.user_name
+		where s.create_user_name is null ;
+	</update>
 	<update id="updateBaiscBusiness">
 		UPDATE tb_repayment_confirm_log_synch s,
 		tb_basic_business b
@@ -522,7 +529,10 @@
 		repay_source AS repaySource, SUM(IFNULL(surplus_amount,0)) AS surplusAmount,
 		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
 		create_time AS createTime, 
-		IFNULL(u.user_name,'系统自动代扣') as create_user, 
+		(case 
+		when repay_source = 20 or repay_source = 30 then '系统自动代扣'
+		else create_user_name end ) as create_user,
+		<!-- IFNULL(u.user_name,'系统自动代扣') as create_user,  -->
 		update_time AS
 		updateTime, update_user AS updateUser, create_user_name AS
 		createUserName, last_push_status AS lastPushStatus, last_push_datetime
