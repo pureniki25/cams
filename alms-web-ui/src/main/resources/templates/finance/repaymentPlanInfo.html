@@ -144,8 +144,8 @@
 				            <h3 style="color:red">Tips：数据均来源于团贷网后台接口，非鸿特本地数据</h3>
 				        </p>
 				    </row>
-		        	<tabs :animated="true" @on-click="initProjectFunction($event)">
-						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
+		        	<tabs :animated="true" @on-click="initProjectFunction($event)" >
+						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId" >
 							<row>
 								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
 								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
