@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.hongte.alms.base.assets.car.enums.CarStatusEnums;
 import com.hongte.alms.base.assets.car.vo.FileVo;
 import com.hongte.alms.base.collection.enums.CollectionSetWayEnum;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
@@ -73,12 +74,10 @@ import com.hongte.alms.base.vo.litigation.BusinessHouse;
 import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.LitigationResponse;
 import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
-import com.hongte.alms.base.vo.litigation.TransferLitigationPersonDTO;
 import com.hongte.alms.base.vo.litigation.TransferOfLitigationVO;
 import com.hongte.alms.base.vo.litigation.house.HouseLoanVO;
 import com.hongte.alms.base.vo.litigation.house.HousePlanInfo;
 import com.hongte.alms.base.vo.litigation.house.MortgageInfo;
-import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.ht.ussp.bean.LoginUserInfoHelper;
@@ -344,6 +343,7 @@ public class TransferLitigationServiceImpl implements TransferOfLitigationServic
 			// throw new ServiceRuntimeException("没有找到借款人明细，发送诉讼系统失败！");
 			// }
 			transferLitigationData.setLitigationBorrowerDetailedList(litigationBorrowerDetaileds);
+			transferLitigationData.setExtensionInfo(transferOfLitigationMapper.queryExtensionInfoByOrigBusinessId(businessId));
 
 			transferLitigationData.setCreateUserId(loginUserInfoHelper.getUserId());
 			// 判断业务类型，根据业务类型查询对应的房贷或车贷数据

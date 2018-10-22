@@ -33,6 +33,8 @@
 	    	<result property="businessId" column="businessId"/> 
    			<result property="businessAfterId" column="businessAfterId"/>
    			<result property="oddcorpus" column="surplus_principal"/>
+   			<result property="planRepayDate" column="plan_repay_date"/>
+   			<result property="factRepayDate" column="fact_repay_date"/>
 	    </collection>
 	</resultMap>  
 	
@@ -261,13 +263,17 @@
 		  cb.`vin` chassisNumber,
 		  cb.`engine_model` engineNumber,
 		  cb.`license_plate_number` licensePlateNumber,
-		  cb.`owner_name` ownerName 
+		  cb.`owner_name` ownerName,
+		  cdr.`drag_date` dragDate,
+		  cb.`status` 
 		FROM
-		  tb_car_basic cb,
-		  tb_car_detection cd 
-		WHERE cd.`business_id` = cb.`business_id` 
-		  AND cb.last_detection_id = cd.id
-		  AND cb.`business_id` = #{businessId,jdbcType=VARCHAR}
+		  tb_car_basic cb 
+		  LEFT JOIN tb_car_detection cd 
+		    ON cd.`business_id` = cb.`business_id` 
+		    AND cb.last_detection_id = cd.id 
+		  LEFT JOIN tb_car_drag cdr 
+		    ON cb.`business_id` = cdr.`business_id` 
+		WHERE cb.`business_id` = #{businessId,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="queryTransferLitigationData" resultMap="TransferOfLitigationMap" >
@@ -347,6 +353,8 @@
 		  GROUP BY a.`orig_business_id`) AS repaymentPrincipa,
 		  cc.surplus_principal,
 		  cc.businessAfterId,
+		  cc.fact_repay_date,
+		  cc.plan_repay_date,
 		  (SELECT 
 		    COUNT(1) 
 		  FROM
@@ -380,6 +388,8 @@
 		    c.`orig_business_id`,
 		    c.plan_list_id,
 		    c.after_id businessAfterId,
+		    c.plan_repay_date,
+		    c.fact_repay_date,
 		    (
 		      c.plan_principal - c.fact_principal
 		    ) surplus_principal 
@@ -388,6 +398,8 @@
 		      a.`orig_business_id`,
 		      a.after_id,
 		      t1.plan_list_id,
+		      a.due_date plan_repay_date,
+		      a.fact_repay_date,
 		      SUM(
 		        CASE
 		          WHEN t1.plan_item_type = 10 
@@ -1373,5 +1385,16 @@
 		  tb_creditor b 
 		WHERE a.pledee_id = b.creditor_id 
 		  AND a.business_id = #{businessId,jdbcType=VARCHAR}      
+	</select>
+	
+	<select id="queryExtensionInfoByOrigBusinessId" resultType="com.hongte.alms.base.vo.litigation.ExtensionBusinessDTO">
+		SELECT 
+		  t.`business_id` businessId,
+		  t.`borrow_limit` borrowLimit,
+		  t.`borrow_rate` borrowRate
+		FROM
+		  `tb_repayment_biz_plan` t 
+		WHERE t.`original_business_id` != t.`business_id` 
+		  AND t.`original_business_id` = #{businessId,jdbcType=VARCHAR} 
 	</select>
 </mapper>

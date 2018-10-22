@@ -167,4 +167,9 @@ public class TransferOfLitigationVO implements Serializable {
 	 * 逾期时间
 	 */
 	private Date dueDate;
+	
+	/**
+	 * 展期信息
+	 */
+	private List<ExtensionBusinessDTO> extensionInfo;
 }

@@ -33,4 +33,14 @@ public enum CarStatusEnums {
 		this.statusName = statusName;
 	}
 	
+	public static String getStatusNameByStatusCode(String statusCode) {
+		CarStatusEnums[] carStatusEnums = values();
+		for (CarStatusEnums carStatusEnum : carStatusEnums) {
+			if (carStatusEnum.getStatusCode().equals(statusCode)) {
+				return carStatusEnum.getStatusName();
+			}
+		}
+		return "";
+	}
+	
 }
