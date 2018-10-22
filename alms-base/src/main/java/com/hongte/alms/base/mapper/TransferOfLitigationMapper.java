@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.vo.billing.PreviousFeesVO;
 import com.hongte.alms.base.vo.litigation.BusinessCar;
+import com.hongte.alms.base.vo.litigation.ExtensionBusinessDTO;
 import com.hongte.alms.base.vo.litigation.LitigationBorrowerDetailed;
 import com.hongte.alms.base.vo.litigation.TransferLitigationDTO;
 import com.hongte.alms.base.vo.litigation.TransferLitigationPersonDTO;
@@ -221,4 +222,11 @@ public interface TransferOfLitigationMapper {
 	 * @return
 	 */
 	List<TransferLitigationDTO> queryTransferLitigationDetail(@Param(value = "businessId") String businessId);
+	
+	/**
+	 * 根据原业务ID获取展期信息
+	 * @param businessId
+	 * @return
+	 */
+	List<ExtensionBusinessDTO> queryExtensionInfoByOrigBusinessId(@Param(value = "businessId") String businessId);
 }
