@@ -1416,6 +1416,9 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
 				financeSettleBaseDto.setUnderfillFees(new ArrayList<>());
 			}
 			financeSettleBaseDto.getUnderfillFees().add(fee);
+			/*没钱也要创建一条实还为零的,2018-10-22 因坏账结清资金分发需要 特此修改*/
+			createProjFactRepay(BigDecimal.ZERO, projListDetail, financeSettleBaseDto.getCuralResource(), financeSettleBaseDto);
+			/*没钱也要创建一条实还为零的,2018-10-22 因坏账结清资金分发需要 特此修改*/
 		}
     	
     }
