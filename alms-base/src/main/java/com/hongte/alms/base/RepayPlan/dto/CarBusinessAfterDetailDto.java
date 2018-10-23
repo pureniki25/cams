@@ -38,6 +38,12 @@ public class CarBusinessAfterDetailDto implements Serializable  {
 	@TableField("business_id")
 	@ApiModelProperty(required= true,value = "业务编号")
 	private String businessId;
+	
+    /**
+     * 展期业务编号
+     */
+	@ApiModelProperty(required= true,value = "展期业务编号")
+	private String zqBusinessId;
     /**
      * 期数
      */
@@ -127,6 +133,14 @@ public class CarBusinessAfterDetailDto implements Serializable  {
 	@ApiModelProperty(required= true,value = "[本期应还比例]")
 	private BigDecimal planFeeRate;
 
+    
+	public String getZqBusinessId() {
+		return zqBusinessId;
+	}
+
+	public void setZqBusinessId(String zqBusinessId) {
+		this.zqBusinessId = zqBusinessId;
+	}
 
 	public Integer getId() {
 		return id;

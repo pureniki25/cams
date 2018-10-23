@@ -36,6 +36,9 @@ public class CarBusinessAfterDto implements Serializable  {
     @TableId("car_business_id")
 	@ApiModelProperty(required= true,value = "业务编号")
 	private String carBusinessId;
+    
+	@ApiModelProperty(required= true,value = "展期编号")
+	private String zqBusinessId;
     /**
      * 当前还款期数
      */
@@ -505,6 +508,14 @@ public class CarBusinessAfterDto implements Serializable  {
 	@ApiModelProperty(required= true,value = "本息还款状态 0:未还款 1:本息已还款 2:本期已结清")
 	private Integer interestPaid;
 
+
+	public String getZqBusinessId() {
+		return zqBusinessId;
+	}
+
+	public void setZqBusinessId(String zqBusinessId) {
+		this.zqBusinessId = zqBusinessId;
+	}
 
 	public String getCarBusinessId() {
 		return carBusinessId;
