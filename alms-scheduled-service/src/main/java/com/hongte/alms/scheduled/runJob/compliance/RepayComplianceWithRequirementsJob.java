@@ -44,7 +44,7 @@ public class RepayComplianceWithRequirementsJob extends IJobHandler {
 		try {
 			LOG.info("资产端对团贷网通用合规化还款流程");
 			long start = System.currentTimeMillis();
-			tdrepayRechargeFeignClient.repayComplianceWithRequirements();
+//			tdrepayRechargeFeignClient.repayComplianceWithRequirements();
 			long end = System.currentTimeMillis();
 			LOG.info("资产端对团贷网通用合规化还款流程，耗时：{}", (end - start));
 			return SUCCESS;
