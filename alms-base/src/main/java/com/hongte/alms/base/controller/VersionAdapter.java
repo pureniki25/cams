@@ -17,7 +17,7 @@ public class VersionAdapter {
 	/*Bservice="abc"*/
 	/*Cservice="2018-08-27 08:45:00"*/
 	/*Dservice="1"*/
-	final String ALMS_CORE_SERVICE = "(finance)1018 18:10" ;
+	final String ALMS_CORE_SERVICE = "(prdbug)1024 10:15" ;
 	final String ALMS_FINANCE_SERVICE = "(finance)1018 18:10" ;
 	final String ALMS_OPEN_SERVICE = "0913" ;
 	final String ALMS_PLATREPAY_SERVICE = "(finance)1018 18:10" ;
