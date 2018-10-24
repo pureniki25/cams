@@ -101,6 +101,24 @@ public class AfterLoanRepaymentController {
     }
     
     /**
+     * 自动检查代扣成功了没有核销的记录
+     */
+    @GetMapping("/autoCheckCancle")
+    @ApiOperation(value = "自动检查核销")
+    public Result autoCheckCancle(){
+	    try {
+	  		logger.info("@autoRepay@自动检查核销--开始");
+	    	withholdingService.withholding();
+			logger.info("@autoRepay@自动检查核销--结束");
+	        return Result.success();
+	    }catch (Exception ex){
+	        ex.printStackTrace();
+	        return Result.error("500", "自动检查核销:"+ ex.getMessage());
+	    }
+    }
+    
+    
+    /**
      * 查询代扣结果
  
      */

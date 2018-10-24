@@ -32,6 +32,7 @@ public enum RepayPlanFeeTypeEnum implements IEnum {
     ,RUSH_RECEIVABLES(100,"冲应收","d5596127-530f-4083-95c5-01e5a75635aa",6)
     ,REBATE(110,"返点","b8c5c29f-dd2c-4a7c-8520-e1e8eb130021",110)  //UUID为随机生成
     ,OTHER_FEE(120,"其他费用","cef85db3-6ece-448e-a9ba-a2db665e9be4",4)
+    ,DIFFERENT(25,"利差","f1f96007-aef3-4124-a009-b5d4f692fcc1",4)
     ;
 
 //    9883ee39-4448-11e8-b4f8-0242ac110003  提前结清本金违约金

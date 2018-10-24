@@ -375,6 +375,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDto.getBizPlanListDetails();
                 CarBusinessAfterDto bizAfterDto = new CarBusinessAfterDto();
                 bizAfterDtos.add(bizAfterDto);
+                bizAfterDto.setZqBusinessId(repaymentBizPlan.getBusinessId());//add By Czs
                 bizAfterDto.setCarBusinessId(repaymentBizPlan.getOriginalBusinessId());//业务id
                 bizAfterDto.setCarBusinessAfterId(repaymentBizPlanList.getAfterId());//[当前还款期数]
                 BasicBusinessType basicBusinessType =basicBusinessTypeService.selectById(businessBasicInfo.getBusinessType());
@@ -447,7 +448,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 for(RepaymentBizPlanListDetail bizPlanListDetail: repaymentBizPlanListDetails){
                     CarBusinessAfterDetailDto afterDetailDto = new CarBusinessAfterDetailDto();
                     bizAfterDetailDtos.add(afterDetailDto);
-
+                    afterDetailDto.setZqBusinessId(bizAfterDto.getZqBusinessId());
                     afterDetailDto.setBusinessId(bizAfterDto.getCarBusinessId());//业务编号
                     afterDetailDto.setBusinessAfterId(bizAfterDto.getCarBusinessAfterId());//期数
                     afterDetailDto.setFeeId(bizPlanListDetail.getFeeId());//费用项ID
