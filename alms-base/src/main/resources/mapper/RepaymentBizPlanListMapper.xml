@@ -1119,7 +1119,7 @@ AND plan_id = #{planListId})
 		  <include refid="TableName_Column_List"/> 
 		FROM
 		  tb_repayment_biz_plan_list planList 
-		WHERE TO_DAYS(NOW()) - TO_DAYS(planList.due_date) >= #{overDueDays,jdbcType=INTEGER} 
+		WHERE planList.`overdue_days` >= #{overDueDays,jdbcType=INTEGER} 
 		  AND planList.current_status IN ("还款中", "逾期") 
 		  AND IFNULL(planList.`repay_status`, 0) NOT IN (1, 2, 3) 
 		  AND NOT EXISTS 
