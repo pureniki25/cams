@@ -72,7 +72,8 @@ public class WithHoldingController {
 	public Result<String> withholding(@RequestParam("originalBusinessId") String originalBusinessId,
 			@RequestParam("afterId") String afterId, @RequestParam("total") String total,
 			@RequestParam("planOverDueMoney") String planOverDueMoney, @RequestParam("platformId") String platformId,
-			@RequestParam("type") String type, @RequestParam("nowdate") String nowdate,@RequestParam("isAmountWithheld") String isAmountWithheld
+			@RequestParam("type") String type, @RequestParam("nowdate") String nowdate,@RequestParam("isAmountWithheld") String isAmountWithheld,
+			@RequestParam("userId") String userId
 
 	) {
 		try {

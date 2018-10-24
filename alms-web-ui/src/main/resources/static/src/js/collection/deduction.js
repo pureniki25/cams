@@ -67,7 +67,8 @@ var layer;
                     repaying:'',
                     business:[],
                     bankCardInfo:'',
-                    pList:[]
+                    pList:[],
+                    userId:''
                
 
                     
@@ -215,7 +216,8 @@ var layer;
                 }
             });
 	   }else{
-		    var url=openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.repayAmount+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney+"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld
+		    var url=openPath+ "WithHoldingController/withholding?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId+"&total="+vm.ajax_data.repayAmount+"&planOverDueMoney="+vm.ajax_data.underLineFactOverDueMoney
+		    +"&platformId="+vm.platformId+"&type=0"+"&nowdate="+vm.ajax_data.nowdate+"&isAmountWithheld="+isAmountWithheld+"&userId="+vm.ajax_data.userId
 		    $.ajax({
 		        type : 'GET',
 		        async : false,

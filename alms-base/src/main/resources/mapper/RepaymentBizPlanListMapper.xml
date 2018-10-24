@@ -1134,5 +1134,15 @@ AND plan_id = #{planListId})
 		</if>
     </select>
     
+     <select id="searchNoCancelList" resultType="com.hongte.alms.base.entity.WithholdingRepaymentLog">
+    	select * from tb_withholding_repayment_log t where t.log_id in (
+				select a.log_id from (
+				select t.log_id from tb_withholding_repayment_log t 
+        where t.xd_list_id is null and t.repay_status=1 and t.create_time >date_format(now(),'%y-%m-%d')) a where a.log_id not in (select s.repay_source_ref_id  from tb_repayment_resource s  ))
+
+    </select>
+    
+    
+    
  
 </mapper>
