@@ -1315,10 +1315,10 @@ public class FinanceController {
 		}
 		
 		if (action.equals("settle")) {
-			Result checkLastRepay = checkLastRepay(businessId, afterId);
-			if (!checkLastRepay.getCode().equals("1")) {
-				return checkLastRepay;
-			}
+//			Result checkLastRepay = checkLastRepay(businessId, afterId);
+//			if (!checkLastRepay.getCode().equals("1")) {
+//				return checkLastRepay;
+//			}
 			
 			/*判断当前期或业务是否已结清*/
 			EntityWrapper<RepaymentBizPlan> ew = new EntityWrapper<>() ;
