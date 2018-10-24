@@ -19,6 +19,8 @@ public class TdGuaranteePaymentVO extends TdGuaranteePaymentDTO implements Seria
 
 	private double total;
 
+	private String projectId;
+
 	public int getPeriod() {
 		return period;
 	}
@@ -51,10 +53,18 @@ public class TdGuaranteePaymentVO extends TdGuaranteePaymentDTO implements Seria
 		this.total = total;
 	}
 
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
 	@Override
 	public String toString() {
 		return "TdGuaranteePaymentVO [period=" + period + ", status=" + status + ", addDate=" + addDate + ", total="
-				+ total + "]";
+				+ total + ", projectId=" + projectId + "]";
 	}
 
 }

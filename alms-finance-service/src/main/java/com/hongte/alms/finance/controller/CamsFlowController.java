@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.util.IdGenerator;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,14 +25,18 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AccountantOverRepayLog;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
+import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
+import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.service.AccountantOverRepayLogService;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.FlowPushLogService;
 import com.hongte.alms.base.service.RepaymentConfirmLogService;
+import com.hongte.alms.base.service.TdrepayRechargeLogService;
 import com.hongte.alms.base.service.TdrepayRechargeRecordService;
+import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.util.UUIDHtGenerator;
 import com.hongte.alms.base.vo.cams.CamsMessage;
 import com.hongte.alms.base.vo.cams.CancelBizAccountListCommand;
@@ -84,12 +87,20 @@ public class CamsFlowController {
     TdrepayRechargeRecordService tdrepayRechargeRecordService;
     
     @Autowired
+    @Qualifier("TdrepayRechargeLogService")
+    TdrepayRechargeLogService tdrepayRechargeLogService;
+    
+    @Autowired
     @Qualifier("FlowPushLogService")
     FlowPushLogService flowPushLogService;
     
     @Autowired
     @Qualifier("AccountantOverRepayLogService")
     AccountantOverRepayLogService accountantOverRepayLogService;
+    
+    @Autowired
+    @Qualifier("tuandaiProjectInfoService")
+    TuandaiProjectInfoService tuandaiProjectInfoService;
     
     /**
      * 批量新增账户流水
@@ -169,7 +180,7 @@ public class CamsFlowController {
      * @param bankWithholdFlowReq
      * @return
      */
-    @ApiOperation(value = "指定confirmLogId同步账户流水到核心")
+    @ApiOperation(value = "指定confirmLogId同步分发流水到核心")
     @GetMapping("/addFlowByConfireLogID")
     @ResponseBody
     public Result<Object> addFlowByConfireLogID(String confirmLogId) {
@@ -181,6 +192,24 @@ public class CamsFlowController {
     	addBusinessFlow(listMap);
     	return Result.buildSuccess("指定confirmLogId同步账户流水到核心成功");
     }
+    
+    /**
+     * 指定confireLogID推送账户流水
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "指定logid同步分发流水到核心")
+    @GetMapping("/addFenFaFlowByConfireLogID")
+    @ResponseBody
+    public Result<Object> addFenFaFlowByConfireLogID(String logId) {
+    	//核心流程推送流程
+    	//1# step1 查出未推送和推送失败的业务 list    tb_basic_business加3列 最后推送时间 最后推送状态 最后推送备注   另增加推送流水表
+    	Map<String,Object> paramBusinessMap = new HashMap<>();
+    	paramBusinessMap.put("confirmLogId", logId);
+    	List<Map<String,Object>> listMap = basicBusinessService.selectlPushFenFaBusiness(paramBusinessMap);
+    	addBusinessFenFaFlow(listMap);
+    	return Result.buildSuccess("指定confirmLogId同步账户流水到核心成功");
+    }
 
 	private void addBusinessFenFaFlow(List<Map<String, Object>> listMap) {
 		//2# step2 循环业务list，去除每一条业务的流水list
@@ -190,7 +219,7 @@ public class CamsFlowController {
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
         	int actionId = Integer.parseInt(businessMapInfo.get("action_id").toString());
         	String batchId = confirmLogId;
-        	TdrepayRechargeRecord tdrepayRechargeRecord = tdrepayRechargeRecordService.selectOne(new EntityWrapper<TdrepayRechargeRecord>().eq("log_id", batchId).eq("is_valid", 1));
+        	TdrepayRechargeLog tdrepayRechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("log_id", confirmLogId));
         	FlowPushLog flowPushLog = new FlowPushLog();
         	flowPushLog.setPushKey(batchId);
         	flowPushLog.setPushLogType(2);
@@ -204,17 +233,21 @@ public class CamsFlowController {
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
         	Date createTime = new Date();//(Date) businessMapInfo.get("create_time");
         	String createUser = businessMapInfo.get("create_user")==null?"":businessMapInfo.get("create_user").toString();
-        	String messageId = confirmLogId;
+        	String messageId = confirmLogId+"-5";
         	
         	String branchId = businessMapInfo.get("company_id")==null?"":businessMapInfo.get("company_id").toString();
         	String branchName = businessMapInfo.get("company_name")==null?"":businessMapInfo.get("company_name").toString();
         	String businessId = businessMapInfo.get("business_id")==null?"":businessMapInfo.get("business_id").toString();
+        	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();
         	String businessType = businessMapInfo.get("business_type_name")==null?"":businessMapInfo.get("business_type_name").toString();//business_type
         	String businessCtype = businessMapInfo.get("business_ctype")==null?"":businessMapInfo.get("business_ctype").toString();
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
-        	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();
+        	if(!StringUtils.isBlank(businessTypeId) && StringUtils.isBlank(businessCtype)) {
+        		businessType = BusinessTypeEnum.getName(Integer.parseInt(businessTypeId));
+        	}
+        	
         	String customerName = businessMapInfo.get("customer_name")==null?"":businessMapInfo.get("customer_name").toString();
         	String exhibitionId = businessMapInfo.get("business_id")==null?"":businessMapInfo.get("business_id").toString();
         	Business business = new Business();
@@ -243,85 +276,39 @@ public class CamsFlowController {
             	FlowAccountIdentifier flowAccountIdentifier = new FlowAccountIdentifier();
             	String accountName = flowMap.get("account_name")==null?"":flowMap.get("account_name").toString();
             	String bankCardNo = flowMap.get("bank_card_no")==null?"":flowMap.get("bank_card_no").toString();
+            	
+            	String targetAccountId = flowMap.get("target_account_id")==null?"":flowMap.get("target_account_id").toString();
+            	String targetBankCardNo = flowMap.get("target_bank_card_no")==null?"":flowMap.get("target_bank_card_no").toString();
+            	
             	String depositoryId = null;//存管编号
             	//flowMap.get("main_id")+"";
             	String identifierId = sId;
             	Boolean personal = true;
-            	int mainType = flowMap.get("main_type")==null||StringUtils.isBlank(flowMap.get("main_type").toString())?1:Integer.parseInt(flowMap.get("main_type")+"");
-            	if(mainType == 2) {
-            		personal = false;
-            	}
             	int accountType = 0;
-            	String mainId = flowMap.get("main_id")==null?"":flowMap.get("main_id").toString();
-            	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
-            	
-            	if(repayType == 1) {//手动
-            		accountType = 9;
-            	}
-            	
-            	if(repayType == 7) {
-            		depositoryId = dMainIdnull;
-            		mainId = mainIdnull;
-            		accountName = "无";
-            	}
-            	
-            	if("刷卡".equals(accountName)) {
-            		depositoryId = dMainIdCard;
-            		mainId = mainIdCard;
-            	}
-            	
-            	if("现金".equals(accountName)) {
-            		depositoryId = dMainIdCash;
-            		mainId = mainIdCash;
-            	}
-            	
             	String openBank = flowMap.get("open_bank")==null?"":flowMap.get("open_bank").toString();
             	flowAccountIdentifier.setAccountName(accountName);
             	flowAccountIdentifier.setAccountType(accountType);
-            	flowAccountIdentifier.setBankCardNo(bankCardNo);
-            	flowAccountIdentifier.setDepositoryId(depositoryId);
+            	flowAccountIdentifier.setDepositoryId(bankCardNo);
             	flowAccountIdentifier.setIdentifierId(identifierId);
             	flowAccountIdentifier.setPersonal(personal);
-            	flowAccountIdentifier.setMainId(mainId);
-            	flowAccountIdentifier.setOpenBank(openBank);
+            	flowAccountIdentifier.setMainId(bankCardNo);
             	accountIdentifiers.add(flowAccountIdentifier);
-            	accountType = 1;
+            	
+            	accountType = 8;
+            	personal = false;
+            	String targetAccountName = BusinessTypeEnum.getName(Integer.parseInt(businessTypeId))+"代充值账户";
             	//收入账号
-            	if(2 == repayType) {
-            		depositoryId = dMainIdBf;
-            		mainId = mainIdBf;
-            		accountName = "宝付";
-            		
+            	if(!StringUtils.isBlank(targetAccountName)) {
+            		targetAccountName = targetAccountName.replace("共借", "");
             	}
-            	if(3 == repayType) {
-            		depositoryId = dMainIdYb;
-            		mainId = mainIdYb;
-            		accountName = "易宝";
-            	}
-            	if(repayType == 2 || repayType == 3) {
-	            	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
-	            	flowAccountIdentifier2.setAccountName(accountName);
-	            	flowAccountIdentifier2.setAccountType(4);
-	            	flowAccountIdentifier2.setBankCardNo("");
-	            	flowAccountIdentifier2.setDepositoryId(depositoryId);
-	            	flowAccountIdentifier2.setIdentifierId(tId);
-	            	flowAccountIdentifier2.setPersonal(personal);
-	            	flowAccountIdentifier2.setMainId(mainId);
-	            	flowAccountIdentifier2.setOpenBank("");
-	            	accountIdentifiers.add(flowAccountIdentifier2);
-            	}
-            	if(repayType == 4) {
-            		FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
-            		flowAccountIdentifier2.setAccountName(accountName);
-                	flowAccountIdentifier2.setAccountType(9);
-                	flowAccountIdentifier2.setBankCardNo(bankCardNo);
-                	flowAccountIdentifier2.setDepositoryId(depositoryId);
-                	flowAccountIdentifier2.setIdentifierId(tId);
-                	flowAccountIdentifier2.setPersonal(personal);
-                	flowAccountIdentifier2.setMainId(mainId);
-                	flowAccountIdentifier2.setOpenBank(openBank);
-                	accountIdentifiers.add(flowAccountIdentifier2);
-            	}
+            	FlowAccountIdentifier flowAccountIdentifier2 = new FlowAccountIdentifier();
+            	flowAccountIdentifier2.setAccountName(targetAccountName);
+            	flowAccountIdentifier2.setAccountType(accountType);
+            	flowAccountIdentifier2.setDepositoryId(targetBankCardNo);
+            	flowAccountIdentifier2.setIdentifierId(tId);
+            	flowAccountIdentifier2.setPersonal(personal);
+            	flowAccountIdentifier2.setMainId(targetBankCardNo);
+            	accountIdentifiers.add(flowAccountIdentifier2);
             	
             	Flow flow = new Flow();
             	Date accountTime = (Date) flowMap.get("account_time");
@@ -336,10 +323,8 @@ public class CamsFlowController {
             	String sourceAccountIdentifierId = sId;
             	String targetAccountIdentifierId = tId;
             	String listId = flowMap.get("list_id")==null?"":flowMap.get("list_id").toString();
-            	if(repayType == 7) {
-            		inOut = -1;
-            		amount = new BigDecimal(0);
-            	}
+            	int repayType = Integer.parseInt(flowMap.get("repay_type").toString());
+            	
             	flow.setAccountTime(accountTime);
             	flow.setAfterId(afterId);
             	flow.setAmount(amount);
@@ -352,31 +337,41 @@ public class CamsFlowController {
             	flow.setSegmentationDate(segmentationDate);
             	flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
             	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
-            	if(4 == repayType) {//银行代扣
-            		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
-                	flow.setTargetAccountIdentifierId(targetAccountIdentifierId);
-            	}else if(repayType != 2 && repayType != 3) {//线下还款
-            		flow.setSourceAccountIdentifierId(sourceAccountIdentifierId);
-                	flow.setTargetAccountIdentifierId(null);
-            	}
-            	//if(repayType != 7) {//|| listOnlineFlow.size() == 1
-            		flows.add(flow);
+            	flows.add(flow);
+            		
+            	Flow flow1 = new Flow();
+            	flow1.setAccountTime(accountTime);
+            	flow1.setAfterId(afterId);
+            	flow1.setAmount(amount);
+            	flow1.setExternalId(externalId);
+            	flow1.setInOut(1);
+            	flow1.setIssueId(issueId);
+            	flow1.setMemo(memo);
+            	flow1.setRemark(remark);
+            	flow1.setRepayType(repayType);
+            	flow1.setSegmentationDate(segmentationDate);
+            	flow1.setSourceAccountIdentifierId(sourceAccountIdentifierId);
+            	flow1.setTargetAccountIdentifierId(targetAccountIdentifierId);
+            	flows.add(flow1);
             	//}
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
             	paramFlowItemMap.put("repaySourceId", listId);
-            	List<Map<String,Object>> listFlowItem = basicBusinessService.selectlPushBusinessFlowItem(paramFlowItemMap);
+            	List<Map<String,Object>> listFlowItem = basicBusinessService.selectlPushBusinessFenFaFlowItem(paramFlowItemMap);
             	for (Map<String, Object> listFlowItemMap : listFlowItem) {
             		Date detailAccountTime = (Date) listFlowItemMap.get("account_date");
-            		String detailAfterId = listFlowItemMap.get("after_id").toString();
+            		String detailAfterId = afterId;//listFlowItemMap.get("after_id").toString();
             		BigDecimal detailAmount = new BigDecimal(listFlowItemMap.get("amount").toString());
             		String detailFeeId = listFlowItemMap.get("fee_id").toString();
             		String detailFeeName = listFlowItemMap.get("fee_name").toString();
-            		if("滞纳金".equals(detailFeeName)) {
-            			String detailFeeName1 = RepayPlanFeeTypeEnum.feeIdOf(listFlowItemMap.get("fee_id")+"").getDesc();
-            			if(!StringUtils.isBlank(detailFeeName1)) {
-            				detailFeeName = detailFeeName1;
-            			}
+            		if(StringUtils.isBlank(detailFeeId)) {
+            			detailFeeId = detailFeeName;
             		}
+//            		if("滞纳金".equals(detailFeeName)) {
+//            			String detailFeeName1 = RepayPlanFeeTypeEnum.feeIdOf(listFlowItemMap.get("fee_id")+"").getDesc();
+//            			if(!StringUtils.isBlank(detailFeeName1)) {
+//            				detailFeeName = detailFeeName1;
+//            			}
+//            		}
             		String detailIssueId = listFlowItemMap.get("issue_id")==null?"":listFlowItemMap.get("issue_id").toString();
             		int detailRegisterType = StringUtils.isBlank(flowMap.get("register_type")+"")?0:Integer.parseInt(listFlowItemMap.get("register_type").toString());
             		Date detailSegmentationDate = (Date) listFlowItemMap.get("segmentation_date");
@@ -430,69 +425,86 @@ public class CamsFlowController {
             	
             	int retryTimes = 0;
             	String retStr = "";
-            	while(retryTimes < 3) {
+            	//while(retryTimes < 3) {
             		try {
+            			
+            			TdrepayRechargeLog tdrepayRechargeLogNew = tdrepayRechargeLogService.selectById(batchId);
+                		int newStatus = tdrepayRechargeLogNew.getLastPushStatus();
+            			if(newStatus == 1 || newStatus == 4) {
+            				LOGGER.error("该流水已推送过"+batchId); 
+            				return;
+            			}
+            			
                 		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
-                		System.err.println(JSON.toJSONString(camsMessage));
-                    	System.err.println(JSONObject.toJSONString(ret));
+                		LOGGER.debug(JSON.toJSONString(camsMessage));
+                		LOGGER.debug(JSONObject.toJSONString(ret));
                     	retStr = JSON.toJSONString(ret);
-                		break;//跳出循环
+                    	
+                    	tdrepayRechargeLog.setLastPushStatus(1);
+                    	tdrepayRechargeLog.setLastPushRemark(retStr);
+                		flowPushLog.setPushStatus(1);
+                		//break;//跳出循环
             		} catch (Exception e) {
+            			tdrepayRechargeLog.setLastPushStatus(2);
+            			tdrepayRechargeLog.setLastPushRemark(retStr);
+                		flowPushLog.setPushStatus(2);
+            			
             			retStr = e.getMessage();
+            			e.printStackTrace();
+            			LOGGER.debug(JSON.toJSONString(camsMessage));
+            			LOGGER.debug(JSON.toJSONString(retStr));
             			System.err.println(e.getMessage());
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
 						}
-            			retryTimes++;
+            			//retryTimes++;
     				}
-            	}
+            	//}
             	
-            	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
-	              tdrepayRechargeRecord.setLastPushStatus(1);
-	              tdrepayRechargeRecord.setLastPushRemark(retStr);
+            	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
+            	  tdrepayRechargeLog.setLastPushStatus(1);
+            	  tdrepayRechargeLog.setLastPushRemark(retStr);
 	              flowPushLog.setPushStatus(1);
 	              flowPushLog.setPushRet(retStr);
 	            }else {
-	              tdrepayRechargeRecord.setLastPushStatus(2);
-	              tdrepayRechargeRecord.setLastPushRemark(retStr);
+	              tdrepayRechargeLog.setLastPushStatus(2);
+	              tdrepayRechargeLog.setLastPushRemark(retStr);
 	              flowPushLog.setPushStatus(2);
 	              flowPushLog.setPushRet(retStr);
 	            }
             	//更新推送状态
-                tdrepayRechargeRecord.setLastPushDatetime(new Date());
-                tdrepayRechargeRecordService.update(tdrepayRechargeRecord,new EntityWrapper<TdrepayRechargeRecord>().eq("log_id", confirmLogId).eq("is_valid", 1));
+            	tdrepayRechargeLog.setLastPushDatetime(new Date());
+            	tdrepayRechargeLogService.update(tdrepayRechargeLog,new EntityWrapper<TdrepayRechargeLog>().eq("log_id", confirmLogId).eq("is_valid", 1));
                 
             	//记录推送日志
             	flowPushLog.setPushEndtime(new Date());
             	flowPushLogService.insert(flowPushLog);
+            	
+            	
+            	
         	}
 	}
 	
 	private void addBusinessFlow(List<Map<String, Object>> listMap) {
 		//2# step2 循环业务list，去除每一条业务的流水list
     	for(Map<String,Object> businessMapInfo : listMap) {
+    		LOGGER.info("同步开始");
     		CreateBatchFlowCommand command = new CreateBatchFlowCommand();
     		String confirmLogId = businessMapInfo.get("confirm_log_id")+"";
     		//交易活动,0满标分润,1提现放款,2正常还款,3提前结清,4业务退费,5资金分发,6展期确认,7平台还款,8垫付,9账户提现,10账户充值,11账户转账,12暂收款登记
         	int actionId = Integer.parseInt(businessMapInfo.get("action_id").toString());
         	String batchId = confirmLogId;
-        	RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(batchId);
-        	FlowPushLog flowPushLog = new FlowPushLog();
-        	flowPushLog.setPushKey(batchId);
-        	flowPushLog.setPushLogType(2);
-        	flowPushLog.setPushTo(1);
-        	flowPushLog.setPushStarttime(new Date());
-        	flowPushLog.setPushStatus(0);
+        	RepaymentConfirmLog repaymentConfirmLog = repaymentConfirmLogService.selectById(confirmLogId);
         	//是否业务交易明细,1是,0否
         	int businessFlag = Integer.parseInt(businessMapInfo.get("businessFlag").toString());
         	//所属资产端
         	int businessFrom = Integer.parseInt(businessMapInfo.get("businessFrom")==null?"1":businessMapInfo.get("businessFrom").toString());
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
-        	Date createTime = new Date();//(Date) businessMapInfo.get("create_time");
+        	Date createTime = (Date) businessMapInfo.get("create_time");//new Date();//
         	String createUser = businessMapInfo.get("create_user")==null?"":businessMapInfo.get("create_user").toString();
-        	String messageId = confirmLogId;
+        	String messageId = confirmLogId+"-2";
         	
         	String branchId = businessMapInfo.get("company_id")==null?"":businessMapInfo.get("company_id").toString();
         	String branchName = businessMapInfo.get("company_name")==null?"":businessMapInfo.get("company_name").toString();
@@ -768,17 +780,40 @@ public class CamsFlowController {
             	camsMessage.setQueueName("cams.account.ms.queue.accountListCreatedQueueBatch");
             	camsMessage.setMessage(command);
             	
+            	FlowPushLog flowPushLog = new FlowPushLog();
+            	flowPushLog.setPushKey(batchId);
+            	flowPushLog.setPushLogType(2);
+            	flowPushLog.setPushTo(1);
+            	flowPushLog.setPushStarttime(new Date());
+            	flowPushLog.setPushStatus(0);
             	int retryTimes = 0;
             	String retStr = "";
-            	while(retryTimes < 3) {
+            	//while(retryTimes < 3) {
             		try {
-                		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
-                		System.err.println(JSON.toJSONString(camsMessage));
-                    	System.err.println(JSONObject.toJSONString(ret));
+            			RepaymentConfirmLog repaymentConfirmLogNew = repaymentConfirmLogService.selectById(batchId);
+                		int newStatus = repaymentConfirmLogNew.getLastPushStatus();
+            			if(newStatus == 1 || newStatus == 4) {
+            				LOGGER.error("该流水已推送过"+batchId); 
+            				return;
+            			}
+            			Result ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
+                		LOGGER.debug(JSON.toJSONString(camsMessage));
+                		LOGGER.debug(JSONObject.toJSONString(ret));
                     	retStr = JSON.toJSONString(ret);
-                		break;//跳出循环
+                    	
+                    	repaymentConfirmLog.setLastPushStatus(1);
+                		repaymentConfirmLog.setLastPushRemark(retStr);
+                		flowPushLog.setPushStatus(1);
+                		//break;//跳出循环
             		} catch (Exception e) {
+            			repaymentConfirmLog.setLastPushStatus(2);
+                		repaymentConfirmLog.setLastPushRemark(retStr);
+                		flowPushLog.setPushStatus(2);
+            			
             			retStr = e.getMessage();
+            			e.printStackTrace();
+            			LOGGER.debug(JSON.toJSONString(camsMessage));
+            			LOGGER.debug(JSON.toJSONString(retStr));
             			System.err.println(e.getMessage());
 						try {
 							Thread.sleep(100);
@@ -786,18 +821,18 @@ public class CamsFlowController {
 							e1.printStackTrace();
 						}
             			retryTimes++;
-    				}
+    				//}
             	}
             	
-            	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
-            		repaymentConfirmLog.setLastPushStatus(1);
-            		repaymentConfirmLog.setLastPushRemark(retStr);
-            		flowPushLog.setPushStatus(1);
-            	}else {
-            		repaymentConfirmLog.setLastPushStatus(2);
-            		repaymentConfirmLog.setLastPushRemark(retStr);
-            		flowPushLog.setPushStatus(2);
-            	}
+//            	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
+//            		repaymentConfirmLog.setLastPushStatus(1);
+//            		repaymentConfirmLog.setLastPushRemark(retStr);
+//            		flowPushLog.setPushStatus(1);
+//            	}else {
+//            		repaymentConfirmLog.setLastPushStatus(2);
+//            		repaymentConfirmLog.setLastPushRemark(retStr);
+//            		flowPushLog.setPushStatus(2);
+//            	}
             	//更新推送状态
             	repaymentConfirmLog.setLastPushDatetime(new Date());
             	repaymentConfirmLogService.updateById(repaymentConfirmLog);
@@ -865,7 +900,11 @@ public class CamsFlowController {
 	    	command.setAfterId(afterId);
 	    	command.setBusinessId(businessId);
 	    	command.setClientId(clientId);
-	    	command.setCreateTime(new Date());//queryFullsuccessDate
+	    	Date updateTime = repaymentConfirmLog.getUpdateTime();
+	    	if(null == updateTime) {
+	    		updateTime = repaymentConfirmLog.getCreateTime();
+	    	}
+	    	command.setCreateTime(updateTime); //new Date()
 	    	command.setTriggerEventSystem("1");
 	    	command.setEventType("FlowCanceled");
 	    	command.setTriggerEventType("CanceledFlow");
@@ -883,14 +922,14 @@ public class CamsFlowController {
 	    	
 	    	int retryTimes = 0;
 	    	String retStr = "";
-	    	while(retryTimes < 3) {
+	    	//while(retryTimes < 3) {
 	    		try {
 	    			// 撤销已推送
 	        		Result<Object> ret = accountListHandlerMsgClient.addMessageFlow(camsMessage);
 	        		System.err.println(JSON.toJSONString(camsMessage));
 	            	System.err.println(JSONObject.toJSONString(ret));
 	            	retStr = JSON.toJSONString(ret);
-	        		break;//跳出循环
+	        		//break;//跳出循环
 	    		} catch (Exception e) {
 	    			retStr = e.getMessage();
 	    			System.err.println(e.getMessage());
@@ -901,9 +940,9 @@ public class CamsFlowController {
 					}
 	    			retryTimes++;
 				}
-	    	}
+	    	//}
 	    	
-	    	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
+	    	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
 	    		repaymentConfirmLog.setLastPushStatus(4);
 	    		repaymentConfirmLog.setLastPushRemark(retStr);
 				flowPushLog.setPushStatus(4);
@@ -993,7 +1032,7 @@ public class CamsFlowController {
 				}
 	    	}
 	    	
-	    	if(StringUtils.isNotBlank(retStr) && retStr.contains("执行成功")) {
+	    	if(StringUtils.isNotBlank(retStr) && !retStr.contains("-500")) {
 	    		tdrepayRechargeRecord.setLastPushStatus(4);
 	    		tdrepayRechargeRecord.setLastPushRemark(retStr);
 				flowPushLog.setPushStatus(4);
@@ -1014,4 +1053,114 @@ public class CamsFlowController {
     	
     	return Result.buildSuccess(0);
     }
+    
+    /**
+     * 获取平台还款及垫付信息
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "获取平台还款及垫付信息")
+    @GetMapping("/pullPlatformRepayInfo")
+    @ResponseBody
+    public Result<Object> pullPlatformRepayInfo(String projectId) {
+    	Result ret = null;
+    	if(StringUtils.isBlank(projectId)) {
+    		List<Map<String,Object>> listProjs = flowPushLogService.selectPushProjectList();
+    		for(Map<String,Object> map:listProjs) {
+    			String pushProjectId = map.get("project_id").toString();
+    			if(StringUtils.isNoneBlank(pushProjectId)) {
+    				ret = flowPushLogService.queryDistributeFundRecord(map);
+    			}
+    		}
+    	}
+    	return Result.buildSuccess(ret);
+    }
+    
+    /**
+     * 指定confireLogID推送账户流水
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "获取平台还垫付信息")
+    @GetMapping("/pullAdvanceRepayInfo")
+    @ResponseBody
+    public Result<Object> pullAdvanceRepayInfo(String projectId) {
+    	Result ret = null;
+    	if(StringUtils.isBlank(projectId)) {
+    		List<Map<String,Object>> listProjs = flowPushLogService.selectPushProjectList();
+    		for(Map<String,Object> map:listProjs) {
+    			String pushProjectId = map.get("project_id").toString();
+    			if(StringUtils.isNoneBlank(pushProjectId)) {
+    				ret = flowPushLogService.pullAdvanceRepayInfo(map);
+    			}
+    		}
+    	}
+    	return Result.buildSuccess(ret);
+    }
+    
+    /**
+     * 推送平台还款流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送平台还款流水到核心")
+    @GetMapping("/pushPlatformRepayFlowToCams")
+    @ResponseBody
+    public Result<Object> pushPlatformRepayFlowToCams(String projectId) {
+    	flowPushLogService.pushPlatformRepayFlowToCams(projectId);
+    	return Result.buildSuccess("推送平台还款流水到核心执行成功");
+    }
+    
+    /**
+     * 推送垫付流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送垫付流水到核心")
+    @GetMapping("/pushAdvancePayFlowToCams")
+    @ResponseBody
+    public Result<Object> pushAdvancePayFlowToCams(String projectId) {
+    	flowPushLogService.pushAdvancePayFlowToCams(projectId);
+    	return Result.buildSuccess("推送垫付流水到核心");
+    }
+    
+    /**
+     * 推送还垫付流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送还垫付流水到核心")
+    @GetMapping("/pushAdvanceRepayFlowToCams")
+    @ResponseBody
+    public Result<Object> pushAdvanceRepayFlowToCams(String projectId) {
+    	flowPushLogService.pushAdvanceRepayFlowToCams(projectId);
+    	return Result.buildSuccess("推送还垫付流水到核心");
+    }
+    
+    /**
+     * 推送还垫付流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送你我金融还款流水到核心")
+    @GetMapping("/pushNiWoRepayFlowToCams")
+    @ResponseBody
+    public Result<Object> pushNiWoRepayFlowToCams(String planListId) {
+    	flowPushLogService.pushNiWoRepayFlowToCams(planListId);
+    	return Result.buildSuccess("推送你我金融还款流水到核心");
+    }
+    
+    /**
+     * 推送还垫付流水到核心
+     * @param bankWithholdFlowReq
+     * @return
+     */
+    @ApiOperation(value = "推送充值流水到核心")
+    @GetMapping("/pushRechargeFlowToCams")
+    @ResponseBody
+    public Result<Object> pushRechargeFlowToCams(String logId) {
+    	flowPushLogService.pushRechargeFlowToCams(logId);
+    	return Result.buildSuccess("推送充值流水到核心");
+    }
+    
 }

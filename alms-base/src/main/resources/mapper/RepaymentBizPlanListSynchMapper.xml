@@ -167,6 +167,7 @@
                 WHEN t2.current_status = '逾期' then to_days(now())- to_days(t2.due_date)
                 WHEN t2.fact_repay_date is null then to_days(now())- to_days(t2.due_date)
                 WHEN t2.fact_repay_date<t2.due_date THEN 0
+                WHEN ( !ISNULL(t2.repay_flag) AND t2.repay_flag != 0) THEN 0
                 ELSE to_days(t2.fact_repay_date)- to_days(t2.due_date)
                 end
             ]]>
@@ -228,6 +229,7 @@
                 WHEN t2.current_status = '逾期' then to_days(now())- to_days(t2.due_date)
                 WHEN t2.fact_repay_date is null then to_days(now())- to_days(t2.due_date)
                 WHEN t2.fact_repay_date<t2.due_date THEN 0
+                WHEN ( !ISNULL(t2.repay_flag) AND t2.repay_flag != 0) THEN 0
                 ELSE  to_days(t2.fact_repay_date)- to_days(t2.due_date)
                 end
             ]]>
@@ -355,7 +357,7 @@
   </update>
   
   <update id="updateFiveLevelClassifyBusinessChangeLog">
-  		UPDATE tb_repayment_biz_plan_list_synch t1,tb_five_level_classify_business_change_log t2 SET 
+		UPDATE tb_repayment_biz_plan_list_synch t1,tb_five_level_classify_business_change_log t2 SET 
 		t1.class_name_ext = t2.class_name
 		WHERE 
 		t1.business_id_ext = t2.orig_business_id 

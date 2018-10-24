@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hongte.alms;
+package com.hongte.alms.tool.importOffLineBusiness;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -25,7 +26,9 @@ import java.util.zip.ZipInputStream;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.google.common.collect.Maps;
+import com.hongte.alms.base.collection.vo.AfterLoanStandingBookVo;
 import com.hongte.alms.base.customer.vo.WithholdFlowReq;
 import com.hongte.alms.base.entity.WithholdingFlowRecord;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
@@ -35,6 +38,8 @@ import com.hongte.alms.base.mapper.WithholdingFlowRecordMapper;
 import com.hongte.alms.base.service.WithholdingFlowRecordService;
 import com.hongte.alms.base.service.WithholdingRepaymentLogService;
 import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordSummaryVo;
+import com.hongte.alms.base.vo.withhold.WithholdingFlowRecordVo;
+import com.hongte.alms.base.vo.withhold.WithholdingFlowyYbRecordVo;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.SecurityUtil;
@@ -257,14 +262,14 @@ public class WithholdingFlowRecordServiceImpl extends
                     }
                     flow.setMerchantOrderNo(cols[4]);
                     flow.setTradeWaterNo(cols[5]);
-                    flow.setAmount(new BigDecimal(cols[7]));
+                    flow.setAmount(new BigDecimal(cols[6]));
                     flow.setTradeType(cols[8]);
                     // 接口没有状态，默认为成功
                     flow.setWithholdingStatus("成功");
                     flow.setServiceCharge(new BigDecimal(cols[9]));
                     flow.setProductName(cols[12]);
                     flow.setPaymentCardType(cols[13]);
-                    flow.setPaymentCardNo(cols[14]);
+                    flow.setPaymentCardNo("");
                     flow.setImportTime(new Date());
                     flow.setImportSystem(this.getClass().getSimpleName());
                     flow.insert();
@@ -369,4 +374,24 @@ public class WithholdingFlowRecordServiceImpl extends
             log.error("@WithholdingFlowRecordServiceImpl@导入快钱代扣流水失败.msg:[{}]", ex.getMessage(), ex);
         }
     }
+
+	@Override
+	public Page<WithholdingFlowRecordVo> selectFlowBfRecordPage(WithholdFlowReq req) {
+	        Page<WithholdingFlowRecordVo> pages = new Page<>();
+	        pages.setCurrent(req.getPage());
+	        pages.setSize(req.getLimit());
+	        List<WithholdingFlowRecordVo> list = withholdingFlowRecordMapper.selectFlowBfRecordPage(pages,req);
+	        pages.setRecords(list);
+		return pages;
+	}
+	
+	@Override
+	public Page<WithholdingFlowyYbRecordVo> selectFlowYbRecordPage(WithholdFlowReq req) {
+	        Page<WithholdingFlowyYbRecordVo> pages = new Page<>();
+	        pages.setCurrent(req.getPage());
+	        pages.setSize(req.getLimit());
+	        List<WithholdingFlowyYbRecordVo> list = withholdingFlowRecordMapper.selectFlowYbRecordPage(pages,req);
+	        pages.setRecords(list); 
+		return pages;
+	}
 }

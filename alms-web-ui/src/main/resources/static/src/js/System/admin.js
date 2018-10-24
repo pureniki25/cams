@@ -35,7 +35,12 @@ window.layinit(function (htConfig) {
            autoRepayLoading:false,
            tdrepyChargeLoading:false,	// 合规化还款加载标识
            retryRepaymentLoading:false,	// 重试平台还款接口加载标识
+           alsoToPayOneProjectPaying:false, //还垫付执行标志位
+           advanceShareProfitLoading:false, // 偿还垫付处理状态
+           rechargeRepaymentLoading:false,//推送资金分发数据处理状态
 		   // --- 按钮控制标识 end---
+
+
 
 		   onePListCollogBId:"",
            onePListCollogAfterId:"",
@@ -64,10 +69,57 @@ window.layinit(function (htConfig) {
            logId:"",
 
            //需移交法务的业务id
-           toLawBusinessId:''
+           toLawBusinessId:'',
+
+           // 还垫付标的Id
+           alsoToPayProjectId:"",
+           //还垫付期数Id
+           alsoToPayAfterId:"",
+
+           //推送资金分发数据的标的还款计划id
+           rechargeRepaymentProjPlanListId:""
 
 	   },
 	   methods: {
+           //推送指定标的期数的资金分发数据
+           rechargerRepayment:function(){
+               this.rechargeRepaymentLoading = true;
+               axios.get(platRepayBasePath +"platformRepayment/tdrepayRecharge?projRepaymentId="+vm.rechargeRepaymentProjPlanListId,{timeout: 0})
+                   .then(function (res) {
+                       vm.rechargeRepaymentLoading = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.rechargeRepaymentLoading = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
+
+	       //指定标的，指定期数还垫付触发按钮
+           alsoToPayOneProjectPayClick:function(){
+               this.alsoToPayOneProjectPaying = true;
+               axios.get(platRepayBasePath +"tdrepayRecharge/alsoToPayOneProject?alsoToPayProjectId="+vm.alsoToPayProjectId+"&alsoToPayAfterId="+vm.alsoToPayAfterId,{timeout: 0})
+                   .then(function (res) {
+                       vm.alsoToPayOneProjectPaying = false;
+                       if (res.data.data != null && res.data.code == 1) {
+                           vm.$Modal.success({
+                               content: res.data.msg
+                           });
+                       } else {
+                           vm.$Modal.error({content: res.data.msg });
+                       }
+                   })
+                   .catch(function (error) {
+                       vm.alsoToPayOneProjectPaying = false;
+                       vm.$Modal.error({content: '接口调用异常!'});
+                   });
+           },
 	       //推送指定业务的还款计划到信贷
            pushOneBizRepayPlanToXD:function(){
                this.oneRepayPlanPushing = true;
@@ -89,125 +141,125 @@ window.layinit(function (htConfig) {
            },
 
 		   // 同步电催催收数据
-		   syncCollection:function(){
-			   this.syncCollectionLoading = true;
-			   axios.get(basePath +"alms/transfer",{timeout: 0})
-		        .then(function (res) {
-		        	vm.syncCollectionLoading = false;
-		            if (res.data.data != null && res.data.code == 1) {
-		            	vm.$Modal.success({
-		                    content: res.data.msg
-		                });
-		            } else {
-		                vm.$Modal.error({content: res.data.msg });
-		            }
-		        })
-		        .catch(function (error) {
-		        	vm.syncCollectionLoading = false;
-                    vm.$Modal.error({content: '接口调用异常!'});
-                });
-           },
+		   // syncCollection:function(){
+			//    this.syncCollectionLoading = true;
+			//    axios.get(basePath +"alms/transfer",{timeout: 0})
+		   //      .then(function (res) {
+		   //      	vm.syncCollectionLoading = false;
+		   //          if (res.data.data != null && res.data.code == 1) {
+		   //          	vm.$Modal.success({
+		   //                  content: res.data.msg
+		   //              });
+		   //          } else {
+		   //              vm.$Modal.error({content: res.data.msg });
+		   //          }
+		   //      })
+		   //      .catch(function (error) {
+		   //      	vm.syncCollectionLoading = false;
+            //         vm.$Modal.error({content: '接口调用异常!'});
+            //     });
+           // },
            // 同步指定电催催收数据
-           transferOneCollection:function(){
-               this.synOneCollectionLoading = true;
-               var url = basePath +"alms/transferOneCollection?businessId="+vm.oneCollectionBId
-               if(vm.oneCollectionAfterId!=null &&vm.oneCollectionAfterId!=''){
-                   url = url+"&afterId="+vm.oneCollectionAfterId;
-               }
-               axios.get(url,{timeout: 0})
-                   .then(function (res) {
-                       vm.synOneCollectionLoading = false;
-                       if (res.data.data != null && res.data.code == 1) {
-                           vm.$Modal.success({
-                               content: res.data.msg
-                           });
-                       } else {
-                           vm.$Modal.error({content: res.data.msg });
-                       }
-                   })
-                   .catch(function (error) {
-                       vm.synOneCollectionLoading = false;
-                       vm.$Modal.error({content: '接口调用异常!'});
-                   });
-           },
-           // 同步指定用户电催催收数据
-           transferOneUserCollection:function(){
-               this.synOneUserCollectionLoading = true;
-               var url = basePath +"alms/transferOneUserCollection?userId="+vm.oneColUserXDId
-               axios.get(url,{timeout: 0})
-                   .then(function (res) {
-                       vm.synOneUserCollectionLoading = false;
-                       if (res.data.data != null && res.data.code == 1) {
-                           vm.$Modal.success({
-                               content: res.data.msg
-                           });
-                       } else {
-                           vm.$Modal.error({content: res.data.msg });
-                       }
-                   })
-                   .catch(function (error) {
-                       vm.synOneUserCollectionLoading = false;
-                       vm.$Modal.error({content: '接口调用异常!'});
-                   });
-           },
-           syncSindaiFailPhoneSet:function(){
-                   this.synXindaiFailPhoneSetLoading = true;
-                   var url = basePath +"alms/transferFailPhoneSetInfo"
-                   axios.get(url,{timeout: 0})
-                       .then(function (res) {
-                           vm.synXindaiFailPhoneSetLoading = false;
-                           if (res.data.data != null && res.data.code == 1) {
-                               vm.$Modal.success({
-                                   content: res.data.msg
-                               });
-                           } else {
-                               vm.$Modal.error({content: res.data.msg });
-                           }
-                       })
-                       .catch(function (error) {
-                           vm.synXindaiFailPhoneSetLoading = false;
-                           vm.$Modal.error({content: '接口调用异常!'});
-                       });
-               },
-           // 同步上门催收数据
-           syncVisitCollection:function(){
-               this.syncVisitCollectionLoading = true;
-               axios.get(basePath +"alms/transferVisit",{timeout: 0})
-                   .then(function (res) {
-                       vm.syncVisitCollectionLoading = false;
-                       if (res.data.data != null && res.data.code == 1) {
-                           vm.$Modal.success({
-                               content: res.data.msg
-                           });
-                       } else {
-                           vm.$Modal.error({content: res.data.msg });
-                       }
-                   })
-                   .catch(function (error) {
-                       vm.syncVisitCollectionLoading = false;
-                       vm.$Modal.error({content: '接口调用异常!'});
-                   });
-           },
-
-		   // 同步指定还款计划催收数据
-		   syncOneCollection:function(){
-			   this.synOneListColLoading = true;
-			   axios.get(basePath +"alms/setCollectionStatus?businessId="+vm.onePListCollogBId+"&afterId="+vm.onePListCollogAfterId,{timeout: 0})
-		        .then(function (res) {
-		        	vm.synOneListColLoading = false;
-		            if (res.data.data != null && res.data.code == 1) {
-		            	vm.$Modal.success({
-		                    content: res.data.msg
-		                });
-		            } else {
-		                vm.$Modal.error({content: res.data.msg });
-		            }
-		        })
-		        .catch(function (error) {
-		        	vm.synOneListColLoading = false;
-		            vm.$Modal.error({content: '接口调用异常!'});
-		        });
-		   },
+           // transferOneCollection:function(){
+           //     this.synOneCollectionLoading = true;
+           //     var url = basePath +"alms/transferOneCollection?businessId="+vm.oneCollectionBId
+           //     if(vm.oneCollectionAfterId!=null &&vm.oneCollectionAfterId!=''){
+           //         url = url+"&afterId="+vm.oneCollectionAfterId;
+           //     }
+           //     axios.get(url,{timeout: 0})
+           //         .then(function (res) {
+           //             vm.synOneCollectionLoading = false;
+           //             if (res.data.data != null && res.data.code == 1) {
+           //                 vm.$Modal.success({
+           //                     content: res.data.msg
+           //                 });
+           //             } else {
+           //                 vm.$Modal.error({content: res.data.msg });
+           //             }
+           //         })
+           //         .catch(function (error) {
+           //             vm.synOneCollectionLoading = false;
+           //             vm.$Modal.error({content: '接口调用异常!'});
+           //         });
+           // },
+           // // 同步指定用户电催催收数据
+           // transferOneUserCollection:function(){
+           //     this.synOneUserCollectionLoading = true;
+           //     var url = basePath +"alms/transferOneUserCollection?userId="+vm.oneColUserXDId
+           //     axios.get(url,{timeout: 0})
+           //         .then(function (res) {
+           //             vm.synOneUserCollectionLoading = false;
+           //             if (res.data.data != null && res.data.code == 1) {
+           //                 vm.$Modal.success({
+           //                     content: res.data.msg
+           //                 });
+           //             } else {
+           //                 vm.$Modal.error({content: res.data.msg });
+           //             }
+           //         })
+           //         .catch(function (error) {
+           //             vm.synOneUserCollectionLoading = false;
+           //             vm.$Modal.error({content: '接口调用异常!'});
+           //         });
+           // },
+           // syncSindaiFailPhoneSet:function(){
+           //         this.synXindaiFailPhoneSetLoading = true;
+           //         var url = basePath +"alms/transferFailPhoneSetInfo"
+           //         axios.get(url,{timeout: 0})
+           //             .then(function (res) {
+           //                 vm.synXindaiFailPhoneSetLoading = false;
+           //                 if (res.data.data != null && res.data.code == 1) {
+           //                     vm.$Modal.success({
+           //                         content: res.data.msg
+           //                     });
+           //                 } else {
+           //                     vm.$Modal.error({content: res.data.msg });
+           //                 }
+           //             })
+           //             .catch(function (error) {
+           //                 vm.synXindaiFailPhoneSetLoading = false;
+           //                 vm.$Modal.error({content: '接口调用异常!'});
+           //             });
+           //     },
+           // // 同步上门催收数据
+           // syncVisitCollection:function(){
+           //     this.syncVisitCollectionLoading = true;
+           //     axios.get(basePath +"alms/transferVisit",{timeout: 0})
+           //         .then(function (res) {
+           //             vm.syncVisitCollectionLoading = false;
+           //             if (res.data.data != null && res.data.code == 1) {
+           //                 vm.$Modal.success({
+           //                     content: res.data.msg
+           //                 });
+           //             } else {
+           //                 vm.$Modal.error({content: res.data.msg });
+           //             }
+           //         })
+           //         .catch(function (error) {
+           //             vm.syncVisitCollectionLoading = false;
+           //             vm.$Modal.error({content: '接口调用异常!'});
+           //         });
+           // },
+           //
+           // // 同步指定还款计划催收数据
+           // syncOneCollection:function(){
+			//    this.synOneListColLoading = true;
+			//    axios.get(basePath +"alms/setCollectionStatus?businessId="+vm.onePListCollogBId+"&afterId="+vm.onePListCollogAfterId,{timeout: 0})
+		    //     .then(function (res) {
+		    //     	vm.synOneListColLoading = false;
+		    //         if (res.data.data != null && res.data.code == 1) {
+		    //         	vm.$Modal.success({
+		    //                 content: res.data.msg
+		    //             });
+		    //         } else {
+		    //             vm.$Modal.error({content: res.data.msg });
+		    //         }
+		    //     })
+		    //     .catch(function (error) {
+		    //     	vm.synOneListColLoading = false;
+		    //         vm.$Modal.error({content: '接口调用异常!'});
+		    //     });
+           // },
 		   // 设置所有用户可访问业务对照关系
 		   setUserPermissons:function(){
 			   this.setUserPermissonsLoading = true;
@@ -427,6 +479,21 @@ window.layinit(function (htConfig) {
         	   })
         	   .catch(function (error) {
         		   vm.retryRepaymentLoading = false;
+        		   vm.$Modal.error({content: '接口调用异常!'});
+        	   });
+           },
+           // 偿还垫付
+           advanceShareProfit:function(){
+        	   this.advanceShareProfitLoading = true;
+        	   axios.get(platRepayBasePath +"tdrepayRecharge/advanceShareProfit")
+        	   .then(function (res) {
+        		   vm.advanceShareProfitLoading = false;
+        		   vm.$Modal.success({
+        			   content: res.data.msg
+        		   });
+        	   })
+        	   .catch(function (error) {
+        		   vm.advanceShareProfitLoading = false;
         		   vm.$Modal.error({content: '接口调用异常!'});
         	   });
            },

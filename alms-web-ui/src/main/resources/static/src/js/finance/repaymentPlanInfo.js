@@ -24,7 +24,7 @@ window.layinit(function (htConfig) {
         	repayOtherFeeFlag: false, // 其他费用弹窗控制标识(业务维度)
         	repayProjOtherFeeFlag: false, // 其他费用弹窗控制标识（标维度）
         	businessSurplus:0, // 用户账户结余
-        	plateTypeFlag: '', // 数据来源：1、团贷网；2、你我金融
+        	plateTypeFlag: '', // 数据来源：1、团贷网；2、你我金融；0、线下出款；
         	
         	// -- 实还流水 --
         	actualPaymentRecordList: [],
@@ -33,6 +33,7 @@ window.layinit(function (htConfig) {
         	
         	projectInfoList: [], 	//  标信息LIST
             tableHeight:450,
+            paneHeight:"height:450px",
         	// 还款计划表头  -- start --
         	repayPlanColumns: [
         		{
@@ -300,9 +301,9 @@ window.layinit(function (htConfig) {
     		 * 平台标的应还计划
     		 */
     		platformRepaymentInfoColumns:[
-        		{
+    			{
                     title: '期数',
-                    key: 'periods',
+                    key: 'period',
                     align: 'center',
                 },
                 {
@@ -312,7 +313,7 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '应还合计',
-                    key: 'total',
+                    key: 'totalAmount',
                     align: 'center',
                 },
                 {
@@ -322,12 +323,47 @@ window.layinit(function (htConfig) {
                 },
                 {
                     title: '还款利息',
-                    key: 'interestAmout',
+                    key: 'interestAmount',
                     align: 'center',
                 },
                 {
-                    title: '还款状态（借款人还款状态）',
-                    key: 'statusStr',
+                	title: '平台服务费',
+                	key: 'tuandaiAmount',
+                	align: 'center',
+                },
+                {
+                	title: '资产端服务费',
+                	key: 'orgAmount',
+                	align: 'center',
+                },
+                {
+                	title: '担保费',
+                	key: 'guaranteeAmount',
+                	align: 'center',
+                },
+                {
+                	title: '滞纳金',
+                	key: 'agencyAmount',
+                	align: 'center',
+                },
+                {
+                	title: '保证金',
+                	key: 'depositAmount',
+                	align: 'center',
+                },
+                {
+                	title: '仲裁费',
+                	key: 'arbitrationAmount',
+                	align: 'center',
+                },
+                {
+                	title: '中介服务费',
+                	key: 'agencyAmount',
+                	align: 'center',
+                },
+                {
+                    title: '其他费用',
+                    key: 'otherAmount',
                     align: 'center',
                 },
             ],
@@ -553,21 +589,32 @@ window.layinit(function (htConfig) {
              * 初始化方法
              */
             initFunction: function(event){
-            	if (event == 'realRepaymentRecord') {
+                this.paneHeight="height:"+this.tableHeight+"px";
+                if (event == 'realRepaymentRecord') {
+                    this.paneHeight="";
 					this.queryActualPaymentByBusinessId();
 				}else if (event == 'platformRealRepayment') {
+                    this.paneHeight="";
 					if (this.firstProjectId != '') {
 						this.getProjectPayment(this.firstProjectId);
 					}
 				}else if (event == 'advancesRecord') {
+                    this.paneHeight="";
 					if (this.firstProjectId != '') {
 						this.returnAdvanceShareProfit(this.firstProjectId);
 					}
 				}else if (event == 'fundDistributionRecord') {
+                    this.paneHeight="";
 					if (this.firstProjectId != '') {
 						this.queryDistributeFundRecord(this.firstProjectId);
 					}
+				}else{
+                    var that = this;
+                    setTimeout(function(){
+                        that.paneHeight = "height:"+(that.tableHeight+2)+"px";
+                    },500)
 				}
+
             },
             /*
              * 标的初始化方法
@@ -808,7 +855,9 @@ window.layinit(function (htConfig) {
     	            if (res.data.data != null && res.data.code == 1) {
     	            	app.platformRepaymentInfoData = res.data.data.periodsList;
     	            	app.platformActualRepaymentInfoData = res.data.data.tdProjectPaymentDTOs;
-    	            	app.platformRepaymentInfoaviMoney = res.data.data.aviMoney.aviMoney;
+    	            	if (res.data.data.aviMoney != null) {
+    	            		app.platformRepaymentInfoaviMoney = res.data.data.aviMoney.aviMoney;
+						}
     	            	if (res.data.data.principal == null) {
     	            		res.data.data.principal = 0;
 						}
@@ -818,7 +867,8 @@ window.layinit(function (htConfig) {
     	            	if (res.data.data.platformCharge == null) {
     	            		res.data.data.platformCharge = 0;
 						}
-    	            	app.platformPrincipalAndInterest = res.data.data.principal + res.data.data.interest;
+    	            	app.platformPrincipal = res.data.data.principal;
+    	            	app.platformInterest = res.data.data.interest;
     	            	app.platformRepaymentInfoPlatformCharge = res.data.data.platformCharge;
     	            	app.platformPrincipalAndInterestAndPlatformCharge = res.data.data.principal + res.data.data.interest + res.data.data.platformCharge;
     	            } else {
@@ -886,6 +936,7 @@ window.layinit(function (htConfig) {
         mounted: function() {
 
             this.tableHeight = window.innerHeight-180;
+            this.paneHeight = "height:"+this.tableHeight+"px";
 		}
     })
 })

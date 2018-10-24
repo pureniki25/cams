@@ -57,7 +57,7 @@ public class TransferLitigationCarServiceImpl extends
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void saveCarProcessApprovalResult(ProcessLogReq req, String sendUrl) {
+	public void saveCarProcessApprovalResult(ProcessLogReq req) {
 		try {
 			// 存储审批结果信息
 			Process process = processService.saveProcessApprovalResult(req, ProcessTypeEnums.CAR_LOAN_LITIGATION);
@@ -69,7 +69,7 @@ public class TransferLitigationCarServiceImpl extends
 			Integer processResult = process.getProcessResult();
 			if (!CollectionUtils.isEmpty(cars) && status == ProcessStatusEnums.END.getKey()
 					&& processResult == ProcessApproveResult.PASS.getKey()) {
-				transferOfLitigationService.sendTransferLitigationData(businessId, sendUrl, req.getCrpId(), 2);
+				transferOfLitigationService.sendTransferLitigationData(businessId, req.getCrpId(), 2);
 				// 更新贷后状态为 移交诉讼
 //				collectionStatusService.setBussinessAfterStatus(req.getBusinessId(), req.getCrpId(), "",
 //						CollectionStatusEnum.TO_LAW_WORK, CollectionSetWayEnum.MANUAL_SET);

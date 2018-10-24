@@ -79,14 +79,13 @@
 
 	
 
-
-
 ( select a.* from tb_repayment_biz_plan_list a where a.period &lt; (
 
 select t.period from tb_repayment_biz_plan_list t where t.plan_list_id=#{pListId}
 )
 
-and a.plan_id=#{planId} order by a.period desc limit 1 ) a  on a.plan_list_id=colSstatus.crp_id 
+and a.orig_business_id=#{originalBusinessId}  ) a  on a.plan_list_id=colSstatus.crp_id   and colSstatus.phone_staff is not null order by colSstatus.create_time  desc limit 1
+
 	</select>
 
 

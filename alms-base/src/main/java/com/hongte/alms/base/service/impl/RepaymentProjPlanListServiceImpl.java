@@ -126,7 +126,7 @@ public class RepaymentProjPlanListServiceImpl extends
 						BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
 						BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
 						
-						if(pList.getPlanListId().equals("77808a72-33c2-4777-bc3a-dea43f8e00e1")) {
+						if(pList.getPlanListId().equals("e736d0fe-91fd-4aba-80f9-a41d1e50ec9e")) {
 							System.out.println("stop");
 						}
 						
@@ -618,7 +618,6 @@ public class RepaymentProjPlanListServiceImpl extends
 
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public RepaymentBizPlanList calLateFeeForPerPList(RepaymentBizPlanList pList,Integer type) {
 		Date nowDate=new Date();
 		if(pList.getFactRepayDate()!=null&&type!=null&&type==1) {//说明是结清重算使用的，取实际还款的日期重算滞纳金

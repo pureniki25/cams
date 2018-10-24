@@ -22,5 +22,9 @@
     <sql id="Base_Column_List">
         id, push_key AS pushKey, push_log_type AS pushLogType, push_to AS pushTo, push_starttime AS pushStarttime, push_endtime AS pushEndtime, push_status AS pushStatus, push_param AS pushParam, push_ret AS pushRet, push_remark AS pushRemark, push_key1 AS pushKey1, push_key2 AS pushKey2
     </sql>
-
+    
+	<select id="selectPushProjectList" resultType="map">
+		SELECT DISTINCT t1.project_id,t1.after_id,t1.period FROM tb_tdrepay_recharge_log t1 
+		WHERE t1.process_status = 2 AND t1.project_id IS NOT NULL
+    </select>
 </mapper>

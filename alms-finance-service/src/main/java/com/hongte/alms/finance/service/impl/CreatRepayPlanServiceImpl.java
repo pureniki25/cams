@@ -1060,9 +1060,16 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 }
             }
         }
-
-
+        
+        
         List<ProjInfoReq>  projInfoReqs = creatRepayPlanReq.getProjInfoReqs();
+//        if(projInfoReqs.size()==0) {
+//        	if(businessBasicInfoReq.getOutputPlatformid()==PaymentPlatformEnums.YUECAI.getValue()) {
+//            	projInfoReqs= createProjInfoReqsList(businessBasicInfoReq, bizCusInfoReqs);
+//            }
+//          
+//        }
+        
 
         ////////   传入的标信息  校验  开始   ///////////////////////////
 
@@ -1512,8 +1519,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 List<ProjFeeReq> projFeeReqs =  projInfoReq.getProjFeeInfos();
 
                 ///////  标的还款计划00期   一次性收取的费用信息  开始   ///////////////
-//                ////00期List 信息
-//                RepaymentProjPlanList  zeroList =  creatRepaymentProjPlanList(repaymentProjPlan,0);// new RepaymentProjPlanList();
+                ////00期List 信息
+//                RepaymentProjPlanList  zeroList =  creatRepaymentProjPlanList(repaymentProjPlan,0,planIndex);// new RepaymentProjPlanList();
 //                zeroList.setCurrentStatus(RepayPlanStatus.REPAYED.getName()); //当前还款状态  00期的直接置位为已还款
 //                //将标的00期写入还款计划map
 //                addPlanListToMap(repaymentPlanListPeriorMap,projPlanListPMap,zeroList, 0);
@@ -1557,7 +1564,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                    zeroProidTotol = zeroProidTotol.add(detail.getProjPlanAmount());
 //                }
 //                zeroList.setTotalBorrowAmount(zeroProidTotol);
-//
+
 //                ///////  标的还款计划00期   一次性收取的费用信息  结束   ///////////////
 
                 //////   标的其他期还款计划   按月收取费用信息   开始  ///////////////
@@ -1856,14 +1863,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         Map<Integer,Map<String,BigDecimal>>  retMap  = new HashMap<>();
 
         BigDecimal monthRate = getMonthRate(rate,rateUnit);
-
+        BigDecimal yearRate = getYearRate(rate, rateUnit);
         switch (repayType){
             case PAY_LAST:  //到期还本息
-            calcPrincipalLast(fullBorrowMoney,monthRate
+            calcPrincipalLast(fullBorrowMoney,yearRate
             ,periodMonth,retMap);
             break;
             case PRINCIPAL_LAST:  //先息后本
-                calcPrincipalLast(fullBorrowMoney,monthRate
+                calcPrincipalLast(fullBorrowMoney,yearRate
                 ,periodMonth,retMap);
                 break;
             case INT_AND_PRIN_EQUAL://等额本息
@@ -1891,20 +1898,35 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      * @param periodMonth
      * @param retMap
      */
-    private void calcPrincipalLast(BigDecimal fullBorrowMoney,BigDecimal monthRate,
+    private void calcPrincipalLast(BigDecimal fullBorrowMoney,BigDecimal yearRate,
                                    Integer periodMonth ,Map<Integer,Map<String,BigDecimal>>  retMap )
     {
-        //每月利息
-        BigDecimal interest =  fullBorrowMoney.multiply(monthRate);
-        for (int i=0;i<periodMonth;i++){
-            //每月本金
-            BigDecimal priciple = new BigDecimal(0);
-            //如果是最后一期
-            if(i==periodMonth-1){
-                priciple = fullBorrowMoney;
+//        //每月利息
+//        BigDecimal interest =  fullBorrowMoney.multiply(monthRate);
+//        for (int i=0;i<periodMonth;i++){
+//            //每月本金
+//            BigDecimal priciple = new BigDecimal(0);
+//            //如果是最后一期
+//            if(i==periodMonth-1){
+//                priciple = fullBorrowMoney;
+//            }
+//            addPAndIToList(priciple,interest,retMap,i);
+//        }
+        /*2018-10-16 根据平台RepaymentDifferenceService修改以下代码 wangjiguang*/
+        BigDecimal interestTemp = BigDecimal.ZERO;
+        BigDecimal interestTotal = fullBorrowMoney.multiply(yearRate).multiply(BigDecimal.valueOf(periodMonth)).divide(BigDecimal.valueOf(12),2,BigDecimal.ROUND_HALF_UP);
+        BigDecimal interest = fullBorrowMoney.multiply(yearRate).divide(BigDecimal.valueOf(12),2,BigDecimal.ROUND_HALF_UP);
+        for (int i = 0; i < periodMonth; i++) {
+        	BigDecimal principal = BigDecimal.ZERO;
+            if (i == periodMonth-1) {
+            	principal = fullBorrowMoney ;
+            	interest = interestTotal.subtract(interestTemp);
+            } else {
+                interestTemp = interestTemp.add(interest);
             }
-            addPAndIToList(priciple,interest,retMap,i);
+            addPAndIToList(principal, interest, retMap, i);
         }
+        
     }
 
     /**
@@ -1925,7 +1947,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         BigDecimal rateMi = monthRate.add(new BigDecimal(1)).pow(periodMonth);
 
         BigDecimal monthTotalRepay =  fullBorrowMoney.multiply(monthRate).multiply(rateMi)
-                .divide((rateMi.subtract(new BigDecimal(1))),smallNum,roundingMode);
+                .divide((rateMi.subtract(new BigDecimal(1))),2,RoundingMode.HALF_UP);
 //        BigDecimal monthTotalRepay =  fullBorrowMoney.multiply(monthRate).multiply(monthRate.add(new BigDecimal(1))).pow(periodMonth)
 //                .divide(((monthRate.add(new BigDecimal(1))).pow(periodMonth).subtract(new BigDecimal(1))));
 
@@ -1939,7 +1961,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 //                    本金=贷款金额*月利率*（1+月利率）^(第N次还款-1)/（(（1+月利率）^贷款期限)-1）
                 BigDecimal rateNtimes = monthRate.add(new BigDecimal(1)).pow(i+1-1);
                 priciple = fullBorrowMoney.multiply(monthRate).multiply(rateNtimes)
-                        .divide((rateMi.subtract(new BigDecimal(1))),smallNum,roundingMode);
+                        .divide((rateMi.subtract(new BigDecimal(1))),2,RoundingMode.HALF_UP);
                 payedPriciple = payedPriciple.add(priciple);
             }else{
                 //是最后一期
@@ -1950,6 +1972,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             BigDecimal interest = monthTotalRepay.subtract(priciple);
             addPAndIToList(priciple,interest,retList,i);
         }
+    	
     }
 
     /**
@@ -2375,7 +2398,89 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
 	}
-
+	
+	private  List<ProjInfoReq>  createProjInfoReqsList(BusinessBasicInfoReq businessBasicInfoReq,List<BusinessCustomerInfoReq> bizCusInfoReqs ){
+	      List<ProjInfoReq>  projInfoReqs = new ArrayList();
+	      BusinessCustomerInfoReq customerReq=null;
+	      for(BusinessCustomerInfoReq businessCustomerInfoReq:bizCusInfoReqs) {
+	    	  if(businessCustomerInfoReq.getIsmainCustomer()==1) {
+	    		  customerReq=businessCustomerInfoReq;
+	    	  }
+	      }
+        ProjInfoReq projInfoReq = creatProjInfoReq2(businessBasicInfoReq, customerReq);
+        projInfoReqs.add(projInfoReq);
+		return projInfoReqs;
+  
+        
+	}
+	private  ProjInfoReq creatProjInfoReq2(BusinessBasicInfoReq  businessBasicInfoReq,BusinessCustomerInfoReq main){
+		ProjInfoReq p = new ProjInfoReq();
+        String projectId = UUID.randomUUID().toString() ;
+        p.setProjFeeInfos(new ArrayList<>());
+        p.setIsHaveCar(0);
+        p.setIsHaveHouse(0);
+        p.setRate(businessBasicInfoReq.getBorrowRate());
+        p.setRateUnitType(businessBasicInfoReq.getBorrowRateUnit());
+        p.setOffLineInOverDueRate(new BigDecimal(0.1));
+        p.setOffLineInOverDueRateType(2);
+        p.setOffLineOutOverDueRate(new BigDecimal(0.1));
+        p.setOffLineOutOverDueRateType(2);
+        p.setOnLineOverDueRate(new BigDecimal(0.06));
+		p.setOnLineOverDueRateType(2);
+		p.setRepayType(businessBasicInfoReq.getRepaymentTypeId());
+		p.setProjectId(projectId);
+		p.setCustomerId(main.getCustomerId());
+		p.setTdUserId("");
+		p.setStatusFlag("2");
+		p.setBeginTime(businessBasicInfoReq.getInputTime());
+		p.setFullBorrowMoney(businessBasicInfoReq.getBorrowMoney());
+		p.setBorrowLimit(businessBasicInfoReq.getBorrowLimit());
+		p.setExtendFlag(0);
+		p.setOrgIssueId("");
+		p.setMasterIssueId(projectId);
+		p.setIssueOrder(1);
+		p.setQueryFullsuccessDate(businessBasicInfoReq.getInputTime());
+		p.setTelNo(main.getPhoneNumber()==null?"":main.getPhoneNumber());
+		p.setIdentityCard(main.getIdentifyCard());
+		p.setRealName(main.getCustomerName());
+		p.setBankAccountNo("");
+		p.setBankType(0);
+		p.setBankProvice("");
+		p.setBankCity("");
+		p.setOpenBankName("");
+		p.setPeriodMonth(businessBasicInfoReq.getBorrowLimit());
+		p.setRepaymentType(businessBasicInfoReq.getRepaymentTypeId());
+		p.setAmount(businessBasicInfoReq.getBorrowMoney());
+		p.setBranchCompanyId("");
+		p.setControlDesc("");
+		p.setTdStatus(4);
+		p.setProjectType(0);
+		p.setEnterpriseUserId("");
+		p.setAviCreditGrantingAmount(new BigDecimal(0));
+		p.setOverRate(new BigDecimal(0.1));
+		p.setUserTypeId(main.getCustomerType().equals("个人")?1:2);
+		p.setTuandaiAmount(new BigDecimal(0));
+		p.setGuaranteeRate(new BigDecimal(0));
+		p.setSubCompanyRate(new BigDecimal(0));
+		p.setSubCompanyCharge(new BigDecimal(0));
+		p.setAgencyId("");
+		p.setAgencyRate(new BigDecimal(0));
+		p.setAgencyAmount(new BigDecimal(0));
+		p.setDepositAmount(new BigDecimal(0));
+		p.setFreedAmount(BigDecimal.ZERO);
+		p.setFreedRate(new BigDecimal(0));
+		p.setCooperativeTdComUserId("");
+		p.setCooperativeTdComRate(BigDecimal.ZERO);
+		p.setCooperativeTdComAmount(BigDecimal.ZERO);
+		p.setBorrowerRate(BigDecimal.ZERO);
+		p.setBorrowAmount(businessBasicInfoReq.getBorrowMoney());
+		p.setProjectFrom(0);
+		p.setMonthPrincipalAmount(BigDecimal.ZERO);
+		p.setPlateType(0);
+		p.setTuandaiRate(BigDecimal.ZERO);
+		p.setGuaranteeAmount(BigDecimal.ZERO);
+		return p ;
+	}
     public static void main(String[] args) {
 
 //        BusinessBasicInfoReq  businessBasicInfo = new BusinessBasicInfoReq();
@@ -2532,7 +2637,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     	BigDecimal rate=BigDecimal.valueOf(11);
     	BigDecimal  monthRate = rate.divide(new BigDecimal(12),10,roundingMode);
     	System.out.println(monthRate);
-    }
+     }
 
 
 	

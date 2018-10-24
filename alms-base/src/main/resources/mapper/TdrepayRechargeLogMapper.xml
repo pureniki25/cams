@@ -34,21 +34,31 @@
         <result column="platform_repay_status" property="platformRepayStatus" />
         <result column="is_valid" property="isValid" />
         <result column="process_status" property="processStatus" />
+        <result column="process_time" property="processTime" />
         <result column="status" property="status" />
         <result column="remark" property="remark" />
         <result column="create_user" property="createUser" />
         <result column="create_time" property="createTime" />
         <result column="update_user" property="updateUser" />
         <result column="update_time" property="updateTime" />
+        <result column="last_push_status" property="lastPushStatus" />
+        <result column="last_push_datetime" property="lastPushDatetime" />
+        <result column="last_push_remark" property="lastPushRemark" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        log_id AS logId, project_id AS projectId, asset_type AS assetType, orig_business_id AS origBusinessId, business_type AS businessType, fact_repay_date AS factRepayDate, customer_name AS customerName, company_name AS companyName, repay_source AS repaySource, after_id AS afterId, confirm_time AS confirmTime, td_user_id AS tdUserId, total_amount AS totalAmount, batch_id AS batchId, period, user_id AS userId, recharge_amount AS rechargeAmount, settle_type AS settleType, fact_repay_amount AS factRepayAmount, resource_amount AS resourceAmount, is_complete AS isComplete, proj_plan_list_id AS projPlanListId, confirm_log_id AS confirmLogId, request_no AS requestNo, user_ip AS userIp, oid_partner AS oidPartner, plat_status AS platStatus, platform_repay_status AS platformRepayStatus, is_valid AS isValid, process_status AS processStatus, status, remark, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime
+        log_id AS logId, project_id AS projectId, asset_type AS assetType, orig_business_id AS origBusinessId, business_type AS businessType, fact_repay_date AS factRepayDate, customer_name AS customerName, company_name AS companyName, repay_source AS repaySource, after_id AS afterId, confirm_time AS confirmTime, td_user_id AS tdUserId, total_amount AS totalAmount, batch_id AS batchId, period, user_id AS userId, recharge_amount AS rechargeAmount, settle_type AS settleType, fact_repay_amount AS factRepayAmount, resource_amount AS resourceAmount, is_complete AS isComplete, proj_plan_list_id AS projPlanListId, confirm_log_id AS confirmLogId, request_no AS requestNo, user_ip AS userIp, oid_partner AS oidPartner, plat_status AS platStatus, platform_repay_status AS platformRepayStatus, is_valid AS isValid, process_status AS processStatus, process_time AS processTime, status, remark, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime, last_push_status AS lastPushStatus, last_push_datetime AS lastPushDatetime, last_push_remark AS lastPushRemark
     </sql>
         
     <sql id="ComplianceRepaymentDataCondition">
     	t.`is_valid` = 1 
+		<if test="rechargeTimeStart != null">
+		    AND t.`process_time` <![CDATA[ >= ]]> #{rechargeTimeStart,jdbcType=DATE}
+		</if>
+		<if test="rechargeTimeEnd != null">
+			AND t.`process_time` <![CDATA[ < ]]> #{rechargeTimeEnd,jdbcType=DATE}
+		</if>
 		<if test="confirmTimeStart != null">
 		    AND t.`confirm_time` <![CDATA[ >= ]]> #{confirmTimeStart,jdbcType=DATE}
 		</if>
@@ -61,14 +71,8 @@
 		<if test="repaySource != null">
 			AND t.`repay_source` =  #{repaySource,jdbcType=INTEGER}
 		</if>
-		<if test="settleType != null and settleType == 0">
+		<if test="settleType != null">
 		    AND t.`settle_type` =  #{settleType,jdbcType=INTEGER}
-		</if>
-		<if test="settleType != null and settleType == 1">
-		    AND t.`settle_type` in  (10, 11, 30)
-		</if>
-		<if test="settleType != null and settleType == 2">
-		    AND t.`settle_type` =  20
 		</if>
 		<if test="origBusinessId != null and origBusinessId != ''">
 			AND t.`orig_business_id` =  #{origBusinessId,jdbcType=VARCHAR}

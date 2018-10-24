@@ -17,14 +17,14 @@ public class VersionAdapter {
 	/*Bservice="abc"*/
 	/*Cservice="2018-08-27 08:45:00"*/
 	/*Dservice="1"*/
-	final String ALMS_CORE_SERVICE = "0918 10:26:27" ;
-	final String ALMS_FINANCE_SERVICE = "ALMS0919" ;
+	final String ALMS_CORE_SERVICE = "(finance)1018 18:10" ;
+	final String ALMS_FINANCE_SERVICE = "(finance)1018 18:10" ;
 	final String ALMS_OPEN_SERVICE = "0913" ;
-	final String ALMS_PLATREPAY_SERVICE = "0918 10:26:27" ;
-	final String ALMS_SCHEDULED_SERVICE = "ALMS0919：17：59" ;
+	final String ALMS_PLATREPAY_SERVICE = "(finance)1018 18:10" ;
+	final String ALMS_SCHEDULED_SERVICE = "(finance)1018 18:10" ;
 
-	final String ALMS_WEBUI = "(finance)2018-09-13 11:33" ; 
-	final String ALMS_WITHHOLD_SERVICE = "(finance)2018-09-13 14:39" ;
+	final String ALMS_WEBUI = "(finance)1018 18:10" ; 
+	final String ALMS_WITHHOLD_SERVICE = "(finance)0926 22:16" ;
 	
 	@RequestMapping("/version")
 	public Result version() {

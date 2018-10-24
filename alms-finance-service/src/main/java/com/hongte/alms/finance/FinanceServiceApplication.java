@@ -27,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
 @SpringCloudApplication
 @MapperScan(basePackages = {"com.hongte.alms.finance.mapper","com.hongte.alms.base"})
 @EnableTransactionManagement 
-@ComponentScan(basePackages= {"com.hongte.alms.finance","com.hongte.alms.common.*", "com.hongte.alms.base.*","com.ht.ussp.bean"})
+@ComponentScan(basePackages= {"com.hongte.alms.finance","com.hongte.alms.common.*", "com.hongte.alms.base.*","com.ht.ussp.bean","cn.afterturn.easypoi.view"})
 public class FinanceServiceApplication {
 
 	@Bean

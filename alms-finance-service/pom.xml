@@ -140,7 +140,7 @@
         </dependency>
 
         <!-- poi方式导出xls,xlsx -->
-<!--         <dependency>
+         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>3.16</version>
@@ -155,7 +155,7 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-scratchpad</artifactId>
             <version>3.16</version>
-        </dependency> -->
+        </dependency> 
        <dependency>
             <groupId>org.jeecg</groupId>
             <artifactId>easypoi-base</artifactId>

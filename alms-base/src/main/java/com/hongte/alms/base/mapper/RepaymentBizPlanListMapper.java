@@ -134,4 +134,11 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
 	List<RepaymentBizPlanList> getPlanListForCalLateFee(@Param(value = "planListId") String planListId);
 
     List<RepaymentSettleMoneyDto> selectProjPlanMoney(int flage, String businessId, Integer period);
+    
+    /**
+     * 查询自动或手动移交法务的数据
+     * @param origBusinessId
+     * @return
+     */
+    List<RepaymentBizPlanList> queryTransferOfLitigationData(@Param(value = "overDueDays") Integer overDueDays, @Param(value = "origBusinessId") String origBusinessId);
 }

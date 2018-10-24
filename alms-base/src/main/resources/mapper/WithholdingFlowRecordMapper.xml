@@ -37,16 +37,82 @@
     </sql>
 
     <select id="querySummary" parameterType="com.hongte.alms.base.customer.vo.WithholdFlowReq" resultType="com.hongte.alms.base.vo.withhold.WithholdingFlowRecordSummaryVo">
-        select count(1) as totalNumber, sum(amount) as totalAmount, sum(service_charge) as totalServiceCharge from tb_withholding_flow_record
+        select count(1) as totalNumber, sum(r.amount) as totalAmount, sum(r.service_charge) as totalServiceCharge from tb_withholding_flow_record r
+        join 
+
+         tb_withholding_repayment_log l on r.merchant_order_no=l.merch_order_id 
+        
         where 1=1
         <if test="withholdingPlatform != null ">
-            and withholding_platform = #{withholdingPlatform}
+            and r.withholding_platform = #{withholdingPlatform}
         </if>
         <if test="startTime !=null and startTime != ''">
-            and liquidation_date &gt;= #{startTime}
+            and r.liquidation_date &gt;= #{startTime}
         </if>
         <if test="endTime != null and endTime !=''">
-            and liquidation_date &lt;= #{endTime}
+            and r.liquidation_date &lt;= #{endTime}
         </if>
     </select>
+    
+    
+    
+    
+    <select id="selectFlowBfRecordPage" parameterType="com.hongte.alms.base.customer.vo.WithholdFlowReq" resultType="com.hongte.alms.base.vo.withhold.WithholdingFlowRecordVo">
+     select   l.original_business_id as originalBusinessId,l.after_id as afterId,l.customer_name as custName,r.id, r.withholding_platform AS withholdingPlatform, r.merchant_no AS merchantNo, r.terminal_no AS terminalNo, r.trade_type AS tradeType, r.product_name AS productName, r.merchant_order_no AS merchantOrderNo, r.trade_order_no AS tradeOrderNo, r.trade_water_no AS tradeWaterNo, r.trade_date AS tradeDate, r.amount, r.service_charge AS serviceCharge, r.payment_card_type AS paymentCardType,r.payment_card_no AS paymentCardNo, r.liquidation_date AS liquidationDate, r.withholding_status AS withholdingStatus, r.identity_card AS identityCard, r.customer_name AS customerName, r.phone_number AS phoneNumber, r.bank_card AS bankCard, r.remark, r.bank_code AS bankCode, r.bank_name AS bankName, r.import_time AS importTime, r.import_system AS importSystem
+    from tb_withholding_flow_record r join 
+
+     tb_withholding_repayment_log l on r.merchant_order_no=l.merch_order_id 
+     
+         <where>
+            1=1 
+     
+        <!--          /*清算日期 开始*/  -->
+            <if test="startTime !=null and startTime!='' ">
+                <![CDATA[ and r.liquidation_date >= #{startTime}]]>
+
+            </if>
+            <!--            /*清算日期日期 结束*/ -->
+            <if test="endTime !=null and endTime!=''">
+                <![CDATA[ and r.liquidation_date <= #{endTime}]]>
+            </if>
+            <!--            /*代扣平台*/ -->
+            <if test="withholdingPlatform !=null">
+                <![CDATA[ and l.bind_platform_id = #{withholdingPlatform}]]>
+            </if>
+     
+           order by r.liquidation_date desc
+      </where>
+    </select>
+    
+    
+        <select id="selectFlowYbRecordPage" parameterType="com.hongte.alms.base.customer.vo.WithholdFlowReq" resultType="com.hongte.alms.base.vo.withhold.WithholdingFlowyYbRecordVo">
+     select   l.original_business_id as originalBusinessId,l.after_id as afterId,l.customer_name as custName,r.id, r.withholding_platform AS withholdingPlatform, r.merchant_no AS merchantNo, r.terminal_no AS terminalNo, r.trade_type AS tradeType, r.product_name AS productName, r.merchant_order_no AS merchantOrderNo, r.trade_order_no AS tradeOrderNo, r.trade_water_no AS tradeWaterNo, r.trade_date AS tradeDate, r.amount, r.service_charge AS serviceCharge, r.payment_card_type AS paymentCardType,r.payment_card_no AS paymentCardNo, r.liquidation_date AS liquidationDate, r.withholding_status AS withholdingStatus, r.identity_card AS identityCard, r.customer_name AS customerName, r.phone_number AS phoneNumber, r.bank_card AS bankCard, r.remark, r.bank_code AS bankCode, r.bank_name AS bankName, r.import_time AS importTime, r.import_system AS importSystem
+    from tb_withholding_flow_record r join 
+
+     tb_withholding_repayment_log l on r.merchant_order_no=l.merch_order_id 
+     
+         <where>
+            1=1 
+     
+        <!--          /*清算日期 开始*/  -->
+            <if test="startTime !=null and startTime!='' ">
+                <![CDATA[ and r.liquidation_date >= #{startTime}]]>
+
+            </if>
+            <!--            /*清算日期日期 结束*/ -->
+            <if test="endTime !=null and endTime!=''">
+                <![CDATA[ and r.liquidation_date <= #{endTime}]]>
+            </if>
+            <!--            /*代扣平台*/ -->
+            <if test="withholdingPlatform !=null">
+                <![CDATA[ and l.bind_platform_id = #{withholdingPlatform}]]>
+            </if>
+     
+           order by r.liquidation_date desc
+      </where>
+    </select>
+    
+    
+    
+    
 </mapper>

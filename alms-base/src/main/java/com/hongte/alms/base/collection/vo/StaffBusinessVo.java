@@ -30,6 +30,10 @@ public class StaffBusinessVo {
 //    private Integer status; //还款状态  1:还款中 2:已还款 3逾期 4:部分还款  对应 tb_customer_repayment_plan 表中 status
     private String statusName; //还款状态 名称
 
+    /**
+     * 原业务ID
+     */
+    private String origBusinessId;
 
 //    public static StaffBusinessVo getDefaultVo(){
 //        StaffBusinessVo vo = new StaffBusinessVo();
@@ -213,4 +217,25 @@ public class StaffBusinessVo {
     public void setCrpId(String crpId) {
         this.crpId = crpId;
     }
+
+	public String getOrigBusinessId() {
+		return origBusinessId;
+	}
+
+	public void setOrigBusinessId(String orgBusinessId) {
+		this.origBusinessId = orgBusinessId;
+	}
+
+	@Override
+	public String toString() {
+		return "StaffBusinessVo [businessId=" + businessId + ", periods=" + periods + ", districtId=" + districtId
+				+ ", districtAreaName=" + districtAreaName + ", companyId=" + companyId + ", companyName=" + companyName
+				+ ", operatorId=" + operatorId + ", operatorName=" + operatorName + ", customerId=" + customerId
+				+ ", customerName=" + customerName + ", businessTypeId=" + businessTypeId + ", businessTypeName="
+				+ businessTypeName + ", borrowMoney=" + borrowMoney + ", totalBorrowAmount=" + totalBorrowAmount
+				+ ", crpId=" + crpId + ", repaymentBatchId=" + repaymentBatchId + ", dueDate=" + dueDate
+				+ ", overDueDays=" + overDueDays + ", statusName=" + statusName + ", origBusinessId=" + origBusinessId
+				+ "]";
+	}
+    
 }

@@ -68,4 +68,12 @@ public interface RepaymentProjPlanListMapper extends SuperMapper<RepaymentProjPl
 	 */
     List<RepaymentSettleMoneyDto> selectProjPlanMoney(@Param("flag") int flag,@Param("businessId")  String businessId,@Param("period")  Integer period,@Param("planId") String planId);
 
+    /**
+     * 外联平台7.1.83旧标添加还款计划接口（历史标补数据）
+     * @author 王继光
+     * 2018年9月25日 上午11:50:51
+     * @param projectId
+     * @return
+     */
+    RepaymentProjPlanList selectByProjectIdAndPeriod(@Param("projectId")String projectId,@Param("period") Integer period);
 }

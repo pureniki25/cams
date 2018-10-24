@@ -34,7 +34,7 @@ public class MysqlGenerator {
 //        String tableName="tb_basic_company";//本次需要生成的表名
 //        String tableName="tb_collection_status";//本次需要生成的表名
        // String tableName="tb_withholding_flow_record";//本次需要生成的表名
-        String tableName="tb_flow_push_log";//本次需要生成的表名
+        String tableName="tb_repayment_advance_repay_flow";//本次需要生成的表名
         //1 设定生成配置
         GeneratorConfig inputConfig = new GeneratorConfig(
 //                "黄咏康",

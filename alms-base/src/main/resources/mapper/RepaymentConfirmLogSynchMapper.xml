@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.hongte.alms.base.mapper.RepaymentConfirmLogSynchMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.hongte.alms.base.entity.RepaymentConfirmLogSynch">
+		<id column="confirm_log_id" property="confirmLogId" />
+		<result column="business_id" property="businessId" />
+		<result column="org_business_id" property="orgBusinessId" />
+		<result column="after_id" property="afterId" />
+		<result column="period" property="period" />
+		<result column="idx" property="idx" />
+		<result column="can_revoke" property="canRevoke" />
+		<result column="is_cancelled" property="isCancelled" />
+		<result column="proj_plan_json" property="projPlanJson" />
+		<result column="repay_date" property="repayDate" />
+		<result column="fact_amount" property="factAmount" />
+		<result column="repay_source" property="repaySource" />
+		<result column="surplus_amount" property="surplusAmount" />
+		<result column="surplus_ref_id" property="surplusRefId" />
+		<result column="surplus_use_ref_id" property="surplusUseRefId" />
+		<result column="create_time" property="createTime" />
+		<result column="create_user" property="createUser" />
+		<result column="update_time" property="updateTime" />
+		<result column="update_user" property="updateUser" />
+		<result column="create_user_name" property="createUserName" />
+		<result column="last_push_status" property="lastPushStatus" />
+		<result column="last_push_datetime" property="lastPushDatetime" />
+		<result column="last_push_remark" property="lastPushRemark" />
+		<result column="ext_business_type" property="extBusinessType" />
+		<result column="ext_business_ctype" property="extBusinessCtype" />
+		<result column="ext_company_name" property="extCompanyName" />
+		<result column="ext_customer_name" property="extCustomerName" />
+		<result column="ext_platform" property="extPlatform" />
+		<result column="ext_repay_type" property="extRepayType" />
+		<result column="ext_item10" property="extItem10" />
+		<result column="ext_item20" property="extItem20" />
+		<result column="ext_item30" property="extItem30" />
+		<result column="ext_item50" property="extItem50" />
+		<result column="ext_item60online" property="extItem60online" />
+		<result column="ext_item60offline" property="extItem60offline" />
+		<result column="ext_item70_bj" property="extItem70Bj" />
+		<result column="ext_item70_pt" property="extItem70Pt" />
+		<result column="ext_item70_fw" property="extItem70Fw" />
+		<result column="ext_other_fee" property="extOtherFee" />
+		<result column="ext_remark" property="extRemark" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		confirm_log_id AS confirmLogId, business_id AS businessId,
+		org_business_id AS
+		orgBusinessId, after_id AS afterId, period, idx,
+		can_revoke AS
+		canRevoke, is_cancelled AS isCancelled, proj_plan_json AS
+		projPlanJson, repay_date AS repayDate, fact_amount AS factAmount,
+		repay_source AS repaySource, surplus_amount AS surplusAmount,
+		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
+		create_time AS createTime, create_user AS createUser, update_time AS
+		updateTime, update_user AS updateUser, create_user_name AS
+		createUserName, last_push_status AS lastPushStatus, last_push_datetime
+		AS lastPushDatetime, last_push_remark AS lastPushRemark,ext_business_type AS extBusinessType,
+		ext_business_ctype AS extBusinessCtype, ext_company_name AS
+		extCompanyName, ext_customer_name AS extCustomerName, ext_platform AS
+		extPlatform, ext_repay_type AS extRepayType, ext_item10 AS extItem10,
+		ext_item20 AS extItem20, ext_item30 AS extItem30, ext_item50 AS
+		extItem50, ext_item60online AS extItem60online, ext_item60offline AS
+		extItem60offline, ext_item70_bj AS extItem70Bj, ext_item70_pt AS
+		extItem70Pt, ext_item70_fw AS extItem70Fw, ext_other_fee AS
+		extOtherFee, ext_remark AS extRemark
+	</sql>
+
+	<insert id="addRepaymentConfirmLogSynch">
+		INSERT INTO tb_repayment_confirm_log_synch (
+		`confirm_log_id`,
+		`business_id`,
+		`org_business_id`,
+		`after_id`,
+		`period`,
+		`idx`,
+		`can_revoke`,
+		`is_cancelled`,
+		`proj_plan_json`,
+		`repay_date`,
+		`fact_amount`,
+		`repay_source`,
+		`surplus_amount`,
+		`surplus_ref_id`,
+		`surplus_use_ref_id`,
+		`type`,
+		`plan_id`,
+		`create_time`,
+		`create_user`,
+		`update_time`,
+		`update_user`,
+		`create_user_name`,
+		`last_push_status`,
+		`last_push_datetime`,
+		`last_push_remark`
+		) (
+		SELECT
+		l.`confirm_log_id`,
+		l.`business_id`,
+		l.`org_business_id`,
+		l.`after_id`,
+		l.`period`,
+		l.`idx`,
+		l.`can_revoke`,
+		l.`is_cancelled`,
+		l.`proj_plan_json`,
+		l.`repay_date`,
+		l.`fact_amount`,
+		l.`repay_source`,
+		l.`surplus_amount`,
+		l.`surplus_ref_id`,
+		l.`surplus_use_ref_id`,
+		l.`type`,
+		l.`plan_id`,
+		l.`create_time`,
+		l.`create_user`,
+		l.`update_time`,
+		l.`update_user`,
+		l.`create_user_name`,
+		l.`last_push_status`,
+		l.`last_push_datetime`,
+		l.`last_push_remark`
+		FROM
+		tb_repayment_confirm_log_synch s
+		RIGHT JOIN
+		tb_repayment_confirm_log l ON l.confirm_log_id =
+		s.confirm_log_id
+		WHERE
+		ISNULL( s.confirm_log_id )
+		)
+	</insert>
+	
+	<select id="countNeedSynch" resultType="int">
+		SELECT COUNT(1)
+		FROM
+		tb_repayment_confirm_log_synch s
+		RIGHT JOIN
+		tb_repayment_confirm_log l ON l.confirm_log_id =
+		s.confirm_log_id
+		WHERE
+		ISNULL( s.confirm_log_id )
+	</select>
+
+	<update id="updateRepaymentConfirmLog">
+		UPDATE tb_repayment_confirm_log_synch s,
+		tb_repayment_confirm_log l
+		SET s.`confirm_log_id` = l.`confirm_log_id`,
+		s.`business_id` = l.`business_id`,
+		s.`org_business_id` =
+		l.`org_business_id`,
+		s.`after_id` = l.`after_id`,
+		s.`period` =
+		l.`period`,
+		s.`idx` = l.`idx`,
+		s.`can_revoke` = l.`can_revoke`,
+		s.`is_cancelled` = l.`is_cancelled`,
+		s.`proj_plan_json` =
+		l.`proj_plan_json`,
+		s.`repay_date` = l.`repay_date`,
+		s.`fact_amount` =
+		l.`fact_amount`,
+		s.`repay_source` = l.`repay_source`,
+		s.`surplus_amount` = l.`surplus_amount`,
+		s.`surplus_ref_id` =
+		l.`surplus_ref_id`,
+		s.`surplus_use_ref_id` = l.`surplus_use_ref_id`,
+		s.`type` = l.`type`,
+		s.`plan_id` = l.`plan_id`,
+		s.`create_time` =
+		l.`create_time`,
+		s.`create_user` = l.`create_user`,
+		s.`update_time` =
+		l.`update_time`,
+		s.`update_user` = l.`update_user`,
+		s.`create_user_name` = l.`create_user_name`,
+		s.`last_push_status` =
+		l.`last_push_status`,
+		s.`last_push_datetime` = l.`last_push_datetime`,
+		s.`last_push_remark` = l.`last_push_remark`
+		WHERE
+		l.confirm_log_id =
+		s.confirm_log_id
+		AND (
+		IFNULL( l.`confirm_log_id`, 0 ) != IFNULL(
+		s.`confirm_log_id`, 0 )
+		OR IFNULL( l.`business_id`, 0 ) != IFNULL(
+		s.`business_id`, 0 )
+		OR IFNULL( l.`org_business_id`, 0 ) != IFNULL(
+		s.`org_business_id`, 0 )
+		OR IFNULL( l.`after_id`, 0 ) != IFNULL(
+		s.`after_id`, 0 )
+		OR IFNULL( l.`period`, 0 ) != IFNULL( s.`period`, 0 )
+		OR IFNULL( l.`idx`, 0 ) != IFNULL( s.`idx`, 0 )
+		OR IFNULL(
+		l.`can_revoke`, 0 ) != IFNULL( s.`can_revoke`, 0 )
+		OR IFNULL(
+		l.`is_cancelled`, 0 ) != IFNULL( s.`is_cancelled`, 0 )
+		OR IFNULL(
+		l.`proj_plan_json`, 0 ) != IFNULL( s.`proj_plan_json`, 0 )
+		OR IFNULL(
+		l.`repay_date`, 0 ) != IFNULL( s.`repay_date`, 0 )
+		OR IFNULL(
+		l.`fact_amount`, 0 ) != IFNULL( s.`fact_amount`, 0 )
+		OR IFNULL(
+		l.`repay_source`, 0 ) != IFNULL( s.`repay_source`, 0 )
+		OR IFNULL(
+		l.`surplus_amount`, 0 ) != IFNULL( s.`surplus_amount`, 0 )
+		OR IFNULL(
+		l.`surplus_ref_id`, 0 ) != IFNULL( s.`surplus_ref_id`, 0 )
+		OR IFNULL(
+		l.`surplus_use_ref_id`, 0 ) != IFNULL(
+		s.`surplus_use_ref_id`, 0 )
+		OR
+		IFNULL( l.`type`, 0 ) != IFNULL( s.`type`, 0 )
+		OR IFNULL( l.`plan_id`,
+		0 ) != IFNULL( s.`plan_id`, 0 )
+		OR IFNULL( l.`create_time`, 0 ) !=
+		IFNULL( s.`create_time`, 0 )
+		OR IFNULL( l.`create_user`, 0 ) != IFNULL(
+		s.`create_user`, 0 )
+		OR IFNULL( l.`update_time`, 0 ) != IFNULL(
+		s.`update_time`, 0 )
+		OR IFNULL( l.`update_user`, 0 ) != IFNULL(
+		s.`update_user`, 0 )
+		OR IFNULL( l.`create_user_name`, 0 ) != IFNULL(
+		s.`create_user_name`, 0
+		)
+		OR IFNULL( l.`last_push_status`, 0 ) !=
+		IFNULL( s.`last_push_status`, 0
+		)
+		OR IFNULL( l.`last_push_datetime`, 0 )
+		!= IFNULL(
+		s.`last_push_datetime`, 0 )
+		OR IFNULL( l.`last_push_remark`,
+		0 ) != IFNULL( s.`last_push_remark`, 0
+		)
+		)
+	</update>
+
+	<update id="updateBaiscBusiness">
+		UPDATE tb_repayment_confirm_log_synch s,
+		tb_basic_business b
+		SET s.ext_business_ctype = b.business_ctype,
+		s.ext_business_type = b.business_type,
+		s.ext_customer_name = b.customer_name,
+		s.ext_company_name =
+		b.company_name
+		<!-- s.ext_platform = ( CASE b.output_platform_id
+		WHEN 0 THEN
+		'线下出款'
+		WHEN 1 THEN '团贷网'
+		WHEN 2 THEN '你我金融'
+		WHEN 3 THEN '粤财' END ) -->
+		WHERE
+		s.business_id = b.business_id
+		AND (
+		IFNULL(
+		s.ext_business_type, 0 ) !=
+		IFNULL( b.business_type, 0 )
+		OR IFNULL(
+		s.ext_customer_name, 0 ) !=
+		IFNULL( b.customer_name, 0 )
+		OR ISNULL(
+		s.ext_business_ctype )
+		)
+	</update>
+
+	<update id="updatePlateType">
+		UPDATE tb_repayment_confirm_log_synch s,
+		tb_tuandai_project_info p
+		SET s.ext_platform = (
+		CASE
+		p.plate_type
+		WHEN 0 THEN
+		'线下出款'
+		WHEN 1 THEN
+		'团贷网'
+		WHEN 2 THEN
+		'你我金融'
+		WHEN 3 THEN
+		'粤财'
+		ELSE '线下出款'
+		END
+		)
+		WHERE
+		ISNULL( s.ext_platform ) AND s.business_id = p.business_id ;
+	</update>
+
+	<update id="updateItem10">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_item10 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND fee_id = 'b69a84dc-ed67-4c9f-80bf-89ee8efd5167' )
+		WHERE
+		ISNULL(
+		s.ext_item10 );
+	</update>
+
+	<update id="updateItem20">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_item20 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND fee_id = '556bce4f-f3a9-4b7a-a8b1-43368bebb49c' )
+		WHERE
+		ISNULL(
+		s.ext_item20 );
+	</update>
+
+	<update id="updateItem30">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_item30 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND plan_item_type = 30 )
+		<!-- AND fee_id = '3df61688-d5a0-49c5-9c32-46b30855310a' ) -->
+		WHERE
+		ISNULL(
+		s.ext_item30 );
+	</update>
+
+	<update id="updateItem50">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_item50 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND plan_item_type = 50 )
+		<!-- AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' ) -->
+		WHERE
+		ISNULL(
+		s.ext_item50 );
+	</update>
+
+	<update id="updateItem60online">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_item60online = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND fee_id = '2e646c87-5721-11e8-8a00-0242ac110002' )
+		WHERE
+		ISNULL(
+		s.ext_item60online );
+	</update>
+	<update id="updateItem60offline">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_item60offline = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND fee_id = '3131c075-5721-11e8-8a00-0242ac110002' )
+		WHERE
+		ISNULL(
+		s.ext_item60offline );
+	</update>
+	<update id="updateItem70bj">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_item70_bj = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND fee_id = '9883ee39-4448-11e8-b4f8-0242ac110003' )
+		WHERE
+		ISNULL(
+		s.ext_item70_bj );
+	</update>
+	<update id="updateItem70pt">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_item70_pt = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND fee_id = 'a0b666c2-4448-11e8-b4f8-0242ac110003' )
+		WHERE
+		ISNULL(
+		s.ext_item70_pt );
+	</update>
+	<update id="updateItem70fw">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_item70_fw = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND fee_id = '9e0a6fc1-4448-11e8-b4f8-0242ac110003' )
+		WHERE
+		ISNULL(
+		s.ext_item70_fw );
+	</update>
+	<update id="updateOtherFee">
+		UPDATE tb_repayment_confirm_log_synch s
+		SET
+		s.ext_other_fee = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
+		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
+		AND plan_item_type = 120 )
+		WHERE
+		ISNULL(
+		s.ext_other_fee );
+	</update>
+	<update id="updateRemark">
+		UPDATE tb_repayment_confirm_log_synch s,
+		tb_repayment_biz_plan_list pl
+		SET s.ext_remark = pl.remark
+		WHERE
+		ISNULL(
+		s.ext_remark )
+		AND s.business_id = pl.business_id
+		AND s.after_id =
+		pl.after_id;
+	</update>
+	<update id="updateRepayType">
+		UPDATE tb_repayment_confirm_log_synch s SET
+		s.ext_repay_type = (
+		CASE
+		WHEN s.repay_source BETWEEN 10 AND 11 THEN '线下转账'
+		WHEN s.repay_source IN
+		(20,21,30,31) THEN (
+		SELECT
+		CASE
+		bind_platform_id
+		WHEN 0 THEN '易宝代扣' 
+		WHEN ISNULL( bind_platform_id ) THEN '易宝代扣' 
+		WHEN 3 THEN '宝付代扣'
+		WHEN 5 THEN '银行代扣'
+		END
+		FROM
+		tb_withholding_repayment_log
+		WHERE
+		log_id = ( SELECT repay_source_ref_id FROM tb_repayment_resource WHERE
+		confirm_log_id = s.confirm_log_id ORDER BY create_date DESC LIMIT 1 )
+		)
+		END
+		)
+		WHERE ISNULL(s.ext_repay_type);
+	</update>
+
+	<select id="count" resultType="int">
+
+		SELECT count(1) from ( SELECT
+		`confirm_log_id`,
+		`business_id`,
+		`org_business_id`,
+		`after_id`,
+		`period`,
+		`idx`,
+		`can_revoke`,
+		`type`,
+		`plan_id`,
+		`is_cancelled`,
+		`proj_plan_json`,
+		`repay_date`,
+		`fact_amount`,
+		`repay_source`,
+		`surplus_amount`,
+		`surplus_ref_id`,
+		`surplus_use_ref_id`,
+		`create_time`,
+		`create_user`,
+		`update_time`,
+		`update_user`,
+		`create_user_name`,
+		`last_push_status`,
+		`last_push_datetime`,
+		`last_push_remark`,
+		`ext_business_ctype`,
+		`ext_company_name`,
+		`ext_customer_name`,
+		`ext_platform`,
+		`ext_repay_type`,
+		`ext_item10`,
+		`ext_item20`,
+		`ext_item30`,
+		`ext_item50`,
+		`ext_item60online`,
+		`ext_item60offline`,
+		`ext_item70_bj`,
+		`ext_item70_pt`,
+		`ext_item70_fw`,
+		`ext_other_fee`,
+		`ext_remark`
+		FROM
+		tb_repayment_confirm_log_synch s
+		WHERE s.is_cancelled = 0 
+		<if test="req.key != null and req.key neq '' ">
+			and ( s.business_id like '${req.key}%' or s.ext_customer_name like '${req.key}%' )
+		</if>
+		<if test="req.repayType != null and req.repayType neq ''  and req.repayType neq '混合代扣' ">
+			and s.ext_repay_type = #{req.repayType}
+		</if>
+		<if test="req.confirmStart != null and req.confirmStart neq '' ">
+			and #{req.confirmStart} &lt;= DATE(s.create_time)
+		</if>
+		<if test="req.confirmEnd != null and req.confirmEnd neq ''">
+			and #{req.confirmEnd} &gt;= DATE(s.create_time)
+		</if>
+		<if test="req.companyId != null and req.companyId neq ''">
+			and #{req.companyId} = s.ext_company_name
+		</if>
+		<if test="req.businessType != null and req.businessType neq ''">
+			and #{req.businessType} = s.ext_business_type
+		</if>
+		<if test="req.srcType != null and req.srcType neq ''">
+			and #{req.srcType} = s.ext_platform
+		</if>
+		GROUP BY s.business_id,s.after_id, DATE( s.create_time ) 
+		<if test="req.repayType != null and req.srcType neq '' and req.repayType eq '混合代扣' ">
+			HAVING count( DISTINCT s.ext_repay_type ) > 1
+		</if>
+		) temp
+
+	</select>
+	
+	<select id="select" resultType="com.hongte.alms.base.entity.RepaymentConfirmLogSynch">
+		SELECT
+		confirm_log_id AS confirmLogId, business_id AS businessId,
+		org_business_id AS
+		orgBusinessId, after_id AS afterId, period, idx,
+		can_revoke AS
+		canRevoke, is_cancelled AS isCancelled, proj_plan_json AS
+		projPlanJson, repay_date AS repayDate, SUM(fact_amount) AS factAmount,
+		repay_source AS repaySource, SUM(IFNULL(surplus_amount,0)) AS surplusAmount,
+		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
+		create_time AS createTime, 
+		IFNULL(u.user_name,'系统自动代扣') as create_user, 
+		update_time AS
+		updateTime, update_user AS updateUser, create_user_name AS
+		createUserName, last_push_status AS lastPushStatus, last_push_datetime
+		AS lastPushDatetime, last_push_remark AS lastPushRemark,ext_business_type AS extBusinessType,
+		ext_business_ctype AS extBusinessCtype, ext_company_name AS
+		extCompanyName, ext_customer_name AS extCustomerName, ext_platform AS
+		extPlatform, ext_repay_type AS extRepayType, 
+		SUM(ext_item10) AS extItem10,
+		SUM(ext_item20) AS extItem20, 
+		SUM(ext_item30) AS extItem30, 
+		SUM(ext_item50) AS extItem50, 
+		SUM(ext_item60online) AS extItem60online, 
+		SUM(ext_item60offline) AS extItem60offline, 
+		SUM(ext_item70_bj) AS extItem70Bj, 
+		SUM(ext_item70_pt) AS extItem70Pt, 
+		SUM(ext_item70_fw) AS extItem70Fw, 
+		SUM(ext_other_fee) AS extOtherFee, 
+		ext_remark AS extRemark
+		FROM
+		tb_repayment_confirm_log_synch 
+		left join tb_sys_user u on u.user_id = create_user
+		WHERE is_cancelled = 0 
+		<if test="req.key != null and req.key neq '' ">
+			and ( business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
+		</if>
+		<if test="req.repayType != null and req.repayType neq ''  and req.repayType neq '混合代扣' ">
+			and ext_repay_type = #{req.repayType}
+		</if>
+		<if test="req.confirmStart != null and req.confirmStart neq '' ">
+			and #{req.confirmStart} &lt;= DATE(create_time)
+		</if>
+		<if test="req.confirmEnd != null and req.confirmEnd neq ''">
+			and #{req.confirmEnd} &gt;= DATE(create_time)
+		</if>
+		<if test="req.companyId != null and req.companyId neq ''">
+			and #{req.companyId} = ext_company_name
+		</if>
+		<if test="req.businessType != null and req.businessType neq ''">
+			and #{req.businessType} = ext_business_type
+		</if>
+		<if test="req.srcType != null and req.srcType neq ''">
+			and #{req.srcType} = ext_platform
+		</if>
+		GROUP BY business_id,after_id, DATE( create_time ) 
+		<if test="req.repayType != null and req.srcType neq '' and req.repayType eq '混合代扣' ">
+			HAVING count( DISTINCT ext_repay_type ) > 1
+		</if>
+		ORDER BY repay_date desc
+		<if test="req.curPage != null and req.curPage != 0">
+			LIMIT ${(req.curPage-1)*req.pageSize} , ${req.pageSize}
+		</if>
+	</select>
+</mapper>

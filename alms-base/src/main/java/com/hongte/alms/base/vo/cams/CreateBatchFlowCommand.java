@@ -50,7 +50,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
     }
     
     public void setBatchId(String batchId) {
-		this.batchId = batchId;
+		this.batchId = batchId+"-"+this.getActionId();
 	}
 
 //    @JsonIgnore
@@ -221,7 +221,7 @@ public class CreateBatchFlowCommand extends MessageCommand {
         }
     }
 
-    public static class Flow{
+    public static class Flow implements Cloneable{
         @JsonProperty("sid")
         private String sourceAccountIdentifierId;
 
