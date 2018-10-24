@@ -357,7 +357,7 @@
                 end
             ]]>
         )as delayDays, -->
-        pList.delay_days_ext as delayDays,
+        pList.overdue_days as delayDays,
 		pList.overdue_days,
         pList.due_date as dueDate,
         pList.fact_repay_date AS repaymentDate,
