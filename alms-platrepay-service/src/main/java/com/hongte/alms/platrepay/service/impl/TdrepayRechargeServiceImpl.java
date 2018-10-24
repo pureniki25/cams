@@ -1550,7 +1550,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 							penaltyAmount = guaranteePayment.getPenaltyAmount() == null ? penaltyAmount
 									: guaranteePayment.getPenaltyAmount();
 							// 若担保公司垫付了滞纳金，则需要将滞纳金计算到本息上
-							if (BigDecimal.ZERO.compareTo(penaltyAmount) <= 0) {
+							if (BigDecimal.ZERO.compareTo(penaltyAmount) < 0) {
 								principalAndInterest = principalAndInterest.add(penaltyAmount);
 							}
 							tuandaiAmount = guaranteePayment.getTuandaiAmount() == null ? tuandaiAmount
@@ -1606,15 +1606,38 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			arbitrationAmount3 = arbitrationAmount.subtract(arbitrationAmount2);
 			totalAmount = totalAmount.add(arbitrationAmount3);
 
+			// 若没有垫付未还记录
 			if (totalAmount.compareTo(BigDecimal.ZERO) < 1) {
 				if (tdrepayRechargeLog.getSettleType().intValue() == 0) {
-					// 非结清，若没有垫付未还，则设置status = 2；
+					// 非结清，则设置status = 2；
 					tdrepayRechargeLog.setStatus(2);
+					tdrepayRechargeLog.setRemark("执行成功");
 				} else {
-					tdrepayRechargeLog.setStatus(0);
+					// 结清，判断是否是提前结清
+					List<TdPlatformPlanRepaymentDTO> tdPlatformPlanRepaymentDTOs = remotePlatformRepaymentPlan(
+							tdrepayRechargeLog.getProjectId());
+					if (CollectionUtils.isNotEmpty(tdPlatformPlanRepaymentDTOs)) {
+						for (TdPlatformPlanRepaymentDTO dto : tdPlatformPlanRepaymentDTOs) {
+							if (dto.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
+								if (new Date().before(DateUtil.getDate(dto.getCycDate()))) {
+									// 若是提前结清，则处理状态设置为未处理，待执行提前结清任务
+									tdrepayRechargeLog.setStatus(0);
+									tdrepayRechargeLog.setRemark("没有垫付未还记录，待执行提前结清任务");
+								} else {
+									// 若不是提前结清，则处理状态设置为成功，流程结束
+									tdrepayRechargeLog.setStatus(2);
+									tdrepayRechargeLog.setRemark("执行成功");
+								}
+								break;
+							}
+							tdrepayRechargeLog.setStatus(0);
+							tdrepayRechargeLog.setRemark("在平台还款计划没有匹配到对应的期数");
+						}
+					}else {
+						tdrepayRechargeLog.setStatus(0);
+						tdrepayRechargeLog.setRemark("没有查询到平台还款计划");
+					}
 				}
-				tdrepayRechargeLog.setRemark("没有垫付未还记录，执行成功");
-				tdrepayRechargeLog.setUpdateTime(new Date());
 				tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
 				return;
 			}
@@ -1810,6 +1833,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			for (TdrepayRechargeDetail tdrepayRechargeDetail : tdrepayRechargeDetails) {
 				if (overDueAmount.compareTo(tdrepayRechargeDetail.getFeeValue()) < 0) {
 					overDueAmount = overDueAmount.add(tdrepayRechargeDetail.getFeeValue());
+					totalAmount = totalAmount.add(overDueAmount);
 				}
 			}
 		}
@@ -1881,6 +1905,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 							if (tdReturnAdvanceShareProfitDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()
 									&& tdReturnAdvanceShareProfitDTO.getStatus() == 1) {
 								logStatus = 2;
+								break;
 							}
 						}
 					} else {
@@ -1969,7 +1994,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		lstStatus.add(3); // 还垫付失败的数据
 		lstStatus.add(4); // 部分还垫付的数据
 
-		List<TdrepayRechargeLog> tdrepayRechargeLogs = queryToDoData(lstStatus, true);;
+		List<TdrepayRechargeLog> tdrepayRechargeLogs = queryToDoData(lstStatus, true);
+		;
 
 		// 判断是否提前结清：当前时间 与平台当期应还日期比较
 		List<TdrepayRechargeLog> isSettleData = getSettleData(tdrepayRechargeLogs);
@@ -1985,6 +2011,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 	/**
 	 * 获取没有垫付未还记录的，且是提前结清的数据
+	 * 
 	 * @param lstStatus
 	 * @param tdrepayRechargeLogs
 	 * @return
@@ -2010,7 +2037,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				}
 				tdrepayRechargeLogService.updateBatchById(tdrepayRechargeLogs);
 			}
-			
+
 			if (CollectionUtils.isEmpty(isSettleData)) {
 				return isSettleData;
 			}
@@ -2041,6 +2068,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 	/**
 	 * 计算提前结清应还分润、调用提前结清接口
+	 * 
 	 * @param tdrepayRechargeLog
 	 */
 	@SuppressWarnings("rawtypes")
@@ -2067,7 +2095,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				tdrepayRechargeLog.setStatus(3);
 				if (remoteRepaymentEarlierResult != null) {
 					tdrepayRechargeLog.setRemark(remoteRepaymentEarlierResult.getCodeDesc());
-				}else {
+				} else {
 					tdrepayRechargeLog.setRemark("提前结清失败");
 				}
 				tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
@@ -2187,7 +2215,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						if (dto.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
 							if (new Date().before(DateUtil.getDate(dto.getCycDate()))) {
 								isSettleData.add(tdrepayRechargeLog);
-							}else {
+							} else {
 								break;
 							}
 						}
