@@ -15,7 +15,7 @@ import com.ht.ussp.core.Result;
  * @author 王继光
  * 2018年9月25日 上午10:13:46
  */
-@FeignClient(name="AddRepaymentScheduleForHistory", url="http://172.16.200.112:30406" ,qualifier="api")
+@FeignClient(name="AddRepaymentScheduleForHistory", url="http://120.79.47.252:30406" ,qualifier="api")
 public interface AddRepaymentScheduleForHistory {
 	@RequestMapping(value = "/eip/td/repayment/addRepaymentScheduleForHistory",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.POST)
 	public Result addRepaymentScheduleForHistory(Req req) ;
