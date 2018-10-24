@@ -373,7 +373,7 @@
 		t1.identify_card_ext = t2.identify_card
 		WHERE
 		t1.business_id_ext = t2.business_id
-		AND t1.ismain_customer = 1
+		AND t2.ismain_customer = 1
 		AND(
 		IFNULL(t1.phone_number_ext,0) != IFNULL(t2.phone_number,0) OR
 		IFNULL(t1.identify_card_ext,0) != IFNULL(t2.identify_card,0)
