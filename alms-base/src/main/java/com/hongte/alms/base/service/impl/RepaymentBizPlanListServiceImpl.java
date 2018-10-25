@@ -26,6 +26,7 @@ import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentResource;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.feignClient.XindaiFeign;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
@@ -445,4 +446,10 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     public List<RepaymentBizPlanList> queryTransferOfLitigationData(Integer overDueDays, String origBusinessId) {
     	return repaymentBizPlanListMapper.queryTransferOfLitigationData(overDueDays, origBusinessId);
     }
+
+	@Override
+	public List<WithholdingRepaymentLog> searchNoCancelList() {
+		repaymentBizPlanListMapper.searchNoCancelList();
+		return null;
+	}
 }

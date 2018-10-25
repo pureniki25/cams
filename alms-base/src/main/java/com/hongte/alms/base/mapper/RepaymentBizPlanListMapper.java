@@ -141,4 +141,11 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
      * @return
      */
     List<RepaymentBizPlanList> queryTransferOfLitigationData(@Param(value = "overDueDays") Integer overDueDays, @Param(value = "origBusinessId") String origBusinessId);
+    
+    
+    /**
+     * 查找代扣成功没有核销的记录
+     */
+    
+    List<RepaymentBizPlanList> searchNoCancelList();
 }

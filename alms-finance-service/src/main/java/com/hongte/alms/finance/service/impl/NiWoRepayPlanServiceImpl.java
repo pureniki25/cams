@@ -161,9 +161,13 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 						for (NiWoProjPlanListDetailDto detailDto : dto.getRepaymentPlans()) {
 							 if(detail.getPeriod()==detailDto.getPeriod()) {
 									detail.setProjFactAmount(detail.getProjPlanAmount());
-									if(detail.getPlanItemType()==RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue()) {
+									if(detail.getPlanItemType()==RepayPlanFeeTypeEnum.OVER_DUE_AMONT_ONLINE.getValue()) {//线上滞纳金
 										detail.setProjPlanAmount(detailDto.getTotalPenalty());	
 										detail.setProjFactAmount(detailDto.getRepaidPenalty());
+									}
+									if(detail.getPlanItemType()==RepayPlanFeeTypeEnum.INTEREST.getValue()) {//利息
+										detail.setProjPlanAmount(detailDto.getInterest());	
+										detail.setProjFactAmount(detailDto.getRepaidInterest());
 									}
 									
 									detail.setUpdateDate(new Date());

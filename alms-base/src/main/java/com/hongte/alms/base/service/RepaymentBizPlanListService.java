@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.common.service.BaseService;
 import com.hongte.alms.common.vo.PageResult;
@@ -133,4 +134,10 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * @return
      */
     List<RepaymentBizPlanList> queryTransferOfLitigationData(Integer overDueDays, String origBusinessId);
+    
+    /**
+     * 查找代扣成功没有核销的记录
+     */
+    
+    List<WithholdingRepaymentLog> searchNoCancelList();
 }
