@@ -1106,6 +1106,7 @@ window.layinit(function(htConfig) {
 	    	            		vm.firstProjectId = data.data[0].projectId;
 	    	            		vm.firstTdUserId = data.data[0].tdUserId;
 							}else {
+								vm.projectInfoList = [];
 								vm.projectInfoList.push(vm.projectId);
 								vm.firstProjectId = vm.projectId;
 							}
