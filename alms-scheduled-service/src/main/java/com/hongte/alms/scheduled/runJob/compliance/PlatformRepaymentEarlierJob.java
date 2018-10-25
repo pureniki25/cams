@@ -10,7 +10,7 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
 
-@JobHandler(value = "platformRepaymentAdvance")
+@JobHandler(value = "platformRepaymentEarlier")
 @Component
 public class PlatformRepaymentEarlierJob extends IJobHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(PlatformRepaymentEarlierJob.class);
