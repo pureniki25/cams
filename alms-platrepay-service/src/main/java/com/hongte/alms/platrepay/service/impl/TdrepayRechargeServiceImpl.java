@@ -1480,10 +1480,10 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 		if (isSettle) {
 			rechargeLogs = tdrepayRechargeLogService.selectList(new EntityWrapper<TdrepayRechargeLog>()
-					.eq("is_valid", 1).in("status", lstStatus).eq("process_status", 2).ne("settle_type", 0));
+					.eq("is_valid", 1).in("status", lstStatus).eq("process_status", 2).ne("settle_type", 0).where("order by project_id, period"));
 		} else {
 			rechargeLogs = tdrepayRechargeLogService.selectList(new EntityWrapper<TdrepayRechargeLog>()
-					.eq("is_valid", 1).in("status", lstStatus).eq("process_status", 2));
+					.eq("is_valid", 1).in("status", lstStatus).eq("process_status", 2).where("order by project_id, period"));
 		}
 
 		if (CollectionUtils.isEmpty(rechargeLogs)) {
