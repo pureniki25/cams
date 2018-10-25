@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -24,9 +26,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.FiveLevelClassifyBusinessChangeLog;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.service.BusinessParameterService;
 import com.hongte.alms.base.service.FiveLevelClassifyBusinessChangeLogService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.SysParameterService;
 import com.hongte.alms.base.vo.module.classify.ClassifyConditionVO;
 import com.hongte.alms.common.result.Result;
@@ -53,6 +57,10 @@ public class BusinessParameterController {
 	@Autowired
 	@Qualifier("FiveLevelClassifyBusinessChangeLogService")
 	private FiveLevelClassifyBusinessChangeLogService fiveLevelClassifyBusinessChangeLogService;
+
+	@Autowired
+	@Qualifier("RepaymentBizPlanService")
+	private RepaymentBizPlanService repaymentBizPlanService;
 
 	@GetMapping("/queryConditionDesc")
 	@ResponseBody
@@ -138,9 +146,9 @@ public class BusinessParameterController {
 					String[] arrBorrower = borrowerConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
 					resultMap.put("borrowerConditionDesc", Arrays.asList(arrBorrower));
 				}
-				
+
 				String guaranteeConditionDesc = changeLog.getGuaranteeConditionDesc();
-				
+
 				if (StringUtil.notEmpty(guaranteeConditionDesc)) {
 					String[] arrBorrower = guaranteeConditionDesc.split(Constant.FIVE_LEVEL_CLASSIFY_SPLIT);
 					resultMap.put("guaranteeConditionDesc", Arrays.asList(arrBorrower));
@@ -156,20 +164,61 @@ public class BusinessParameterController {
 	@ApiOperation("根据时间段查询业务五级分类信息")
 	@PostMapping("/queryBusinessFiveLevelClassify")
 	@ResponseBody
-	public Result<List<Map<String, Object>>> queryBusinessFiveLevelClassify(@RequestBody BusinessFiveLevelClassifyInfoVO vo) {
+	public Result<List<Map<String, Object>>> queryBusinessFiveLevelClassify(
+			@RequestBody BusinessFiveLevelClassifyInfoVO vo) {
 		LOG.info("BusinessFiveLevelClassifyInfoVO: {}", vo);
 		try {
 			List<FiveLevelClassifyBusinessChangeLog> changeLogs = fiveLevelClassifyBusinessChangeLogService
 					.selectList(new EntityWrapper<FiveLevelClassifyBusinessChangeLog>().gt("op_time", vo.getStartDate())
 							.lt("op_time", vo.getEndDate()).eq("valid_status", "1"));
-			
+
 			List<Map<String, Object>> resultList = new LinkedList<>();
 			if (CollectionUtils.isNotEmpty(changeLogs)) {
+				
 				for (FiveLevelClassifyBusinessChangeLog changeLog : changeLogs) {
-					Map<String, Object> resultMap = new HashMap<>();
-					resultMap.put("businessId", changeLog.getOrigBusinessId());
-					resultMap.put("levelName", changeLog.getClassName());
-					resultList.add(resultMap);
+					String className = changeLog.getClassName();
+					
+					List<RepaymentBizPlan> repaymentBizPlans = repaymentBizPlanService
+							.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id",
+									changeLog.getOrigBusinessId()));
+
+					Set<String> businessIdSet = new HashSet<>();
+					if (CollectionUtils.isNotEmpty(repaymentBizPlans)) {
+						for (RepaymentBizPlan repaymentBizPlan : repaymentBizPlans) {
+							businessIdSet.add(repaymentBizPlan.getBusinessId());
+						}
+					} else {
+						Map<String, Object> resultMap = new HashMap<>();
+						resultMap.put("businessId", changeLog.getOrigBusinessId());
+						resultMap.put("levelName", className);
+						resultMap.put("isSettle", null);
+						resultList.add(resultMap);
+						continue;
+					}
+
+					if (!businessIdSet.isEmpty()) {
+						for (String businessId : businessIdSet) {
+							List<RepaymentBizPlan> bizPlans = repaymentBizPlanService
+									.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
+							boolean settleFlag = true;
+							Set<Integer> settleSet = new HashSet<>();
+							for (RepaymentBizPlan repaymentBizPlan : bizPlans) {
+								settleSet.add(repaymentBizPlan.getPlanStatus());
+							}
+							
+							if (settleSet.contains(0) || settleSet.contains(50)) {
+								settleFlag = false;
+							}
+							
+							for (RepaymentBizPlan repaymentBizPlan : bizPlans) {
+								Map<String, Object> resultMap = new HashMap<>();
+								resultMap.put("businessId", repaymentBizPlan.getBusinessId());
+								resultMap.put("levelName", className);
+								resultMap.put("isSettle", settleFlag);
+								resultList.add(resultMap);
+							}
+						}
+					}
 				}
 			}
 			return Result.success(resultList);
@@ -178,5 +227,5 @@ public class BusinessParameterController {
 			return Result.error("系统异常：" + e.getMessage());
 		}
 	}
-	
+
 }
