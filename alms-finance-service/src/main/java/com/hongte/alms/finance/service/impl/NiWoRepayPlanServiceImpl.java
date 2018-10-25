@@ -650,7 +650,7 @@ public class NiWoRepayPlanServiceImpl implements NiWoRepayPlanService {
 									BigDecimal planAmountSum=getPlanAmountSum(projDetails);//当前期计划要还的总金额
 									BigDecimal afterRepayAmountSum=getRepayAmountSum(projDetails);//当前期已还总金额
 									pList.setTotalBorrowAmount(getPlanAllPlanRepayAmount(pList).subtract(pList.getOverdueAmount()));
-									projPlanList.setTotalBorrowAmount(planAmountSum);
+									projPlanList.setTotalBorrowAmount(planAmountSum.subtract(projPlanList.getOverdueAmount()));
 									pList.setUpdateTime(new Date());
 									projPlanList.setUpdateTime(new Date());
 									repaymentProjPlanListService.updateById(projPlanList);
