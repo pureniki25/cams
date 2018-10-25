@@ -159,19 +159,7 @@
 		t2.total_borrow_amount,
 		t2.overdue_amount,
 		t2.overdue_days,
-		<!-- (
-        <![CDATA[
-              case
-                WHEN t2.due_date is null then 0
-                WHEN t2.due_date>now() THEN 0
-                WHEN t2.current_status = '逾期' then to_days(now())- to_days(t2.due_date)
-                WHEN t2.fact_repay_date is null then to_days(now())- to_days(t2.due_date)
-                WHEN t2.fact_repay_date<t2.due_date THEN 0
-                WHEN ( !ISNULL(t2.repay_flag) AND t2.repay_flag != 0) THEN 0
-                ELSE to_days(t2.fact_repay_date)- to_days(t2.due_date)
-                end
-            ]]>
-        ), -->
+		t2.overdue_days,
 		t2.current_status,
 		t2.repay_flag,
 		t2.fact_repay_date,
