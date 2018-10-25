@@ -25,4 +25,7 @@ public interface WithholdingClient {
 
     @RequestMapping(value = "/sms/sendSms",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
     void sendRemindMsg();
+    
+    @RequestMapping(value = "/repay/autoCheckCancle",headers = {"app=ALMS", "content-type=application/json"},method = RequestMethod.GET)
+    void autoCheckCancle();
 }
