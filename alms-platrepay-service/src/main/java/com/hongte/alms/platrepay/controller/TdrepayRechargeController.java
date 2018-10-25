@@ -430,7 +430,7 @@ public class TdrepayRechargeController {
 				for (TdrepayRechargeLog tdrepayRechargeLog : list) {
 					TdrepayRechargeInfoVO infoVO = BeanUtils.deepCopy(tdrepayRechargeLog, TdrepayRechargeInfoVO.class);
 					if (infoVO != null) {
-						IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(infoVO.getBatchId());
+						/*IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(infoVO.getBatchId());
 						if (issueSendOutsideLog != null) {
 							if (JsonUtil.isJSONValid(issueSendOutsideLog.getReturnJson())) {
 								JSONObject parseObject = JSONObject.parseObject(issueSendOutsideLog.getReturnJson());
@@ -440,7 +440,7 @@ public class TdrepayRechargeController {
 							} else {
 								infoVO.setRemark(issueSendOutsideLog.getReturnJson());
 							}
-						}
+						}*/
 
 						infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
 						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
