@@ -1303,62 +1303,68 @@ public class RechargeServiceImpl implements RechargeService {
 			6 订单不存在 7 调用存管接口失败
 			9 机构编号不存在
 		 */
-		ResultData resultData=getBankSearchResultMsg(result);
-		if (result == null) {
-			log.setRepayStatus(2);
-			log.setRemark("调用外联平台接口异常");
-			log.setUpdateTime(new Date());
-			withholdingRepaymentLogService.updateById(log);
-			throw new ServiceRuntimeException("调用外联平台接口失败！");
-		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("1")) {
-			log.setRepayStatus(0);
-			log.setRemark(resultData.getResultMsg());
-			log.setUpdateTime(new Date());
-			withholdingRepaymentLogService.updateById(log);
-		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("2")) {
-			outsideResult.setCode("1");
-			log.setRepayStatus(1);
-			log.setRemark("充值成功");
-			log.setUpdateTime(new Date());
-			withholdingRepaymentLogService.updateById(log);
-			shareProfit(pList, log);
-			try {
-				//sms
-				sendMessageService.sendAfterRepayFailSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod());
-				}catch(Exception e) {
-					logger.error("银行代扣失败短信发送错误,logId:{0}",log.getLogId());
-				}
-		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("3")) {
-			outsideResult.setCode("2");
-			log.setRepayStatus(2);
-			log.setRemark("待付款");
-			log.setUpdateTime(new Date());
-			withholdingRepaymentLogService.updateById(log);
-		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("6")) {
-			outsideResult.setCode("-1");
-			log.setRepayStatus(0);
-			log.setRemark("订单不存在");
-			log.setUpdateTime(new Date());
-			withholdingRepaymentLogService.updateById(log);
-		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("7")) {
-			outsideResult.setCode("-1");
-			log.setRepayStatus(0);
-			log.setRemark("调用存管接口失败");
-			log.setUpdateTime(new Date());
-			withholdingRepaymentLogService.updateById(log);
-		}else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("9")) {
-			outsideResult.setCode("-1");
-			log.setRepayStatus(0);
-			log.setRemark("机构编号不存在");
-			log.setUpdateTime(new Date());
-			withholdingRepaymentLogService.updateById(log);
-		}else {
-			outsideResult.setCode("-1");
-			log.setRepayStatus(0);
-			log.setRemark(resultData.getResultMsg());
-			log.setUpdateTime(new Date());
-			withholdingRepaymentLogService.updateById(log);
-		}
+		 ResultData resultData=getBankSearchResultMsg(result);
+		    if (result == null) {
+		      log.setRepayStatus(2);
+		      log.setRemark("调用外联平台接口异常");
+		      log.setUpdateTime(new Date());
+		      withholdingRepaymentLogService.updateById(log);
+		      throw new ServiceRuntimeException("调用外联平台接口失败！");
+		    }else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("1")) {
+		      log.setRepayStatus(0);
+		      log.setRemark(resultData.getResultMsg());
+		      log.setUpdateTime(new Date());
+		      withholdingRepaymentLogService.updateById(log);
+		    }else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("2")) {
+		      outsideResult.setCode("1");
+		      log.setRepayStatus(1);
+		      log.setRemark("充值成功");
+		      log.setUpdateTime(new Date());
+		      withholdingRepaymentLogService.updateById(log);
+		      shareProfit(pList, log);
+		      try {
+		        //sms
+		        sendMessageService.sendAfterRepaySuccessSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod(), pList.getTotalBorrowAmount().add(pList.getOverdueAmount()==null?BigDecimal.valueOf(0):pList.getOverdueAmount()),log.getCurrentAmount());
+		        }catch(Exception e) {
+		          logger.error("银行代扣成功短信发送错误,logId:{0}",log.getLogId());
+		        }
+		    }else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("3")) {
+		      outsideResult.setCode("2");
+		      log.setRepayStatus(2);
+		      log.setRemark("待付款");
+		      log.setUpdateTime(new Date());
+		      withholdingRepaymentLogService.updateById(log);
+		    }else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("6")) {
+		      outsideResult.setCode("-1");
+		      log.setRepayStatus(0);
+		      log.setRemark("订单不存在");
+		      log.setUpdateTime(new Date());
+		      withholdingRepaymentLogService.updateById(log);
+		    }else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("7")) {
+		      outsideResult.setCode("-1");
+		      log.setRepayStatus(0);
+		      log.setRemark("调用存管接口失败");
+		      log.setUpdateTime(new Date());
+		      withholdingRepaymentLogService.updateById(log);
+		    }else if(result.getReturnCode().equals("0000") &&resultData.getStatus().equals("9")) {
+		      outsideResult.setCode("-1");
+		      log.setRepayStatus(0);
+		      log.setRemark("机构编号不存在");
+		      log.setUpdateTime(new Date());
+		      withholdingRepaymentLogService.updateById(log);
+		    }else {
+		      outsideResult.setCode("-1");
+		      log.setRepayStatus(0);
+		      log.setRemark(resultData.getResultMsg());
+		      log.setUpdateTime(new Date());
+		      withholdingRepaymentLogService.updateById(log);
+		      try {
+		        //sms
+		        sendMessageService.sendAfterRepayFailSms(log.getPhoneNumber(),log.getCustomerName(),borrowDate, plan.getBorrowMoney(), pList.getPeriod());
+		        }catch(Exception e) {
+		          logger.error("银行代扣失败短信发送错误,logId:{0}",log.getLogId());
+		        }
+		    }
 		
 		
 //		if (result == null) {
