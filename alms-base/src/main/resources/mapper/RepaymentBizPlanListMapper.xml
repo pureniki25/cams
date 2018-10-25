@@ -1121,7 +1121,7 @@ AND plan_id = #{planListId})
 		  tb_repayment_biz_plan_list planList 
 		WHERE planList.`overdue_days` >= #{overDueDays,jdbcType=INTEGER} 
 		  AND planList.current_status IN ("还款中", "逾期") 
-		  AND IFNULL(planList.`repay_status`, 0) NOT IN (1, 2, 3) 
+		  AND IFNULL(planList.`repay_status`, 0) NOT IN (2, 3) 
 		  AND NOT EXISTS 
 		  (SELECT 
 		    1 
