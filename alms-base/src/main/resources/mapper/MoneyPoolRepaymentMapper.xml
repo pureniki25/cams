@@ -119,7 +119,7 @@
 			  '支出' incomeType,
 			  rr.repay_date tradeTime,
 			  '结余转还款' tradeType,
-			  '结余转还款' accountName 
+			  '' accountName 
 			FROM
 			  `tb_repayment_biz_plan_list` lst,
 			  tb_repayment_resource rr,
