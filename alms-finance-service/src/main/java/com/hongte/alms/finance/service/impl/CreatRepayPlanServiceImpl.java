@@ -375,6 +375,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDto.getBizPlanListDetails();
                 CarBusinessAfterDto bizAfterDto = new CarBusinessAfterDto();
                 bizAfterDtos.add(bizAfterDto);
+                bizAfterDto.setZqBusinessId(repaymentBizPlan.getBusinessId());//add By Czs
                 bizAfterDto.setCarBusinessId(repaymentBizPlan.getOriginalBusinessId());//业务id
                 bizAfterDto.setCarBusinessAfterId(repaymentBizPlanList.getAfterId());//[当前还款期数]
                 BasicBusinessType basicBusinessType =basicBusinessTypeService.selectById(businessBasicInfo.getBusinessType());
@@ -447,7 +448,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 for(RepaymentBizPlanListDetail bizPlanListDetail: repaymentBizPlanListDetails){
                     CarBusinessAfterDetailDto afterDetailDto = new CarBusinessAfterDetailDto();
                     bizAfterDetailDtos.add(afterDetailDto);
-
+                    afterDetailDto.setZqBusinessId(bizAfterDto.getZqBusinessId());
                     afterDetailDto.setBusinessId(bizAfterDto.getCarBusinessId());//业务编号
                     afterDetailDto.setBusinessAfterId(bizAfterDto.getCarBusinessAfterId());//期数
                     afterDetailDto.setFeeId(bizPlanListDetail.getFeeId());//费用项ID
@@ -1863,14 +1864,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         Map<Integer,Map<String,BigDecimal>>  retMap  = new HashMap<>();
 
         BigDecimal monthRate = getMonthRate(rate,rateUnit);
-
+        BigDecimal yearRate = getYearRate(rate, rateUnit);
         switch (repayType){
             case PAY_LAST:  //到期还本息
-            calcPrincipalLast(fullBorrowMoney,monthRate
+            calcPrincipalLast(fullBorrowMoney,yearRate
             ,periodMonth,retMap);
             break;
             case PRINCIPAL_LAST:  //先息后本
-                calcPrincipalLast(fullBorrowMoney,monthRate
+                calcPrincipalLast(fullBorrowMoney,yearRate
                 ,periodMonth,retMap);
                 break;
             case INT_AND_PRIN_EQUAL://等额本息

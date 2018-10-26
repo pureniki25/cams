@@ -461,7 +461,7 @@ public class ProjInfoReq {
      * 合作公司所属团贷网分公司编号
      */
     @ApiModelProperty(required= true,value = "合作公司所属团贷网分公司编号")
-    @NotNull(message="ProjInfoReq 合作公司所属团贷网分公司编号(cooperativeTdComUserId)不能为空")
+   // @NotNull(message="ProjInfoReq 合作公司所属团贷网分公司编号(cooperativeTdComUserId)不能为空")
     private String cooperativeTdComUserId;
     /**
      * 合作公司所属团贷网分公司费用比例

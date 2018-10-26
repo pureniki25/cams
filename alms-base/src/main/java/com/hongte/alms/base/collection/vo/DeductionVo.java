@@ -55,9 +55,14 @@ public class DeductionVo {
     private boolean haveThirtyRepay;//是否含有用电放代扣
     private boolean haveUnderRepay;//是否含有线下转账
     private boolean repaying;//是否有代扣中的记录
-    
- 
+    private String userId;//信贷userId
 	
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 	public boolean isRepaying() {
 		return repaying;
 	}

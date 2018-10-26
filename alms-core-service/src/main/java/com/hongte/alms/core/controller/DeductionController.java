@@ -26,6 +26,8 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
+import com.ht.ussp.bean.LoginUserInfoHelper;
+import com.ht.ussp.client.dto.LoginInfoDto;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -113,6 +115,8 @@ public class DeductionController {
 
     @Autowired
     CustomerInfoXindaiRemoteApi customerInfoXindaiRemoteApi;
+    @Autowired
+    LoginUserInfoHelper loginUserInfoHelper;
     
     @SuppressWarnings({ "rawtypes", "unused" })
 	@ApiOperation(value = "根据Plan_list_id查找代扣信息")
@@ -164,6 +168,8 @@ public class DeductionController {
         	
             //执行代扣信息
             DeductionVo deductionVo=  deductionService.selectDeductionInfoByPlanListId(planListId);
+            LoginInfoDto loginInfoDto=loginUserInfoHelper.getUserInfoByUserId(loginUserInfoHelper.getUserId(), null);
+            deductionVo.setUserId(loginInfoDto.getBmUserId());
             deductionVo.setBankCardInfo(bankCardInfo);
             deductionVo.setIdentifyCard(bankCardInfo.getIdentityNo());
             deductionVo.setStrType(business.getSrcType());

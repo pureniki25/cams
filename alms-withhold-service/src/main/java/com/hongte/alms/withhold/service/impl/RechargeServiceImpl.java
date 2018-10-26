@@ -938,12 +938,12 @@ public class RechargeServiceImpl implements RechargeService {
 		result.setCode("1");
 		BizOutputRecord record = bizOutputRecordService
 				.selectOne(new EntityWrapper<BizOutputRecord>().eq("business_id", pList.getBusinessId()));
-//		if (DateUtil.getDiff(new Date(), pList.getDueDate()) > 30) {
-//			// msg = "超出三十天不自动代扣";
-//			result.setCode("-1");
-//			result.setMsg("超出三十天不自动代扣");
-//			return result;
-//		}
+		if (DateUtil.getDiff(new Date(), pList.getDueDate()) > 30) {
+			// msg = "超出三十天不自动代扣";
+			result.setCode("-1");
+			result.setMsg("超出三十天不自动代扣");
+			return result;
+		}
 		if(record==null) {
 			result.setCode("-1");
 			result.setMsg("没有出款记录");
@@ -1060,21 +1060,46 @@ public class RechargeServiceImpl implements RechargeService {
 		//还没有还款的到了应该还日期的期数集合
 		
 		List<RepaymentBizPlanList> notRepayLists=dueDateLists.stream().filter(a->(!a.getCurrentStatus().equals("已还款"))).collect(Collectors.toList());
-		notRepayLists=repaymentBizPlanLists.stream().filter(a->(a.getRepayStatus()!=SectionRepayStatusEnum.ALL_REPAID.getKey())).collect(Collectors.toList());
+		notRepayLists=notRepayLists.stream().filter(a->(a.getRepayStatus()!=SectionRepayStatusEnum.ALL_REPAID.getKey())).collect(Collectors.toList());
 		
 		//期数从小到大排序
-		Optional<RepaymentBizPlanList> min=notRepayLists.stream().min((a1,a2)->a1.getPeriod().compareTo(a2.getPeriod()));
-		RepaymentBizPlanList minRepayBizPlanList=min.get();
+		Optional<RepaymentBizPlanList> max=notRepayLists.stream().max((a1,a2)->a1.getPeriod().compareTo(a2.getPeriod()));
+		RepaymentBizPlanList maxRepayBizPlanList=max.get();
 		
-		RepaymentBizPlanList pList=null;
-		   if(minRepayBizPlanList.getRepayStatus()==SectionRepayStatusEnum.ONLINE_REPAID.getKey()) {	//判断是否在线上已还款
-			    pList=getNext(minRepayBizPlanList);
-			}else {
-				pList=minRepayBizPlanList;
-			}
-		return pList;
+		RepaymentBizPlanList last=getLast(maxRepayBizPlanList);
+		if(last!=null) {
+			   if(last.getRepayStatus()==SectionRepayStatusEnum.ONLINE_REPAID.getKey()||(last.getCurrentStatus().equals("已还款"))) {	//判断是否在线上已还款或者已还款
+				    return maxRepayBizPlanList;
+				}else {
+					return last;
+				}
+		}else {
+			return maxRepayBizPlanList;
+		}
+		
+	
 		
 	 }
+	
+	
+	
+	
+	
+	public  RepaymentBizPlanList getLast(RepaymentBizPlanList current) {
+		RepaymentBizPlanList last = repaymentBizPlanListService
+				.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", current.getBusinessId())
+						.eq("plan_id", current.getPlanId()).eq("period", current.getPeriod() - 1).eq("confirm_flag", 1));
+	
+				return last;
+	
+		
+	   }
+	
+	
+	
+	
+	
+	
 	public  RepaymentBizPlanList getNext(RepaymentBizPlanList current) {
 		RepaymentBizPlanList next = repaymentBizPlanListService
 				.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", current.getBusinessId())
@@ -1082,7 +1107,7 @@ public class RechargeServiceImpl implements RechargeService {
 		if (next != null) {
 			Date nowDate = new Date();
 			int days = 0 - 30;
-			Date before30Days = DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, nowDate)));
+			Date before30Days = DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, next.getDueDate())));
 			if (next.getDueDate().compareTo(before30Days) >= 0 && next.getDueDate().compareTo(nowDate) <= 0) {
 				RepaymentBizPlanList nextNext = repaymentBizPlanListService
 						.selectOne(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", next.getBusinessId())

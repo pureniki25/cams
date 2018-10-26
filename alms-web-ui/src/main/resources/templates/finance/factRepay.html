@@ -36,7 +36,7 @@
                         </i-select>
                     </form-item>
                     <form-item label="财务确认时间">
-                        <date-picker type="daterange" element-id="datePicker" @on-change="form.confirmTime=$event"
+                        <date-picker type="daterange" @on-change="vm.form.confirmTime=$event"
                             style="width: 180px;text-align: left" :options="dateOptions" placeholder="--请选择时间范围--"></date-picker>
                     </form-item>
                     <form-item label="分公司">
@@ -72,7 +72,7 @@
                             导出
                         </i-button>
                     </form-item>
-                    <form-item>
+                    <!-- <form-item>
                         <i-button type="primary" @click="today" :disabled="syncing">
                             今天
                         </i-button>
@@ -85,14 +85,14 @@
                         <i-button type="primary" @click="lastMonth" :disabled="syncing">
                             上个月
                         </i-button>
-                    </form-item>
+                    </form-item> -->
                 </i-form>
             </Header>
             <Content>
                 <i-table :columns="table.col" :data="table.data" stripe :loading="table.loading"></i-table>
             </Content>
             <Footer style="text-align: center;width: 100%">
-                <Page :total="table.total" ref="pages" show-total @on-change="paging"></Page>
+                <Page :total="table.total" ref="pages"  :current="table.current" show-total @on-change="paging"></Page>
             </Footer>
         </layout>
 

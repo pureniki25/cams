@@ -174,9 +174,7 @@
 		s.`plan_id` = l.`plan_id`,
 		s.`create_time` =
 		l.`create_time`,
-		s.`create_user` = (
-			SELECT user_name from tb_sys_user where user_id = l.`create_user` limit 1 
-		),
+		s.`create_user` = l.`create_user`,
 		s.`update_time` =
 		l.`update_time`,
 		s.`update_user` = l.`update_user`,
@@ -245,6 +243,34 @@
 		)
 	</update>
 
+	<update id="updateUser">
+		update tb_repayment_confirm_log_synch s 
+		right join tb_repayment_resource r on r.confirm_log_id = s.confirm_log_id
+		
+		left join tb_sys_user u on u.user_id = r.create_user
+		set s.create_user_name = u.user_name
+		where s.create_user_name is null ;
+	</update>
+	
+	<update id="updateRepaysource10">
+		update tb_repayment_confirm_log_synch s , tb_sys_user u 
+		set s.create_user_name = u.user_name 
+		where s.create_user_name is null and (s.repay_source = 10 or s.repay_source=11) and s.create_user = u.user_id ;
+	</update>
+	
+	<update id="updateRepaysource2030">
+		update tb_repayment_confirm_log_synch s 
+		set s.create_user_name = '系统自动代扣'
+		where s.create_user_name is null and (s.repay_source = 20 or s.repay_source=30) ;
+	</update>
+	
+	<update id="updateRepaysource2131">
+		update tb_repayment_confirm_log_synch s , tb_repayment_resource r , tb_withholding_repayment_log l ,tb_sys_user u
+		set s.create_user_name = u.user_name
+		where s.create_user_name is null and ( s.repay_source = 21 or s.repay_source = 31 ) and s.confirm_log_id = r.confirm_log_id and r.repay_source_ref_id = l.log_id and u.user_id = l.create_user ;
+	</update>
+	
+	
 	<update id="updateBaiscBusiness">
 		UPDATE tb_repayment_confirm_log_synch s,
 		tb_basic_business b
@@ -321,7 +347,8 @@
 		SET
 		s.ext_item30 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
 		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
-		AND fee_id = '3df61688-d5a0-49c5-9c32-46b30855310a' )
+		AND plan_item_type = 30 )
+		<!-- AND fee_id = '3df61688-d5a0-49c5-9c32-46b30855310a' ) -->
 		WHERE
 		ISNULL(
 		s.ext_item30 );
@@ -332,7 +359,8 @@
 		SET
 		s.ext_item50 = ( SELECT IFNULL( sum( fact_amount ), 0 ) FROM
 		tb_repayment_proj_fact_repay WHERE confirm_log_id = s.confirm_log_id
-		AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' )
+		AND plan_item_type = 50 )
+		<!-- AND fee_id = 'cf7a15e1-9bc8-44fc-b53e-de3c84234211' ) -->
 		WHERE
 		ISNULL(
 		s.ext_item50 );
@@ -519,9 +547,14 @@
 		can_revoke AS
 		canRevoke, is_cancelled AS isCancelled, proj_plan_json AS
 		projPlanJson, repay_date AS repayDate, SUM(fact_amount) AS factAmount,
-		repay_source AS repaySource, surplus_amount AS surplusAmount,
+		repay_source AS repaySource, SUM(IFNULL(surplus_amount,0)) AS surplusAmount,
 		surplus_ref_id AS surplusRefId, surplus_use_ref_id AS surplusUseRefId,
-		create_time AS createTime, create_user AS createUser, update_time AS
+		create_time AS createTime, 
+		(case 
+		when repay_source = 20 or repay_source = 30 then '系统自动代扣'
+		else create_user_name end ) as create_user,
+		<!-- IFNULL(u.user_name,'系统自动代扣') as create_user,  -->
+		update_time AS
 		updateTime, update_user AS updateUser, create_user_name AS
 		createUserName, last_push_status AS lastPushStatus, last_push_datetime
 		AS lastPushDatetime, last_push_remark AS lastPushRemark,ext_business_type AS extBusinessType,
@@ -541,6 +574,7 @@
 		ext_remark AS extRemark
 		FROM
 		tb_repayment_confirm_log_synch 
+		<!-- left join tb_sys_user u on u.user_id = create_user -->
 		WHERE is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
 			and ( business_id like '${req.key}%' or ext_customer_name like '${req.key}%' )
@@ -567,7 +601,7 @@
 		<if test="req.repayType != null and req.srcType neq '' and req.repayType eq '混合代扣' ">
 			HAVING count( DISTINCT ext_repay_type ) > 1
 		</if>
-		ORDER BY create_time 
+		ORDER BY repay_date desc
 		<if test="req.curPage != null and req.curPage != 0">
 			LIMIT ${(req.curPage-1)*req.pageSize} , ${req.pageSize}
 		</if>
