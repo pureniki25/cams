@@ -140,10 +140,12 @@
 			FROM
 			  `tb_repayment_biz_plan_list` lst
 				left join 
-			  tb_repayment_resource rr on (rr.after_id = lst.after_id and rr.business_id = lst.business_id )
+				tb_repayment_confirm_log l on ( lst.business_id = l.business_id and lst.after_id = l.after_id )
+				left join 
+			  tb_repayment_resource rr on l.confirm_log_id = rr.confirm_log_id 
 			WHERE 
 			   lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
-				 AND rr.is_cancelled = 0  
+				 AND l.is_cancelled = 0  
 				 and rr.repay_source = 11 
 		ORDER BY 1, 4
 	</select>
