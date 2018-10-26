@@ -375,6 +375,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDto.getBizPlanListDetails();
                 CarBusinessAfterDto bizAfterDto = new CarBusinessAfterDto();
                 bizAfterDtos.add(bizAfterDto);
+                bizAfterDto.setXdOutId(repaymentBizPlan.getXdOutId());//add By Czs
                 bizAfterDto.setZqBusinessId(repaymentBizPlan.getBusinessId());//add By Czs
                 bizAfterDto.setCarBusinessId(repaymentBizPlan.getOriginalBusinessId());//业务id
                 bizAfterDto.setCarBusinessAfterId(repaymentBizPlanList.getAfterId());//[当前还款期数]
@@ -1279,7 +1280,8 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             bizPlan.setPlanStatus(RepayPlanSettleStatusEnum.REPAYINF.getValue());  // 还款计划状态
             bizPlan.setIsDefer(businessBasicInfo.getIsRenewBusiness()); //是否展期还款计划
             bizPlan.setXdAfterGuid(null);       //对应原信贷的还款批次号  置位为空
-            bizPlan.setXdOutId(null);       //对应原信贷的出款计划ID  置位为空
+            int i=repaymentBizPlanService.selectCount(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessBasicInfo.getOrgBusinessId()));//该业务的还款计划数量
+            bizPlan.setXdOutId(i+1);       //对应原信贷的出款计划ID 
             bizPlan.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());       //还款计划生成系统标志
             bizPlan.setCreateTime(new Date());       //创建日期
             bizPlan.setCreateUser(Constant.ADMIN_ID);       //创建用户
@@ -1581,7 +1583,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     //还款计划详情项列表
                     List<RepaymentProjPlanListDetail>  priodListDetails = new LinkedList<>();
                     //创建还款计划list
-                    RepaymentProjPlanList  projPlanList =  creatRepaymentProjPlanList(repaymentProjPlan,i,planIndex);// new RepaymentProjPlanList();
+                    RepaymentProjPlanList  projPlanList =  creatRepaymentProjPlanList(projInfoReq,repaymentProjPlan,i,planIndex);// new RepaymentProjPlanList();
                     Date date = DateUtil.addMonth2Date(i,projInfoReq.getBeginTime());
                     date = DateUtil.addDay2Date(-1,date);
                     projPlanList.setDueDate(DateUtil.getDayStart(date));
@@ -1786,11 +1788,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
     //创建标的还款计划，并设置基本信息
-    private   RepaymentProjPlanList  creatRepaymentProjPlanList(RepaymentProjPlan repaymentProjPlan,Integer period,Integer planIndex){
+    private   RepaymentProjPlanList  creatRepaymentProjPlanList(ProjInfoReq projInfoReq,RepaymentProjPlan repaymentProjPlan,Integer period,Integer planIndex){
         Boolean isRenew = false;
         if(!repaymentProjPlan.getBusinessId().equals(repaymentProjPlan.getOriginalBusinessId())){
             isRenew = true;
         }
+       
 
         RepaymentProjPlanList  projPlanList = new RepaymentProjPlanList();
         projPlanList.setProjPlanListId(UUID.randomUUID().toString());
@@ -1800,7 +1803,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         projPlanList.setBusinessId(repaymentProjPlan.getBusinessId());  //还款计划所属业务编号(若当前业务为展期，则存展期业务编号)
         projPlanList.setOrigBusinessId(repaymentProjPlan.getOriginalBusinessId());  //还款计划所属原业务编号
         projPlanList.setPeriod(period);  //还款计划期数
-        projPlanList.setAfterId(calcAfterId(repaymentProjPlan.getBusinessId(),period,isRenew,planIndex)); // 总批次期数，  核对原来信贷还款计划是怎么写的
+        projPlanList.setAfterId(calcAfterId(projInfoReq,repaymentProjPlan.getOriginalBusinessId(),period,isRenew,planIndex)); // 总批次期数，  核对原来信贷还款计划是怎么写的
         projPlanList.setDueDate(new Date()); //应还日期 怎么设置， 需要核对
         projPlanList.setTotalBorrowAmount(new BigDecimal(0));// 总计划应还金额   需要按照每一项计算
         projPlanList.setOverdueAmount(new BigDecimal(0)); //总应还滞纳金
@@ -1824,7 +1827,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
      * @param planIndex   还款计划排序，这一次生成的所有还款计划
      * @return
      */
-    private  String  calcAfterId(String businessId,Integer period,boolean isRenew,Integer planIndex){
+    private  String  calcAfterId(ProjInfoReq projInfoReq,String businessId,Integer period,boolean isRenew,Integer planIndex){
 
          List<RepaymentBizPlan> bizPlans =  repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("business_id",businessId));
          Integer size = bizPlans==null?0:bizPlans.size();
@@ -1833,7 +1836,20 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         String periodStr=(new DecimalFormat("00")).format(period);
          String  afterId;
          if(isRenew){
-            afterId = size+"-ZQ-"+periodStr;
+        	   //如果是展期，需要根据信贷传来的批次ID来确定在哪个还款计划的基础上生成展期计划
+        	 List<RepaymentBizPlan> plans =  repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id",businessId).eq("is_defer", 1));
+        	   RepaymentBizPlan bizPlan =  repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("repayment_batch_id",projInfoReq.getBusinessAfterGuid()));
+        	   List<RepaymentBizPlanList> bizPlanLists=null;
+        	    String index="";
+        	   if(bizPlan!=null) {
+        		   bizPlanLists =  repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id",bizPlan.getPlanId()));
+        		    index=bizPlanLists.get(0).getAfterId();
+        		    index=index.split("-")[0];
+        	   }else {
+        		   index="1";
+        	   }
+	           String businessIndex=(new DecimalFormat("00")).format(plans.size()+1);//计算这个业务现在是第几次展期
+               afterId = index+"-ZQ"+businessIndex+"-"+periodStr;
          }else{
              afterId = size+"-"+periodStr;
          }
@@ -2638,8 +2654,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
     	BigDecimal rate=BigDecimal.valueOf(11);
     	BigDecimal  monthRate = rate.divide(new BigDecimal(12),10,roundingMode);
     	System.out.println(monthRate);
+    	String str="2-01";
+    	System.out.println(str.split("-")[0]);
      }
-
 
 	
 }

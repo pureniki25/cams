@@ -39,6 +39,9 @@ public class CarBusinessAfterDto implements Serializable  {
     
 	@ApiModelProperty(required= true,value = "展期编号")
 	private String zqBusinessId;
+	
+	@ApiModelProperty(required= true,value = "对应原信贷的出款计划ID(out_id)，用作历史数据迁移的标记字段。若非原信贷系统生成的还款计划，则为空")
+	private Integer xdOutId;
     /**
      * 当前还款期数
      */
@@ -1157,4 +1160,13 @@ public class CarBusinessAfterDto implements Serializable  {
 	public void setCarBizDetailDtos(List<CarBusinessAfterDetailDto> carBizDetailDtos) {
 		this.carBizDetailDtos = carBizDetailDtos;
 	}
+
+	public Integer getXdOutId() {
+		return xdOutId;
+	}
+
+	public void setXdOutId(Integer xdOutId) {
+		this.xdOutId = xdOutId;
+	}
+	
 }
