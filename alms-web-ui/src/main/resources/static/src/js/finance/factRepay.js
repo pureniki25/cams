@@ -21,38 +21,56 @@ window.layinit(function (htConfig) {
                 srcType: null,
             },
             dateOptions:{
-                shortcuts:[
-                    {
-                        text:'今天',
-                        value(){
-                            let today = moment().format("YYYY-MM-DD");
-                            return [today,today];
-                        }
-                    },
-                    {
-                        text:'昨天',
-                        value(){
-                            let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
-                            return [yesterday,yesterday];
-                        }
-                    },
-                    {
-                        text:'本月',
-                        value(){
-                            let start = moment().add('month', 0).format('YYYY-MM') + '-01'
-                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                            return [start,end];
-                        }
-                    },
-                    {
-                        text:'上个月',
-                        value(){
-                            let start = moment().add('month', -1).format('YYYY-MM') + '-01'
-                            let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                            return [start,end];
-                        }
-                    }
-                ],
+                // shortcuts:[
+                //     {
+                //         text:'今天',
+                //         value(){
+                //             let today = moment().format("YYYY-MM-DD");
+                //             return [today,today];
+                //         },
+                //         onClick(dp){
+                //             let today = moment().format("YYYY-MM-DD");
+                //             vm.form.confirmTime=[today,today]
+                //         }
+                //     },
+                //     {
+                //         text:'昨天',
+                //         value(){
+                //             let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
+                //             return [yesterday,yesterday];
+                //         },
+                //         onClick(dp){
+                //             let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
+                //             vm.form.confirmTime=[yesterday,yesterday]
+                //         }
+                //     },
+                //     {
+                //         text:'本月',
+                //         value(){
+                //             let start = moment().add('month', 0).format('YYYY-MM') + '-01'
+                //             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                //             return [start,end];
+                //         },
+                //         onClick(dp){
+                //             let start = moment().add('month', 0).format('YYYY-MM') + '-01'
+                //             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                //             vm.form.confirmTime=[start,end]
+                //         }
+                //     },
+                //     {
+                //         text:'上个月',
+                //         value(){
+                //             let start = moment().add('month', -1).format('YYYY-MM') + '-01'
+                //             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                //             return [start,end];
+                //         },
+                //         onClick(dp){
+                //             let start = moment().add('month', -1).format('YYYY-MM') + '-01'
+                //             let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+                //             vm.form.confirmTime=[start,end]
+                //         }
+                //     }
+                // ],
                 disabledDate: function (date) {
                     return date > new Date();
                 },
@@ -61,6 +79,7 @@ window.layinit(function (htConfig) {
                 loading: false,
                 total: 0,
                 data: [],
+                current:1,
                 col: [{
                         title: '业务编号',
                         key: 'businessId'
@@ -120,7 +139,8 @@ window.layinit(function (htConfig) {
                     {
                         title: '滞纳金',
                         render: function (h, p) {
-                            return h('span', p.row.extItem60offline + p.row.extItem60online)
+                           
+                            return h('span',  accAdd(p.row.extItem60offline,p.row.extItem60online))
                         }
                     },
                     {
@@ -138,30 +158,35 @@ window.layinit(function (htConfig) {
             businessTypes: [],
             paymentPlatformList: []
         },
+        watch:{
+            'form.confirmTime':function(){
+                vm.form.curPage = 1
+            }
+        },
         methods: {
-            today: function () {
-                let today = moment().format("YYYY-MM-DD");
-                // $ref
-                vm.form.confirmTime=[today,today]
-                vm.paging(1)
-            },
-            yesterday: function () {
-                let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
-                vm.form.confirmTime=[yesterday,yesterday]
-                vm.paging(1)
-            },
-            thisMonth: function () {
-                let start = moment().add('month', 0).format('YYYY-MM') + '-01'
-                let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                vm.form.confirmTime=[start,end]
-                vm.paging(1)
-            },
-            lastMonth: function () {
-                let start = moment().add('month', -1).format('YYYY-MM') + '-01'
-                let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
-                vm.form.confirmTime=[start,end]
-                vm.paging(1)
-            },
+            // today: function () {
+            //     let today = moment().format("YYYY-MM-DD");
+            //     // $ref
+            //     vm.form.confirmTime=[today,today]
+            //     vm.paging(1)
+            // },
+            // yesterday: function () {
+            //     let yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
+            //     vm.form.confirmTime=[yesterday,yesterday]
+            //     vm.paging(1)
+            // },
+            // thisMonth: function () {
+            //     let start = moment().add('month', 0).format('YYYY-MM') + '-01'
+            //     let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+            //     vm.form.confirmTime=[start,end]
+            //     vm.paging(1)
+            // },
+            // lastMonth: function () {
+            //     let start = moment().add('month', -1).format('YYYY-MM') + '-01'
+            //     let end = moment(start).add('month', 1).add('days', -1).format('YYYY-MM-DD')
+            //     vm.form.confirmTime=[start,end]
+            //     vm.paging(1)
+            // },
             paging: function (page) {
                 if (this.syncing) {
                     return;
@@ -189,9 +214,11 @@ window.layinit(function (htConfig) {
                         vm.$Message.error({
                             content: '查询实还记录失败'
                         })
+                        vm.table.current = 1
                     } else {
                         vm.table.data = res.data.records
                         vm.table.total = res.data.total
+                        vm.table.current = res.data.current
                     }
 
                     vm.table.loading = false;

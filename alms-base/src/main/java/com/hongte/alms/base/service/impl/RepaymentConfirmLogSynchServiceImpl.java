@@ -127,6 +127,7 @@ public class RepaymentConfirmLogSynchServiceImpl extends BaseServiceImpl<Repayme
 		int updateRemark = updateRemark();
 		int updateRepayType = updateRepayType();
 		int updatePlateType = updatePlateType() ;
+		int updateUser = updateUser();
 		List<Integer> list = Arrays.asList(
 				updateRepaymentConfirmLog
 				,updateBaiscBusiness
@@ -142,13 +143,20 @@ public class RepaymentConfirmLogSynchServiceImpl extends BaseServiceImpl<Repayme
 				,updateItem70pt
 				,updateOtherFee
 				,updateRemark
-				,updateRepayType,updatePlateType);
+				,updateRepayType,updatePlateType,updateUser);
 		Integer max = Collections.max(list);
 		return max;
 	}
 	@Override
 	public int updatePlateType() {
 		return synchMapper.updatePlateType();
+	}
+	@Override
+	public int updateUser() {
+		synchMapper.updateRepaysource10();
+		synchMapper.updateRepaysource2030();
+		synchMapper.updateRepaysource2131();
+		return 1;
 	}
 
 }
