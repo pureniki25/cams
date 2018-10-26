@@ -110,25 +110,7 @@
 		  AND mpr.income_type IN (1, 2)
 		  AND mpr.is_finance_match = 1
 		  AND mpr.state = '财务确认已还款' 
-		  and rr.is_cancelled = 0
-		UNION
-		ALL
-		  SELECT 
-			  rr.`after_id` afterId,
-			  rr.`repay_amount` currentAmount,
-			  '支出' incomeType,
-			  rr.repay_date tradeTime,
-			  '结余转还款' tradeType,
-			  '' accountName 
-			FROM
-			  `tb_repayment_biz_plan_list` lst,
-			  tb_repayment_resource rr,
-			  tb_accountant_over_repay_log aorl 
-			WHERE rr.after_id = lst.after_id
-			  AND rr.repay_source_ref_id = aorl.log_id 
-			  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
-			  AND rr.is_cancelled = 0 
-			  AND aorl.money_type = 0 
+		  and rr.is_cancelled = 0 
 		ORDER BY 1, 4
 	</select>
 
