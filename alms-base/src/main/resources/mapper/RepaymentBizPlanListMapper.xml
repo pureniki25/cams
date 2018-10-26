@@ -768,8 +768,9 @@
 				      `tb_accountant_over_repay_log` t 
 				      LEFT JOIN tb_repayment_confirm_log rcl 
 				        ON rcl.surplus_ref_id = t.log_id 
-				        AND rcl.is_cancelled = 0 
+				        
 				    WHERE t.freeze_status != 1 
+				      AND rcl.is_cancelled = 0 
 				      AND t.money_type = 1 
 				      AND t.business_id = #{businessId,jdbcType=VARCHAR}  
 				      AND t.business_after_id = rbpl.after_id) - 
@@ -779,9 +780,10 @@
 				      `tb_accountant_over_repay_log` t 
 				      LEFT JOIN tb_repayment_confirm_log rcl 
 				        ON rcl.surplus_ref_id = t.log_id 
-				        AND rcl.is_cancelled = 1 
 				    WHERE t.freeze_status != 1 
+				      AND rcl.is_cancelled = 0 
 				      AND t.money_type = 0 
+				      AND rcl.surplus_use_ref_id is null 
 				      AND t.business_id = #{businessId,jdbcType=VARCHAR}  
 				      AND t.business_after_id = rbpl.after_id) surplus,
 				    CASE
