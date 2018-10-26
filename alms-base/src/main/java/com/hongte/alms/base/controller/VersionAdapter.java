@@ -18,7 +18,7 @@ public class VersionAdapter {
 	/*Cservice="2018-08-27 08:45:00"*/
 	/*Dservice="1"*/
 	final String ALMS_CORE_SERVICE = "(prdbug)1026 20:35" ;
-	final String ALMS_FINANCE_SERVICE = "(prdbug)1026 20:35" ;
+	final String ALMS_FINANCE_SERVICE = "(prdbug)1026 21:15 撤销亏损结清补0元实还的 实还流水查结余转还款逻辑调整 详情页查结余逻辑调整" ;
 	final String ALMS_OPEN_SERVICE = "(prdbug)1026 20:35" ;
 	final String ALMS_PLATREPAY_SERVICE = "(prdbug)1026 20:35" ;
 	final String ALMS_SCHEDULED_SERVICE = "(prdbug)1026 20:35" ;
