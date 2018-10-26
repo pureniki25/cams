@@ -550,6 +550,14 @@ public class ProjInfoReq {
      */
     @ApiModelProperty(required= true,value = "资产端上标编号")
 	private String requestNo;
+    
+    /**
+     * 信贷批次号
+     */
+    @ApiModelProperty(required= true,value = "信贷批次号")
+	private String businessAfterGuid;
+    
+    
 	
 //    /**
 //     * 创建日期
@@ -572,7 +580,15 @@ public class ProjInfoReq {
 //    @ApiModelProperty(required= true,value = "更新人")
 //    private String updateUser;
 
-    public String getRequestNo() {
+    public String getBusinessAfterGuid() {
+		return businessAfterGuid;
+	}
+
+	public void setBusinessAfterGuid(String businessAfterGuid) {
+		this.businessAfterGuid = businessAfterGuid;
+	}
+
+	public String getRequestNo() {
 		return requestNo;
 	}
 
