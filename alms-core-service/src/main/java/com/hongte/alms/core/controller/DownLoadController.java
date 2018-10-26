@@ -218,8 +218,8 @@ public class DownLoadController  implements Serializable {
 					row.add(infoVO.getCompanyName());
 					row.add(infoVO.getPeriodTypeStr());
 					row.add(infoVO.getResourceAmount() == null ? BigDecimal.valueOf(0) : infoVO.getResourceAmount());
-					row.add(infoVO.getFactRepayAmount() == null ? BigDecimal.valueOf(0) : infoVO.getResourceAmount());
-					row.add(infoVO.getRechargeAmount() == null ? BigDecimal.valueOf(0) : infoVO.getResourceAmount());
+					row.add(infoVO.getFactRepayAmount() == null ? BigDecimal.valueOf(0) : infoVO.getFactRepayAmount());
+					row.add(infoVO.getRechargeAmount() == null ? BigDecimal.valueOf(0) : infoVO.getRechargeAmount());
 					row.add(infoVO.getPlatformTypeStr());
 					row.add(infoVO.getProcessStatusStr());
 					row.add(infoVO.getRemark());
