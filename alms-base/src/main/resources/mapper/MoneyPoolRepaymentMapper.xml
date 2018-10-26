@@ -113,7 +113,7 @@
 		  and rr.is_cancelled = 0
 		UNION
 		ALL
-		  SELECT 
+	<!-- 	  SELECT 
 			  rr.`after_id` afterId,
 			  rr.`repay_amount` currentAmount,
 			  '支出' incomeType,
@@ -129,6 +129,22 @@
 			  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
 			  AND rr.is_cancelled = 0 
 			  AND aorl.money_type = 0 
+		ORDER BY 1, 4 -->
+		SELECT 
+			  rr.`after_id` afterId,
+			  rr.`repay_amount` currentAmount,
+			  '支出' incomeType,
+			  rr.repay_date tradeTime,
+			  '结余转还款' tradeType,
+			  '' accountName 
+			FROM
+			  `tb_repayment_biz_plan_list` lst
+				left join 
+			  tb_repayment_resource rr on (rr.after_id = lst.after_id and rr.business_id = lst.business_id )
+			WHERE 
+			   lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
+				 AND rr.is_cancelled = 0  
+				 and rr.repay_source = 11 
 		ORDER BY 1, 4
 	</select>
 
