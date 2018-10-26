@@ -758,7 +758,7 @@
 		SELECT
 		t1.resource_id AS 'list_id',
 		''  AS 'account_id',
-		t2.repay_date AS 'account_time',
+		t3.trade_date AS 'account_time',
 		t2.org_business_id AS 'business_id',
 		t6.project_id AS 'issue_id',
 		t2.after_id AS 'after_id',
@@ -829,7 +829,7 @@
 			t1.fee_id AS 'fee_id',
 			t1.plan_item_name AS 'fee_name',
 			t1.fact_amount AS 'amount',
-			t8.repay_date AS 'account_time',
+			t8.create_time AS 'account_time',
 			t8.create_time AS 'account_date',
 			t1.is_cancelled AS 'status_flag',
 			t1.create_date AS 'create_time',
