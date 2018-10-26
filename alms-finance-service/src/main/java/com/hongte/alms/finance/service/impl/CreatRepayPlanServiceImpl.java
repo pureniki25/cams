@@ -1839,12 +1839,17 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         	   //如果是展期，需要根据信贷传来的批次ID来确定在哪个还款计划的基础上生成展期计划
         	 List<RepaymentBizPlan> plans =  repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id",businessId).eq("is_defer", 1));
         	   RepaymentBizPlan bizPlan =  repaymentBizPlanService.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("repayment_batch_id",projInfoReq.getBusinessAfterGuid()));
-        	   List<RepaymentBizPlanList> bizPlanLists =  repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id",bizPlan.getPlanId()));
-	           String index=bizPlanLists.get(0).getAfterId();
-	           index=index.split("-")[0];
+        	   List<RepaymentBizPlanList> bizPlanLists=null;
+        	    String index="";
+        	   if(bizPlan!=null) {
+        		   bizPlanLists =  repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("plan_id",bizPlan.getPlanId()));
+        		    index=bizPlanLists.get(0).getAfterId();
+        		    index=index.split("-")[0];
+        	   }else {
+        		   index="1";
+        	   }
 	           String businessIndex=(new DecimalFormat("00")).format(plans.size()+1);//计算这个业务现在是第几次展期
-        	  
-            afterId = index+"-ZQ"+businessIndex+periodStr;
+               afterId = index+"-ZQ"+businessIndex+"-"+periodStr;
          }else{
              afterId = size+"-"+periodStr;
          }
