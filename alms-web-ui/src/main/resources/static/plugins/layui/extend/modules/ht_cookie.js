@@ -53,6 +53,7 @@ layui.define([], function (exports) {
                 //对它解码
                 return unescape(value);
             }else if(cookie.getPara("token")){
+            	cookie.setToken(cookie.getPara("token"));
                 return cookie.getPara("token");
             }
             else return "";
