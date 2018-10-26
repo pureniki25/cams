@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,6 +46,7 @@ import com.hongte.alms.base.enums.BankEnum;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
 import com.hongte.alms.base.enums.TdrepayRechargePeriodTypeEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.feignClient.CasProjectFeignClient;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.service.AgencyRechargeLogService;
 import com.hongte.alms.base.service.BasicCompanyService;
@@ -119,7 +121,10 @@ public class TdrepayRechargeController {
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
 	private AgencyRechargeLogService agencyRechargeLogService;
-	
+
+	@Autowired
+	private CasProjectFeignClient casProjectFeignClient;
+
 	@Autowired
 	@Qualifier("TdrepayAdvanceLogService")
 	private TdrepayAdvanceLogService tdrepayAdvanceLogService;
@@ -460,7 +465,7 @@ public class TdrepayRechargeController {
 						infoVO.setBusinessTypeStr(BusinessTypeEnum.getName(infoVO.getBusinessType()));
 						infoVO.setRepaymentTypeStr(RepaySourceEnum.getName(infoVO.getRepaySource()));
 						infoVO.setPeriodTypeStr(TdrepayRechargePeriodTypeEnums.getValueByKey(infoVO.getSettleType()));
- 
+
 						if (StringUtil.notEmpty(infoVO.getPlatStatus())) {
 							infoVO.setPlatformTypeStr(
 									PlatformStatusTypeEnum.getName(Integer.valueOf(infoVO.getPlatStatus())));
@@ -472,7 +477,7 @@ public class TdrepayRechargeController {
 				}
 				return PageResult.success(resultList, count);
 			}
- 
+
 			return PageResult.success(0);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -528,12 +533,24 @@ public class TdrepayRechargeController {
 			paramMap.put("projectId", projectId);
 
 			TuandaiProjectInfo info = tuandaiProjectInfoService.selectById(projectId);
-			
+
 			if (info != null) {
 				paramMap2.put("userId", info.getTdUserId());
+			} else {
+				List<String> projectIds = new ArrayList<>();
+				projectIds.add(projectId);
+				com.ht.ussp.core.Result projectStatusResult = casProjectFeignClient.getProjectInfoList(projectIds);
+				if (projectStatusResult != null
+						&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(projectStatusResult.getReturnCode())
+						&& projectStatusResult.getData() != null) {
+					List<Map> lst = JSONObject.parseArray(JSONObject.toJSONString(projectStatusResult.getData()), Map.class);
+					if (CollectionUtils.isNotEmpty(lst)) {
+						Map map = lst.get(0);
+						paramMap2.put("userId", map.get("userId"));
+					}
+				}
 			}
-			
-			
+
 			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment参数信息，{}", paramMap);
 			com.ht.ussp.core.Result resultActual = eipRemote.queryProjectPayment(paramMap);
 			LOG.info("标的还款信息查询接口/eip/td/repayment/queryProjectPayment返回信息，{}", resultActual);
@@ -1257,7 +1274,7 @@ public class TdrepayRechargeController {
 			issueSendOutsideLog.setSystem(Constant.SYSTEM_CODE_EIP);
 			issueSendOutsideLog.setSendKey(projectId);
 			issueSendOutsideLog.setCreateTime(new Date());
-			
+
 			try {
 				LOG.info("调用偿还垫付接口/eip/td/repayment/advanceShareProfit，参数：{}", dtoJsonStr);
 				result = eipRemote.advanceShareProfit(dto);
@@ -1267,7 +1284,7 @@ public class TdrepayRechargeController {
 				issueSendOutsideLog.setReturnJson(e.getMessage());
 				LOG.error(e.getMessage(), e);
 			}
-			
+
 			issueSendOutsideLogService.insert(issueSendOutsideLog);
 
 			if (result != null) {
@@ -1302,7 +1319,7 @@ public class TdrepayRechargeController {
 	@GetMapping("/alsoToPayOneProject")
 	@ResponseBody
 	public Result<RepaymentProjPlan> alsoToPayOneProject(@RequestParam("alsoToPayProjectId") String alsoToPayProjectId,
-														 @RequestParam("alsoToPayAfterId") String alsoToPayAfterId) {
+			@RequestParam("alsoToPayAfterId") String alsoToPayAfterId) {
 		try {
 			if (StringUtil.isEmpty(alsoToPayProjectId) || StringUtil.isEmpty(alsoToPayAfterId)) {
 				return Result.error("-99", "标ID和afterId不能为空");
@@ -1310,11 +1327,8 @@ public class TdrepayRechargeController {
 
 			Integer[] arrStatus = { 0, 3, 4 };
 			List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-					.selectList(new EntityWrapper<TdrepayRechargeLog>()
-							.in("status", arrStatus)
-							.eq("is_valid", 1)
-							.eq("project_id",alsoToPayProjectId)
-							.eq("after_id",alsoToPayAfterId)
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().in("status", arrStatus).eq("is_valid", 1)
+							.eq("project_id", alsoToPayProjectId).eq("after_id", alsoToPayAfterId)
 							.eq("process_status", 2));
 
 			if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
@@ -1322,7 +1336,7 @@ public class TdrepayRechargeController {
 				for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 					oneLogAdvanceShareProfit(tdrepayRechargeLog);
 				}
-			}else{
+			} else {
 
 				return Result.error("-99", "此标没有可还垫付的资金分发记录");
 			}
@@ -1334,8 +1348,6 @@ public class TdrepayRechargeController {
 		}
 	}
 
-
-
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "偿还垫付功能")
 	@GetMapping("/advanceShareProfit")
@@ -1344,12 +1356,11 @@ public class TdrepayRechargeController {
 		// 1、查出所有偿还垫付失败和未偿还垫付的数据
 		Integer[] arrStatus = { 0, 3, 4 };
 		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-				.selectList(new EntityWrapper<TdrepayRechargeLog>().in("status", arrStatus).eq("is_valid", 1).eq("process_status", 2));
+				.selectList(new EntityWrapper<TdrepayRechargeLog>().in("status", arrStatus).eq("is_valid", 1)
+						.eq("process_status", 2));
 
-		
 		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
-			
-			
+
 			for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 				try {
 					oneLogAdvanceShareProfit(tdrepayRechargeLog);
@@ -1361,13 +1372,13 @@ public class TdrepayRechargeController {
 		return Result.success();
 	}
 
-
 	/**
 	 * 针对指定资金分发记录，执行还垫付
+	 * 
 	 * @param tdrepayRechargeLog
 	 * @return
 	 */
-	public Result  oneLogAdvanceShareProfit(TdrepayRechargeLog tdrepayRechargeLog){
+	public Result oneLogAdvanceShareProfit(TdrepayRechargeLog tdrepayRechargeLog) {
 		try {
 			// 3、根据 project_id 查询担保公司垫付记录、还垫付记录
 
@@ -1429,7 +1440,8 @@ public class TdrepayRechargeController {
 					if (tdProjectPaymentDTO.getPeriod() == period.intValue()) {
 						TdGuaranteePaymentDTO guaranteePayment = tdProjectPaymentDTO.getGuaranteePayment();
 						if (guaranteePayment != null) {
-							principalAndInterest = guaranteePayment.getPrincipalAndInterest() == null ? principalAndInterest
+							principalAndInterest = guaranteePayment.getPrincipalAndInterest() == null
+									? principalAndInterest
 									: guaranteePayment.getPrincipalAndInterest();
 							penaltyAmount = guaranteePayment.getPenaltyAmount() == null ? penaltyAmount
 									: guaranteePayment.getPenaltyAmount();
@@ -1439,7 +1451,8 @@ public class TdrepayRechargeController {
 							}
 							tuandaiAmount = guaranteePayment.getTuandaiAmount() == null ? tuandaiAmount
 									: guaranteePayment.getTuandaiAmount();
-							orgAmount = guaranteePayment.getOrgAmount() == null ? orgAmount : guaranteePayment.getOrgAmount();
+							orgAmount = guaranteePayment.getOrgAmount() == null ? orgAmount
+									: guaranteePayment.getOrgAmount();
 							guaranteeAmount = guaranteePayment.getGuaranteeAmount() == null ? guaranteeAmount
 									: guaranteePayment.getGuaranteeAmount();
 							arbitrationAmount = guaranteePayment.getArbitrationAmount() == null ? arbitrationAmount
@@ -1495,28 +1508,25 @@ public class TdrepayRechargeController {
 				tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
 				throw new ServiceRuntimeException(
 						"标的号：" + projectId + "，在平台期数：" + period + "没有未还垫付记录。totalAmount = " + totalAmount);
-				
+
 			}
 
 			/*
-			 *  6、根据 tdUserId 查询存管账户余额, 比较应还垫付总额与客户存管账户余额记录
-			 *   a.若是主借标，则只查询主借款人账户余额；
-			 *   b.若是共借标：
-			 *   	若共借人存管账户余额若大于或等于应还垫付总额，则传结清状态给平台，调用偿还垫付接口
-			 *   	若共借人存管账户余额若小于应还垫付总额，则还需查询主借人存管账户余额：
-			 *   		若主、共借人存管账户余额之和大于或等于应还垫付总额，则传结清状态给平台，调用偿还垫付接口
-			 *   		若主、共借人存管账户余额之和小于应还垫付总额，则传结非清状态给平台，调用偿还垫付接口
+			 * 6、根据 tdUserId 查询存管账户余额, 比较应还垫付总额与客户存管账户余额记录 a.若是主借标，则只查询主借款人账户余额； b.若是共借标：
+			 * 若共借人存管账户余额若大于或等于应还垫付总额，则传结清状态给平台，调用偿还垫付接口 若共借人存管账户余额若小于应还垫付总额，则还需查询主借人存管账户余额：
+			 * 若主、共借人存管账户余额之和大于或等于应还垫付总额，则传结清状态给平台，调用偿还垫付接口
+			 * 若主、共借人存管账户余额之和小于应还垫付总额，则传结非清状态给平台，调用偿还垫付接口
 			 */
 
 			// 查询客户存管账户余额
 			BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
 
 			Set<Integer> businessTypes = new HashSet<>();
-			businessTypes.add(28);	// 商贸贷共借
-			businessTypes.add(29);	// 业主贷共借
-			businessTypes.add(31);	// 车贷共借
-			businessTypes.add(32);	// 房贷共借
-			businessTypes.add(33);	// 一点车贷共借
+			businessTypes.add(28); // 商贸贷共借
+			businessTypes.add(29); // 业主贷共借
+			businessTypes.add(31); // 车贷共借
+			businessTypes.add(32); // 房贷共借
+			businessTypes.add(33); // 一点车贷共借
 
 			// 若是共借标，则需要查找主借标的 tdUserId
 			if (businessTypes.contains(tdrepayRechargeLog.getBusinessType())) {
@@ -1533,7 +1543,7 @@ public class TdrepayRechargeController {
 					if (aviMoney.compareTo(totalAmount) >= 0) {
 						advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
 								orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
-					}else {
+					} else {
 						totalAmount = aviMoney;
 						if (aviMoney.compareTo(principalAndInterest3) > 0) {
 							aviMoney = aviMoney.subtract(principalAndInterest3);
@@ -1541,16 +1551,16 @@ public class TdrepayRechargeController {
 								aviMoney = aviMoney.subtract(tuandaiAmount3);
 								if (aviMoney.compareTo(guaranteeAmount3) > 0) {
 									orgAmount3 = aviMoney.subtract(guaranteeAmount3);
-								}else {
+								} else {
 									guaranteeAmount3 = aviMoney;
 									orgAmount3 = BigDecimal.ZERO;
 								}
-							}else {
+							} else {
 								tuandaiAmount3 = aviMoney;
 								guaranteeAmount3 = BigDecimal.ZERO;
 								orgAmount3 = BigDecimal.ZERO;
 							}
-						}else {
+						} else {
 							principalAndInterest3 = aviMoney;
 							tuandaiAmount3 = BigDecimal.ZERO;
 							guaranteeAmount3 = BigDecimal.ZERO;
@@ -1559,15 +1569,15 @@ public class TdrepayRechargeController {
 						advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
 								orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 0);
 					}
-				}else {
-					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
-							orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
+				} else {
+					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3, orgAmount3,
+							guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
 				}
-			}else {
+			} else {
 				if (aviMoney.compareTo(totalAmount) >= 0) {
-					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
-							orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
-				}else {
+					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3, orgAmount3,
+							guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
+				} else {
 					totalAmount = aviMoney;
 					if (aviMoney.compareTo(principalAndInterest3) > 0) {
 						aviMoney = aviMoney.subtract(principalAndInterest3);
@@ -1575,34 +1585,35 @@ public class TdrepayRechargeController {
 							aviMoney = aviMoney.subtract(tuandaiAmount3);
 							if (aviMoney.compareTo(guaranteeAmount3) > 0) {
 								orgAmount3 = aviMoney.subtract(guaranteeAmount3);
-							}else {
+							} else {
 								guaranteeAmount3 = aviMoney;
 								orgAmount3 = BigDecimal.ZERO;
 							}
-						}else {
+						} else {
 							tuandaiAmount3 = aviMoney;
 							guaranteeAmount3 = BigDecimal.ZERO;
 							orgAmount3 = BigDecimal.ZERO;
 						}
-					}else {
+					} else {
 						principalAndInterest3 = aviMoney;
 						tuandaiAmount3 = BigDecimal.ZERO;
 						guaranteeAmount3 = BigDecimal.ZERO;
 						orgAmount3 = BigDecimal.ZERO;
 					}
-					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3,
-							orgAmount3, guaranteeAmount3, arbitrationAmount3, totalAmount, period, 0);
+					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3, orgAmount3,
+							guaranteeAmount3, arbitrationAmount3, totalAmount, period, 0);
 				}
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new ServiceRuntimeException(e.getMessage(), e);
 		}
-		return  Result.success();
+		return Result.success();
 	}
 
 	/**
 	 * 偿还垫付
+	 * 
 	 * @param tdrepayRechargeLog
 	 * @param projectId
 	 * @param principalAndInterest3
@@ -1642,7 +1653,7 @@ public class TdrepayRechargeController {
 		issueSendOutsideLog.setInterfacename(Constant.INTERFACE_NAME_ADVANCE_SHARE_PROFIT);
 		issueSendOutsideLog.setSystem(Constant.SYSTEM_CODE_EIP);
 		issueSendOutsideLog.setSendKey(projectId);
-		
+
 		// 偿还垫付记录
 		TdrepayAdvanceLog tdrepayAdvanceLog = new TdrepayAdvanceLog();
 		tdrepayAdvanceLog.setProjectId(projectId);
@@ -1663,7 +1674,7 @@ public class TdrepayRechargeController {
 		LOG.info("偿还垫付接口/eip/td/repayment/advanceShareProfit返回信息，{}", result);
 
 		issueSendOutsideLog.setReturnJson(JSONObject.toJSONString(result));
-		
+
 		if (result != null) {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("projectId", projectId);
@@ -1672,29 +1683,30 @@ public class TdrepayRechargeController {
 			LOG.info("还垫付信息查询接口/eip/td/repayment/returnAdvanceShareProfit返回信息，{}", advanceShareProfitResult);
 
 			int logStatus = 4;
-			
-			if (advanceShareProfitResult != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(advanceShareProfitResult.getReturnCode())
+
+			if (advanceShareProfitResult != null
+					&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(advanceShareProfitResult.getReturnCode())
 					&& advanceShareProfitResult.getData() != null) {
-					JSONObject parseObject = (JSONObject) JSONObject.toJSON(advanceShareProfitResult.getData());
-					if (parseObject.get("returnAdvanceShareProfits") != null) {
-						List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = JSONObject.parseArray(
-								JSONObject.toJSONString(parseObject.get("returnAdvanceShareProfits")),
-								TdReturnAdvanceShareProfitDTO.class);
-						if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
-							for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
-								if (tdReturnAdvanceShareProfitDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()
-										&& tdReturnAdvanceShareProfitDTO.getStatus() == 1) {
-									logStatus = 2;
-								}
+				JSONObject parseObject = (JSONObject) JSONObject.toJSON(advanceShareProfitResult.getData());
+				if (parseObject.get("returnAdvanceShareProfits") != null) {
+					List<TdReturnAdvanceShareProfitDTO> returnAdvanceShareProfits = JSONObject.parseArray(
+							JSONObject.toJSONString(parseObject.get("returnAdvanceShareProfits")),
+							TdReturnAdvanceShareProfitDTO.class);
+					if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
+						for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
+							if (tdReturnAdvanceShareProfitDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()
+									&& tdReturnAdvanceShareProfitDTO.getStatus() == 1) {
+								logStatus = 2;
 							}
-						}else {
-							logStatus = 4;
 						}
+					} else {
+						logStatus = 4;
 					}
+				}
 			}
 			if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 				tdrepayAdvanceLog.setAdvanceStatus(1);
-			}else {
+			} else {
 				tdrepayAdvanceLog.setAdvanceStatus(2);
 			}
 			tdrepayRechargeLog.setStatus(logStatus);
@@ -1709,9 +1721,10 @@ public class TdrepayRechargeController {
 		issueSendOutsideLogService.insert(issueSendOutsideLog);
 		tdrepayAdvanceLogService.insert(tdrepayAdvanceLog);
 	}
-	
+
 	/**
 	 * 查询客户存管账户余额
+	 * 
 	 * @param tdUserId
 	 * @return
 	 */
@@ -1722,12 +1735,10 @@ public class TdrepayRechargeController {
 		LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet参数信息，{}", paramMap);
 		com.ht.ussp.core.Result result = eipRemote.queryUserAviMoneyForNet(paramMap);
 		LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet返回信息，{}", result);
-		
-		if (result != null
-				&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+
+		if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
 				&& result.getData() != null) {
-			Map map = JSONObject.parseObject(JSONObject.toJSONString(result.getData()),
-					Map.class);
+			Map map = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), Map.class);
 			if (map != null) {
 				return map.get("AviMoney") == null ? BigDecimal.ZERO : (BigDecimal) map.get("AviMoney");
 			}

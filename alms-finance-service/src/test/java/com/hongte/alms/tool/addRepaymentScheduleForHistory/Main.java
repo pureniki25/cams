@@ -78,7 +78,7 @@ public class Main {
 //				 .where(" project_id in  ('30123949-7e62-4acd-9cba-516babf8e493','d551381b-5352-484d-9fd2-19c2960045b0','ec11bd46-96a8-4a16-9587-ce58d80dc0b7') ").orderBy("create_time"));
 		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper
 				.selectList(new EntityWrapper<TuandaiProjectInfo>()
-						.where(" plate_type = 1 and DATE( create_time ) >= '2018-06-28' ").orderBy("create_time"));
+						.where(" PLATE_TYPE = 1 AND DATE(CREATE_TIME) >= '2018-06-28' AND DATE(CREATE_TIME) <= '2018-10-25' ").orderBy("create_time"));
 		for (TuandaiProjectInfo tuandaiProjectInfo : selectList) {
 			Req req = new Req();
 
