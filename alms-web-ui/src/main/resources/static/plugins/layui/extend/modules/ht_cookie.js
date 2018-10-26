@@ -21,6 +21,12 @@ layui.define([], function (exports) {
             var _expires = (typeof times) == "string" ? "" : ";expires=" + expires.toUTCString();
             document.cookie = name + "=" + value + _expires + path;
         },
+        getPara:function(name){
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); // 构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  // 匹配目标参数
+            if (r != null) return unescape(r[2]);
+            return null; // 返回参数值
+        },
         /**
          * 获取cookie
          * @param name
@@ -46,6 +52,9 @@ layui.define([], function (exports) {
                 var value = allcookies.substring(start, end);
                 //对它解码
                 return unescape(value);
+            }else if(cookie.getPara("token")){
+            	cookie.setToken(cookie.getPara("token"));
+                return cookie.getPara("token");
             }
             else return "";
         }
