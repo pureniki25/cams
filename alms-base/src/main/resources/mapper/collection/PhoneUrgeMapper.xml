@@ -422,15 +422,15 @@
             </if>
             <!--             /*逾期天数 开始*/-->
             <if test="delayDaysBegin !=null ">
-           <!--      <![CDATA[ and pList.overdue_days >= #{delayDaysBegin}]]> -->
-                <![CDATA[ and pList.delay_days_ext >= #{delayDaysBegin}]]>
+                <![CDATA[ and pList.overdue_days >= #{delayDaysBegin}]]>
+              <!--  <![CDATA[ and pList.delay_days_ext >= #{delayDaysBegin}]]>  -->
             </if>
             <!--       /*逾期天数 结束*/ -->
             <if test="delayDaysEnd !=null ">
-             	<!-- <![CDATA[ and pList.overdue_days < #{delayDaysEnd}]]> -->
-                <![CDATA[ and pList.delay_days_ext < #{delayDaysEnd}]]>
-            </if>
-            <!--          /*//业务获取*/ -->
+             	 <![CDATA[ and pList.overdue_days < #{delayDaysEnd}]]>
+            <!-- <![CDATA[ and pList.delay_days_ext < #{delayDaysEnd}]]> -->
+        </if>
+        <!--          /*//业务获取*/ -->
             <if test="operatorName !=null and operatorName !='' ">
                 and pList.operator_name_ext LIKE '%${operatorName}%'
             </if>
