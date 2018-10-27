@@ -1903,7 +1903,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
 						for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
 							if (tdReturnAdvanceShareProfitDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()
-									&& tdReturnAdvanceShareProfitDTO.getStatus() == 1) {
+									&& tdReturnAdvanceShareProfitDTO.getStatus() == 1 && tdrepayRechargeLog.getSettleType().intValue() == 0) {
 								logStatus = 2;
 								break;
 							}
