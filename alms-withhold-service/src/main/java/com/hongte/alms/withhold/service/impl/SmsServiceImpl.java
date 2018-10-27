@@ -258,7 +258,7 @@ public class SmsServiceImpl implements SmsService{
 			for(Iterator<RepaymentBizPlanList> it = remindLists.iterator();it.hasNext();) {
 				RepaymentBizPlanList pList=it.next();
 				List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", pList.getOrigBusinessId()));
-				if(plans.size()>1&&!istLastPeriod(pList)) {
+				if(plans.size()==1&&!istLastPeriod(pList)) {
 					it.remove();
 				}
 			}
