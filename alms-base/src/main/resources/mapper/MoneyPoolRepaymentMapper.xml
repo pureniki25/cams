@@ -62,6 +62,7 @@
 		  IFNULL(wrl.`current_amount`, 0) currentAmount,
 		  '收入' incomeType,
 		  wrl.`create_time` tradeTime,
+		  rbpl.period,
 		  CASE
 		    wp.`platform_id` 
 		    WHEN 5 
@@ -80,12 +81,15 @@
 		  END accountName 
 		FROM
 		  `tb_withholding_repayment_log` wrl 
+		  JOIN tb_repayment_biz_plan_list rbpl 
+		    ON wrl.after_id = rbpl.after_id 
 		  LEFT JOIN `tb_withholding_platform` wp 
 		    ON wrl.`bind_platform_id` = wp.`platform_id` 
-		  left join tb_repayment_resource rr on rr.repay_source_ref_id = wrl.log_id
-		  WHERE wrl.`repay_status` = 1 
-		    AND wrl.original_business_id = #{businessId,jdbcType=VARCHAR}
-		  and rr.is_cancelled = 0 
+		  LEFT JOIN tb_repayment_resource rr 
+		    ON rr.repay_source_ref_id = wrl.log_id 
+		WHERE wrl.`repay_status` = 1 
+		  AND wrl.original_business_id = #{businessId,jdbcType=VARCHAR} 
+		  AND rr.is_cancelled = 0 
 		UNION
 		ALL 
 		SELECT 
@@ -98,56 +102,43 @@
 		    ELSE '支出' 
 		  END incomeType,
 		  mpr.trade_date tradeTime,
+		  lst.period,
 		  '线下转账' tradeType,
 		  mpr.bank_account accountName 
 		FROM
 		  `tb_money_pool_repayment` mpr,
-		  `tb_repayment_biz_plan_list` lst ,
-		 tb_repayment_resource rr 
+		  `tb_repayment_biz_plan_list` lst,
+		  tb_repayment_resource rr 
 		WHERE mpr.plan_list_id = lst.plan_list_id 
 		  AND rr.repay_source_ref_id = mpr.id 
-		  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
-		  AND mpr.income_type IN (1, 2)
-		  AND mpr.is_finance_match = 1
+		  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR} 
+		  AND mpr.income_type IN (1, 2) 
+		  AND mpr.is_finance_match = 1 
 		  AND mpr.state = '财务确认已还款' 
-		  and rr.is_cancelled = 0
+		  AND rr.is_cancelled = 0 
 		UNION
-		ALL
-	<!-- 	  SELECT 
-			  rr.`after_id` afterId,
-			  rr.`repay_amount` currentAmount,
-			  '支出' incomeType,
-			  rr.repay_date tradeTime,
-			  '结余转还款' tradeType,
-			  '' accountName 
-			FROM
-			  `tb_repayment_biz_plan_list` lst,
-			  tb_repayment_resource rr,
-			  tb_accountant_over_repay_log aorl 
-			WHERE rr.after_id = lst.after_id
-			  AND rr.repay_source_ref_id = aorl.log_id 
-			  AND lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
-			  AND rr.is_cancelled = 0 
-			  AND aorl.money_type = 0 
-		ORDER BY 1, 4 -->
+		ALL 
 		SELECT 
-			  rr.`after_id` afterId,
-			  rr.`repay_amount` currentAmount,
-			  '支出' incomeType,
-			  rr.repay_date tradeTime,
-			  '结余转还款' tradeType,
-			  '' accountName 
-			FROM
-			  `tb_repayment_biz_plan_list` lst
-				left join 
-				tb_repayment_confirm_log l on ( lst.business_id = l.business_id and lst.after_id = l.after_id )
-				left join 
-			  tb_repayment_resource rr on l.confirm_log_id = rr.confirm_log_id 
-			WHERE 
-			   lst.orig_business_id = #{businessId,jdbcType=VARCHAR}
-				 AND l.is_cancelled = 0  
-				 and rr.repay_source = 11 
-		ORDER BY 1, 4
+		  rr.`after_id` afterId,
+		  rr.`repay_amount` currentAmount,
+		  '支出' incomeType,
+		  rr.repay_date tradeTime,
+		  lst.period,
+		  '结余转还款' tradeType,
+		  '' accountName 
+		FROM
+		  `tb_repayment_biz_plan_list` lst 
+		  LEFT JOIN tb_repayment_confirm_log l 
+		    ON (
+		      lst.business_id = l.business_id 
+		      AND lst.after_id = l.after_id
+		    ) 
+		  LEFT JOIN tb_repayment_resource rr 
+		    ON l.confirm_log_id = rr.confirm_log_id 
+		WHERE lst.orig_business_id = #{businessId,jdbcType=VARCHAR} 
+		  AND l.is_cancelled = 0 
+		  AND rr.repay_source = 11 
+		ORDER BY 5,1,4 
 	</select>
 
     <select id="getCustomerRepayFlowPageList" parameterType="com.hongte.alms.base.customer.vo.CustomerRepayFlowListReq"
