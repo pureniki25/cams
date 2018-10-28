@@ -5,6 +5,7 @@ import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.dto.RepaymentPlanInfoDTO;
 import com.hongte.alms.base.dto.RepaymentProjInfoDTO;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.WithholdingRepaymentLog;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.common.mapper.SuperMapper;
@@ -147,5 +148,5 @@ public interface RepaymentBizPlanListMapper extends SuperMapper<RepaymentBizPlan
      * 查找代扣成功没有核销的记录
      */
     
-    List<RepaymentBizPlanList> searchNoCancelList();
+    List<WithholdingRepaymentLog> searchNoCancelList();
 }

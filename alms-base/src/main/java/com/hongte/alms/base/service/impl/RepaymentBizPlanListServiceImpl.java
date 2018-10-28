@@ -449,7 +449,6 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 
 	@Override
 	public List<WithholdingRepaymentLog> searchNoCancelList() {
-		repaymentBizPlanListMapper.searchNoCancelList();
-		return null;
+		return repaymentBizPlanListMapper.searchNoCancelList();
 	}
 }
