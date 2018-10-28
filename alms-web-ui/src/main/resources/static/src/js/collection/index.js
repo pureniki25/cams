@@ -716,8 +716,7 @@ window.layinit(function(htConfig){
                                     {
                                         "name": "还款详情", click: function (e, currentItem) {
                                         	console.log("currentItem:", currentItem)
-        	                                var url = '/finance/repaymentPlanInfo?businessId=' + currentItem.businessId + '&customer=' + currentItem.customerName + '&phoneNumber=' + currentItem.phoneNumber +
-                                            '&repaymentType=' + currentItem.repaymentType + '&borrowMoney=' + currentItem.borrowMoney + '&borrowLimit=' + currentItem.borrowLimit + '&plateType=' + currentItem.plateType;
+        	                                var url = '/finance/repaymentPlanInfo?businessId=' + currentItem.businessId;
         	                                showOneLineOprLayer(url, "还款详情")
 
                                         }

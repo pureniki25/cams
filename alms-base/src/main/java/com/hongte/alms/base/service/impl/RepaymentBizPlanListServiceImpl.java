@@ -35,6 +35,7 @@ import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.base.service.RepaymentResourceService;
 import com.hongte.alms.base.service.SysBankLimitService;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
+import com.hongte.alms.base.vo.finance.RepaymentPlanBaseInfoVo;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
@@ -450,5 +451,10 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 	@Override
 	public List<WithholdingRepaymentLog> searchNoCancelList() {
 		return repaymentBizPlanListMapper.searchNoCancelList();
+	}
+	
+	@Override
+	public RepaymentPlanBaseInfoVo queryBaseInfoByBusinessId(String businessId) {
+		return repaymentBizPlanListMapper.queryBaseInfoByBusinessId(businessId);
 	}
 }
