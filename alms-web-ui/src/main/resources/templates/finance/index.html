@@ -21,12 +21,18 @@
     <div id="app" v-cloak>
         <layout>
             <Header>
-                <i-form ref="form" show-message label-width="90" label-position="right" inline autocomplete="off" model="form" style="text-align: right;">
+                <i-form ref="form" show-message label-width="90" label-position="right" inline autocomplete="off" model="form" >
                     <form-item label="客户姓名">
                         <i-input v-model="form.customer"></i-input>
                     </form-item>
                     <form-item label="业务编号">
                         <i-input v-model="form.businessId"></i-input>
+                    </form-item>
+                    <form-item label="应还日期">
+                        <date-picker format="yyyy-MM-dd" v-model="form.repayDate" placeholder="应还日期" @on-change="form.repayDate=$event" clearable></date-picker>
+                    </form-item>
+                    <form-item label="还款登记日期">
+                        <date-picker type="daterange" split-panels format="yyyy-MM-dd" placeholder="还款登记日期" @on-change="form.regDateStart=$event[0];form.regDateEnd=$event[1];console.log($event);" clearable></date-picker>
                     </form-item>
                     <!-- <form-item label="是否本金到期">
                         <i-select v-model="form.principalDeadLine" placeholder="请选择">
@@ -53,12 +59,6 @@
                         <i-select v-model="form.businessType" placeholder="请选择" style="width: 180px;text-align: left" filterable clearable>
                             <i-option v-for="item in businessTypes" :value="item.businessTypeId" >{{item.businessTypeName}}</i-option>
                         </i-select>
-                    </form-item>
-                    <form-item label="应还日期">
-                        <date-picker format="yyyy-MM-dd" v-model="form.repayDate" placeholder="应还日期" @on-change="form.repayDate=$event" clearable></date-picker>
-                    </form-item>
-                    <form-item label="还款登记日期">
-                        <date-picker type="daterange" split-panels format="yyyy-MM-dd" placeholder="还款登记日期" @on-change="form.regDateStart=$event[0];form.regDateEnd=$event[1];console.log($event);" clearable></date-picker>
                     </form-item>
                     <form-item label="还款状态">
                         <i-select v-model="form.status" placeholder="请选择" filterable clearable style="width: 180px;text-align: left">
