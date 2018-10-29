@@ -49,41 +49,106 @@ public class RepaymentBizPlanListSynchController {
 			public void run() {
 				Long startLongDate = new Date().getTime();
 				// 1循环取10000条插入
-				synchRepaymentBizPlanListAdd();
+				try {
+					synchRepaymentBizPlanListAdd();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》插入同步表出错");
+					e.printStackTrace();
+				}
 				// 2处理删除
-				synchRepaymentBizPlanListDel();
+				try {
+					synchRepaymentBizPlanListDel();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理删除出错");
+					e.printStackTrace();
+				}
 				// 3处理更新
 				// 3-1处理tb_repayment_biz_plan_list表更新
-				synchRepaymentBizPlanList();
+				try {
+					synchRepaymentBizPlanList();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理更新出错");
+					e.printStackTrace();
+				}
 
 				// 3-4处理tb_repayment_biz_plan表更新
 				// 3-2处理tb_basic_businessg表更新
-				synchRepaymentBizPlan();
-				synchBasicBusinessg();
+				try {
+					synchRepaymentBizPlan();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理还款计划更新出错");
+					e.printStackTrace();
+				}
+				try {
+					synchBasicBusinessg();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理业务更新出错");
+					e.printStackTrace();
+				}
 
 				// 3-3处理tb_collection_status表更新
-				synchCollectionStatus();
+				try {
+					synchCollectionStatus();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理催收更新出错");
+					e.printStackTrace();
+				}
 
 				// 3-5处理tb_five_level_classify_business_change_log表更新
-				synchFiveLevelClassifyBusinessChangeLog();
+				try {
+					synchFiveLevelClassifyBusinessChangeLog();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理五级分类更新出错");
+					e.printStackTrace();
+				}
 
 				// 3-6处理tb_repayment_biz_plan表更新
-				synchBasicBusinessCustomer();
+				try {
+					synchBasicBusinessCustomer();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理客户信息更新出错");
+					e.printStackTrace();
+				}
 
 				// 3-7处理tb_repayment_biz_plan_list_detail表更新
-				synchRepaymentBizPlanListDetail();
+				try {
+					synchRepaymentBizPlanListDetail();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理费用项信息更新出错");
+					e.printStackTrace();
+				}
 
 				// 3-8处理tb_basic_company表更新
-				synchBasicCompany();
+				try {
+					synchBasicCompany();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理公司信息更新出错");
+					e.printStackTrace();
+				}
 
 				// 3-9处理tb_tuandai_project_info表更新
-				synchTuandaiProjectInfo();
+				try {
+					synchTuandaiProjectInfo();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》标的信息更新出错");
+					e.printStackTrace();
+				}
 
 				// 3-10处理tb_money_pool_repayment表更新
-				synchMoneyPoolRepayment();
+				try {
+					synchMoneyPoolRepayment();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》处理借款信息更新出错");
+					e.printStackTrace();
+				}
 
 				// 3-11处理tb_basic_business_type表更新
-				updateBasicBusinessType();
+				try {
+					updateBasicBusinessType();
+				} catch (Exception e) {
+					logger.error("处理还款计划表同步》更新业务类型信息出错");
+					e.printStackTrace();
+				}
 				Long endLongDate = new Date().getTime();
 				System.err.println("同步结束,耗时：" + (endLongDate - startLongDate));
 			}
@@ -114,9 +179,7 @@ public class RepaymentBizPlanListSynchController {
 
 
 	private void synchRepaymentBizPlanListDel() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering synchRepaymentBizPlanListDel()");
-		}
+		logger.info("entering synchRepaymentBizPlanListDel()");
 		Wrapper<RepaymentBizPlanListSynch> wrapperDelId = new EntityWrapper<>();
 		wrapperDelId.isNull("t2.plan_list_id");
 		wrapperDelId.last(" limit 1000 ");
@@ -125,16 +188,12 @@ public class RepaymentBizPlanListSynchController {
 			repaymentBizPlanListSynchService.deleteBatchIds(listDelId);
 			listDelId = repaymentBizPlanListSynchService.selectdelList(wrapperDelId);
 		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting synchRepaymentBizPlanListDel()");
-		}
+		logger.info("exiting synchRepaymentBizPlanListDel()");
 	}
 
 
 	private void synchRepaymentBizPlanListAdd() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering synchRepaymentBizPlanListAdd()");
-		}
+		logger.info("entering synchRepaymentBizPlanListAdd()");
 		Wrapper<RepaymentBizPlanListSynch> wrapperRepaymentBizPlanListSynch = new EntityWrapper<>();
 		wrapperRepaymentBizPlanListSynch.isNull("t1.plan_list_id");
 		wrapperRepaymentBizPlanListSynch.last(" limit 1 ");
@@ -144,9 +203,7 @@ public class RepaymentBizPlanListSynchController {
 			repaymentBizPlanListSynchService.addRepaymentBizPlanListSynch();
 			list = repaymentBizPlanListSynchService.selectAddList(wrapperRepaymentBizPlanListSynch);
 		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting synchRepaymentBizPlanListAdd()");
-		}
+		logger.info("exiting synchRepaymentBizPlanListAdd()");
 	}
 	
 	
@@ -158,13 +215,9 @@ public class RepaymentBizPlanListSynchController {
 	 * @throws  null
 	 */
 	private void synchRepaymentBizPlanList() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering synchRepaymentBizPlanList()");
-		}
+		logger.info("entering synchRepaymentBizPlanList()");
 		repaymentBizPlanListSynchService.updateRepaymentBizPlanList();
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting synchRepaymentBizPlanList()");
-		}
+		logger.info("exiting synchRepaymentBizPlanList()");
 	}
 	
 	/**
@@ -175,13 +228,9 @@ public class RepaymentBizPlanListSynchController {
 	 * @throws  null
 	 */
 	private void synchBasicBusinessg() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering synchBasicBusinessg()");
-		}
+		logger.info("entering synchBasicBusinessg()");
 		repaymentBizPlanListSynchService.updateBasicBusinessg();
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting synchBasicBusinessg()");
-		}
+		logger.info("exiting synchBasicBusinessg()");
 	}
 	
 	/**
@@ -192,13 +241,9 @@ public class RepaymentBizPlanListSynchController {
 	 * @throws  3-3
 	 */
 	private void synchCollectionStatus() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering synchCollectionStatus()");
-		}
+		logger.info("entering synchCollectionStatus()");
 		repaymentBizPlanListSynchService.updateCollectionStatus();
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting synchCollectionStatus()");
-		}
+		logger.info("exiting synchCollectionStatus()");
 	}
 	
 	/**
@@ -209,13 +254,9 @@ public class RepaymentBizPlanListSynchController {
 	 * @throws  null
 	 */
 	private void synchRepaymentBizPlan() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering synchRepaymentBizPlan()");
-		}
+		logger.info("entering synchRepaymentBizPlan()");
 		repaymentBizPlanListSynchService.updateRepaymentBizPlan();
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting synchRepaymentBizPlan()");
-		}
+		logger.info("exiting synchRepaymentBizPlan()");
 	}
 	
 	/**
@@ -226,13 +267,9 @@ public class RepaymentBizPlanListSynchController {
 	 * @throws  null
 	 */
 	private void synchFiveLevelClassifyBusinessChangeLog() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering synchFiveLevelClassifyBusinessChangeLog()");
-		}
+		logger.info("entering synchFiveLevelClassifyBusinessChangeLog()");
 		repaymentBizPlanListSynchService.updateFiveLevelClassifyBusinessChangeLog();
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting synchFiveLevelClassifyBusinessChangeLog()");
-		}
+		logger.info("exiting synchFiveLevelClassifyBusinessChangeLog()");
 	}
 	
 	/**
@@ -243,13 +280,9 @@ public class RepaymentBizPlanListSynchController {
 	 * @throws  null
 	 */
 	private void synchBasicBusinessCustomer() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering synchBasicBusinessCustomer()");
-		}
+		logger.info("entering synchBasicBusinessCustomer()");
 		repaymentBizPlanListSynchService.updateBasicBusinessCustomer();
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting synchBasicBusinessCustomer()");
-		}
+		logger.info("exiting synchBasicBusinessCustomer()");
 	}
 	
 	/**
@@ -260,13 +293,9 @@ public class RepaymentBizPlanListSynchController {
 	 * @throws  
 	 */
 	private void synchRepaymentBizPlanListDetail() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering synchRepaymentBizPlanListDetail()");
-		}
+		logger.info("entering synchRepaymentBizPlanListDetail()");
 		repaymentBizPlanListSynchService.updateRepaymentBizPlanListDetail();
-		if (logger.isDebugEnabled()) {
-			logger.debug("exiting synchRepaymentBizPlanListDetail()");
-		}
+		logger.info("exiting synchRepaymentBizPlanListDetail()");
 	}
 
 }

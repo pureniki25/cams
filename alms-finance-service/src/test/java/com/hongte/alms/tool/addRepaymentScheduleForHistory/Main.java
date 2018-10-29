@@ -46,6 +46,7 @@ import com.ht.ussp.core.ReturnCodeEnum;
 import com.thoughtworks.xstream.mapper.Mapper;
 
 /**
+ * 历史标的补发给平台,只补发6月28后生成且在平台处于还款中的期数
  * @author 王继光 2018年9月25日 上午10:12:48
  */
 @RunWith(SpringRunner.class)
@@ -73,9 +74,8 @@ public class Main {
 	@Test
 	public void run() {
 
-		// List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new
-		// EntityWrapper<TuandaiProjectInfo>().where(" project_id in
-		// ('84fcf55e-9748-49fc-a5ca-054530479aab') ").orderBy("create_time"));
+//		 List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>()
+//				 .where(" project_id in  ('30123949-7e62-4acd-9cba-516babf8e493','d551381b-5352-484d-9fd2-19c2960045b0','ec11bd46-96a8-4a16-9587-ce58d80dc0b7') ").orderBy("create_time"));
 		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper
 				.selectList(new EntityWrapper<TuandaiProjectInfo>()
 						.where(" plate_type = 1 and DATE( create_time ) >= '2018-06-28' ").orderBy("create_time"));
@@ -191,6 +191,9 @@ public class Main {
 		Result res = api.addRepaymentScheduleForHistory(req);
 		if (res.getReturnCode().equals(ReturnCodeEnum.SUCCESS.getReturnCode())) {
 			// System.out.println(JSON.toJSONString(result));
+			System.out.println(JSON.toJSONString(result.getData()));
+			System.out.println(JSON.toJSONString(req));
+			System.out.println(JSON.toJSONString(res));
 		} else {
 			System.err.println(JSON.toJSONString(result.getData()));
 			System.err.println(JSON.toJSONString(req));
@@ -200,19 +203,4 @@ public class Main {
 
 	}
 
-	private boolean hasRepaid(List<TdProjectPaymentDTO> tdProjectPaymentDTOs,
-			TdPlatformPlanRepaymentDTO tdPlatformPlanRepaymentDTO) {
-		for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
-			if (tdPlatformPlanRepaymentDTO.getPeriod() == tdProjectPaymentDTO.getPeriod()) {
-				if (tdProjectPaymentDTO.getStatus() == 1) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-		}
-
-		return false;
-
-	}
 }

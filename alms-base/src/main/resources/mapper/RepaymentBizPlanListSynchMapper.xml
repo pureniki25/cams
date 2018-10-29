@@ -159,19 +159,7 @@
 		t2.total_borrow_amount,
 		t2.overdue_amount,
 		t2.overdue_days,
-		(
-        <![CDATA[
-              case
-                WHEN t2.due_date is null then 0
-                WHEN t2.due_date>now() THEN 0
-                WHEN t2.current_status = '逾期' then to_days(now())- to_days(t2.due_date)
-                WHEN t2.fact_repay_date is null then to_days(now())- to_days(t2.due_date)
-                WHEN t2.fact_repay_date<t2.due_date THEN 0
-                WHEN ( !ISNULL(t2.repay_flag) AND t2.repay_flag != 0) THEN 0
-                ELSE to_days(t2.fact_repay_date)- to_days(t2.due_date)
-                end
-            ]]>
-        ),
+		t2.overdue_days,
 		t2.current_status,
 		t2.repay_flag,
 		t2.fact_repay_date,
@@ -220,7 +208,7 @@
 		t1.total_borrow_amount = t2.total_borrow_amount,
 		t1.overdue_amount = t2.overdue_amount,
 		t1.overdue_days = t2.overdue_days,
-		t1.delay_days_ext =
+		<!-- t1.delay_days_ext =
 		(
         <![CDATA[
               case
@@ -233,7 +221,7 @@
                 ELSE  to_days(t2.fact_repay_date)- to_days(t2.due_date)
                 end
             ]]>
-        ),
+        ), -->
 		t1.current_status = t2.current_status,
 		t1.repay_flag = t2.repay_flag,
 		t1.fact_repay_date = t2.fact_repay_date,
@@ -373,7 +361,7 @@
 		t1.identify_card_ext = t2.identify_card
 		WHERE
 		t1.business_id_ext = t2.business_id
-		AND t1.ismain_customer = 1
+		AND t2.ismain_customer = 1
 		AND(
 		IFNULL(t1.phone_number_ext,0) != IFNULL(t2.phone_number,0) OR
 		IFNULL(t1.identify_card_ext,0) != IFNULL(t2.identify_card,0)
