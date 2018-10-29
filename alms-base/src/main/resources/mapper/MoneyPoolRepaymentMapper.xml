@@ -83,6 +83,7 @@
 		  `tb_withholding_repayment_log` wrl 
 		  JOIN tb_repayment_biz_plan_list rbpl 
 		    ON wrl.after_id = rbpl.after_id 
+		    AND wrl.original_business_id = rbpl.orig_business_id
 		  LEFT JOIN `tb_withholding_platform` wp 
 		    ON wrl.`bind_platform_id` = wp.`platform_id` 
 		  LEFT JOIN tb_repayment_resource rr 
