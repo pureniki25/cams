@@ -46,7 +46,7 @@ import com.ht.ussp.bean.LoginUserInfoHelper;
 
 import io.swagger.annotations.ApiOperation;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping("/recharge")
 public class RechargeController {

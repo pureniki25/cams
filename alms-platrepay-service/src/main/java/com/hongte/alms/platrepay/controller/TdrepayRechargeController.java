@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -79,7 +78,7 @@ import com.ht.ussp.util.BeanUtils;
 
 import io.swagger.annotations.ApiOperation;
 
-@CrossOrigin
+//@CrossOrigin
 @Controller
 @RequestMapping("/tdrepayRecharge")
 public class TdrepayRechargeController {
@@ -1299,44 +1298,7 @@ public class TdrepayRechargeController {
 				if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 					for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 						if (successFlag1) {
-							List<TdPlatformPlanRepaymentDTO> tdPlatformPlanRepaymentDTOs = null;
-							
-							/*
-							 * 通过外联平台eip调用团贷查询标的还款计划信息
-							 */
-							Map<String, Object> paramMap2 = new HashMap<>();
-							paramMap2.put("projectId", projectId);
-
-							com.ht.ussp.core.Result ret = eipRemote.queryRepaymentSchedule(paramMap2);
-							LOG.info("查询平台标的还款计划，标id：{}；接口返回数据：{}", projectId, ret);
-
-							if (ret != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(ret.getReturnCode()) && ret.getData() != null) {
-
-								Map map = JSONObject.parseObject(JSONObject.toJSONString(ret.getData()), Map.class);
-
-								if (map != null && map.get("repaymentScheduleList") != null) {
-									tdPlatformPlanRepaymentDTOs = JSONObject.parseArray(JSONObject.toJSONString(map.get("repaymentScheduleList")),
-											TdPlatformPlanRepaymentDTO.class);
-
-								}
-							}
-							
-							if (CollectionUtils.isNotEmpty(tdPlatformPlanRepaymentDTOs)) {
-								for (TdPlatformPlanRepaymentDTO dto2 : tdPlatformPlanRepaymentDTOs) {
-									if (dto2.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
-										if (new Date().before(DateUtil.getDate(dto2.getCycDate()))) {
-											tdrepayRechargeLog.setStatus(4);
-										}else {
-											tdrepayRechargeLog.setStatus(2);
-										}
-										break;
-									}
-								}
-							}else {
-								tdrepayRechargeLog.setStatus(3);
-							}
-						}else {
-							tdrepayRechargeLog.setStatus(3);
+							tdrepayRechargeLog.setStatus(2);
 						}
 						tdrepayRechargeLog.setUpdateTime(new Date());
 						tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
