@@ -1479,8 +1479,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		List<TdrepayRechargeLog> rechargeLogs = null;
 
 		if (isSettle) {
-			rechargeLogs = tdrepayRechargeLogService.selectList(new EntityWrapper<TdrepayRechargeLog>()
-					.eq("is_valid", 1).in("status", lstStatus).eq("process_status", 2).ne("settle_type", 0).orderBy("project_id, period"));
+			rechargeLogs = tdrepayRechargeLogService
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("is_valid", 1).in("status", lstStatus)
+							.eq("process_status", 2).ne("settle_type", 0).orderBy("project_id, period"));
 		} else {
 			rechargeLogs = tdrepayRechargeLogService.selectList(new EntityWrapper<TdrepayRechargeLog>()
 					.eq("is_valid", 1).in("status", lstStatus).eq("process_status", 2).orderBy("project_id, period"));
@@ -1633,7 +1634,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 							tdrepayRechargeLog.setStatus(3);
 							tdrepayRechargeLog.setRemark("在平台还款计划没有匹配到对应的期数");
 						}
-					}else {
+					} else {
 						tdrepayRechargeLog.setStatus(3);
 						tdrepayRechargeLog.setRemark("没有查询到平台还款计划");
 					}
@@ -1903,7 +1904,8 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
 						for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
 							if (tdReturnAdvanceShareProfitDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()
-									&& tdReturnAdvanceShareProfitDTO.getStatus() == 1 && tdrepayRechargeLog.getSettleType().intValue() == 0) {
+									&& tdReturnAdvanceShareProfitDTO.getStatus() == 1
+									&& tdrepayRechargeLog.getSettleType().intValue() == 0) {
 								logStatus = 2;
 								break;
 							}
@@ -2148,21 +2150,31 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				BigDecimal totalGuaranteePayment = BigDecimal.ZERO;
 				if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
 					for (TdProjectPaymentDTO dto : tdProjectPaymentDTOs) {
+						TdGuaranteePaymentDTO guaranteePayment = dto.getGuaranteePayment();
+						if (guaranteePayment == null) {
+							continue;
+						}
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getPrincipalAndInterest() == null ? BigDecimal.ZERO
-										: dto.getPrincipalAndInterest());
+								.add(guaranteePayment.getPrincipalAndInterest() == null ? BigDecimal.ZERO
+										: guaranteePayment.getPrincipalAndInterest());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getPenaltyAmount() == null ? BigDecimal.ZERO : dto.getPenaltyAmount());
+								.add(guaranteePayment.getPenaltyAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getPenaltyAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getTuandaiAmount() == null ? BigDecimal.ZERO : dto.getTuandaiAmount());
+								.add(guaranteePayment.getTuandaiAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getTuandaiAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getOrgAmount() == null ? BigDecimal.ZERO : dto.getOrgAmount());
+								.add(guaranteePayment.getOrgAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getOrgAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getGuaranteeAmount() == null ? BigDecimal.ZERO : dto.getGuaranteeAmount());
+								.add(guaranteePayment.getGuaranteeAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getGuaranteeAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getArbitrationAmount() == null ? BigDecimal.ZERO : dto.getArbitrationAmount());
+								.add(guaranteePayment.getArbitrationAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getArbitrationAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getAgencyAmount() == null ? BigDecimal.ZERO : dto.getAgencyAmount());
+								.add(guaranteePayment.getAgencyAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getAgencyAmount());
 					}
 				}
 
@@ -2214,12 +2226,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						if (dto.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
 							if (new Date().before(DateUtil.getDate(dto.getCycDate()))) {
 								isSettleData.add(tdrepayRechargeLog);
-							} else {
-								break;
-							}
+								
+							} 
+							break;
 						}
 					}
-				}else {
+				} else {
 					tdrepayRechargeLog.setRemark("没有查询到平台还款计划");
 				}
 			} catch (Exception e) {
