@@ -9,6 +9,7 @@ import com.hongte.alms.base.feignClient.CustomerInfoXindaiRemoteApi;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
 import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.withhold.feignClient.FinanceClient;
 import com.hongte.alms.withhold.service.AfterLoanRepaymentService;
 import com.hongte.alms.withhold.service.RechargeService;
@@ -81,7 +82,7 @@ public class AfterLoanRepaymentController {
     @PostMapping("/handRepay")
     @ApiOperation(value = "手动代扣")
     public Result handRepay(@RequestBody DeductionVo deuctionVo){
-    	if(deuctionVo.getPlatformId()==PlatformEnum.YH_FORM.getValue()) {
+    	if(deuctionVo.getPlatformId()==PlatformEnum.YH_FORM.getValue()&&(!StringUtil.isEmpty(deuctionVo.getBankCardInfo().getCgBankCardNumber()))) {
     		Result result=withholdingService.handBankRecharge(deuctionVo.getBusiness(), deuctionVo.getBankCardInfo(), deuctionVo.getpList(), deuctionVo.getRepayAmount());
     	    return result;
     	}else {
