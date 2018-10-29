@@ -1436,4 +1436,15 @@ public class FinanceController {
 		}
 		return Result.success();
 	}
+	
+	@RequestMapping("/queryBaseInfoByBusinessId")
+	@ApiOperation(value="根据业务编号查询还款详情页面基础信息")
+	public Result<RepaymentPlanBaseInfoVo> queryBaseInfoByBusinessId(@RequestParam("businessId") String businessId) {
+		try {
+			return Result.success(repaymentBizPlanListService.queryBaseInfoByBusinessId(businessId));
+		} catch (Exception e) {
+			logger.info(e.getMessage(), e);
+			return Result.error(e.getMessage());
+		}
+	}
 }

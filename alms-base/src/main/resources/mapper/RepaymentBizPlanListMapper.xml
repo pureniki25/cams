@@ -1144,7 +1144,33 @@ AND plan_id = #{planListId})
 
     </select>
     
-    
+    <select id="queryBaseInfoByBusinessId" resultType="com.hongte.alms.base.vo.finance.RepaymentPlanBaseInfoVo">
+    	SELECT 
+		  t.`business_id` businessId,
+		  t.`customer_name` customerName,
+		  (SELECT 
+		    bbc.`phone_number` 
+		  FROM
+		    `tb_basic_biz_customer` bbc 
+		  WHERE bbc.`business_id` = t.`business_id` 
+		    AND bbc.`ismain_customer` = 1) phoneNumber,
+		  (SELECT 
+		    brt.`repayment_type_name` 
+		  FROM
+		    `tb_basic_repayment_type` brt 
+		  WHERE brt.`repayment_type_id` = t.`repayment_type_id`) repaymentTypeName,
+		  t.`borrow_money` borrowMoney,
+		  t.`borrow_limit` borrowLimit,
+		  (SELECT 
+		    tpi.`plate_type` 
+		  FROM
+		    `tb_tuandai_project_info` tpi 
+		  WHERE tpi.`business_id` = t.`business_id` 
+		  LIMIT 1) plateType 
+		FROM
+		  `tb_basic_business` t 
+		WHERE t.`business_id` = #{businessId,jdbcType=VARCHAR}
+    </select>
     
  
 </mapper>

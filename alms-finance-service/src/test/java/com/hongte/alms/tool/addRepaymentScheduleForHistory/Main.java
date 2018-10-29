@@ -74,11 +74,11 @@ public class Main {
 	@Test
 	public void run() {
 
-//		 List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>()
-//				 .where(" project_id in  ('30123949-7e62-4acd-9cba-516babf8e493','d551381b-5352-484d-9fd2-19c2960045b0','ec11bd46-96a8-4a16-9587-ce58d80dc0b7') ").orderBy("create_time"));
-		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper
-				.selectList(new EntityWrapper<TuandaiProjectInfo>()
-						.where(" PLATE_TYPE = 1 AND DATE(CREATE_TIME) >= '2018-06-28' AND DATE(CREATE_TIME) <= '2018-10-25' ").orderBy("create_time"));
+		 List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper.selectList(new EntityWrapper<TuandaiProjectInfo>()
+				 .where(" project_id in  ('c8c82dba-1c06-4633-9b02-c5d9f44496ae','9f63058f-5afb-4207-8687-20a503fa799b','87689d7f-56eb-4522-9f8e-059b034eaaef','2431605c-692f-44a4-90f8-5a5afa6e5561','0416acb9-96f7-40bc-baaf-2ce6fc7b4e10','88b7ef6e-8c88-492b-8f89-46b7ded4ca74','01d94f7b-5e0b-4064-9989-4aa313ffba46','0a551c0f-2aeb-4c34-82fd-9b196e391c9f','b0569ba5-0144-42dd-8f9f-c2fdfd1e9853') ").orderBy("create_time"));
+//		List<TuandaiProjectInfo> selectList = tuandaiProjectInfoMapper
+//				.selectList(new EntityWrapper<TuandaiProjectInfo>()
+//						.where(" PLATE_TYPE = 1 AND DATE(CREATE_TIME) >= '2018-06-28' AND DATE(CREATE_TIME) <= '2018-10-25' ").orderBy("create_time"));
 		for (TuandaiProjectInfo tuandaiProjectInfo : selectList) {
 			Req req = new Req();
 
@@ -179,6 +179,24 @@ public class Main {
 
 							schedule.setAmount(item10.get(0).getProjPlanAmount());
 							schedule.setInterestAmount(item20.get(0).getProjPlanAmount());
+							
+							
+							if (req.getRepaymentSchedules().size()>0) {
+								RepaymentSchedule removeOne = null ;
+								for (RepaymentSchedule schedule2 : req.getRepaymentSchedules()) {
+									if (schedule2.getPeriod().equals(schedule.getPeriod())) {
+										schedule.setAmount(schedule2.getAmount().add(schedule.getAmount()));
+										schedule.setInterestAmount(schedule2.getInterestAmount().add(schedule.getInterestAmount()));		
+										removeOne = schedule2 ;
+									}
+								}
+							
+							
+								if (removeOne!=null) {
+									req.getRepaymentSchedules().remove(removeOne);
+								}
+							}
+							
 							req.getRepaymentSchedules().add(schedule);
 						}
 					}

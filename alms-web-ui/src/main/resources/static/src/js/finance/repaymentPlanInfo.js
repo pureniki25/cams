@@ -4,12 +4,6 @@ window.layinit(function (htConfig) {
     let financeBasePath = htConfig.financeBasePath;
     let platRepayBasePath = htConfig.platRepayBasePath;
     let businessId = getQueryStr('businessId');	// 业务编号
-    let customer = decodeURI(getQueryStr('customer'));	// 客户姓名
-    let phoneNumber = getQueryStr('phoneNumber');	// 电话号码
-    let repaymentType = decodeURI(getQueryStr('repaymentType'));	// 还款方式
-    let borrowMoney = getQueryStr('borrowMoney');	// 借款金额
-    let borrowLimit = getQueryStr('borrowLimit');	// 借款期限
-    let plateType = getQueryStr('plateType');	// 业务来源
     
     app = new Vue({
         el: "#app",
@@ -579,11 +573,22 @@ window.layinit(function (htConfig) {
         	 */
             initBaseInfo: function(){
             	this.baseInfo.businessId = businessId;
-            	this.baseInfo.customer = customer == 'null' ? '' : customer;
-            	this.baseInfo.phoneNumber = phoneNumber == 'null' ? '' : phoneNumber;
-            	this.baseInfo.repaymentType = repaymentType;
-            	this.baseInfo.borrowMoney = borrowMoney;
-            	this.baseInfo.borrowLimit = borrowLimit + '个月';
+            	axios.get(financeBasePath +"finance/queryBaseInfoByBusinessId?businessId=" + businessId)
+    	        .then(function (res) {
+    	            if (res.data.data != null && res.data.code == 1) {
+    	            	app.baseInfo.customer = res.data.data.customer == 'null' ? '' : res.data.data.customerName;
+    	            	app.baseInfo.phoneNumber = res.data.data.phoneNumber == 'null' ? '' : res.data.data.phoneNumber;
+    	            	app.baseInfo.repaymentType = res.data.data.repaymentTypeName;
+    	            	app.baseInfo.borrowMoney = res.data.data.borrowMoney;
+    	            	app.baseInfo.borrowLimit = res.data.data.borrowLimit + '个月';
+    	            	app.baseInfo.plateTypeFlag = res.data.data.plateType;
+    	            } else {
+    	            	app.$Modal.error({content: res.data.msg });
+    	            }
+    	        })
+    	        .catch(function (error) {
+    	        	app.$Modal.error({content: '接口调用异常!'});
+    	        });
             },
             /*
              * 初始化方法
@@ -634,7 +639,6 @@ window.layinit(function (htConfig) {
              * 根据业务编号获取业务维度的还款计划信息
              */
             queryRepaymentPlanInfoByBusinessId: function(){
-            	this.plateTypeFlag = plateType;
             	if (this.bizRepaymentPlanList == null || this.bizRepaymentPlanList.length == 0) {
             		axios.get(financeBasePath +"finance/queryRepaymentPlanInfoByBusinessId?businessId=" + businessId)
         	        .then(function (res) {
@@ -786,7 +790,6 @@ window.layinit(function (htConfig) {
              * 为其他费用增加点击事件
              */
             addEventForOtherFee: function(item){
-            	var planListId = item.planListId;
         		return '<a href="#" onclick="app.openRepayOtherFee(`'+item+'`)" style="text-decoration:underline ">' + item.otherFee + '</a>';
             },
             /*
