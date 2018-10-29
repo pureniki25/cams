@@ -3,6 +3,7 @@ package com.hongte.alms.platrepay.service.impl;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -43,6 +44,7 @@ import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
 import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
+import com.hongte.alms.base.enums.SysParameterEnums;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.mapper.AgencyRechargeLogMapper;
@@ -1479,11 +1481,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		List<TdrepayRechargeLog> rechargeLogs = null;
 
 		if (isSettle) {
-			rechargeLogs = tdrepayRechargeLogService.selectList(new EntityWrapper<TdrepayRechargeLog>()
-					.eq("is_valid", 1).in("status", lstStatus).eq("process_status", 2).ne("settle_type", 0).where("order by project_id, period"));
+			rechargeLogs = tdrepayRechargeLogService
+					.selectList(new EntityWrapper<TdrepayRechargeLog>().eq("is_valid", 1).in("status", lstStatus)
+							.eq("process_status", 2).ne("settle_type", 0).orderBy("project_id, period"));
 		} else {
 			rechargeLogs = tdrepayRechargeLogService.selectList(new EntityWrapper<TdrepayRechargeLog>()
-					.eq("is_valid", 1).in("status", lstStatus).eq("process_status", 2).where("order by project_id, period"));
+					.eq("is_valid", 1).in("status", lstStatus).eq("process_status", 2).orderBy("project_id, period"));
 		}
 
 		if (CollectionUtils.isEmpty(rechargeLogs)) {
@@ -1543,7 +1546,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				for (TdProjectPaymentDTO tdProjectPaymentDTO : tdProjectPaymentDTOs) {
 					if (tdProjectPaymentDTO.getPeriod() == period.intValue()) {
 						TdGuaranteePaymentDTO guaranteePayment = tdProjectPaymentDTO.getGuaranteePayment();
-						if (guaranteePayment != null) {
+						if (tdProjectPaymentDTO.getStatus() == 0 && guaranteePayment != null) {
 							principalAndInterest = guaranteePayment.getPrincipalAndInterest() == null
 									? principalAndInterest
 									: guaranteePayment.getPrincipalAndInterest();
@@ -1573,21 +1576,16 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						.getReturnAdvanceShareProfits();
 
 				if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
-					for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
-						if (tdReturnAdvanceShareProfitDTO.getPeriod() == period.intValue()) {
-							principalAndInterest2 = tdReturnAdvanceShareProfitDTO.getPrincipalAndInterest() == null
-									? principalAndInterest2
-									: tdReturnAdvanceShareProfitDTO.getPrincipalAndInterest();
-							tuandaiAmount2 = tdReturnAdvanceShareProfitDTO.getTuandaiAmount() == null ? tuandaiAmount2
-									: tdReturnAdvanceShareProfitDTO.getTuandaiAmount();
-							orgAmount2 = tdReturnAdvanceShareProfitDTO.getOrgAmount() == null ? orgAmount2
-									: tdReturnAdvanceShareProfitDTO.getOrgAmount();
-							guaranteeAmount2 = tdReturnAdvanceShareProfitDTO.getGuaranteeAmount() == null
-									? guaranteeAmount2
-									: tdReturnAdvanceShareProfitDTO.getGuaranteeAmount();
-							arbitrationAmount2 = tdReturnAdvanceShareProfitDTO.getArbitrationAmount() == null
-									? arbitrationAmount2
-									: tdReturnAdvanceShareProfitDTO.getArbitrationAmount();
+					for (TdReturnAdvanceShareProfitDTO dto : returnAdvanceShareProfits) {
+						if (dto.getStatus() == 0 && dto.getPeriod() == period.intValue()) {
+							principalAndInterest2 = dto.getPrincipalAndInterest() == null ? principalAndInterest2
+									: dto.getPrincipalAndInterest();
+							tuandaiAmount2 = dto.getTuandaiAmount() == null ? tuandaiAmount2 : dto.getTuandaiAmount();
+							orgAmount2 = dto.getOrgAmount() == null ? orgAmount2 : dto.getOrgAmount();
+							guaranteeAmount2 = dto.getGuaranteeAmount() == null ? guaranteeAmount2
+									: dto.getGuaranteeAmount();
+							arbitrationAmount2 = dto.getArbitrationAmount() == null ? arbitrationAmount2
+									: dto.getArbitrationAmount();
 							break;
 						}
 					}
@@ -1633,7 +1631,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 							tdrepayRechargeLog.setStatus(3);
 							tdrepayRechargeLog.setRemark("在平台还款计划没有匹配到对应的期数");
 						}
-					}else {
+					} else {
 						tdrepayRechargeLog.setStatus(3);
 						tdrepayRechargeLog.setRemark("没有查询到平台还款计划");
 					}
@@ -1693,15 +1691,17 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 		// 查询客户存管账户余额
 		BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
 
-		Set<Integer> businessTypes = new HashSet<>();
-		businessTypes.add(28); // 商贸贷共借
-		businessTypes.add(29); // 业主贷共借
-		businessTypes.add(31); // 车贷共借
-		businessTypes.add(32); // 房贷共借
-		businessTypes.add(33); // 一点车贷共借
+		List<String> businessTypes = new ArrayList<>();
+		SysParameter sysParameter = sysParameterService
+				.selectById(SysParameterEnums.SLAVE_PROJECT_BUSINESS_TYPE.getKey());
+		String paramValue = sysParameter.getParamValue();
+		if (StringUtil.notEmpty(paramValue)) {
+			String[] arrStr = paramValue.split(",");
+			businessTypes = Arrays.asList(arrStr);
+		}
 
 		// 若是共借标，则需要查找主借标的 tdUserId
-		if (businessTypes.contains(tdrepayRechargeLog.getBusinessType())) {
+		if (businessTypes.contains(String.valueOf(tdrepayRechargeLog.getBusinessType()))) {
 			if (aviMoney.compareTo(totalAmount) < 0) {
 				TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService
 						.selectOne(new EntityWrapper<TuandaiProjectInfo>()
@@ -1903,13 +1903,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					if (CollectionUtils.isNotEmpty(returnAdvanceShareProfits)) {
 						for (TdReturnAdvanceShareProfitDTO tdReturnAdvanceShareProfitDTO : returnAdvanceShareProfits) {
 							if (tdReturnAdvanceShareProfitDTO.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()
-									&& tdReturnAdvanceShareProfitDTO.getStatus() == 1) {
+									&& tdReturnAdvanceShareProfitDTO.getStatus() == 1
+									&& tdrepayRechargeLog.getSettleType().intValue() == 0) {
 								logStatus = 2;
 								break;
 							}
 						}
-					} else {
-						logStatus = 4;
 					}
 				}
 			}
@@ -2148,21 +2147,31 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				BigDecimal totalGuaranteePayment = BigDecimal.ZERO;
 				if (CollectionUtils.isNotEmpty(tdProjectPaymentDTOs)) {
 					for (TdProjectPaymentDTO dto : tdProjectPaymentDTOs) {
+						TdGuaranteePaymentDTO guaranteePayment = dto.getGuaranteePayment();
+						if (dto.getStatus() == 1 || guaranteePayment == null) {
+							continue;
+						}
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getPrincipalAndInterest() == null ? BigDecimal.ZERO
-										: dto.getPrincipalAndInterest());
+								.add(guaranteePayment.getPrincipalAndInterest() == null ? BigDecimal.ZERO
+										: guaranteePayment.getPrincipalAndInterest());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getPenaltyAmount() == null ? BigDecimal.ZERO : dto.getPenaltyAmount());
+								.add(guaranteePayment.getPenaltyAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getPenaltyAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getTuandaiAmount() == null ? BigDecimal.ZERO : dto.getTuandaiAmount());
+								.add(guaranteePayment.getTuandaiAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getTuandaiAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getOrgAmount() == null ? BigDecimal.ZERO : dto.getOrgAmount());
+								.add(guaranteePayment.getOrgAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getOrgAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getGuaranteeAmount() == null ? BigDecimal.ZERO : dto.getGuaranteeAmount());
+								.add(guaranteePayment.getGuaranteeAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getGuaranteeAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getArbitrationAmount() == null ? BigDecimal.ZERO : dto.getArbitrationAmount());
+								.add(guaranteePayment.getArbitrationAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getArbitrationAmount());
 						totalGuaranteePayment = totalGuaranteePayment
-								.add(dto.getAgencyAmount() == null ? BigDecimal.ZERO : dto.getAgencyAmount());
+								.add(guaranteePayment.getAgencyAmount() == null ? BigDecimal.ZERO
+										: guaranteePayment.getAgencyAmount());
 					}
 				}
 
@@ -2170,6 +2179,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 				BigDecimal totalReturnAdvance = BigDecimal.ZERO;
 				if (CollectionUtils.isNotEmpty(tdReturnAdvanceShareProfitDTOs)) {
 					for (TdReturnAdvanceShareProfitDTO dto : tdReturnAdvanceShareProfitDTOs) {
+						if (dto.getStatus() == 1) {
+							continue;
+						}
 						totalReturnAdvance = totalReturnAdvance
 								.add(dto.getTotalAmount() == null ? BigDecimal.ZERO : dto.getTotalAmount());
 					}
@@ -2214,12 +2226,12 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						if (dto.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
 							if (new Date().before(DateUtil.getDate(dto.getCycDate()))) {
 								isSettleData.add(tdrepayRechargeLog);
-							} else {
-								break;
+
 							}
+							break;
 						}
 					}
-				}else {
+				} else {
 					tdrepayRechargeLog.setRemark("没有查询到平台还款计划");
 				}
 			} catch (Exception e) {

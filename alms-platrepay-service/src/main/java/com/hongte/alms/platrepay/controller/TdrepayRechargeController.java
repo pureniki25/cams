@@ -1299,7 +1299,6 @@ public class TdrepayRechargeController {
 					for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 						if (successFlag1) {
 							tdrepayRechargeLog.setStatus(2);
-							tdrepayRechargeLog.setProcessStatus(2);
 						}
 						tdrepayRechargeLog.setUpdateTime(new Date());
 						tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
