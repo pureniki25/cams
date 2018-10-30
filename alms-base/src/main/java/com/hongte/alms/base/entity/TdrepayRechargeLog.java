@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 胡伟骞
- * @since 2018-09-25
+ * @since 2018-10-30
  */
 @ApiModel
 @TableName("tb_tdrepay_recharge_log")
@@ -44,17 +44,35 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "业务所属资产端，1、鸿特信息，2、 一点车贷")
 	private Integer assetType;
     /**
+     * 标的所属业务编号
+     */
+	@TableField("business_id")
+	@ApiModelProperty(required= true,value = "标的所属业务编号")
+	private String businessId;
+    /**
      * 原业务编号
      */
 	@TableField("orig_business_id")
 	@ApiModelProperty(required= true,value = "原业务编号")
 	private String origBusinessId;
     /**
+     * 是否主借标
+     */
+	@TableField("is_master")
+	@ApiModelProperty(required= true,value = "是否主借标")
+	private Integer isMaster;
+    /**
      * 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:商贸贷,26:业主贷,27:家装分期,28:商贸共借;29:业主共借)
      */
 	@TableField("business_type")
 	@ApiModelProperty(required= true,value = "业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:商贸贷,26:业主贷,27:家装分期,28:商贸共借;29:业主共借)")
 	private Integer businessType;
+    /**
+     * 上标日期
+     */
+	@TableField("begin_date")
+	@ApiModelProperty(required= true,value = "上标日期")
+	private Date beginDate;
     /**
      * 实还日期
      */
@@ -92,10 +110,16 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "财务确认时间或成功代扣时间")
 	private Date confirmTime;
     /**
-     * (代充值资金分发接口参数)团贷网用户唯一编号
+     * (代充值资金分发接口参数)团贷网用户唯一编号(当前标的对应的借款人存管账户)
+     */
+	@TableField("td_user_id_m")
+	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)团贷网用户唯一编号(当前标的对应的借款人存管账户)")
+	private String tdUserIdM;
+    /**
+     * (代充值资金分发接口参数)团贷网用户唯一编号(填写主借人存管账户)
      */
 	@TableField("td_user_id")
-	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)团贷网用户唯一编号")
+	@ApiModelProperty(required= true,value = "(代充值资金分发接口参数)团贷网用户唯一编号(填写主借人存管账户)")
 	private String tdUserId;
     /**
      * (代充值资金分发接口参数)批次分发总金额(保留两位小数)
@@ -211,9 +235,9 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "分发时间")
 	private Date processTime;
     /**
-     * 资产端对团贷网通用合规化还款流程处理状态(0:未处理,1:处理中,2:成功,3:失败)
+     * 资产端对团贷网通用合规化还款流程处理状态 (0:未处理,1:处理中,2:成功,3:失败,4:部分还垫付)
      */
-	@ApiModelProperty(required= true,value = "资产端对团贷网通用合规化还款流程处理状态(0:未处理,1:处理中,2:成功,3:失败)")
+	@ApiModelProperty(required= true,value = "资产端对团贷网通用合规化还款流程处理状态 (0:未处理,1:处理中,2:成功,3:失败,4:部分还垫付)")
 	private Integer status;
     /**
      * 备注
@@ -288,6 +312,14 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 		this.assetType = assetType;
 	}
 
+	public String getBusinessId() {
+		return businessId;
+	}
+
+	public void setBusinessId(String businessId) {
+		this.businessId = businessId;
+	}
+
 	public String getOrigBusinessId() {
 		return origBusinessId;
 	}
@@ -296,12 +328,28 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 		this.origBusinessId = origBusinessId;
 	}
 
+	public Integer getIsMaster() {
+		return isMaster;
+	}
+
+	public void setIsMaster(Integer isMaster) {
+		this.isMaster = isMaster;
+	}
+
 	public Integer getBusinessType() {
 		return businessType;
 	}
 
 	public void setBusinessType(Integer businessType) {
 		this.businessType = businessType;
+	}
+
+	public Date getBeginDate() {
+		return beginDate;
+	}
+
+	public void setBeginDate(Date beginDate) {
+		this.beginDate = beginDate;
 	}
 
 	public Date getFactRepayDate() {
@@ -350,6 +398,14 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 
 	public void setConfirmTime(Date confirmTime) {
 		this.confirmTime = confirmTime;
+	}
+
+	public String getTdUserIdM() {
+		return tdUserIdM;
+	}
+
+	public void setTdUserIdM(String tdUserIdM) {
+		this.tdUserIdM = tdUserIdM;
 	}
 
 	public String getTdUserId() {
@@ -595,14 +651,18 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 			", logId=" + logId +
 			", projectId=" + projectId +
 			", assetType=" + assetType +
+			", businessId=" + businessId +
 			", origBusinessId=" + origBusinessId +
+			", isMaster=" + isMaster +
 			", businessType=" + businessType +
+			", beginDate=" + beginDate +
 			", factRepayDate=" + factRepayDate +
 			", customerName=" + customerName +
 			", companyName=" + companyName +
 			", repaySource=" + repaySource +
 			", afterId=" + afterId +
 			", confirmTime=" + confirmTime +
+			", tdUserIdM=" + tdUserIdM +
 			", tdUserId=" + tdUserId +
 			", totalAmount=" + totalAmount +
 			", batchId=" + batchId +
