@@ -113,17 +113,32 @@ public class WithholdingServiceimpl implements WithholdingService {
 							for(RepaymentBizPlanList pList:lists) {
 				        		//获取该还款计划最早一期没有还的代扣
 				    			pList=rechargeService.getEarlyPeriod(pList);
-				    			// 是否符合自动代扣规则
-				    			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
-				    				autoRepayPerList(pList,WithholdTypeEnum.AUTORUN.getValue().toString());
-				    			} else {
-				    				continue; 
+				    			if(pList.getIsRunning()==null||pList.getIsRunning()==0) {//没有被其他线程执行才能代扣
+				    				pList.setIsRunning(1);
+				    				repaymentBizPlanListService.updateById(pList);
+				    				
+				    				try {
+				    				    // 是否符合自动代扣规则
+						    			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
+						    				autoRepayPerList(pList,WithholdTypeEnum.AUTORUN.getValue().toString());
+						    			} 
+				    				}catch (Exception e) {
+										logger.error("代扣出错 pListId:"+pList.getPlanListId());
+									}finally {
+										pList.setIsRunning(0);//代扣结束
+					    				repaymentBizPlanListService.updateById(pList);
+									}
 				    			}
+				    			
 				        	}					
 						}
 					});
 		        
 		        });
+				
+			}
+		});
+
 				
 			}
 		});
