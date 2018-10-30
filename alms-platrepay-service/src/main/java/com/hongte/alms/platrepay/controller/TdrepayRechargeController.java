@@ -1129,7 +1129,8 @@ public class TdrepayRechargeController {
 					resultMap.put("logId", tdrepayRechargeLog.getLogId());
 					resultMap.put("projectId", tdrepayRechargeLog.getProjectId());
 					resultMap.put("customerName", tdrepayRechargeLog.getCustomerName());
-					resultMap.put("businessId", tdrepayRechargeLog.getOrigBusinessId());
+//					resultMap.put("businessId", tdrepayRechargeLog.getOrigBusinessId());
+					resultMap.put("businessId", tdrepayRechargeLog.getBusinessId());
 					resultMap.put("paramMap", JSONObject.toJSONString(paramMap));
 					if (queryDistributeFund != null) {
 						resultMap.put("queryDistributeFund", queryDistributeFund.getData());
@@ -1534,7 +1535,8 @@ public class TdrepayRechargeController {
 				if (aviMoney.compareTo(totalAmount) < 0) {
 					TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService
 							.selectOne(new EntityWrapper<TuandaiProjectInfo>()
-									.eq("business_id", tdrepayRechargeLog.getOrigBusinessId())
+//									.eq("business_id", tdrepayRechargeLog.getOrigBusinessId())
+									.eq("business_id", tdrepayRechargeLog.getBusinessId())
 									.where("project_id = master_issue_id"));
 
 					if (tuandaiProjectInfo != null) {

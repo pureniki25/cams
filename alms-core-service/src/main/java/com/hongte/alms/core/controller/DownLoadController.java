@@ -209,7 +209,8 @@ public class DownLoadController  implements Serializable {
 			if (CollectionUtils.isNotEmpty(infoVOs)) {
 				for (TdrepayRechargeInfoVO infoVO : infoVOs) {
 					List<Object> row = new ArrayList<>();
-					row.add(infoVO.getOrigBusinessId());
+					row.add(infoVO.getBusinessId());
+//					row.add(infoVO.getOrigBusinessId());
 					row.add(infoVO.getBusinessTypeStr());
 					row.add(infoVO.getRepaymentTypeStr());
 					row.add(infoVO.getCustomerName());
