@@ -8,7 +8,22 @@ window.layinit(function (htConfig) {
     app = new Vue({
         el: "#app",
         data: {
-        	baseInfo:{},	// 业务基本信息
+        	baseInfo:{
+        		businessId:'',
+        		customer:'',
+        		phoneNumber:'',
+        		repaymentType:'',
+        		borrowMoney:'',
+        		borrowLimit:'',
+        		plateTypeFlag:'',
+        		accountBalance:'',
+        		settleTotalAmount:'',
+        		principal:'',
+        		interest:'',
+        		platformAmount:'',
+        		orgAmount:'',
+        		liquidatedDamage:''
+        	},	// 业务基本信息
         	bizRepaymentPlanList: [],	// 还款计划信息
         	projOtherFeeList: [],	// 标还款计划其他费用
         	bizOtherFeeList: [],	// 业务还款计划其他费用
@@ -572,16 +587,23 @@ window.layinit(function (htConfig) {
         	 * 初始化业务基本信息
         	 */
             initBaseInfo: function(){
-            	this.baseInfo.businessId = businessId;
             	axios.get(financeBasePath +"finance/queryBaseInfoByBusinessId?businessId=" + businessId)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
-    	            	app.baseInfo.customer = res.data.data.customer == 'null' ? '' : res.data.data.customerName;
+    	            	app.baseInfo.businessId = res.data.data.businessId;
+    	            	app.baseInfo.customer = res.data.data.customerName == 'null' ? '' : res.data.data.customerName;
     	            	app.baseInfo.phoneNumber = res.data.data.phoneNumber == 'null' ? '' : res.data.data.phoneNumber;
     	            	app.baseInfo.repaymentType = res.data.data.repaymentTypeName;
     	            	app.baseInfo.borrowMoney = res.data.data.borrowMoney;
     	            	app.baseInfo.borrowLimit = res.data.data.borrowLimit + '个月';
     	            	app.baseInfo.plateTypeFlag = res.data.data.plateType;
+    	            	app.baseInfo.accountBalance = res.data.data.accountBalance;
+    	            	app.baseInfo.settleTotalAmount = res.data.data.settleTotalAmount;
+    	            	app.baseInfo.principal = res.data.data.principal;
+    	            	app.baseInfo.interest = res.data.data.interest;
+    	            	app.baseInfo.platformAmount = res.data.data.platformAmount;
+    	            	app.baseInfo.orgAmount = res.data.data.orgAmount;
+    	            	app.baseInfo.liquidatedDamage = res.data.data.liquidatedDamage;
     	            } else {
     	            	app.$Modal.error({content: res.data.msg });
     	            }
@@ -931,13 +953,10 @@ window.layinit(function (htConfig) {
                 return '';
             },
         },
-        created: function () {
+        created: function() {
         	this.initBaseInfo();
         	this.queryRepaymentPlanInfoByBusinessId();
         	this.getProjectInfoByBusinessId();
-        },
-        mounted: function() {
-
             this.tableHeight = window.innerHeight-180;
             this.paneHeight = "height:"+this.tableHeight+"px";
 		}

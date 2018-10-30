@@ -61,7 +61,7 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 	@Autowired
 	@Qualifier("IssueSendOutsideLogService")
 	private IssueSendOutsideLogService issueSendOutsideLogService;
-	
+
 	@Autowired
 	private FinanceFeignClient financeFeignClient;
 
@@ -104,14 +104,13 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				throw new ServiceRuntimeException("调用外联平台接口失败！");
 			}
 
-
 			if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
 				String dataJson = JSONObject.toJSONString(result.getData());
 				Map<String, Object> resultMap = JSONObject.parseObject(dataJson, Map.class);
 				String status = (String) resultMap.get("status");
 				String orderId = (String) resultMap.get("orderId");
 				String message = (String) resultMap.get("message");
-				
+
 				LOG.info("查询订单充值，状态：{}，订单号：{}，消息：{}", status, orderId, message);
 				AgencyRechargeLog log = new AgencyRechargeLog();
 				log.setHandleStatus(status);
@@ -128,10 +127,10 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void queryDistributeFund() {
-		Integer[] arrProcessStatus = {1, 3};
+		Integer[] arrProcessStatus = { 1 };
 		// 查询分发失败和分发处理中的数据
-		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService
-				.selectList(new EntityWrapper<TdrepayRechargeLog>().in("process_status", arrProcessStatus).eq("is_valid", 1));
+		List<TdrepayRechargeLog> tdrepayRechargeLogs = tdrepayRechargeLogService.selectList(
+				new EntityWrapper<TdrepayRechargeLog>().eq("process_status", arrProcessStatus).eq("is_valid", 1));
 		if (CollectionUtils.isNotEmpty(tdrepayRechargeLogs)) {
 
 			Map<String, Object> paramMap = new HashMap<>();
@@ -173,34 +172,40 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 
 				issueSendOutsideLogService.insert(issueSendOutsideLog);
 
-				if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
-						&& result.getData() != null) {
-					String jsonString = JSONObject.toJSONString(result.getData());
-					Map<String, Object> resultMap = JSONObject.parseObject(jsonString, Map.class);
+				if (result != null) {
+					if (Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+						String jsonString = JSONObject.toJSONString(result.getData());
+						Map<String, Object> resultMap = JSONObject.parseObject(jsonString, Map.class);
 
-					String handlerStatus = (String) resultMap.get("handlerStatus");
+						String handlerStatus = (String) resultMap.get("handlerStatus");
 
-					if (StringUtil.notEmpty(handlerStatus)) {
-						switch (handlerStatus) {
-						case "2":
-							tdrepayRechargeLog.setProcessStatus(2);
-							break;
-							
-						case "3":
-						case "4":
-						case "500":
-							tdrepayRechargeLog.setProcessStatus(3);
-							break;
-							
-						default:
-							tdrepayRechargeLog.setProcessStatus(1);
-							break;
+						if (StringUtil.notEmpty(handlerStatus)) {
+							switch (handlerStatus) {
+							case "2":
+								tdrepayRechargeLog.setProcessStatus(2);
+								tdrepayRechargeLog.setRemark("资金分发成功");
+								break;
+
+							case "3":
+							case "4":
+							case "500":
+								tdrepayRechargeLog.setProcessStatus(3);
+								tdrepayRechargeLog.setRemark((String) resultMap.get("codeDesc"));
+								break;
+
+							default:
+								tdrepayRechargeLog.setProcessStatus(1);
+								tdrepayRechargeLog.setRemark((String) resultMap.get("codeDesc"));
+								break;
+							}
+							tdrepayRechargeLog.setUpdateTime(new Date());
+							tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
 						}
-						tdrepayRechargeLog.setUpdateTime(new Date());
-						tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
-						tdrepayRechargeLog.setRemark((String) resultMap.get("message"));
-						tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
+					} else {
+						tdrepayRechargeLog.setProcessStatus(3);
+						tdrepayRechargeLog.setRemark(result.getCodeDesc());
 					}
+					tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
 				}
 			}
 		}
@@ -275,10 +280,10 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 				}
 			}
 			logs.removeAll(failLogs);
-			
+
 			if (CollectionUtils.isNotEmpty(logs)) {
 				this.updateBatchById(logs);
-				
+
 				// 调用核销接口
 				for (AgencyRechargeLog agencyRechargeLog : logs) {
 					if (!"2".equals(agencyRechargeLog.getHandleStatus())) {

@@ -543,7 +543,8 @@ public class TdrepayRechargeController {
 				if (projectStatusResult != null
 						&& Constant.REMOTE_EIP_SUCCESS_CODE.equals(projectStatusResult.getReturnCode())
 						&& projectStatusResult.getData() != null) {
-					List<Map> lst = JSONObject.parseArray(JSONObject.toJSONString(projectStatusResult.getData()), Map.class);
+					List<Map> lst = JSONObject.parseArray(JSONObject.toJSONString(projectStatusResult.getData()),
+							Map.class);
 					if (CollectionUtils.isNotEmpty(lst)) {
 						Map map = lst.get(0);
 						paramMap2.put("userId", map.get("userId"));
@@ -1519,7 +1520,7 @@ public class TdrepayRechargeController {
 			 */
 
 			// 查询客户存管账户余额
-			BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
+			BigDecimal aviMoney = tdrepayRechargeService.queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
 
 			Set<Integer> businessTypes = new HashSet<>();
 			businessTypes.add(28); // 商贸贷共借
@@ -1537,7 +1538,8 @@ public class TdrepayRechargeController {
 									.where("project_id = master_issue_id"));
 
 					if (tuandaiProjectInfo != null) {
-						aviMoney = aviMoney.add(queryUserAviMoney(tuandaiProjectInfo.getTdUserId()));
+						aviMoney = aviMoney
+								.add(tdrepayRechargeService.queryUserAviMoney(tuandaiProjectInfo.getTdUserId()));
 					}
 
 					if (aviMoney.compareTo(totalAmount) >= 0) {
@@ -1722,28 +1724,23 @@ public class TdrepayRechargeController {
 		tdrepayAdvanceLogService.insert(tdrepayAdvanceLog);
 	}
 
-	/**
-	 * 查询客户存管账户余额
-	 * 
-	 * @param tdUserId
-	 * @return
-	 */
-	@SuppressWarnings("rawtypes")
-	private BigDecimal queryUserAviMoney(String tdUserId) {
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("userId", tdUserId);
-		LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet参数信息，{}", paramMap);
-		com.ht.ussp.core.Result result = eipRemote.queryUserAviMoneyForNet(paramMap);
-		LOG.info("查询代充值账户余额/eip/td/queryUserAviMoneyForNet返回信息，{}", result);
-
-		if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
-				&& result.getData() != null) {
-			Map map = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), Map.class);
-			if (map != null) {
-				return map.get("AviMoney") == null ? BigDecimal.ZERO : (BigDecimal) map.get("AviMoney");
-			}
+	@ApiOperation(value = "查询客户存管账户余额")
+	@PostMapping("/queryUserAviMoney")
+	@ResponseBody
+	public Result<BigDecimal> queryUserAviMoney(@RequestBody Map<String, Object> paramMap) {
+		if (paramMap == null || paramMap.isEmpty() || StringUtil.isEmpty((String) paramMap.get("tdUserId"))) {
+			return Result.error("-99", "参数不能为空");
 		}
-		return BigDecimal.ZERO;
+
+		try {
+			return Result.success(tdrepayRechargeService.queryUserAviMoney((String) paramMap.get("tdUserId")));
+		} catch (ServiceRuntimeException e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-500", e.getMessage());
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return Result.error("-500", "系统异常，接口调用失败");
+		}
 	}
 
 	public static void main(String[] args) throws Exception {

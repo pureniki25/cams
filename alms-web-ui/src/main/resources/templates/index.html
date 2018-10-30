@@ -170,7 +170,8 @@
         });
          
          $("#changePwd").on("click", function () {
-             top.location.href = changePwdPath+"\?token="+cookie.getToken()+"&urls="+config.loginPath;
+             var loginUrl = top.location.protocol + "//" + top.location.host + config.loginPath;
+             top.location.href = changePwdPath+"\?token="+cookie.getToken()+"&urls="+loginUrl;
          });
          
          //初始化权限资源

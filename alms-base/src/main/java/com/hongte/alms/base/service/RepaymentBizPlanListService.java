@@ -147,5 +147,5 @@ public interface RepaymentBizPlanListService extends BaseService<RepaymentBizPla
      * @param businessId
      * @return
      */
-    RepaymentPlanBaseInfoVo queryBaseInfoByBusinessId(String businessId);
+    RepaymentPlanBaseInfoVo queryBaseInfoByBusinessId(String businessId, List<String> afterIds);
 }

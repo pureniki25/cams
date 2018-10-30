@@ -273,7 +273,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			/*
 			 * 将分发状态更新为处理中 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
 			 */
-			updateTdrepayRechargeLogProcessStatus(vos, 3, userId);
+//			updateTdrepayRechargeLogProcessStatus(vos, 3, userId);
 
 			throw new ServiceRuntimeException("资金分发执行失败", e);
 		}
@@ -1732,6 +1732,24 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 			}
 		}
+	}
+	
+	@Override
+	public BigDecimal queryUserAviMoney(String tdUserId) {
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("userId", tdUserId);
+		LOG.info("查询代充值账户余额/eip/td/queryUserAviMoney参数信息，{}", paramMap);
+		Result result = eipRemote.queryUserAviMoney(paramMap);
+		LOG.info("查询代充值账户余额/eip/td/queryUserAviMoney返回信息，{}", result);
+
+		if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+				&& result.getData() != null) {
+			Map map = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), Map.class);
+			if (map != null) {
+				return map.get("aviMoney") == null ? BigDecimal.ZERO : (BigDecimal) map.get("aviMoney");
+			}
+		}
+		return BigDecimal.ZERO;
 	}
 
 	public static void main(String[] args) {

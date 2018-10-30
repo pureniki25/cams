@@ -1,5 +1,6 @@
 package com.hongte.alms.base.feignClient;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -58,5 +59,13 @@ public interface PlatformRepaymentFeignClient {
 	 */
 	@RequestMapping(value = "/tdrepayRecharge/handleRunningData", headers = { "app=ALMS","content-type=application/json" })
 	Result<Map<String, Object>> handleRunningData();
+	
+	/**
+	 * 查询客户存管账户余额
+	 *
+	 * @return
+	 */
+	@RequestMapping(value = "/tdrepayRecharge/queryUserAviMoney", headers = { "app=ALMS", "content-type=application/json" }, method = RequestMethod.POST)
+	Result<BigDecimal> queryUserAviMoney(@RequestBody Map<String, Object> paramMap);
 	
 }
