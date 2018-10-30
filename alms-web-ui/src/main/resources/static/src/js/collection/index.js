@@ -750,6 +750,12 @@ window.layinit(function(htConfig){
         if (obj.event === 'operate') {
 
         }else  if(obj.event ==='info'){
+
+            if(obj.data.operatorName=="已离职"&&obj.data.plateTypeText=="线下出款"){
+                vm.$Modal.warning({content: '由于此单为线下补录,部分信息不全,不能显示详情'});
+                return ;
+            }
+            
             if(obj.data.businessTypeId == 9 || obj.data.businessTypeId == 1){
                 //车贷  车贷展期
                 axios.get(basePath + 'api/getXindaiAfterView?businessId='+obj.data.businessId+"&businessAfterId="+obj.data.afterId)
