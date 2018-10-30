@@ -1460,6 +1460,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			} catch (Exception e) {
 				LOG.error("标的ID：{}，平台期数：{}，系统异常：{}", tdrepayRechargeLog.getProjectId(), tdrepayRechargeLog.getPeriod(),
 						e);
+				e.printStackTrace();
 			}
 		}
 	}
