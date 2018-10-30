@@ -375,7 +375,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails = repaymentBizPlanListDto.getBizPlanListDetails();
                 CarBusinessAfterDto bizAfterDto = new CarBusinessAfterDto();
                 bizAfterDtos.add(bizAfterDto);
-                bizAfterDto.setXdOutId(repaymentBizPlan.getXdOutId());//add By Czs
+                bizAfterDto.setXdOutId(Integer.valueOf(repaymentBizPlanList.getAfterId().split("-")[0]));//add By Czs
                 if(repaymentBizPlan.getIsDefer()==1) {
                     bizAfterDto.setZqBusinessId(repaymentBizPlan.getBusinessId());//add By Czs
                 }else {
@@ -1260,7 +1260,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                                    Map<String,Map<String,List<RepaymentBizPlanListDetail>>> bizPlanListDetialMap,
                                    BusinessBasicInfoReq  businessBasicInfo
                                    ){
-
         for(String batchId:repaymentPlanListBatchMap.keySet()){
             List<RepaymentProjPlan> projPlans = repaymentProjPlanMap.get(batchId);
             Map<Integer,List<RepaymentProjPlanList>> planListPeroidMap = repaymentPlanListBatchMap.get(batchId);
@@ -1290,7 +1289,6 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
             bizPlan.setIsDefer(businessBasicInfo.getIsRenewBusiness()); //是否展期还款计划
             bizPlan.setXdAfterGuid(null);       //对应原信贷的还款批次号  置位为空
             int i=repaymentBizPlanService.selectCount(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", businessBasicInfo.getOrgBusinessId()));//该业务的还款计划数量
-            bizPlan.setXdOutId(i+1);       //对应原信贷的出款计划ID 
             bizPlan.setSrcType(RepayPlanCreateSysEnum.ALMS.getValue());       //还款计划生成系统标志
             bizPlan.setCreateTime(new Date());       //创建日期
             bizPlan.setCreateUser(Constant.ADMIN_ID);       //创建用户
