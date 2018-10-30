@@ -560,8 +560,15 @@ public class FinanceServiceImpl implements FinanceService {
 		rpl = repaymentBizPlanListMapper.selectOne(rpl);
 		
 		/*根据最后一条实还流水的时间重新计算滞纳金*/
-		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(
-				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", rpl.getPlanListId()).isNotNull("money_pool_id").andNew("state",RepayRegisterFinanceStatus.未关联银行流水.toString()).or().eq("state", RepayRegisterFinanceStatus.财务指定银行流水.toString()).orderBy("trade_date",false));
+//		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(
+//				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", rpl.getPlanListId())
+//				.isNotNull("money_pool_id")
+//				.andNew("state",RepayRegisterFinanceStatus.未关联银行流水.toString()).or()
+//				.eq("state", RepayRegisterFinanceStatus.财务指定银行流水.toString()).orderBy("trade_date",false));
+		/* 默认 日期 为当前匹配流水中的 金额最大的交易日期 http://wiki.hongte.info/pages/viewpage.action?pageId=6095747 */
+		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(new EntityWrapper<MoneyPoolRepayment>()
+				.where(" plan_list_id = {0} and money_pool_id is not null and (state = '未关联银行流水' or state = '财务指定银行流水') ", rpl.getPlanListId())
+				.orderBy("account_money",false).last(" limit 1 "));
 		/*将流水时间收集,返回前端*/
 		for (MoneyPoolRepayment moneyPoolRepayment : moneyPoolRepayments) {
 			c.getMoneyPoolRepayDates().add(DateUtil.formatDate(moneyPoolRepayment.getTradeDate()));
