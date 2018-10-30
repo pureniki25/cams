@@ -1688,8 +1688,6 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			BigDecimal principalAndInterest3, BigDecimal tuandaiAmount3, BigDecimal orgAmount3,
 			BigDecimal guaranteeAmount3, BigDecimal arbitrationAmount3, BigDecimal totalAmount, Integer period) {
 
-		// 查询客户存管账户余额
-		BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
 
 		List<String> businessTypes = new ArrayList<>();
 		SysParameter sysParameter = sysParameterService
@@ -1699,9 +1697,11 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			String[] arrStr = paramValue.split(",");
 			businessTypes = Arrays.asList(arrStr);
 		}
-
+		
 		// 若是共借标，则需要查找主借标的 tdUserId
 		if (businessTypes.contains(String.valueOf(tdrepayRechargeLog.getBusinessType()))) {
+			// 查询共借人存管账户余额
+			BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
 			if (aviMoney.compareTo(totalAmount) < 0) {
 				TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService
 						.selectOne(new EntityWrapper<TuandaiProjectInfo>()
@@ -1746,6 +1746,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 						guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
 			}
 		} else {
+			// 查询主借人客户存管账户余额
+			BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
+
 			if (aviMoney.compareTo(totalAmount) >= 0) {
 				advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3, orgAmount3,
 						guaranteeAmount3, arbitrationAmount3, totalAmount, period, 1);
