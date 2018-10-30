@@ -56,10 +56,10 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "原业务编号")
 	private String origBusinessId;
     /**
-     * 是否主借标
+     * 是否主借标(0,否;1,是)
      */
 	@TableField("is_master")
-	@ApiModelProperty(required= true,value = "是否主借标")
+	@ApiModelProperty(required= true,value = "是否主借标(0,否;1,是)")
 	private Integer isMaster;
     /**
      * 业务类型(1:车易贷展期,2:房速贷展期,3:金融仓储,4:三农金融,9:车易贷,11:房速贷,12车全垫资代采,13:扶贫贷,14:汽车融资租赁,15:二手车商贷,20:一点车贷,25:商贸贷,26:业主贷,27:家装分期,28:商贸共借;29:业主共借)
