@@ -40,5 +40,39 @@ public class RepaymentPlanBaseInfoVo implements Serializable {
 	 * 上标平台
 	 */
 	private Integer plateType;
+	
+	/**
+	 * 存管账户余额
+	 */
+	private BigDecimal accountBalance;
 
+	/**
+	 * 今天结清应缴纳费用
+	 */
+	private BigDecimal settleTotalAmount;
+	
+	/**
+	 * 本金
+	 */
+	private BigDecimal principal;
+	
+	/**
+	 * 利息
+	 */
+	private BigDecimal interest;
+	
+	/**
+	 * 平台费
+	 */
+	private BigDecimal platformAmount;
+	
+	/**
+	 * 分公司服务费
+	 */
+	private BigDecimal orgAmount;
+	
+	/**
+	 * 本金违约金
+	 */
+	private BigDecimal liquidatedDamage;
 }

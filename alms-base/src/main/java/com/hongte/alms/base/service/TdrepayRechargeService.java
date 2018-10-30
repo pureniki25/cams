@@ -1,5 +1,6 @@
 package com.hongte.alms.base.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -100,4 +101,11 @@ public interface TdrepayRechargeService {
 	 * 处理合规化还款处理中的数据
 	 */
 	void handleRunningData();
+	
+	/**
+	 * 查询客户存管账户余额
+	 * @param tdUserId
+	 * @return
+	 */
+	BigDecimal queryUserAviMoney(String tdUserId);
 }

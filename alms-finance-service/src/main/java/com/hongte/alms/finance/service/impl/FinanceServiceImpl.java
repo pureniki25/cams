@@ -1501,7 +1501,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 					List<RepaymentPlanInfoDTO> resultList = new ArrayList<>();
 					
-					Double businessSurplus = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(origBusinessId);
+					Double businessSurplus = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId);
 
 					for (Entry<String, List<RepaymentPlanInfoDTO>> entry : map.entrySet()) {
 
