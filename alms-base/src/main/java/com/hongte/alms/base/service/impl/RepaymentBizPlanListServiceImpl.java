@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.BasicBusiness;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentResource;
@@ -37,9 +37,9 @@ import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.XindaiFeign;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
-import com.hongte.alms.base.mapper.TransferOfLitigationMapper;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
 import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.RepaymentResourceService;
 import com.hongte.alms.base.service.SysBankLimitService;
@@ -104,7 +104,8 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     private TuandaiProjectInfoService tuandaiProjectInfoService;
     
     @Autowired
-	private TransferOfLitigationMapper transferOfLitigationMapper;
+    @Qualifier("RepaymentBizPlanService")
+    private RepaymentBizPlanService repaymentBizPlanService;
     
     @Autowired
     private EipRemote eipRemote;
@@ -492,6 +493,13 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 		
 		if (vo == null) {
 			return vo;
+		}
+		
+		RepaymentBizPlan repaymentBizPlan = repaymentBizPlanService
+				.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
+		
+		if (repaymentBizPlan != null) {
+			vo.setSrcType(repaymentBizPlan.getSrcType());
 		}
 
 		// 获取所有标还款计划

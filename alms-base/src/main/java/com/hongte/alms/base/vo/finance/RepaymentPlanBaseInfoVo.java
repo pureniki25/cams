@@ -75,4 +75,9 @@ public class RepaymentPlanBaseInfoVo implements Serializable {
 	 * 本金违约金
 	 */
 	private BigDecimal liquidatedDamage;
+	
+	/**
+	 * 来源类型：1.信贷生成，2.贷后管理生成
+	 */
+	private Integer srcType;
 }
