@@ -15,7 +15,7 @@ window.layinit(function (htConfig) {
         el: "#app",
         data: {
             info: {},
-            submitloading:false,
+            submitloading: false,
             repayInfo: {
                 url: '/finance/repayBaseInfo?businessId=' + businessId + "&afterId=" + afterId,
             },
@@ -56,9 +56,9 @@ window.layinit(function (htConfig) {
                                 props: {
                                     stripe: true,
                                     columns: [{
-                                        title: '借款人',
-                                        key: 'userName'
-                                    },
+                                            title: '借款人',
+                                            key: 'userName'
+                                        },
                                         {
                                             title: '上标金额',
                                             key: 'projAmount'
@@ -420,7 +420,7 @@ window.layinit(function (htConfig) {
                 subtotal: '',
                 total: '',
                 derateDetails: [],
-                moneyPoolRepayDates:[]
+                moneyPoolRepayDates: []
             },
             factRepaymentInfo: {
                 repayDate: '',
@@ -444,6 +444,11 @@ window.layinit(function (htConfig) {
                 total: 0,
                 surplus: 0,
                 mprIds: []
+            },
+            dateOption: {
+                disabledDate(date) {
+                    return date > new Date();
+                }
             }
         },
         watch: {
@@ -452,7 +457,7 @@ window.layinit(function (htConfig) {
                 if (n && n.length > 0) {
                     n.forEach(element => {
                         // moneyPoolAccount = (moneyPoolAccount * 10000 + element.accountMoney * 10000) / 10000
-                        moneyPoolAccount = accAdd(moneyPoolAccount,element.accountMoney)
+                        moneyPoolAccount = accAdd(moneyPoolAccount, element.accountMoney)
                         app.factRepaymentInfo.mprIds.push(element.mprId);
                     });
                     let o = n[n.length - 1]
@@ -462,7 +467,7 @@ window.layinit(function (htConfig) {
 
                 // app.factRepaymentInfo.repayAccount = parseFloat(app.factRepaymentInfo.moneyPoolAccount.toFixed(2))  + parseFloat(app.factRepaymentInfo.surplusFund.toFixed(2) || 0)
                 // app.factRepaymentInfo.repayAccount = (app.factRepaymentInfo.moneyPoolAccount * 10000 + (app.factRepaymentInfo.surplusFund || 0) * 10000) / 10000
-                app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount,(app.factRepaymentInfo.surplusFund || 0))
+                app.factRepaymentInfo.repayAccount = accAdd(app.factRepaymentInfo.moneyPoolAccount, (app.factRepaymentInfo.surplusFund || 0))
             },
             'factRepaymentInfo.useSurplusflag': function (n, o) {
                 if (o == '') {
@@ -487,8 +492,8 @@ window.layinit(function (htConfig) {
         methods: {
             closePage() {
                 var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
-                console.log("index1==",index);
-                console.log("name==",window.name);
+                console.log("index1==", index);
+                console.log("name==", window.name);
                 parent.layer.close(index);
             },
             closeModal: function (target) {
@@ -544,12 +549,12 @@ window.layinit(function (htConfig) {
                     }
                 })
             },
-            onRepayDateChange(repayDate){
+            onRepayDateChange(repayDate) {
                 app.factRepaymentInfo.repayDate = repayDate
 
                 $.ajax({
                     type: "GET",
-                    url: fpath + 'finance/thisTimeRepayment?businessId=' + businessId + "&afterId=" + afterId +'&repayDate='+repayDate,
+                    url: fpath + 'finance/thisTimeRepayment?businessId=' + businessId + "&afterId=" + afterId + '&repayDate=' + repayDate,
                     contentType: "application/json; charset=utf-8",
                     async: false,
                     dataType: "json",
@@ -633,14 +638,14 @@ window.layinit(function (htConfig) {
                                         // chaer.onlineOverDue += element.onlineOverDue ? element.onlineOverDue : 0
                                         // chaer.total += element.total ? element.total : 0
 
-                                        chaer.item10 = accAdd(chaer.item10,element.item10 ? element.item10 : 0)
-                                        chaer.item20 = accAdd(chaer.item20,element.item20 ? element.item20 : 0)
-                                        chaer.item30 = accAdd(chaer.item30,element.item30 ? element.item30 : 0)
-                                        chaer.item50 = accAdd(chaer.item50,element.item50 ? element.item50 : 0)
-                                        chaer.subTotal = accAdd(chaer.subTotal,element.subTotal ? element.subTotal : 0)
-                                        chaer.offlineOverDue = accAdd(chaer.offlineOverDue,element.offlineOverDue ? element.offlineOverDue : 0)
-                                        chaer.onlineOverDue = accAdd(chaer.onlineOverDue,element.onlineOverDue ? element.onlineOverDue : 0)
-                                        chaer.total = accAdd(chaer.total,element.total ? element.total : 0)
+                                        chaer.item10 = accAdd(chaer.item10, element.item10 ? element.item10 : 0)
+                                        chaer.item20 = accAdd(chaer.item20, element.item20 ? element.item20 : 0)
+                                        chaer.item30 = accAdd(chaer.item30, element.item30 ? element.item30 : 0)
+                                        chaer.item50 = accAdd(chaer.item50, element.item50 ? element.item50 : 0)
+                                        chaer.subTotal = accAdd(chaer.subTotal, element.subTotal ? element.subTotal : 0)
+                                        chaer.offlineOverDue = accAdd(chaer.offlineOverDue, element.offlineOverDue ? element.offlineOverDue : 0)
+                                        chaer.onlineOverDue = accAdd(chaer.onlineOverDue, element.onlineOverDue ? element.onlineOverDue : 0)
+                                        chaer.total = accAdd(chaer.total, element.total ? element.total : 0)
                                     }
                                 });
 
@@ -653,23 +658,23 @@ window.layinit(function (htConfig) {
                                 // chaer.onlineOverDue = (chaer.onlineOverDue * 10000 - e1.onlineOverDue * 10000) / 10000
                                 // chaer.total = (chaer.total * 10000 - e1.total * 10000) / 10000
 
-                                chaer.item10 = accSub(chaer.item10 , e1.item10 )
-                                chaer.item20 = accSub(chaer.item20 , e1.item20 )
-                                chaer.item30 = accSub(chaer.item30 , e1.item30 )
-                                chaer.item50 = accSub(chaer.item50 , e1.item50 )
-                                chaer.subTotal = accSub(chaer.subTotal , e1.subTotal )
-                                chaer.offlineOverDue = accSub(chaer.offlineOverDue , e1.offlineOverDue )
-                                chaer.onlineOverDue = accSub(chaer.onlineOverDue , e1.onlineOverDue )
-                                chaer.total = accSub(chaer.total , e1.total )
+                                chaer.item10 = accSub(chaer.item10, e1.item10)
+                                chaer.item20 = accSub(chaer.item20, e1.item20)
+                                chaer.item30 = accSub(chaer.item30, e1.item30)
+                                chaer.item50 = accSub(chaer.item50, e1.item50)
+                                chaer.subTotal = accSub(chaer.subTotal, e1.subTotal)
+                                chaer.offlineOverDue = accSub(chaer.offlineOverDue, e1.offlineOverDue)
+                                chaer.onlineOverDue = accSub(chaer.onlineOverDue, e1.onlineOverDue)
+                                chaer.total = accSub(chaer.total, e1.total)
                             } else {
-                                chaer.item10 = accSub(0 , e1.item10 )
-                                chaer.item20 = accSub(0 , e1.item20 )
-                                chaer.item30 = accSub(0 , e1.item30 )
-                                chaer.item50 = accSub(0 , e1.item50 )
-                                chaer.subTotal = accSub(0 , e1.subTotal )
-                                chaer.offlineOverDue = accSub(0 , e1.offlineOverDue )
-                                chaer.onlineOverDue = accSub(0 , e1.onlineOverDue )
-                                chaer.total = accSub(0 , e1.total )
+                                chaer.item10 = accSub(0, e1.item10)
+                                chaer.item20 = accSub(0, e1.item20)
+                                chaer.item30 = accSub(0, e1.item30)
+                                chaer.item50 = accSub(0, e1.item50)
+                                chaer.subTotal = accSub(0, e1.subTotal)
+                                chaer.offlineOverDue = accSub(0, e1.offlineOverDue)
+                                chaer.onlineOverDue = accSub(0, e1.onlineOverDue)
+                                chaer.total = accSub(0, e1.total)
                             }
 
                             app.table.currPeriodRepayment.data.push(chaer)
@@ -715,7 +720,9 @@ window.layinit(function (htConfig) {
                             app.handleConfirmRepaymentResult(res)
                         } else {
                             app.factRepaymentInfo.surplusFund = 0
-                            app.$Message.error({content: res.data.msg})
+                            app.$Message.error({
+                                content: res.data.msg
+                            })
                         }
                     })
                     .catch(function (err) {
@@ -745,17 +752,17 @@ window.layinit(function (htConfig) {
                     // app.factRepayPreview.subTotal = (app.factRepayPreview.subTotal * 10000 + e.subTotal * 10000) / 10000
                     // app.factRepayPreview.total += (app.factRepayPreview.total * 10000 + e.total * 10000) / 10000
 
-                    app.factRepayPreview.surplus = accAdd(app.factRepayPreview.surplus,e.surplus)
-                    app.factRepayPreview.item10 = accAdd(app.factRepayPreview.item10,e.item10)
-                    app.factRepayPreview.item20 = accAdd(app.factRepayPreview.item20,e.item20)
-                    app.factRepayPreview.item30 = accAdd(app.factRepayPreview.item30,e.item30)
-                    app.factRepayPreview.item50 = accAdd(app.factRepayPreview.item50,e.item50)
-                    app.factRepayPreview.offlineOverDue = accAdd(app.factRepayPreview.offlineOverDue,e.offlineOverDue)
-                    app.factRepayPreview.onlineOverDue = accAdd(app.factRepayPreview.onlineOverDue,e.onlineOverDue)
-                    app.factRepayPreview.subTotal = accAdd(app.factRepayPreview.subTotal,e.subTotal)
-                    app.factRepayPreview.total = accAdd(app.factRepayPreview.total,e.total)
+                    app.factRepayPreview.surplus = accAdd(app.factRepayPreview.surplus, e.surplus)
+                    app.factRepayPreview.item10 = accAdd(app.factRepayPreview.item10, e.item10)
+                    app.factRepayPreview.item20 = accAdd(app.factRepayPreview.item20, e.item20)
+                    app.factRepayPreview.item30 = accAdd(app.factRepayPreview.item30, e.item30)
+                    app.factRepayPreview.item50 = accAdd(app.factRepayPreview.item50, e.item50)
+                    app.factRepayPreview.offlineOverDue = accAdd(app.factRepayPreview.offlineOverDue, e.offlineOverDue)
+                    app.factRepayPreview.onlineOverDue = accAdd(app.factRepayPreview.onlineOverDue, e.onlineOverDue)
+                    app.factRepayPreview.subTotal = accAdd(app.factRepayPreview.subTotal, e.subTotal)
+                    app.factRepayPreview.total = accAdd(app.factRepayPreview.total, e.total)
                 })
-                app.factRepayPreview.total = accAdd(accAdd(app.factRepayPreview.subTotal,app.factRepayPreview.offlineOverDue),accAdd(app.factRepayPreview.onlineOverDue,app.factRepayPreview.surplus))
+                app.factRepayPreview.total = accAdd(accAdd(app.factRepayPreview.subTotal, app.factRepayPreview.offlineOverDue), accAdd(app.factRepayPreview.onlineOverDue, app.factRepayPreview.surplus))
                 //  app.factRepayPreview.total = (app.factRepayPreview.subTotal * 100000
                 //     + app.factRepayPreview.offlineOverDue * 100000
                 //     + app.factRepayPreview.onlineOverDue * 100000
@@ -767,7 +774,9 @@ window.layinit(function (htConfig) {
                 param.afterId = afterId;
                 param = Object.assign(app.factRepaymentInfo, param);
                 if ((!param.mprIds || param.mprIds == '') && (!param.surplusFund || param.surplusFund == 0)) {
-                    app.$Message.error({content: '不能提交没匹配流水且没使用结余金额的还款确认'})
+                    app.$Message.error({
+                        content: '不能提交没匹配流水且没使用结余金额的还款确认'
+                    })
                     return;
                 }
                 var repayAccount = app.factRepaymentInfo.repayAccount;
@@ -776,25 +785,31 @@ window.layinit(function (htConfig) {
                 console.log("total=", total);
 
                 if (repayAccount < total) {
-                    app.$Message.error({content: '实还明细金额不能大于还款来源金额'})
+                    app.$Message.error({
+                        content: '实还明细金额不能大于还款来源金额'
+                    })
                     return;
                 }
 
-                layer.confirm('确认本次还款?', {icon: 3, title: '提示'}, function (index) {
-                    app.submitloading=true
+                layer.confirm('确认本次还款?', {
+                    icon: 3,
+                    title: '提示'
+                }, function (index) {
+                    app.submitloading = true
                     app.$Message.loading({
-                        content:'处理中...',
-                        duration:0
+                        content: '处理中...',
+                        duration: 0
                     })
                     axios.post(fpath + 'finance/confirmRepayment', param)
                         .then(function (res) {
-                            app.submitloading=false
+                            app.submitloading = false
                             app.$Message.destroy()
                             if (res.data.code == '1') {
                                 app.handleConfirmRepaymentResult(res);
 
                                 app.$Modal.success({
-                                    content: '还款确认成功!', onOk() {
+                                    content: '还款确认成功!',
+                                    onOk() {
                                         var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                                         parent.layer.close(index);
                                         parent.app.search()
@@ -802,7 +817,9 @@ window.layinit(function (htConfig) {
                                 })
                             } else {
                                 app.factRepaymentInfo.surplusFund = 0
-                                app.$Message.error({content: res.data.msg})
+                                app.$Message.error({
+                                    content: res.data.msg
+                                })
                             }
                         })
                         .catch(function (err) {
@@ -820,11 +837,13 @@ window.layinit(function (htConfig) {
                 previewConfirmRepayment();
 
             },
-            surplusFundEnter(e){
-              var n= e.target.value;
-                if ((n || n == 0 ) && !isNaN(n)) {
+            surplusFundEnter(e) {
+                var n = e.target.value;
+                if ((n || n == 0) && !isNaN(n)) {
                     if (n > app.factRepaymentInfo.canUseSurplus) {
-                        app.$Modal.warning({content: '可使用结余金额不能大于' + app.factRepaymentInfo.canUseSurplus})
+                        app.$Modal.warning({
+                            content: '可使用结余金额不能大于' + app.factRepaymentInfo.canUseSurplus
+                        })
                         app.factRepaymentInfo.surplusFund = 0
                         return;
                     }
@@ -836,11 +855,11 @@ window.layinit(function (htConfig) {
             },
             getBaseInfo() {
                 axios.get(fpath + 'finance/repayBaseInfo', {
-                    params: {
-                        businessId: businessId,
-                        afterId: afterId
-                    }
-                })
+                        params: {
+                            businessId: businessId,
+                            afterId: afterId
+                        }
+                    })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.info = res.data.data;
@@ -850,14 +869,13 @@ window.layinit(function (htConfig) {
                             })
                         }
                     })
-                    .catch(function (err) {
-                    })
+                    .catch(function (err) {})
             },
             reject() {
                 axios.post(fpath + 'finance/rejectRepayReg', {
-                    mprid: app.repayRegList.mprid,
-                    remark: app.repayRegList.remark
-                })
+                        mprid: app.repayRegList.mprid,
+                        remark: app.repayRegList.remark
+                    })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             window.location.reload()
@@ -876,17 +894,17 @@ window.layinit(function (htConfig) {
             },
             getRepayRegList() {
                 axios.get(cpath + 'moneyPool/checkMoneyPool', {
-                    params: {
-                        businessId: businessId,
-                        afterId: afterId,
-                        isMatched: false,
-                    }
-                })
+                        params: {
+                            businessId: businessId,
+                            afterId: afterId,
+                            isMatched: false,
+                        }
+                    })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             let sumMoney = 0;
                             res.data.data.forEach(element => {
-                                sumMoney = accAdd(sumMoney,element.accountMoney)
+                                sumMoney = accAdd(sumMoney, element.accountMoney)
                                 // sumMoney += element.accountMoney
                             });
                             let sum = {
@@ -902,19 +920,19 @@ window.layinit(function (htConfig) {
                             })
                         }
                     }).catch(function (err) {
-                    console.log(err);
-                    app.$Message.error({
-                        content: '获取登记还款信息列表数据失败'
+                        console.log(err);
+                        app.$Message.error({
+                            content: '获取登记还款信息列表数据失败'
+                        })
                     })
-                })
             },
             getConfirmedList() {
                 axios.get(fpath + 'finance/selectConfirmedBankStatement', {
-                    params: {
-                        businessId: businessId,
-                        afterId: afterId,
-                    }
-                })
+                        params: {
+                            businessId: businessId,
+                            afterId: afterId,
+                        }
+                    })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.table.confirmedRepayment.data = res.data.data
@@ -934,18 +952,18 @@ window.layinit(function (htConfig) {
                             })
                         }
                     }).catch(function (err) {
-                    app.$Message.error({
-                        content: '查询已完成的还款信息数据失败'
+                        app.$Message.error({
+                            content: '查询已完成的还款信息数据失败'
+                        })
                     })
-                })
             },
             disMatchedStatement(p) {
                 app.$Modal.confirm({
                     content: '确认取消关联此条流水?',
                     onOk() {
                         axios.post(fpath + 'finance/disMatchBankStatement', {
-                            mpid: p.row.moneyPoolId
-                        })
+                                mpid: p.row.moneyPoolId
+                            })
                             .then(function (r) {
                                 if (r.data.code == "1") {
                                     window.location.reload()
@@ -968,10 +986,10 @@ window.layinit(function (htConfig) {
                     content: '确认删除此条流水?',
                     onOk() {
                         axios.get(fpath + 'finance/deleteMoneyPool', {
-                            params: {
-                                mprId: p.row.mprId
-                            }
-                        })
+                                params: {
+                                    mprId: p.row.mprId
+                                }
+                            })
                             .then(function (r) {
                                 if (r.data.code == "1") {
                                     window.location.reload()
@@ -991,13 +1009,13 @@ window.layinit(function (htConfig) {
             },
             getMatched() {
                 axios.get(cpath + 'moneyPool/checkMoneyPool', {
-                    params: {
-                        businessId: businessId,
-                        afterId: afterId,
-                        isMatched: true,
-                        noConfirmed: true
-                    }
-                })
+                        params: {
+                            businessId: businessId,
+                            afterId: afterId,
+                            isMatched: true,
+                            noConfirmed: true
+                        }
+                    })
                     .then(function (res) {
                         if (res.data.code == '1') {
                             app.matchedBankStatement.data = res.data.data.slice(0)
@@ -1019,10 +1037,10 @@ window.layinit(function (htConfig) {
                             })
                         }
                     }).catch(function (err) {
-                    app.$Message.error({
-                        content: '获取匹配的款项池银行流水数据失败'
+                        app.$Message.error({
+                            content: '获取匹配的款项池银行流水数据失败'
+                        })
                     })
-                })
             }
         },
         created: function () {
