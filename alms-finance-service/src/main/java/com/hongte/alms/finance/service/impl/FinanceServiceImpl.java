@@ -1927,11 +1927,38 @@ public class FinanceServiceImpl implements FinanceService {
 
 						ActualPaymentLogDTO logDTO = new ActualPaymentLogDTO();
 						logDTO.setActualPaymentSingleLogDTOs(list);
+						logDTO.setPeriod(list.get(0).getPeriod());
 						logDTO.setAfterId(entry.getKey());
 						logDTO.setReceivedTotal(receivedTotal);
 						actualPaymentLogDTOs.add(logDTO);
 					}
-					resultMap.put("actualPaymentLogDTOs", actualPaymentLogDTOs);
+					
+					Map<Integer, List<ActualPaymentLogDTO>> periodMap = new HashMap<>();
+					for (ActualPaymentLogDTO actualPaymentLogDTO : actualPaymentLogDTOs) {
+						Integer period = actualPaymentLogDTO.getPeriod();
+						if (periodMap.containsKey(period)) {
+							List<ActualPaymentLogDTO> list = periodMap.get(period);
+							list.add(actualPaymentLogDTO);
+						}else {
+							List<ActualPaymentLogDTO> list = new ArrayList<>();
+							list.add(actualPaymentLogDTO);
+							periodMap.put(period, list);
+						}
+					}
+					
+					List<ActualPaymentLogDTO> resultList = new ArrayList<>();
+					for (Entry<Integer, List<ActualPaymentLogDTO>> entry : periodMap.entrySet()) {
+						List<ActualPaymentLogDTO> list = entry.getValue();
+						Collections.sort(list, new Comparator<ActualPaymentLogDTO>() {
+							@Override
+							public int compare(ActualPaymentLogDTO o1, ActualPaymentLogDTO o2) {
+								return o1.getPeriod().compareTo(o2.getPeriod());
+							}
+						});
+						resultList.addAll(list);
+					}
+					
+					resultMap.put("actualPaymentLogDTOs", resultList);
 				}
 
 				if (singleLogDTOs.size() > 1) {

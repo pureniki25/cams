@@ -254,13 +254,14 @@ public class SmsServiceImpl implements SmsService{
 		  Date dueDate=DateUtil.getDate(DateUtil.formatDate(DateUtil.addDay2Date(days, new Date())));
 		  List<RepaymentBizPlanList> remindLists=repaymentBizPlanListService.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("current_status","还款中").eq("due_date", dueDate).eq("src_type", 2));
 		  
-		   //筛选只有1个还款计划的记录
+		   //筛选只有1个还款计划的记录且是最后一期
 			for(Iterator<RepaymentBizPlanList> it = remindLists.iterator();it.hasNext();) {
 				RepaymentBizPlanList pList=it.next();
 				List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList(new EntityWrapper<RepaymentBizPlan>().eq("original_business_id", pList.getOrigBusinessId()));
-				if(plans.size()>1&&!istLastPeriod(pList)) {
+				if(plans.size()>1||(plans.size()==1&&!istLastPeriod(pList))) {
 					it.remove();
 				}
+		
 			}
 		  
 		  for(RepaymentBizPlanList pList:remindLists) {

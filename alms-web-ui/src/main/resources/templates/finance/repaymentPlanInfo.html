@@ -109,7 +109,7 @@
 				                <td style="text-align:center">{{ item.afterId }}</td>
 				                <td style="text-align:center">{{item.receivedTotal?numeral(item.receivedTotal).format('0,0.00'):0}}</td>
 				                <td class="td">
-				                    <div class="receive-inner-div" v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.accountName }}</div>
+				                    <div class="receive-inner-div" v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.accountName === '' ? subItem.accountName.replace('', '/') : subItem.accountName }}</div>
 				                </td>
 				                <td class="td">
 				                    <div class="receive-inner-div" v-for = '(subItem, subIndex) in item.actualPaymentSingleRecordList' :key='subIndex'>{{ subItem.tradeTime }}</div>
