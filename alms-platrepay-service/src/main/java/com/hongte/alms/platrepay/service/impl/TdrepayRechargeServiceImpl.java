@@ -1180,9 +1180,9 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 
 				@Override
 				public int compare(TdrepayRechargeLog o1, TdrepayRechargeLog o2) {
-					if (o1.getConfirmTime().before(o2.getConfirmTime())) {
+					if ((o1.getConfirmTime()==null?new Date():o1.getConfirmTime()).before(o2.getConfirmTime()==null?new Date():o2.getConfirmTime())) {
 						return -1;
-					} else if (o1.getConfirmTime().after(o2.getConfirmTime())) {
+					} else if ((o1.getConfirmTime()==null?new Date():o1.getConfirmTime()).after(o2.getConfirmTime()==null?new Date():o2.getConfirmTime())) {
 						return 1;
 					} else {
 						return 0;
