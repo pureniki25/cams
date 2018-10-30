@@ -83,6 +83,7 @@ public class WithHoldingController {
 			RequestData requestData = new RequestData();
 			info.setBusinessId(originalBusinessId);
 			info.setAfterId(afterId);
+			info.setUserID(userId);
 			if(StringUtil.isEmpty(planOverDueMoney)) {
 	           info.setOverduemoney("0");
 	        }else {

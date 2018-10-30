@@ -21,8 +21,7 @@ public class WithHoldingInfo {
     
     private String nowRepayMoney;
     
-    
-   
+    private String userID; 
  
 	public String getIsAmountWithheld() {
 		return isAmountWithheld;
@@ -89,6 +88,14 @@ public class WithHoldingInfo {
 	}
 
 	private Integer Repayplatform;
+
+	public String getUserID() {
+		return userID;
+	}
+
+	public void setUserID(String userID) {
+		this.userID = userID;
+	}
     
 
 
