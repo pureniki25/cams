@@ -750,7 +750,7 @@ window.layinit(function(htConfig){
 
         }else  if(obj.event ==='info'){
 
-            if(obj.data.operatorName=="已离职"&&obj.data.plateTypeText=="线下出款"){
+            if(obj.data.operatorName=="已离职"/* &&obj.data.plateTypeText=="线下出款" */){
                 vm.$Modal.warning({content: '由于此单为线下补录,部分信息不全,不能显示详情'});
                 return ;
             }
