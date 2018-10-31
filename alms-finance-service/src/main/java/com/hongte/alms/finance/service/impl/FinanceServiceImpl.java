@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -43,6 +44,7 @@ import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.ApplyDerateType;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
@@ -1591,6 +1593,24 @@ public class FinanceServiceImpl implements FinanceService {
 						resultList.removeAll(zqDTOs);
 						resultList.addAll(zqDTOs);
 					}
+					if (!resultList.isEmpty()) {//如果包含展期00期，把原业务最后一期去掉，不在页面上显示 add by czs
+						int i = repaymentBizPlanListService
+								.selectCount(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).like("after_id", "ZQ"));
+						if(i>1) {
+							List<RepaymentBizPlanList> list=repaymentBizPlanListService
+									.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("period", false));
+							String afterId=list.get(0).getAfterId();
+							for(Iterator<RepaymentPlanInfoDTO> it = resultList.iterator();it.hasNext();) {
+								RepaymentPlanInfoDTO dto=it.next();
+								if(dto.getAfterId()!=null&&dto.getAfterId().equals(afterId)) {
+									it.remove();
+								}
+						
+							}
+						}
+					
+					}
+					
 					resultMap.put("resultList", resultList);
 					resultMap.put("businessSurplus", businessSurplus);
 					return resultMap;
