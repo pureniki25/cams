@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
+import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentAdvanceRepayFlow;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
@@ -424,6 +425,10 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
+        	
+        	BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
+        	Date businessInputTime = basicBusiness == null?null:basicBusiness.getInputTime();
+        	
         	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();
         	String customerName = businessMapInfo.get("customer_name")==null?"":businessMapInfo.get("customer_name").toString();
         	String exhibitionId = businessMapInfo.get("business_id")==null?"":businessMapInfo.get("business_id").toString();
@@ -520,7 +525,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	String issueId = flowMap.get("issue_id")==null?"":flowMap.get("issue_id").toString();
             	String memo = flowMap.get("memo")==null?"":flowMap.get("memo").toString();;
             	String remark = flowMap.get("remark")==null?"":flowMap.get("remark").toString();
-            	Date segmentationDate = (Date) flowMap.get("segmentation_date");
+            	Date segmentationDate = flowMap.get("segmentation_date")==null?businessInputTime:(Date) flowMap.get("segmentation_date");
             	String sourceAccountIdentifierId = sId;
             	String targetAccountIdentifierId = tId;
             	String listId = flowMap.get("list_id")==null?"":flowMap.get("list_id").toString();

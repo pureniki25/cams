@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.AccountantOverRepayLog;
+import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.FlowPushLog;
 import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
@@ -241,6 +242,10 @@ public class CamsFlowController {
         	String businessTypeId = businessMapInfo.get("business_type")==null?"":businessMapInfo.get("business_type").toString();
         	String businessType = businessMapInfo.get("business_type_name")==null?"":businessMapInfo.get("business_type_name").toString();//business_type
         	String businessCtype = businessMapInfo.get("business_ctype")==null?"":businessMapInfo.get("business_ctype").toString();
+        	
+        	BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
+        	Date businessInputTime = basicBusiness == null?null:basicBusiness.getInputTime();
+        	
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
@@ -319,7 +324,7 @@ public class CamsFlowController {
             	String issueId = flowMap.get("issue_id")==null?"":flowMap.get("issue_id").toString();
             	String memo = flowMap.get("memo")==null?"":flowMap.get("memo").toString();;
             	String remark = flowMap.get("remark")==null?"":flowMap.get("remark").toString();
-            	Date segmentationDate = (Date) flowMap.get("segmentation_date");
+            	Date segmentationDate = flowMap.get("segmentation_date") == null?businessInputTime:(Date) flowMap.get("segmentation_date");
             	String sourceAccountIdentifierId = sId;
             	String targetAccountIdentifierId = tId;
             	String listId = flowMap.get("list_id")==null?"":flowMap.get("list_id").toString();
@@ -374,7 +379,7 @@ public class CamsFlowController {
 //            		}
             		String detailIssueId = listFlowItemMap.get("issue_id")==null?"":listFlowItemMap.get("issue_id").toString();
             		int detailRegisterType = StringUtils.isBlank(flowMap.get("register_type")+"")?0:Integer.parseInt(listFlowItemMap.get("register_type").toString());
-            		Date detailSegmentationDate = (Date) listFlowItemMap.get("segmentation_date");
+            		Date detailSegmentationDate = listFlowItemMap.get("segmentation_date") == null?businessInputTime:(Date) listFlowItemMap.get("segmentation_date");
             		
             		FlowDetail flowDetail = new FlowDetail();
             		flowDetail.setAccountTime(detailAccountTime);
@@ -512,6 +517,10 @@ public class CamsFlowController {
         	String businessType = businessMapInfo.get("business_type_name")==null?"":businessMapInfo.get("business_type_name").toString();//business_type
         	String businessCtype = businessMapInfo.get("business_ctype")==null?"":businessMapInfo.get("business_ctype").toString();
         	String planStatus = businessMapInfo.get("plan_status")==null?"":businessMapInfo.get("plan_status").toString();
+        	
+           	BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
+        	Date businessInputTime = basicBusiness == null?null:basicBusiness.getInputTime();
+        	
         	if(!StringUtils.isBlank(businessCtype)) {
         		businessType = businessCtype;
         	}
@@ -646,9 +655,9 @@ public class CamsFlowController {
             	String externalId = "";
             	int inOut = Integer.parseInt(flowMap.get("in_out").toString());
             	String issueId = flowMap.get("issue_id")==null?"":flowMap.get("issue_id").toString();
-            	String memo = flowMap.get("memo")==null?"":flowMap.get("memo").toString();;
+            	String memo = flowMap.get("memo")==null?"":flowMap.get("memo").toString();
             	String remark = flowMap.get("remark")==null?"":flowMap.get("remark").toString();
-            	Date segmentationDate = (Date) flowMap.get("segmentation_date");
+            	Date segmentationDate = flowMap.get("segmentation_date")==null?businessInputTime:(Date) flowMap.get("segmentation_date");
             	String sourceAccountIdentifierId = sId;
             	String targetAccountIdentifierId = tId;
             	String listId = flowMap.get("list_id")==null?"":flowMap.get("list_id").toString();
@@ -695,7 +704,7 @@ public class CamsFlowController {
             		}
             		String detailIssueId = listFlowItemMap.get("issue_id")==null?"":listFlowItemMap.get("issue_id").toString();
             		int detailRegisterType = StringUtils.isBlank(flowMap.get("register_type")+"")?0:Integer.parseInt(listFlowItemMap.get("register_type").toString());
-            		Date detailSegmentationDate = (Date) listFlowItemMap.get("segmentation_date");
+            		Date detailSegmentationDate = listFlowItemMap.get("segmentation_date")==null?businessInputTime:(Date) listFlowItemMap.get("segmentation_date");
             		
             		FlowDetail flowDetail = new FlowDetail();
             		flowDetail.setAccountTime(detailAccountTime);
