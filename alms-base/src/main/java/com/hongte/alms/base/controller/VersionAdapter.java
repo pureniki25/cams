@@ -17,14 +17,14 @@ public class VersionAdapter {
 	/*Bservice="abc"*/
 	/*Cservice="2018-08-27 08:45:00"*/
 	/*Dservice="1"*/
-	final String ALMS_CORE_SERVICE = "(finance)1019 14:45" ;
-	final String ALMS_FINANCE_SERVICE = "(finance)1019 14:42 实还记录操作人员" ;
-	final String ALMS_OPEN_SERVICE = "0913" ;
-	final String ALMS_PLATREPAY_SERVICE = "(finance)1018 18:10" ;
-	final String ALMS_SCHEDULED_SERVICE = "(finance)1018 18:10" ;
+	final String ALMS_CORE_SERVICE = "(prdbug)1026 20:35" ;
+	final String ALMS_FINANCE_SERVICE = "(prdbug)1027 11:30" ;
+	final String ALMS_OPEN_SERVICE = "(prdbug)1026 20:35" ;
+	final String ALMS_PLATREPAY_SERVICE = "(platrepay)1029 17:10" ;
+	final String ALMS_SCHEDULED_SERVICE = "(platrepay)1029 17:10" ;
 
-	final String ALMS_WEBUI = "(finance)1018 18:10" ; 
-	final String ALMS_WITHHOLD_SERVICE = "(finance)0926 22:16" ;
+	final String ALMS_WEBUI = "(prdbug)1030 19:49 线下补录的单在贷后管理不显示详情" ;
+	final String ALMS_WITHHOLD_SERVICE = "(prdbug)1029 15:24" ;
 	
 	@RequestMapping("/version")
 	public Result version() {

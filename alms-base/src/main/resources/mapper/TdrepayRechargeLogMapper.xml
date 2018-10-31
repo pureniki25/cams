@@ -7,14 +7,18 @@
         <id column="log_id" property="logId" />
         <result column="project_id" property="projectId" />
         <result column="asset_type" property="assetType" />
+        <result column="business_id" property="businessId" />
         <result column="orig_business_id" property="origBusinessId" />
+        <result column="is_master" property="isMaster" />
         <result column="business_type" property="businessType" />
+        <result column="begin_date" property="beginDate" />
         <result column="fact_repay_date" property="factRepayDate" />
         <result column="customer_name" property="customerName" />
         <result column="company_name" property="companyName" />
         <result column="repay_source" property="repaySource" />
         <result column="after_id" property="afterId" />
         <result column="confirm_time" property="confirmTime" />
+        <result column="td_user_id_m" property="tdUserIdM" />
         <result column="td_user_id" property="tdUserId" />
         <result column="total_amount" property="totalAmount" />
         <result column="batch_id" property="batchId" />
@@ -48,7 +52,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        log_id AS logId, project_id AS projectId, asset_type AS assetType, orig_business_id AS origBusinessId, business_type AS businessType, fact_repay_date AS factRepayDate, customer_name AS customerName, company_name AS companyName, repay_source AS repaySource, after_id AS afterId, confirm_time AS confirmTime, td_user_id AS tdUserId, total_amount AS totalAmount, batch_id AS batchId, period, user_id AS userId, recharge_amount AS rechargeAmount, settle_type AS settleType, fact_repay_amount AS factRepayAmount, resource_amount AS resourceAmount, is_complete AS isComplete, proj_plan_list_id AS projPlanListId, confirm_log_id AS confirmLogId, request_no AS requestNo, user_ip AS userIp, oid_partner AS oidPartner, plat_status AS platStatus, platform_repay_status AS platformRepayStatus, is_valid AS isValid, process_status AS processStatus, process_time AS processTime, status, remark, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime, last_push_status AS lastPushStatus, last_push_datetime AS lastPushDatetime, last_push_remark AS lastPushRemark
+        log_id AS logId, project_id AS projectId, asset_type AS assetType, business_id AS businessId, orig_business_id AS origBusinessId, is_master AS isMaster, business_type AS businessType, begin_date AS beginDate, fact_repay_date AS factRepayDate, customer_name AS customerName, company_name AS companyName, repay_source AS repaySource, after_id AS afterId, confirm_time AS confirmTime, td_user_id_m AS tdUserIdM, td_user_id AS tdUserId, total_amount AS totalAmount, batch_id AS batchId, period, user_id AS userId, recharge_amount AS rechargeAmount, settle_type AS settleType, fact_repay_amount AS factRepayAmount, resource_amount AS resourceAmount, is_complete AS isComplete, proj_plan_list_id AS projPlanListId, confirm_log_id AS confirmLogId, request_no AS requestNo, user_ip AS userIp, oid_partner AS oidPartner, plat_status AS platStatus, platform_repay_status AS platformRepayStatus, is_valid AS isValid, process_status AS processStatus, process_time AS processTime, status, remark, create_user AS createUser, create_time AS createTime, update_user AS updateUser, update_time AS updateTime, last_push_status AS lastPushStatus, last_push_datetime AS lastPushDatetime, last_push_remark AS lastPushRemark
     </sql>
         
     <sql id="ComplianceRepaymentDataCondition">

@@ -85,13 +85,14 @@ public class WithholdingServiceimpl implements WithholdingService {
 		Integer days = Integer.valueOf(repayStatusList.get(0).getParamValue());
 
 		
+		
 		executor.execute(new Runnable() {
 			
 			@Override
 			public void run() {
 				List<RepaymentBizPlanList> pLists = repaymentBizPlanListService.selectAutoRepayList(days);// 查询一个周期内(30天)要代扣的记录
 //				for (RepaymentBizPlanList pList : pLists) {
-//					if(pList.getPlanListId().equals("1df25ed0-0c07-4feb-9186-6eeb96c8a95e")||pList.getPlanListId().equals("1df25ed0-0c07-4feb-9186-6eeb96c8a95e")||pList.getPlanListId().equals("267f4a50-5cc4-4d7e-9f0a-e972b5f9d8d8")) {
+//					if(pList.getPlanListId().equals("de6ee923-9df2-4e44-8f57-7abadf40d7e8")) {
 //						System.out.println("STOP");
 //					}
 //					//获取该还款计划最早一期没有还的代扣
@@ -112,7 +113,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 							for(RepaymentBizPlanList pList:lists) {
 				        		//获取该还款计划最早一期没有还的代扣
 				    			pList=rechargeService.getEarlyPeriod(pList);
-				    			if(pList.getIsRunning()==null&&pList.getIsRunning()==0) {//没有被其他线程执行才能代扣
+				    			if(pList.getIsRunning()==null||pList.getIsRunning()==0) {//没有被其他线程执行才能代扣
 				    				pList.setIsRunning(1);
 				    				repaymentBizPlanListService.updateById(pList);
 				    				
@@ -137,6 +138,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 				
 			}
 		});
+
+		
+
 
 	    
 	}

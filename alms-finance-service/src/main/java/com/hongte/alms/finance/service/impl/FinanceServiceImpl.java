@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -43,6 +44,7 @@ import com.hongte.alms.base.entity.ApplyDerateProcess;
 import com.hongte.alms.base.entity.ApplyDerateType;
 import com.hongte.alms.base.entity.MoneyPool;
 import com.hongte.alms.base.entity.MoneyPoolRepayment;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
 import com.hongte.alms.base.entity.RepaymentBizPlanListDetail;
 import com.hongte.alms.base.entity.RepaymentProjFactRepay;
@@ -560,8 +562,15 @@ public class FinanceServiceImpl implements FinanceService {
 		rpl = repaymentBizPlanListMapper.selectOne(rpl);
 		
 		/*根据最后一条实还流水的时间重新计算滞纳金*/
-		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(
-				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", rpl.getPlanListId()).isNotNull("money_pool_id").andNew("state",RepayRegisterFinanceStatus.未关联银行流水.toString()).or().eq("state", RepayRegisterFinanceStatus.财务指定银行流水.toString()).orderBy("trade_date",false));
+//		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(
+//				new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", rpl.getPlanListId())
+//				.isNotNull("money_pool_id")
+//				.andNew("state",RepayRegisterFinanceStatus.未关联银行流水.toString()).or()
+//				.eq("state", RepayRegisterFinanceStatus.财务指定银行流水.toString()).orderBy("trade_date",false));
+		/* 默认 日期 为当前匹配流水中的 金额最大的交易日期 http://wiki.hongte.info/pages/viewpage.action?pageId=6095747 */
+		List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(new EntityWrapper<MoneyPoolRepayment>()
+				.where(" plan_list_id = {0} and money_pool_id is not null and (state = '未关联银行流水' or state = '财务指定银行流水') ", rpl.getPlanListId())
+				.orderBy("account_money",false).last(" limit 1 "));
 		/*将流水时间收集,返回前端*/
 		for (MoneyPoolRepayment moneyPoolRepayment : moneyPoolRepayments) {
 			c.getMoneyPoolRepayDates().add(DateUtil.formatDate(moneyPoolRepayment.getTradeDate()));
@@ -1501,7 +1510,7 @@ public class FinanceServiceImpl implements FinanceService {
 
 					List<RepaymentPlanInfoDTO> resultList = new ArrayList<>();
 					
-					Double businessSurplus = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(origBusinessId);
+					Double businessSurplus = transferOfLitigationMapper.queryOverRepayMoneyByBusinessId(businessId);
 
 					for (Entry<String, List<RepaymentPlanInfoDTO>> entry : map.entrySet()) {
 
@@ -1584,6 +1593,24 @@ public class FinanceServiceImpl implements FinanceService {
 						resultList.removeAll(zqDTOs);
 						resultList.addAll(zqDTOs);
 					}
+					if (!resultList.isEmpty()) {//如果包含展期00期，把原业务最后一期去掉，不在页面上显示 add by czs
+						int i = repaymentBizPlanListService
+								.selectCount(new EntityWrapper<RepaymentBizPlanList>().eq("orig_business_id", businessId).like("after_id", "ZQ"));
+						if(i>1) {
+							List<RepaymentBizPlanList> list=repaymentBizPlanListService
+									.selectList(new EntityWrapper<RepaymentBizPlanList>().eq("business_id", businessId).orderBy("period", false));
+							String afterId=list.get(0).getAfterId();
+							for(Iterator<RepaymentPlanInfoDTO> it = resultList.iterator();it.hasNext();) {
+								RepaymentPlanInfoDTO dto=it.next();
+								if(dto.getAfterId()!=null&&dto.getAfterId().equals(afterId)) {
+									it.remove();
+								}
+						
+							}
+						}
+					
+					}
+					
 					resultMap.put("resultList", resultList);
 					resultMap.put("businessSurplus", businessSurplus);
 					return resultMap;
@@ -1927,11 +1954,38 @@ public class FinanceServiceImpl implements FinanceService {
 
 						ActualPaymentLogDTO logDTO = new ActualPaymentLogDTO();
 						logDTO.setActualPaymentSingleLogDTOs(list);
+						logDTO.setPeriod(list.get(0).getPeriod());
 						logDTO.setAfterId(entry.getKey());
 						logDTO.setReceivedTotal(receivedTotal);
 						actualPaymentLogDTOs.add(logDTO);
 					}
-					resultMap.put("actualPaymentLogDTOs", actualPaymentLogDTOs);
+					
+					Map<Integer, List<ActualPaymentLogDTO>> periodMap = new HashMap<>();
+					for (ActualPaymentLogDTO actualPaymentLogDTO : actualPaymentLogDTOs) {
+						Integer period = actualPaymentLogDTO.getPeriod();
+						if (periodMap.containsKey(period)) {
+							List<ActualPaymentLogDTO> list = periodMap.get(period);
+							list.add(actualPaymentLogDTO);
+						}else {
+							List<ActualPaymentLogDTO> list = new ArrayList<>();
+							list.add(actualPaymentLogDTO);
+							periodMap.put(period, list);
+						}
+					}
+					
+					List<ActualPaymentLogDTO> resultList = new ArrayList<>();
+					for (Entry<Integer, List<ActualPaymentLogDTO>> entry : periodMap.entrySet()) {
+						List<ActualPaymentLogDTO> list = entry.getValue();
+						Collections.sort(list, new Comparator<ActualPaymentLogDTO>() {
+							@Override
+							public int compare(ActualPaymentLogDTO o1, ActualPaymentLogDTO o2) {
+								return o1.getPeriod().compareTo(o2.getPeriod());
+							}
+						});
+						resultList.addAll(list);
+					}
+					
+					resultMap.put("actualPaymentLogDTOs", resultList);
 				}
 
 				if (singleLogDTOs.size() > 1) {

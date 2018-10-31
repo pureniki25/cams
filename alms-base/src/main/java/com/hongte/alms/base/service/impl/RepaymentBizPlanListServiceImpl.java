@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,27 +25,42 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.collection.enums.CollectionStatusEnum;
 import com.hongte.alms.base.dto.FinanceManagerListReq;
 import com.hongte.alms.base.entity.BasicBusiness;
+import com.hongte.alms.base.entity.RepaymentBizPlan;
 import com.hongte.alms.base.entity.RepaymentBizPlanList;
+import com.hongte.alms.base.entity.RepaymentProjPlan;
 import com.hongte.alms.base.entity.RepaymentResource;
+import com.hongte.alms.base.entity.TuandaiProjectInfo;
 import com.hongte.alms.base.entity.WithholdingRepaymentLog;
+import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
+import com.hongte.alms.base.feignClient.AlmsFinanceServiceFeignClient;
+import com.hongte.alms.base.feignClient.EipRemote;
 import com.hongte.alms.base.feignClient.XindaiFeign;
 import com.hongte.alms.base.feignClient.dto.BankCardInfo;
 import com.hongte.alms.base.mapper.RepaymentBizPlanListMapper;
 import com.hongte.alms.base.service.BasicBusinessService;
 import com.hongte.alms.base.service.RepaymentBizPlanListService;
+import com.hongte.alms.base.service.RepaymentBizPlanService;
+import com.hongte.alms.base.service.RepaymentProjPlanService;
 import com.hongte.alms.base.service.RepaymentResourceService;
 import com.hongte.alms.base.service.SysBankLimitService;
+import com.hongte.alms.base.service.TuandaiProjectInfoService;
 import com.hongte.alms.base.vo.finance.ConfirmWithholdListVO;
+import com.hongte.alms.base.vo.finance.FinanceSettleReq;
+import com.hongte.alms.base.vo.finance.RepaymentPlanBaseInfoVo;
+import com.hongte.alms.base.vo.finance.SettleFeesVO;
+import com.hongte.alms.base.vo.finance.SettleInfoVO;
 import com.hongte.alms.base.vo.module.FinanceManagerListVO;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.Constant;
 import com.hongte.alms.common.util.DESC;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.EncryptionResult;
+import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 import com.hongte.alms.common.vo.RequestData;
 import com.hongte.alms.common.vo.ResponseData;
 import com.hongte.alms.common.vo.ResponseEncryptData;
+import com.ht.ussp.core.Result;
 
 import feign.Feign;
 
@@ -78,6 +94,24 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
     @Autowired
     @Qualifier("SysBankLimitService")
     private SysBankLimitService sysBankLimitService;
+    
+    @Autowired
+    @Qualifier("RepaymentProjPlanService")
+    private RepaymentProjPlanService repaymentProjPlanService;
+    
+    @Autowired
+    @Qualifier("TuandaiProjectInfoService")
+    private TuandaiProjectInfoService tuandaiProjectInfoService;
+    
+    @Autowired
+    @Qualifier("RepaymentBizPlanService")
+    private RepaymentBizPlanService repaymentBizPlanService;
+    
+    @Autowired
+    private EipRemote eipRemote;
+    
+    @Autowired
+    private AlmsFinanceServiceFeignClient almsFinanceServiceFeignClient;
 
     @Override
     public List<RepaymentBizPlanList> selectNeedPhoneUrgNorBiz(String companyId, Integer overDueDays, Integer businessType) {
@@ -449,7 +483,104 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 
 	@Override
 	public List<WithholdingRepaymentLog> searchNoCancelList() {
-		repaymentBizPlanListMapper.searchNoCancelList();
-		return null;
+		return repaymentBizPlanListMapper.searchNoCancelList();
+	}
+	
+	@Override
+	public RepaymentPlanBaseInfoVo queryBaseInfoByBusinessId(String businessId, List<String> afterIds) {
+		// 根据业务编号查询还款详情页面基础信息
+		RepaymentPlanBaseInfoVo vo = repaymentBizPlanListMapper.queryBaseInfoByBusinessId(businessId);
+		
+		if (vo == null) {
+			return vo;
+		}
+		
+		RepaymentBizPlan repaymentBizPlan = repaymentBizPlanService
+				.selectOne(new EntityWrapper<RepaymentBizPlan>().eq("business_id", businessId));
+		
+		if (repaymentBizPlan != null) {
+			vo.setSrcType(repaymentBizPlan.getSrcType());
+		}
+
+		// 获取所有标还款计划
+		List<RepaymentProjPlan> repaymentProjPlans = repaymentProjPlanService
+				.selectList(new EntityWrapper<RepaymentProjPlan>().eq("business_id", businessId));
+
+		if (CollectionUtils.isNotEmpty(repaymentProjPlans)) {
+			List<String> idList = new ArrayList<>();
+			for (RepaymentProjPlan repaymentProjPlan : repaymentProjPlans) {
+				idList.add(repaymentProjPlan.getProjectId());
+			}
+			// 获取所有上标信息
+			List<TuandaiProjectInfo> infos = tuandaiProjectInfoService.selectBatchIds(idList);
+			if (CollectionUtils.isNotEmpty(infos)) {
+				Map<String, Object> paramMap = new HashMap<>();
+
+				// 累计所有存管账户余额
+				BigDecimal accountBalance = BigDecimal.ZERO;
+				
+				for (TuandaiProjectInfo info : infos) {
+					paramMap.put("userId", info.getTdUserId());
+					Result result = eipRemote.queryUserAviMoney(paramMap);
+					if (result != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())
+							&& result.getData() != null) {
+						Map map = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), Map.class);
+						accountBalance = accountBalance.add(StringUtil.isEmpty((String) map.get("aviMoney"))
+								? BigDecimal.valueOf(Double.valueOf("0"))
+								: BigDecimal.valueOf(Double.valueOf((String) map.get("aviMoney"))));
+					}
+				}
+				vo.setAccountBalance(accountBalance);
+			}
+		}
+
+		BigDecimal principal = BigDecimal.ZERO;
+		BigDecimal interest = BigDecimal.ZERO;
+		BigDecimal platformAmount = BigDecimal.ZERO;
+		BigDecimal orgAmount = BigDecimal.ZERO;
+		BigDecimal liquidatedDamage = BigDecimal.ZERO;
+		
+//		if (CollectionUtils.isNotEmpty(afterIds)) {
+//			for (String afterId : afterIds) {
+				// 查询本金违约金、分公司服务费
+				FinanceSettleReq req = new FinanceSettleReq();
+				req.setBusinessId(businessId);
+				req.setAfterId("1-01");
+				com.hongte.alms.common.result.Result result = almsFinanceServiceFeignClient.settleInfo(req);
+				if (result != null && Constant.LMS_SUCCESS_CODE.equals(result.getCode()) && result.getData() != null) {
+					SettleInfoVO infoVO = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), SettleInfoVO.class);
+					if (infoVO != null) {
+						principal = principal.add(infoVO.getItem10() == null ? BigDecimal.ZERO : infoVO.getItem10());
+						interest = interest.add(infoVO.getItem20() == null ? BigDecimal.ZERO : infoVO.getItem20());
+						platformAmount = platformAmount.add(infoVO.getItem30() == null ? BigDecimal.ZERO : infoVO.getItem30());
+						orgAmount = orgAmount.add(infoVO.getItem50() == null ? BigDecimal.ZERO : infoVO.getItem50());
+						List<SettleFeesVO> penaltyFees = infoVO.getPenaltyFees();
+						if (CollectionUtils.isNotEmpty(penaltyFees)) {
+							for (SettleFeesVO settleFeesVO : penaltyFees) {
+								if (RepayPlanFeeTypeEnum.PRINCIPAL_PENALTY.getUuid().equals(settleFeesVO.getFeeId())) {
+									liquidatedDamage = liquidatedDamage.add(settleFeesVO.getAmount() == null ? BigDecimal.ZERO : settleFeesVO.getAmount());
+									break;
+								}
+							}
+						}
+					}
+				}
+//			}
+//		}
+		
+		vo.setPrincipal(principal);
+		vo.setInterest(interest);
+		vo.setPlatformAmount(platformAmount);
+		vo.setOrgAmount(orgAmount);
+		vo.setLiquidatedDamage(liquidatedDamage);
+		
+		BigDecimal settleTotalAmount = BigDecimal.ZERO;
+		settleTotalAmount = settleTotalAmount.add(vo.getPrincipal());
+		settleTotalAmount = settleTotalAmount.add(vo.getInterest());
+		settleTotalAmount = settleTotalAmount.add(vo.getPlatformAmount());
+		settleTotalAmount = settleTotalAmount.add(vo.getOrgAmount());
+		settleTotalAmount = settleTotalAmount.add(vo.getLiquidatedDamage());
+		vo.setSettleTotalAmount(settleTotalAmount);
+		return vo;
 	}
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,4 +92,6 @@ public class FinanceBaseDto {
      * 本次还款已完成的标的还款计划
      */
     private List<RepaymentProjPlanList> curTimeRepaidProjPlanList ;
+    
+    private Date factRepayDate ;
 }

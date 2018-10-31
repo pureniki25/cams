@@ -403,6 +403,7 @@
 	        </if>	
 		<where>
 			1 = 1
+			 and (pl.repay_flag != 6 or pl.repay_flag is null)
 			<if test="userId !=null  and userId != '' and needPermission == 1">
                 and pl.orig_business_id in (
 					select business_id from tb_sys_user_permission where page_type = 9 and user_id = #{userId}    	
@@ -768,8 +769,9 @@
 				      `tb_accountant_over_repay_log` t 
 				      LEFT JOIN tb_repayment_confirm_log rcl 
 				        ON rcl.surplus_ref_id = t.log_id 
-				        AND rcl.is_cancelled = 0 
+				        
 				    WHERE t.freeze_status != 1 
+				      AND rcl.is_cancelled = 0 
 				      AND t.money_type = 1 
 				      AND t.business_id = #{businessId,jdbcType=VARCHAR}  
 				      AND t.business_after_id = rbpl.after_id) - 
@@ -779,9 +781,10 @@
 				      `tb_accountant_over_repay_log` t 
 				      LEFT JOIN tb_repayment_confirm_log rcl 
 				        ON rcl.surplus_ref_id = t.log_id 
-				        AND rcl.is_cancelled = 1 
 				    WHERE t.freeze_status != 1 
+				      AND rcl.is_cancelled = 0 
 				      AND t.money_type = 0 
+				      AND rcl.surplus_use_ref_id is null 
 				      AND t.business_id = #{businessId,jdbcType=VARCHAR}  
 				      AND t.business_after_id = rbpl.after_id) surplus,
 				    CASE
@@ -1119,9 +1122,9 @@ AND plan_id = #{planListId})
 		  <include refid="TableName_Column_List"/> 
 		FROM
 		  tb_repayment_biz_plan_list planList 
-		WHERE TO_DAYS(NOW()) - TO_DAYS(planList.due_date) >= #{overDueDays,jdbcType=INTEGER} 
+		WHERE planList.`overdue_days` >= #{overDueDays,jdbcType=INTEGER} 
 		  AND planList.current_status IN ("还款中", "逾期") 
-		  AND IFNULL(planList.`repay_status`, 0) NOT IN (1, 2, 3) 
+		  AND IFNULL(planList.`repay_status`, 0) NOT IN (2, 3) 
 		  AND NOT EXISTS 
 		  (SELECT 
 		    1 
@@ -1142,7 +1145,33 @@ AND plan_id = #{planListId})
 
     </select>
     
-    
+    <select id="queryBaseInfoByBusinessId" resultType="com.hongte.alms.base.vo.finance.RepaymentPlanBaseInfoVo">
+    	SELECT 
+		  t.`business_id` businessId,
+		  t.`customer_name` customerName,
+		  (SELECT 
+		    bbc.`phone_number` 
+		  FROM
+		    `tb_basic_biz_customer` bbc 
+		  WHERE bbc.`business_id` = t.`business_id` 
+		    AND bbc.`ismain_customer` = 1) phoneNumber,
+		  (SELECT 
+		    brt.`repayment_type_name` 
+		  FROM
+		    `tb_basic_repayment_type` brt 
+		  WHERE brt.`repayment_type_id` = t.`repayment_type_id`) repaymentTypeName,
+		  t.`borrow_money` borrowMoney,
+		  t.`borrow_limit` borrowLimit,
+		  (SELECT 
+		    tpi.`plate_type` 
+		  FROM
+		    `tb_tuandai_project_info` tpi 
+		  WHERE tpi.`business_id` = t.`business_id` 
+		  LIMIT 1) plateType 
+		FROM
+		  `tb_basic_business` t 
+		WHERE t.`business_id` = #{businessId,jdbcType=VARCHAR}
+    </select>
     
  
 </mapper>

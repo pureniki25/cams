@@ -32,4 +32,11 @@ public interface FinanceSettleService {
      */
     List<RepaymentBizPlanSettleDto> getCurrentPeriod(FinanceSettleReq req,FinanceSettleBaseDto financeSettleBaseDto);
     
+    /**
+     * 获取当前期
+     * @param req
+     * @return
+     */
+    List<RepaymentBizPlanList> getCurrenPeroids(com.hongte.alms.base.vo.finance.FinanceSettleReq req);
+    
 }

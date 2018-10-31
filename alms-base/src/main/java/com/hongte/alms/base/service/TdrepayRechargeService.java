@@ -1,8 +1,10 @@
 package com.hongte.alms.base.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.hongte.alms.base.dto.compliance.TdPlatformPlanRepaymentDTO;
 import com.hongte.alms.base.entity.AgencyRechargeLog;
 import com.hongte.alms.base.entity.SysParameter;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
@@ -100,4 +102,35 @@ public interface TdrepayRechargeService {
 	 * 处理合规化还款处理中的数据
 	 */
 	void handleRunningData();
+	
+	/**
+	 * 执行还垫付
+	 * @param tdrepayRechargeLog
+	 */
+	void advanceShareProfit(TdrepayRechargeLog tdrepayRechargeLog);
+	
+	/**
+	 * 查询用户余额
+	 * @param tdUserId
+	 * @return
+	 */
+	BigDecimal queryUserAviMoney(String tdUserId);
+	
+
+	/**
+	 * 偿还垫付流程
+	 */
+	void repaymentAdvance();
+	
+	/**
+	 * 提前结清流程
+	 */
+	void repaymentEarlier();
+	
+	/**
+	 * 根据标的ID获取平台还款计划
+	 * @param projectId
+	 * @return
+	 */
+	List<TdPlatformPlanRepaymentDTO> remotePlatformRepaymentPlan(String projectId);
 }
