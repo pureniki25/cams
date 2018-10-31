@@ -22,8 +22,9 @@ window.layinit(function (htConfig) {
         		interest:'',
         		platformAmount:'',
         		orgAmount:'',
-        		liquidatedDamage:''
+        		liquidatedDamage:'',
         	},	// 业务基本信息
+        	srcTypeFlag: false, // 生产还款计划源
         	bizRepaymentPlanList: [],	// 还款计划信息
         	projOtherFeeList: [],	// 标还款计划其他费用
         	bizOtherFeeList: [],	// 业务还款计划其他费用
@@ -604,6 +605,9 @@ window.layinit(function (htConfig) {
     	            	app.baseInfo.platformAmount = res.data.data.platformAmount;
     	            	app.baseInfo.orgAmount = res.data.data.orgAmount;
     	            	app.baseInfo.liquidatedDamage = res.data.data.liquidatedDamage;
+    	            	if (res.data.data.srcType != null && res.data.data.srcType == 2) {
+    	            		app.srcTypeFlag = true;
+						}
     	            } else {
     	            	app.$Modal.error({content: res.data.msg });
     	            }

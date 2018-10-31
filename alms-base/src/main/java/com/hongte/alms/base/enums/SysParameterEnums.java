@@ -10,7 +10,9 @@ public enum SysParameterEnums {
 	
 	REPAY_DAYS("autoRepayDays","筛选自动代扣记录天数范围"),
 	FORGIVE_DAYS("forgiveDay","代扣线下滞纳金宽限期"),
-	BANK_CHANNEL("bankChannel","银行代扣子渠道");
+	BANK_CHANNEL("bankChannel","银行代扣子渠道"),
+	SLAVE_PROJECT_BUSINESS_TYPE("e69955f4-db17-11e8-b8f2-0242ac110003", "共借标业务类型汇总"),
+	;
 	
 
 //	borrowLimitUnit

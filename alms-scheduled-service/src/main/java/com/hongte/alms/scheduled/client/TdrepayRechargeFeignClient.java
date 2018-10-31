@@ -11,11 +11,34 @@ public interface TdrepayRechargeFeignClient {
 
 	/**
 	 * 资产端对团贷网通用合规化还款流程
+	 * 
 	 * @param paramMap
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
 	@RequestMapping(value = "/tdrepayRecharge/repayComplianceWithRequirements", headers = { "app=ALMS",
-	"content-type=application/json" }, method = RequestMethod.POST)
+			"content-type=application/json" }, method = RequestMethod.POST)
 	Result repayComplianceWithRequirements();
+
+	/**
+	 * 资产端对团贷网通用合规化还款流程
+	 * 
+	 * @param paramMap
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/tdrepayRecharge/repaymentAdvance", headers = { "app=ALMS",
+			"content-type=application/json" }, method = RequestMethod.POST)
+	Result repaymentAdvance();
+
+	/**
+	 * 资产端对团贷网通用合规化还款流程
+	 * 
+	 * @param paramMap
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/tdrepayRecharge/repaymentEarlier", headers = { "app=ALMS",
+			"content-type=application/json" }, method = RequestMethod.POST)
+	Result repaymentEarlier();
 }
