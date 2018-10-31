@@ -431,8 +431,7 @@
 		tb_repayment_biz_plan_list pl
 		SET s.ext_remark = pl.remark
 		WHERE
-		ISNULL(
-		s.ext_remark )
+		( ISNULL( s.ext_remark ) OR s.ext_remark != pl.remark ) 
 		AND s.business_id = pl.business_id
 		AND s.after_id =
 		pl.after_id;

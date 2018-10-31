@@ -264,7 +264,7 @@
                                 <!-- <i-select v-model="factRepaymentInfo.repayDate" @on-change="onRepayDateChange">
                                     <i-option v-for="item in thisTimeRepaymentInfo.moneyPoolRepayDates" :key="item" :value="item" >{{item}}</i-option>
                                 </i-select> -->
-                                <Date-picker v-model="factRepaymentInfo.repayDate" @on-change="onRepayDateChange($event)" type="date" placeholder="选择实还日期" :options="dateOption"></Date-picker>
+                                <Date-picker :value="factRepaymentInfo.repayDate" @on-change="onRepayDateChange($event)" type="date" placeholder="选择实还日期" :options="dateOption"></Date-picker>
                                 <!-- <i-input disabled v-model="factRepaymentInfo.repayDate"></i-input> -->
                             </td>
                             <td></td>

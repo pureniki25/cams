@@ -338,7 +338,7 @@
                                         </i-option>
                                     </i-select> -->
                                     <!-- <i-input disabled v-model="factRepaymentInfo.repayDate"></i-input> -->
-                                <Date-picker v-model="factRepaymentInfo.repayDate" @on-change="factRepaymentInfo.repayDate=$event;reGetSttleInfo();" type="date" placeholder="选择实还日期" :options="dateOption"></Date-picker>
+                                <Date-picker :value="factRepaymentInfo.repayDate" @on-change="factRepaymentInfo.repayDate=$event;reGetSttleInfo();" type="date" placeholder="选择实还日期" :options="dateOption"></Date-picker>
 
                                 </td>
                                 <td></td>
