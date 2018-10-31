@@ -47,7 +47,7 @@
 				<i-col span="3">借款期限：{{baseInfo.borrowLimit}}</i-col> 
 				<i-col span="3">结余：{{businessSurplus?numeral(businessSurplus).format('0,0.00'):0}}</i-col> 
 			</row>
-			<row style="margin-top:1rem" v-if="srcTypeFlag"> 
+			<!-- <row style="margin-top:1rem" v-if="srcTypeFlag"> 
 				<i-col span="3">存管账户余额：{{ baseInfo.accountBalance?numeral(baseInfo.accountBalance).format('0,0.00'):0 }}</i-col> 
 				<i-col span="4">今天结清应缴纳费用：{{ baseInfo.settleTotalAmount?numeral(baseInfo.settleTotalAmount).format('0,0.00'):0 }}</i-col>
 				<i-col span="3">本金：{{ baseInfo.principal?numeral(baseInfo.principal).format('0,0.00'):0 }}</i-col> 
@@ -55,7 +55,7 @@
 				<i-col span="2">平台费：{{ baseInfo.platformAmount?numeral(baseInfo.platformAmount).format('0,0.00'):0 }}</i-col> 
 				<i-col span="3">分公司服务费：{{baseInfo.orgAmount?numeral(baseInfo.orgAmount).format('0,0.00'):0}}</i-col> 
 				<i-col span="3">本金违约金：{{baseInfo.liquidatedDamage?numeral(baseInfo.liquidatedDamage).format('0,0.00'):0}}</i-col> 
-			</row>
+			</row> -->
 		</Card>
 		
 		<Card>
