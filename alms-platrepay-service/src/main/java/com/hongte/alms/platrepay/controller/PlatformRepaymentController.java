@@ -88,7 +88,7 @@ public class PlatformRepaymentController {
 
 	@Autowired
 	@Qualifier("IssueSendOutsideLogService")
-	private IssueSendOutsideLogService issueSendOutsideLogService ;
+	private IssueSendOutsideLogService issueSendOutsideLogService;
 
 	@Autowired
 	@Qualifier("AgencyRechargeLogService")
@@ -561,12 +561,12 @@ public class PlatformRepaymentController {
 	@SuppressWarnings("rawtypes")
 	private double handelResourceAmount(String projectId, String afterId) {
 		try {
-			
+
 			TuandaiProjectInfo info = tuandaiProjectInfoService.selectById(projectId);
 			if (info == null) {
 				return 0;
 			}
-			
+
 			Result result = almsFinanceServiceFeignClient.queryActualPaymentByBusinessId(info.getBusinessId());
 			if (result != null && result.getData() != null && Constant.LMS_SUCCESS_CODE.equals(result.getCode())) {
 				Map map = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), Map.class);
@@ -605,7 +605,7 @@ public class PlatformRepaymentController {
 
 		if (settleType.intValue() != 0) {
 
-			List<TdPlatformPlanRepaymentDTO> dtos = remotePlatformRepaymentPlan(projectId);
+			List<TdPlatformPlanRepaymentDTO> dtos = tdrepayRechargeService.remotePlatformRepaymentPlan(projectId);
 
 			if (CollectionUtils.isNotEmpty(dtos)) {
 
@@ -617,37 +617,6 @@ public class PlatformRepaymentController {
 			}
 		}
 		return isSettle;
-	}
-
-	/**
-	 * 从平台获取还款计划
-	 * 
-	 * @param projectId
-	 */
-	@SuppressWarnings("rawtypes")
-	private List<TdPlatformPlanRepaymentDTO> remotePlatformRepaymentPlan(String projectId) {
-		/*
-		 * 通过外联平台eip调用团贷查询标的还款计划信息
-		 */
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("projectId", projectId);
-
-		com.ht.ussp.core.Result ret = eipRemote.queryRepaymentSchedule(paramMap);
-		LOGGER.info("查询平台标的还款计划，标id：{}；接口返回数据：{}", projectId, ret);
-
-		if (ret != null && Constant.REMOTE_EIP_SUCCESS_CODE.equals(ret.getReturnCode()) && ret.getData() != null) {
-
-			Map map = JSONObject.parseObject(JSONObject.toJSONString(ret.getData()), Map.class);
-
-			if (map != null && map.get("repaymentScheduleList") != null) {
-				return JSONObject.parseArray(JSONObject.toJSONString(map.get("repaymentScheduleList")),
-						TdPlatformPlanRepaymentDTO.class);
-
-			}
-		}
-
-		return Lists.newArrayList();
-
 	}
 
 	/**
@@ -765,7 +734,7 @@ public class PlatformRepaymentController {
 	public Result retryRepayment(@RequestParam("projPlanListId") String projPlanListId) {
 		try {
 
-			if(projPlanListId.equals("")){
+			if (projPlanListId.equals("")) {
 				List<SysApiCallFailureRecord> sysApiCallFailureRecords = sysApiCallFailureRecordService
 						.queryRetryMaxCntFailData(Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT,
 								AlmsServiceNameEnums.FINANCE.getName(), projPlanListId);
@@ -799,14 +768,11 @@ public class PlatformRepaymentController {
 					}
 					sysApiCallFailureRecordService.insert(record);
 				}
-			}else{
+			} else {
 				Map<String, Object> paramMap = new HashMap<>();
 				paramMap.put("projPlanListId", projPlanListId);
 				Result result = repayment(paramMap);
 			}
-
-
-
 
 			return Result.success();
 		} catch (Exception e) {
@@ -815,54 +781,52 @@ public class PlatformRepaymentController {
 		}
 	}
 
-
 	@RequestMapping("/tdrepayRecharge")
 	@ApiOperation(value = "根据标的还款计划Listid 重推资金分发数据")
-	private Result tdrepayRecharge(String projRepaymentId){
+	private Result tdrepayRecharge(String projRepaymentId) {
 
 		List<String> idList = new LinkedList<>();
 		idList.add(projRepaymentId);
 
-		RepaymentProjPlanList  repaymentProjPlanList= repaymentProjPlanListService.selectById(projRepaymentId);
+		RepaymentProjPlanList repaymentProjPlanList = repaymentProjPlanListService.selectById(projRepaymentId);
 
-		if(repaymentProjPlanList == null){
-			return Result.error("-99","找不到此标的还款计划");
+		if (repaymentProjPlanList == null) {
+			return Result.error("-99", "找不到此标的还款计划");
 		}
 
-		if(!repaymentProjPlanList.getCreatSysType().equals(RepayPlanCreateSysEnum.ALMS.getValue())){
-			return Result.error("-99","此标的不是贷后系统还款的标的");
+		if (!repaymentProjPlanList.getCreatSysType().equals(RepayPlanCreateSysEnum.ALMS.getValue())) {
+			return Result.error("-99", "此标的不是贷后系统还款的标的");
 		}
 
-		if(repaymentProjPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ONLINE_REPAID.getKey())
+		if (repaymentProjPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ONLINE_REPAID.getKey())
 				|| repaymentProjPlanList.getRepayStatus().equals(SectionRepayStatusEnum.ALL_REPAID.getKey())
-				|| repaymentProjPlanList.getCurrentStatus().equals(RepayPlanStatus.REPAYED.getName())){
-			List<RepaymentProjPlanList>  rlist = new LinkedList<RepaymentProjPlanList>();
+				|| repaymentProjPlanList.getCurrentStatus().equals(RepayPlanStatus.REPAYED.getName())) {
+			List<RepaymentProjPlanList> rlist = new LinkedList<RepaymentProjPlanList>();
 			rlist.add(repaymentProjPlanList);
 			tdrepayRecharge(rlist);
 
-		}else{
-			return Result.error("-99","此标的没有还完款");
+		} else {
+			return Result.error("-99", "此标的没有还完款");
 		}
 
 		return Result.success();
 	}
 
-
 	public void tdrepayRecharge(List<RepaymentProjPlanList> projPlanLists) {
 
-		if(projPlanLists==null||projPlanLists.size()==0){
+		if (projPlanLists == null || projPlanLists.size() == 0) {
 			LOGGER.info("开始调用平台合规化还款接口，参数：{}", projPlanLists);
 			return;
 		}
-//        //睡一下，让还款的信息先存完。
-//        try {
-//            Thread.sleep(500);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-		for(RepaymentProjPlanList repaymentProjPlanList : projPlanLists){
+		// //睡一下，让还款的信息先存完。
+		// try {
+		// Thread.sleep(500);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		for (RepaymentProjPlanList repaymentProjPlanList : projPlanLists) {
 			SysApiCallFailureRecord record = new SysApiCallFailureRecord();
-			IssueSendOutsideLog issueSendOutsideLog = null ;
+			IssueSendOutsideLog issueSendOutsideLog = null;
 			Result result = null;
 			try {
 				record.setModuleName(AlmsServiceNameEnums.FINANCE.getName());
@@ -883,18 +847,15 @@ public class PlatformRepaymentController {
 				if (plan != null) {
 
 					Map<String, Object> paramMap = new HashMap<>();
-					paramMap.put("projPlanListId",repaymentProjPlanList.getProjPlanListId());
-
+					paramMap.put("projPlanListId", repaymentProjPlanList.getProjPlanListId());
 
 					record.setApiParamPlaintext(JSONObject.toJSONString(paramMap));
-//                    sysApiCallFailureRecordService.insert(record);
+					// sysApiCallFailureRecordService.insert(record);
 
 					issueSendOutsideLog = issueSendOutsideLogService.createIssueSendOutsideLog(
-							loginUserInfoHelper.getUserId(),
-							JSON.toJSONString(paramMap),
-							Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT,
-							Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT,
-							Constant.SYSTEM_CODE_EIP) ;
+							loginUserInfoHelper.getUserId(), JSON.toJSONString(paramMap),
+							Constant.INTERFACE_CODE_PLATREPAY_REPAYMENT, Constant.INTERFACE_NAME_PLATREPAY_REPAYMENT,
+							Constant.SYSTEM_CODE_EIP);
 					issueSendOutsideLog.setBusinessId(repaymentProjPlanList.getBusinessId());
 					issueSendOutsideLog.setSendKey(repaymentProjPlanList.getProjPlanListId());
 
