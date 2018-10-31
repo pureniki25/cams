@@ -15,7 +15,6 @@ window.layinit(function (htConfig) {
         		repaymentType:'',
         		borrowMoney:'',
         		borrowLimit:'',
-        		plateTypeFlag:'',
         		accountBalance:'',
         		settleTotalAmount:'',
         		principal:'',
@@ -597,7 +596,7 @@ window.layinit(function (htConfig) {
     	            	app.baseInfo.repaymentType = res.data.data.repaymentTypeName;
     	            	app.baseInfo.borrowMoney = res.data.data.borrowMoney;
     	            	app.baseInfo.borrowLimit = res.data.data.borrowLimit + '个月';
-    	            	app.baseInfo.plateTypeFlag = res.data.data.plateType;
+    	            	app.plateTypeFlag = res.data.data.plateType;
     	            	app.baseInfo.accountBalance = res.data.data.accountBalance;
     	            	app.baseInfo.settleTotalAmount = res.data.data.settleTotalAmount;
     	            	app.baseInfo.principal = res.data.data.principal;
