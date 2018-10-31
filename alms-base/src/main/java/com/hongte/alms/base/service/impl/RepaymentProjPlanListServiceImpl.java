@@ -107,15 +107,11 @@ public class RepaymentProjPlanListServiceImpl extends
 	
     @Override
 	public void calLateFee() {
-		// 所有业务贷后生成的业务
-		List<BasicBusiness> basicBusiness = basicBusinessService
-				.selectList((new EntityWrapper<BasicBusiness>().eq("src_type", 2)));
+	
 
-		for (BasicBusiness business : basicBusiness) {
                   
 			// 每个业务对应所有贷后生成的还款计划
-			List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList((new EntityWrapper<RepaymentBizPlan>().eq("src_type", 2))
-							.eq("original_business_id", business.getBusinessId()));
+			List<RepaymentBizPlan> plans=repaymentBizPlanService.selectList((new EntityWrapper<RepaymentBizPlan>().eq("src_type", 2)));
 			
 			
 			for(RepaymentBizPlan plan:plans) {
@@ -123,21 +119,17 @@ public class RepaymentProjPlanListServiceImpl extends
 				    for(RepaymentBizPlanList pList:pLists) {
 				    	// 每个业务的还款计划列表对应所有标的还款计划列表
 						List<RepaymentProjPlanList> projList = getProListForCalLateFee(pList.getPlanListId());
-						BigDecimal underLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线下收费
-						BigDecimal onlineLateFeeSum=BigDecimal.valueOf(0);//每个业务每期还款计划的线上收费
-						
-						if(pList.getPlanListId().equals("e736d0fe-91fd-4aba-80f9-a41d1e50ec9e")) {
+						if(pList.getPlanListId().equals("9f3962f8-16b2-4fd4-9266-aa8ec130591a")) {
 							System.out.println("stop");
 						}
-						
-						
-							for (RepaymentProjPlanList projPList : projList) {
-							
+							try {
 								// 每个表的还款计划列表对应所的标的还款计划
 								calLateFeeForPerPList(pList,null);
+							}catch(Exception e){
+								e.printStackTrace();
+								logger.error("计算滞纳金报错pListId:"+pList.getPlanListId());
+							}
 							
-							
-				    }
 			
 			}
 			
@@ -175,7 +167,6 @@ public class RepaymentProjPlanListServiceImpl extends
 			}
   */
 		 }
-		}
      
 	}
     
