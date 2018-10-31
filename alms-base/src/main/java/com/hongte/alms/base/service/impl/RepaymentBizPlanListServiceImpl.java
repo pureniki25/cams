@@ -540,12 +540,12 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 		BigDecimal orgAmount = BigDecimal.ZERO;
 		BigDecimal liquidatedDamage = BigDecimal.ZERO;
 		
-		if (CollectionUtils.isNotEmpty(afterIds)) {
-			for (String afterId : afterIds) {
+//		if (CollectionUtils.isNotEmpty(afterIds)) {
+//			for (String afterId : afterIds) {
 				// 查询本金违约金、分公司服务费
 				FinanceSettleReq req = new FinanceSettleReq();
 				req.setBusinessId(businessId);
-				req.setAfterId(afterId);
+				req.setAfterId("1-01");
 				com.hongte.alms.common.result.Result result = almsFinanceServiceFeignClient.settleInfo(req);
 				if (result != null && Constant.LMS_SUCCESS_CODE.equals(result.getCode()) && result.getData() != null) {
 					SettleInfoVO infoVO = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), SettleInfoVO.class);
@@ -565,8 +565,8 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 						}
 					}
 				}
-			}
-		}
+//			}
+//		}
 		
 		vo.setPrincipal(principal);
 		vo.setInterest(interest);
