@@ -13,6 +13,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class FinanceSettleBaseDto {
 	private String userId;
 	private String userName;
 	private String remark ;
-	
+	private Date factRepayDate ;
 	private String uuid;
 	// 临时变量
 	private String projPlanId;

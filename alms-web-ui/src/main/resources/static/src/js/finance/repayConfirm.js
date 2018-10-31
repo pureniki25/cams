@@ -461,7 +461,7 @@ window.layinit(function (htConfig) {
                         app.factRepaymentInfo.mprIds.push(element.mprId);
                     });
                     let o = n[n.length - 1]
-                    app.factRepaymentInfo.repayDate = o.tradeDate
+                    // app.factRepaymentInfo.repayDate = o.tradeDate
                 }
                 app.factRepaymentInfo.moneyPoolAccount = moneyPoolAccount
 

@@ -188,6 +188,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
         	  financeBaseDto.setUserId("0111130000");
               financeBaseDto.setUserName("admin");
         }
+        
+        if (!StringUtil.isEmpty(req.getRepayDate())) {
+			financeBaseDto.setFactRepayDate(DateUtil.getDate(req.getRepayDate()));
+		}
+        
         financeBaseDto.setConfirmLog(createConfirmLog(financeBaseDto));
         return financeBaseDto;
     }
@@ -364,7 +369,9 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 repaymentResource.setRepaySourceRefId(moneyPoolRepayment.getId().toString());
                 repaymentResource.setConfirmLogId(financeBaseDto.getConfirmLog().getConfirmLogId());
                 if (financeBaseDto.getSave()) {
-                    financeBaseDto.getConfirmLog().setRepayDate(repaymentResource.getRepayDate());
+                	if (financeBaseDto.getConfirmLog().getRepayDate()==null) {
+                		financeBaseDto.getConfirmLog().setRepayDate(repaymentResource.getRepayDate());
+					}
 //                    confirmLog.get().setRepayDate(repaymentResource.getRepayDate());
                     repaymentResource.insert();
                 }
@@ -419,7 +426,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             repaymentResource.setRepaySource(repaySource);
             if (financeBaseDto.getSave()) {
                 RepaymentConfirmLog repaymentConfirmLog = financeBaseDto.getConfirmLog();
-                repaymentConfirmLog.setRepayDate(repaymentResource.getRepayDate());
+                
+                if (financeBaseDto.getConfirmLog().getRepayDate()==null) {
+            		financeBaseDto.getConfirmLog().setRepayDate(repaymentResource.getRepayDate());
+				}
+                
                 repaymentResource.setRepaySourceRefId(log.getLogId().toString());
                 repaymentResource.setConfirmLogId(repaymentConfirmLog.getConfirmLogId());
                 repaymentResource.insert();
@@ -469,9 +480,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
             if (financeBaseDto.getSave()) {
                 repaymentResource.setRepaySourceRefId(accountantOverRepayLog.getLogId());
                 repaymentResource.insert();
-                if (mprids.size() == 0) {
-                    financeBaseDto.getConfirmLog().setRepayDate(repaymentResource.getRepayDate());
-                }
+                
+                if (financeBaseDto.getConfirmLog().getRepayDate()==null) {
+            		financeBaseDto.getConfirmLog().setRepayDate(repaymentResource.getRepayDate());
+				}
+                
             }
             BigDecimal reamount = financeBaseDto.getRepayFactAmount().add(req.getSurplusFund());
             financeBaseDto.setRepayFactAmount(reamount);
@@ -1817,6 +1830,11 @@ public class ShareProfitServiceImpl implements ShareProfitService {
                 repaymentConfirmLog.setIdx(repaymentConfirmLogs.get(0).getIdx() + 1);
             }
         }
+        
+        if (financeBaseDto.getFactRepayDate()!=null) {
+			repaymentConfirmLog.setRepayDate(financeBaseDto.getFactRepayDate());
+		}
+        
         repaymentConfirmLog.setOrgBusinessId(orgBusinessId);
 //		repaymentConfirmLog.setProjPlanJson(JSON.toJSONString(projListDetails.get()));
         repaymentConfirmLog.setRepaySource(financeBaseDto.getCallFlage());
