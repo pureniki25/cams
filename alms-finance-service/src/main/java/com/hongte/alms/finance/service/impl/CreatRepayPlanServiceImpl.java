@@ -376,7 +376,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 CarBusinessAfterDto bizAfterDto = new CarBusinessAfterDto();
                 bizAfterDtos.add(bizAfterDto);
                 bizAfterDto.setXdOutId(Integer.valueOf(repaymentBizPlanList.getAfterId().split("-")[0]));//add By Czs
-                if(repaymentBizPlan.getIsDefer()==1) {
+                if(!repaymentBizPlan.getOriginalBusinessId().equals(repaymentBizPlan.getBusinessId())) {
                     bizAfterDto.setZqBusinessId(repaymentBizPlan.getBusinessId());//add By Czs
                 }else {
                     bizAfterDto.setZqBusinessId("");//add By Czs
@@ -453,11 +453,12 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 for(RepaymentBizPlanListDetail bizPlanListDetail: repaymentBizPlanListDetails){
                     CarBusinessAfterDetailDto afterDetailDto = new CarBusinessAfterDetailDto();
                     bizAfterDetailDtos.add(afterDetailDto);
-                    if(repaymentBizPlan.getIsDefer()==1) {
+                    if(!repaymentBizPlan.getOriginalBusinessId().equals(repaymentBizPlan.getBusinessId())) {
                         afterDetailDto.setZqBusinessId(bizAfterDto.getZqBusinessId());//add By Czs
                     }else {
                         bizAfterDto.setZqBusinessId("");//add By Czs
                     }
+                    
               
                     afterDetailDto.setBusinessId(bizAfterDto.getCarBusinessId());//业务编号
                     afterDetailDto.setBusinessAfterId(bizAfterDto.getCarBusinessAfterId());//期数
