@@ -480,6 +480,11 @@ window.layinit(function (htConfig) {
                 total: 0,
                 surplus: 0,
                 penalty:0
+            },
+            dateOption: {
+                disabledDate(date) {
+                    return date > new Date();
+                }
             }
         },
         watch: {
@@ -516,8 +521,6 @@ window.layinit(function (htConfig) {
                 app.previewSettle()
             },
             'thisTimeRepaymentInfo.otherFees':function(n,o){
-                console.log(o);
-                console.log(n)
             }
         },
         methods: {
