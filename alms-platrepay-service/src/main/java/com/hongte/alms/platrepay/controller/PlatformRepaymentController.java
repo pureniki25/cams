@@ -281,6 +281,15 @@ public class PlatformRepaymentController {
 				LOGGER.info("@对接合规还款接口@  查不到平台的上标信息 输入参数 projPlanListId:[{}]  ", projPlanListId);
 				return Result.error("查不到平台的上标信息");
 			}
+			
+			vo.setBusinessId(tuandaiProjectInfo.getBusinessId());
+			vo.setBeginDate(tuandaiProjectInfo.getBeginTime());
+			vo.setTdUserIdM(tuandaiProjectInfo.getTdUserId());
+			if (tuandaiProjectInfo.getProjectId().equals(StringUtil.nullToStr(tuandaiProjectInfo.getMasterIssueId()))) {
+				vo.setIsMaster(1);
+			}else {
+				vo.setIsMaster(0);
+			}
 
 			// 处理业务类型
 			Integer businessType = handleBusinessType(basicBusiness, tuandaiProjectInfo);

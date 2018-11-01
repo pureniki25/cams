@@ -1693,29 +1693,37 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			BigDecimal principalAndInterest3, BigDecimal tuandaiAmount3, BigDecimal orgAmount3,
 			BigDecimal guaranteeAmount3, BigDecimal arbitrationAmount3, BigDecimal totalAmount, Integer period) {
 
-
-		List<String> businessTypes = new ArrayList<>();
-		SysParameter sysParameter = sysParameterService
-				.selectById(SysParameterEnums.SLAVE_PROJECT_BUSINESS_TYPE.getKey());
-		String paramValue = sysParameter.getParamValue();
-		if (StringUtil.notEmpty(paramValue)) {
-			String[] arrStr = paramValue.split(",");
-			businessTypes = Arrays.asList(arrStr);
+		boolean isMasterFlag = false;
+		if (tdrepayRechargeLog.getIsMaster() == null) {
+			List<String> businessTypes = new ArrayList<>();
+			SysParameter sysParameter = sysParameterService
+					.selectById(SysParameterEnums.SLAVE_PROJECT_BUSINESS_TYPE.getKey());
+			String paramValue = sysParameter.getParamValue();
+			if (StringUtil.notEmpty(paramValue)) {
+				String[] arrStr = paramValue.split(",");
+				businessTypes = Arrays.asList(arrStr);
+			}
+			if (businessTypes.contains(String.valueOf(tdrepayRechargeLog.getBusinessType()))) {
+				isMasterFlag = false;
+			}else {
+				isMasterFlag = true;
+			}
+		}else if (tdrepayRechargeLog.getIsMaster().intValue() == 1) {
+			isMasterFlag = true;
 		}
 		
 		// 若是共借标，则需要查找主借标的 tdUserId
-		if (businessTypes.contains(String.valueOf(tdrepayRechargeLog.getBusinessType()))) {
+		if (!isMasterFlag) {
 			// 查询共借人存管账户余额
-			BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
+//			BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserId());
+			BigDecimal aviMoney = queryUserAviMoney(tdrepayRechargeLog.getTdUserIdM());
 			if (aviMoney.compareTo(totalAmount) < 0) {
-				TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService
-						.selectOne(new EntityWrapper<TuandaiProjectInfo>()
-								.eq("business_id", tdrepayRechargeLog.getOrigBusinessId())
-								.where("project_id = master_issue_id"));
-
-				if (tuandaiProjectInfo != null) {
-					aviMoney = aviMoney.add(queryUserAviMoney(tuandaiProjectInfo.getTdUserId()));
-				}
+				// 若共借人存管账户金额小于待偿还垫付总额，则需加上主借人存管账户余额
+//				TuandaiProjectInfo tuandaiProjectInfo = tuandaiProjectInfoService
+//						.selectOne(new EntityWrapper<TuandaiProjectInfo>()
+//								.eq("business_id", tdrepayRechargeLog.getOrigBusinessId())
+//								.where("project_id = master_issue_id"));
+				aviMoney = aviMoney.add(queryUserAviMoney(tdrepayRechargeLog.getTdUserId()));
 
 				if (aviMoney.compareTo(totalAmount) >= 0) {
 					advanceShareProfit(tdrepayRechargeLog, projectId, principalAndInterest3, tuandaiAmount3, orgAmount3,
