@@ -379,7 +379,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                 if(!repaymentBizPlan.getOriginalBusinessId().equals(repaymentBizPlan.getBusinessId())) {
                     bizAfterDto.setZqBusinessId(repaymentBizPlan.getBusinessId());//add By Czs
                 }else {
-                    bizAfterDto.setZqBusinessId("");//add By Czs
+                    bizAfterDto.setZqBusinessId(null);//add By Czs
                 }
                 bizAfterDto.setCarBusinessId(repaymentBizPlan.getOriginalBusinessId());//业务id
                 bizAfterDto.setCarBusinessAfterId(repaymentBizPlanList.getAfterId());//[当前还款期数]
@@ -456,7 +456,7 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
                     if(!repaymentBizPlan.getOriginalBusinessId().equals(repaymentBizPlan.getBusinessId())) {
                         afterDetailDto.setZqBusinessId(bizAfterDto.getZqBusinessId());//add By Czs
                     }else {
-                        bizAfterDto.setZqBusinessId("");//add By Czs
+                        bizAfterDto.setZqBusinessId(null);//add By Czs
                     }
                     
               
@@ -1466,8 +1466,16 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         for(String beginDay:beginDays){
             planIndex++;
             List<ProjInfoReq> reqList = projInfoReqMap.get(beginDay);
-            //批次Id
-            String batchId = UUID.randomUUID().toString();
+            RepaymentProjPlan projPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("repayment_batch_id", reqList.get(0).getBusinessAfterGuid()));
+            String batchId ="";
+            if(projPlan!=null) {
+                batchId = projPlan.getRepaymentBatchId(); //展期还款计划批次号延用原业务计划的还款批次号
+            }else {
+            	   //批次Id
+                 batchId = UUID.randomUUID().toString();
+            }
+        
+         
             //期数对应的标List列表    以业务计
             //Map<期数，标还款计划费用详情列表>
             Map<Integer,List<RepaymentProjPlanList>>  repaymentPlanListPeriorMap = new HashMap<>();
@@ -1492,15 +1500,14 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
         
 
             for(ProjInfoReq projInfoReq:reqList){
-
-
+            	
                 ///////  标还款计划表   一次出款 生成一条记录
                 RepaymentProjPlan repaymentProjPlan = new RepaymentProjPlan(); //ClassCopyUtil.copy(projInfoReq,ProjInfoReq.class,RepaymentProjPlan.class);
                 repaymentProjPlan.setProjPlanId(UUID.randomUUID().toString());
                 repaymentProjPlan.setProjectId(projInfoReq.getProjectId());
                 repaymentProjPlan.setBusinessId(businessBasicInfo.getBusinessId());
                 repaymentProjPlan.setOriginalBusinessId(businessBasicInfo.getOrgBusinessId());
-                repaymentProjPlan.setRepaymentBatchId(batchId);  //还款计划批次号
+            	repaymentProjPlan.setRepaymentBatchId(batchId);  //还款计划批次号
                 repaymentProjPlan.setPlanId("");   //业务还款计划ID
                 repaymentProjPlan.setBorrowMoney(projInfoReq.getFullBorrowMoney());  //生成还款计划对应的借款总额
                 repaymentProjPlan.setBorrowRate(projInfoReq.getRate());  //生成还款计划对应的借款利率
