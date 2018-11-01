@@ -562,10 +562,10 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 								if (RepayPlanFeeTypeEnum.PRINCIPAL_PENALTY.getUuid().equals(feeId)) {
 									liquidatedDamage = liquidatedDamage.add(feeValue);
 								}
-								if (RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.equals(feeId)) {
+								if (RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid().equals(feeId)) {
 									orgAmount = orgAmount.add(feeValue);
 								}
-								if (RepayPlanFeeTypeEnum.PLAT_PENALTY.equals(feeId)) {
+								if (RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid().equals(feeId)) {
 									platformAmount = platformAmount.add(feeValue);
 								}
 							}
