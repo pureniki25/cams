@@ -1462,10 +1462,30 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 			}
 
 		});
+		boolean isDefer=false;//判断是否展期
+		Date beginTime=new Date();
+    	if(businessBasicInfo.getBusinessId().contains("ZQ")) {
+    		isDefer=true;
+    	}
+    	
 		 //****************根据启标时间排序*******************//
         for(String beginDay:beginDays){
             planIndex++;
             List<ProjInfoReq> reqList = projInfoReqMap.get(beginDay);
+            List<ProjInfoReq> reqListtepm  =new ArrayList();
+        			if (isDefer) {
+        				for (String beginDaytemp : beginDays) {
+        					List<ProjInfoReq> list = projInfoReqMap.get(beginDaytemp);
+        					reqListtepm.addAll(list);
+        				}
+        				reqList=reqListtepm;
+        				
+        				for(ProjInfoReq req:reqList) {
+        					if(req.getBeginTime().compareTo(beginTime)<0) {
+        						beginTime=req.getBeginTime();
+        					}
+        				}
+        			}
             RepaymentProjPlan projPlan=repaymentProjPlanService.selectOne(new EntityWrapper<RepaymentProjPlan>().eq("repayment_batch_id", reqList.get(0).getBusinessAfterGuid()));
             String batchId ="";
             if(projPlan!=null) {
@@ -1712,6 +1732,9 @@ public class CreatRepayPlanServiceImpl  implements CreatRepayPlanService {
 
 
 
+            }
+            if(isDefer) {
+            	break;
             }
         }
     }
