@@ -211,6 +211,7 @@
         </if>	
 		<where>
 			1 = 1
+			and (pl.repay_flag != 6 or pl.repay_flag is null)
 			<if test="userId !=null  and userId != '' and needPermission == 1">
                 and pl.orig_business_id in (
 					select business_id from tb_sys_user_permission where page_type = 9 and user_id = #{userId}    	

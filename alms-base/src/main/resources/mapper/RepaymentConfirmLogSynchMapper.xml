@@ -572,7 +572,9 @@
 		SUM(ext_other_fee) AS extOtherFee, 
 		ext_remark AS extRemark
 		FROM
-		tb_repayment_confirm_log_synch 
+		 
+			(SELECT * from tb_repayment_confirm_log_synch ORDER BY create_time desc ) as temp
+		
 		<!-- left join tb_sys_user u on u.user_id = create_user -->
 		WHERE is_cancelled = 0 
 		<if test="req.key != null and req.key neq '' ">
