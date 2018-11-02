@@ -1446,18 +1446,18 @@ public class FinanceController {
 	@ApiOperation(value="根据业务编号查询还款详情页面基础信息")
 	public Result<RepaymentPlanBaseInfoVo> queryBaseInfoByBusinessId(@RequestParam("businessId") String businessId) {
 		try {
-			FinanceSettleReq req = new FinanceSettleReq();
-			req.setBusinessId(businessId);
-			req.setAfterId("");
-			List<RepaymentBizPlanList> currenPeroids = financeSettleService.getCurrenPeroids(req);
+//			FinanceSettleReq req = new FinanceSettleReq();
+//			req.setBusinessId(businessId);
+//			req.setAfterId("");
+//			List<RepaymentBizPlanList> currenPeroids = financeSettleService.getCurrenPeroids(req);
 			
 			List<String> afterIds = new ArrayList<>();
-			
-			if (CollectionUtils.isNotEmpty(currenPeroids)) {
-				for (RepaymentBizPlanList repaymentBizPlanList : currenPeroids) {
-					afterIds.add(repaymentBizPlanList.getAfterId());
-				}
-			}
+//			
+//			if (CollectionUtils.isNotEmpty(currenPeroids)) {
+//				for (RepaymentBizPlanList repaymentBizPlanList : currenPeroids) {
+//					afterIds.add(repaymentBizPlanList.getAfterId());
+//				}
+//			}
 			
 			return Result.success(repaymentBizPlanListService.queryBaseInfoByBusinessId(businessId, afterIds));
 		} catch (Exception e) {

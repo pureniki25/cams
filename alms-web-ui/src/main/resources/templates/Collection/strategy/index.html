@@ -509,7 +509,10 @@
                             if(obj.event === 'delete'){
                                 obj.data.id;
 
-
+                                layer.confirm('确定删除本条记录？', {
+                                    btn: ['确定', '取消'] //按钮
+                                }, function (index) {
+                                    layer.close(index);
                                 var url = basePath + "collectionStrategy/deletePersonSet?id="+obj.data.id;
                                 $.ajax({
                                     type: "POST",
@@ -528,7 +531,7 @@
 
                                 });
 
-
+                                });
 
                             }
 

@@ -1931,7 +1931,8 @@ public class FinanceSettleServiceImpl implements FinanceSettleService {
             throw new ServiceRuntimeException("找不到当前期还款计划");
         }
 
-        List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(new EntityWrapper<MoneyPoolRepayment>().eq("plan_list_id", cur.getPlanListId()).eq("is_finance_match", 1).orderBy("trade_date", false));
+        List<MoneyPoolRepayment> moneyPoolRepayments = moneyPoolRepaymentMapper.selectList(new EntityWrapper<MoneyPoolRepayment>()
+        		.eq("plan_list_id", cur.getPlanListId()).eq("is_finance_match", 1).orderBy("account_money", false).last(" limit 1 "));
         SettleInfoVO infoVO = new SettleInfoVO();
         infoVO.setMoneyPoolRepayDates(new LinkedHashSet<>());
         
