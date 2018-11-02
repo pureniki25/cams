@@ -26,6 +26,8 @@ public class CreateBatchFlowCommand extends MessageCommand {
     private Integer actionId;
 
     private Integer businessFrom;
+    
+    private Integer investFrom;
 
     private Integer businessFlag;
 
@@ -75,7 +77,15 @@ public class CreateBatchFlowCommand extends MessageCommand {
         this.businessFrom = businessFrom;
     }
 
-    public Integer getBusinessFlag() {
+    public Integer getInvestFrom() {
+		return investFrom;
+	}
+
+	public void setInvestFrom(Integer investFrom) {
+		this.investFrom = investFrom;
+	}
+
+	public Integer getBusinessFlag() {
         return businessFlag;
     }
 

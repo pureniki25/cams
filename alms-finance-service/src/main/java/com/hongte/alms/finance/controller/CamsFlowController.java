@@ -46,6 +46,7 @@ import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Business;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Flow;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowAccountIdentifier;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowDetail;
+import com.hongte.alms.finance.enums.OutputPlatformIdEnum;
 import com.ht.ussp.core.Result;
 
 import io.swagger.annotations.Api;
@@ -231,6 +232,7 @@ public class CamsFlowController {
         	int businessFlag = Integer.parseInt(businessMapInfo.get("businessFlag").toString());
         	//所属资产端
         	int businessFrom = Integer.parseInt(businessMapInfo.get("businessFrom")==null?"1":businessMapInfo.get("businessFrom").toString());
+        	int investFrom = Integer.parseInt(businessMapInfo.get("investFrom")==null?"1":businessMapInfo.get("investFrom").toString());
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
         	Date createTime = new Date();//(Date) businessMapInfo.get("create_time");
         	String createUser = businessMapInfo.get("create_user")==null?"":businessMapInfo.get("create_user").toString();
@@ -400,6 +402,7 @@ public class CamsFlowController {
             	command.setBatchId(batchId);
             	command.setBusinessFlag(businessFlag);
             	command.setBusinessFrom(businessFrom);
+            	command.setInvestFrom(OutputPlatformIdEnum.getHxValue(investFrom));
             	command.setClientId(clientId);
             	command.setCreateTime(createTime);
             	command.setCreateUser(createUser);
@@ -506,6 +509,7 @@ public class CamsFlowController {
         	int businessFlag = Integer.parseInt(businessMapInfo.get("businessFlag").toString());
         	//所属资产端
         	int businessFrom = Integer.parseInt(businessMapInfo.get("businessFrom")==null?"1":businessMapInfo.get("businessFrom").toString());
+        	int investFrom = Integer.parseInt(businessMapInfo.get("investFrom")==null?"1":businessMapInfo.get("investFrom").toString());
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
         	Date createTime = (Date) businessMapInfo.get("create_time");//new Date();//
         	String createUser = businessMapInfo.get("create_user")==null?"":businessMapInfo.get("create_user").toString();
@@ -761,6 +765,7 @@ public class CamsFlowController {
             	command.setBatchId(batchId);
             	command.setBusinessFlag(businessFlag);
             	command.setBusinessFrom(businessFrom);
+            	command.setInvestFrom(OutputPlatformIdEnum.getHxValue(investFrom));
             	command.setClientId(clientId);
             	command.setCreateTime(createTime);
             	command.setCreateUser(createUser);
