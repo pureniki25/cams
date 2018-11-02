@@ -1391,10 +1391,13 @@
 		SELECT 
 		  t.`business_id` businessId,
 		  t.`borrow_limit` borrowLimit,
-		  t.`borrow_rate` borrowRate
+		  t.`borrow_rate` borrowRate,
+		  t2.`input_time` inputTime
 		FROM
-		  `tb_repayment_biz_plan` t 
+		  `tb_repayment_biz_plan` t,
+		  `tb_basic_business` t2 
 		WHERE t.`original_business_id` != t.`business_id` 
-		  AND t.`original_business_id` = #{businessId,jdbcType=VARCHAR} 
+		AND t2.`business_id` = t.`business_id`
+		  AND t.`original_business_id` =  #{businessId,jdbcType=VARCHAR} 
 	</select>
 </mapper>

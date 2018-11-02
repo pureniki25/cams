@@ -239,7 +239,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			/*
 			 * 将分发状态更新为处理中 分发状态（0：待分发，1：分发处理中，2：分发成功，3，分发失败）
 			 */
-			updateTdrepayRechargeLogProcessStatus(vos, 1, userId);
+			updateTdrepayRechargeLogProcessStatus(vos, 1, userId, "资金分发处理中");
 
 			/*
 			 * 由于每种业务类型对应一个资产端账户唯一编号，根据业务类型进行分批
@@ -306,8 +306,10 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	 */
 	@SuppressWarnings("rawtypes")
 	private void handleSendDistributeFundResult(List<TdrepayRechargeInfoVO> vos, String userId, Result result) {
-		if (result == null || !Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
-			updateTdrepayRechargeLogProcessStatus(vos, 3, userId);
+		if (result != null && !Constant.REMOTE_EIP_SUCCESS_CODE.equals(result.getReturnCode())) {
+			updateTdrepayRechargeLogProcessStatus(vos, 3, userId, result.getCodeDesc());
+		}else if (result == null) {
+			updateTdrepayRechargeLogProcessStatus(vos, 3, userId, "资金分发失败");
 		}
 	}
 
@@ -319,7 +321,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	 * @param userId
 	 */
 	private List<TdrepayRechargeLog> updateTdrepayRechargeLogProcessStatus(List<TdrepayRechargeInfoVO> vos,
-			Integer processStatus, String userId) {
+			Integer processStatus, String userId, String returnDesc) {
 		List<TdrepayRechargeLog> rechargeLogs = new LinkedList<>();
 		for (TdrepayRechargeInfoVO vo : vos) {
 			TdrepayRechargeLog tdrepayRechargeLog = new TdrepayRechargeLog();
@@ -328,6 +330,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 			tdrepayRechargeLog.setProcessTime(new Date());
 			tdrepayRechargeLog.setUpdateTime(new Date());
 			tdrepayRechargeLog.setUpdateUser(userId);
+			tdrepayRechargeLog.setRemark(returnDesc);
 			rechargeLogs.add(tdrepayRechargeLog);
 		}
 		tdrepayRechargeLogService.updateBatchById(rechargeLogs);
