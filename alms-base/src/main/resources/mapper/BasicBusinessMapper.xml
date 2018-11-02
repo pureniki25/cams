@@ -664,6 +664,7 @@
 			ELSE t4.plan_status END  AS 'plan_status',
 		]]>
 		'1' as businessFlag,
+		t2.output_platform_id as investFrom,
 		t6.project_from+1 as businessFrom
 		FROM tb_repayment_confirm_log t1
 		LEFT JOIN tb_basic_business t2 ON t1.business_id = t2.business_id
@@ -971,6 +972,7 @@
 		t1.business_type,t3.business_type_name,t1.customer_name,t2.asset_id,
 		'5' AS 'action_id',
 		'1' as businessFlag,
+		t2.output_platform_id as investFrom,
 		t1.asset_type as businessFrom
 		FROM tb_tdrepay_recharge_log t1
 		LEFT JOIN tb_basic_business t2 ON t1.orig_business_id = t2.business_id
