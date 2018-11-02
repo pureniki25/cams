@@ -30,6 +30,7 @@ import com.hongte.alms.base.entity.RepaymentPlatformListBorrower;
 import com.hongte.alms.base.entity.RepaymentPlatformListGuarantee;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
+import com.hongte.alms.base.enums.OutputPlatformIdEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.feignClient.EipRemote;
@@ -412,6 +413,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
         	int businessFlag = Integer.parseInt(businessMapInfo.get("businessFlag").toString());
         	//所属资产端
         	int businessFrom = Integer.parseInt(businessMapInfo.get("businessFrom")==null?"1":businessMapInfo.get("businessFrom").toString());
+        	int investFrom = Integer.parseInt(businessMapInfo.get("investFrom")==null?"1":businessMapInfo.get("investFrom").toString());
         	String clientId = "ALMS"; //businessMapInfo.get("plate_type")+
         	Date createTime = new Date();//(Date) businessMapInfo.get("create_time");
         	String createUser = businessMapInfo.get("create_user")==null?"":businessMapInfo.get("create_user").toString();
@@ -601,6 +603,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	command.setBatchId(batchId);
             	command.setBusinessFlag(businessFlag);
             	command.setBusinessFrom(businessFrom);
+            	command.setInvestFrom(OutputPlatformIdEnum.getHxValue(investFrom));
             	command.setClientId(clientId);
             	command.setCreateTime(createTime);
             	command.setCreateUser(createUser);

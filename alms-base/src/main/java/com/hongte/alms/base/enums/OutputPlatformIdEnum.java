@@ -1,4 +1,4 @@
-package com.hongte.alms.finance.enums;
+package com.hongte.alms.base.enums;
 
 import java.io.Serializable;
 

@@ -38,6 +38,7 @@
 		t3.business_type,t4.business_type_name,t3.customer_name,
 		7 AS 'action_id',
 		'1' as businessFlag,
+		t3.output_platform_id as investFrom,
 		t2.project_from+1 as businessFrom
 		FROM tb_repayment_platform_list t1
 		LEFT JOIN tb_tuandai_project_info t2 ON t1.project_id = t2.project_id
@@ -91,6 +92,7 @@
 		t6.real_name AS 'account_name',
 		t6.open_bank_name AS 'open_bank',
 		t6.project_from+1 AS 'businessFrom',
+		t9.output_platform_id as investFrom,
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		t6.identity_card AS 'main_id',
 		1 AS 'main_type',
@@ -143,6 +145,7 @@
 		t3.business_type,t4.business_type_name,t3.customer_name,
 		8  AS 'action_id',
 		'1' as businessFlag,
+		t3.output_platform_id as investFrom,
 		t2.project_from+1 as businessFrom
 		FROM tb_repayment_platform_list_guarantee t1
 		LEFT JOIN tb_tuandai_project_info t2 ON t1.project_id = t2.project_id
@@ -196,6 +199,7 @@
 		t6.real_name AS 'account_name',
 		t6.open_bank_name AS 'open_bank',
 		t6.project_from+1 AS 'businessFrom',
+		t9.output_platform_id as investFrom,
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		t6.identity_card AS 'main_id',
 		1 AS 'main_type',
@@ -250,6 +254,7 @@
 		t3.business_type,t4.business_type_name,t3.customer_name,
 		81  AS 'action_id',
 		'1' as businessFlag,
+		t3.output_platform_id as investFrom,
 		t2.project_from+1 as businessFrom
 		FROM tb_repayment_advance_repay_flow t1
 		LEFT JOIN tb_tuandai_project_info t2 ON t1.project_id = t2.project_id
@@ -306,6 +311,7 @@
 		t6.real_name AS 'account_name',
 		t6.open_bank_name AS 'open_bank',
 		t6.project_from+1 AS 'businessFrom',
+		t9.output_platform_id as investFrom,
 		t6.queryFullsuccessDate AS 'segmentation_date',
 		t6.identity_card AS 'main_id',
 		1 AS 'main_type',
@@ -358,6 +364,7 @@
 		t4.business_type,t5.business_type_name,t4.customer_name,
 		2  AS 'action_id',
 		'1' as businessFlag,
+		t4.output_platform_id as investFrom,
 		t3.project_from+1 as businessFrom
 		FROM `tb_repayment_biz_plan_list` t1
 		LEFT JOIN tb_repayment_biz_plan t2 ON t1.plan_id = t2.plan_id
@@ -411,6 +418,7 @@
 		1 AS 'import_type',
 		CONCAT('ALMS-',t1.plan_list_id) AS 'log_id',
 		t3.project_from+1 AS 'businessFrom',
+		t4.output_platform_id as investFrom,
 		t3.queryFullsuccessDate AS 'segmentation_date'
 		FROM `tb_repayment_biz_plan_list` t1
 		LEFT JOIN tb_repayment_biz_plan t2 ON t1.plan_id = t2.plan_id
@@ -429,6 +437,7 @@
 		t4.business_type,t5.business_type_name,t4.customer_name,
 		10  AS 'action_id',
 		'1' AS businessFlag,
+		t4.output_platform_id as investFrom,
 		<![CDATA[ CASE 
 			WHEN t1.recharge_account_type = '一点车贷' THEN '2'
 			ELSE '1' END  AS 'businessFrom'
@@ -480,6 +489,7 @@
 		1 AS 'import_type',
 		CONCAT('ALMS-',t1.id) AS 'log_id',
 		t1.recharge_sourse_account AS 'account_name',
+		t9.output_platform_id as investFrom,
 		<![CDATA[ CASE 
 			WHEN t1.recharge_account_type = '一点车贷' THEN '2'
 			ELSE '1' END  AS 'businessFrom'

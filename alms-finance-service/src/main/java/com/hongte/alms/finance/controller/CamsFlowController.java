@@ -29,6 +29,7 @@ import com.hongte.alms.base.entity.RepaymentConfirmLog;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 import com.hongte.alms.base.entity.TdrepayRechargeRecord;
 import com.hongte.alms.base.enums.BusinessTypeEnum;
+import com.hongte.alms.base.enums.OutputPlatformIdEnum;
 import com.hongte.alms.base.enums.repayPlan.RepayPlanFeeTypeEnum;
 import com.hongte.alms.base.feignClient.AccountListHandlerMsgClient;
 import com.hongte.alms.base.service.AccountantOverRepayLogService;
@@ -46,7 +47,6 @@ import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Business;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Flow;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowAccountIdentifier;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowDetail;
-import com.hongte.alms.finance.enums.OutputPlatformIdEnum;
 import com.ht.ussp.core.Result;
 
 import io.swagger.annotations.Api;
