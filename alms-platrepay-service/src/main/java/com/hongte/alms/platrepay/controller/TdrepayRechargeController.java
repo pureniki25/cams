@@ -522,7 +522,7 @@ public class TdrepayRechargeController {
 			if (info != null) {
 				paramMap2.put("userId", info.getTdUserId());
 			} else {
-				/*List<String> projectIds = new ArrayList<>();
+				List<String> projectIds = new ArrayList<>();
 				projectIds.add(projectId);
 				com.ht.ussp.core.Result projectStatusResult = casProjectFeignClient.getProjectInfoList(projectIds);
 				if (projectStatusResult != null
@@ -534,10 +534,6 @@ public class TdrepayRechargeController {
 						Map map = lst.get(0);
 						paramMap2.put("userId", map.get("userId"));
 					}
-				}*/
-				TdrepayRechargeLog rechargeLog = tdrepayRechargeLogService.selectOne(new EntityWrapper<TdrepayRechargeLog>().eq("project_id", projectId));
-				if (rechargeLog != null) {
-					paramMap2.put("userId", rechargeLog.getTdUserIdM());
 				}
 			}
 

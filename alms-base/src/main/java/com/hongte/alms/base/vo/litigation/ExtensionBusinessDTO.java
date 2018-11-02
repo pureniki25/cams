@@ -2,9 +2,6 @@ package com.hongte.alms.base.vo.litigation;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 import lombok.ToString;
@@ -34,10 +31,4 @@ public class ExtensionBusinessDTO implements Serializable {
 	 * 展期期限
 	 */
 	private int borrowLimit;
-	
-	/**
-	 * 展期开始时间
-	 */
-	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date inputTime;
 }

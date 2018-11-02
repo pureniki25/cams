@@ -50,7 +50,6 @@ window.layinit(function(htConfig) {
 			guaranteePaymentDataList:[], // 担保公司垫付信息
 			handleAdvancePaymentLoading: false, // 执行还垫付加载状态控制
 			handleAdvancePaymentLateFeeLoading: false, // 执行还垫付(含滞纳金)加载状态控制
-			yidianchedaiFlag: false, // 是否新商标一点车贷业务
 				
 			/*
 			 *  详情基础信息
@@ -612,7 +611,6 @@ window.layinit(function(htConfig) {
 			 * 当业务类型改变时触发
 			 */
 			onChangeBusinessType: function(value){
-				console.log("value",value);
 				axios.get(basePath +"recharge/queryRechargeAccountTypeByBusinessType?businessType=" + value)
 				.then(function (res) {
 					if (res.data.data != null && res.data.code == 1) {
@@ -962,11 +960,6 @@ window.layinit(function(htConfig) {
 			 * 标的还款信息查询接口
 			 */
 			getProjectPayment: function(projectId){
-				this.platformRepaymentInfoaviMoney = 0;
-				this.platformPrincipal = 0;
-				this.platformInterest = 0;
-				this.platformRepaymentInfoPlatformCharge = 0;
-				this.platformPrincipalAndInterestAndPlatformCharge = 0;
 				axios.get(basePath +"tdrepayRecharge/getProjectPayment?projectId=" + projectId)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
@@ -1195,11 +1188,6 @@ window.layinit(function(htConfig) {
 	
 	table.on('tool(complianceRepaymentData)', function (obj) {
 		let event = obj.event;
-		if (obj.data.businessType == 20 || obj.data.businessType == 33) {
-			vm.yidianchedaiFlag = true;
-		}else {
-			vm.yidianchedaiFlag = false;
-		}
 		if (event == 'info') {
 			vm.projectId = obj.data.projectId;
 			vm.getProjectInfoByBusinessId(obj);

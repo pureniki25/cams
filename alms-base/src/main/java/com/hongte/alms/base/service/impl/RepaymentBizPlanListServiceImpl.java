@@ -552,21 +552,14 @@ public class RepaymentBizPlanListServiceImpl extends BaseServiceImpl<RepaymentBi
 					if (infoVO != null) {
 						principal = principal.add(infoVO.getItem10() == null ? BigDecimal.ZERO : infoVO.getItem10());
 						interest = interest.add(infoVO.getItem20() == null ? BigDecimal.ZERO : infoVO.getItem20());
-						platformAmount = platformAmount.add(infoVO.getItem50() == null ? BigDecimal.ZERO : infoVO.getItem50());
-						orgAmount = orgAmount.add(infoVO.getItem30() == null ? BigDecimal.ZERO : infoVO.getItem30());
+						platformAmount = platformAmount.add(infoVO.getItem30() == null ? BigDecimal.ZERO : infoVO.getItem30());
+						orgAmount = orgAmount.add(infoVO.getItem50() == null ? BigDecimal.ZERO : infoVO.getItem50());
 						List<SettleFeesVO> penaltyFees = infoVO.getPenaltyFees();
 						if (CollectionUtils.isNotEmpty(penaltyFees)) {
 							for (SettleFeesVO settleFeesVO : penaltyFees) {
-								BigDecimal feeValue = settleFeesVO.getAmount() == null ? BigDecimal.ZERO : settleFeesVO.getAmount();
-								String feeId = StringUtil.nullToStr(settleFeesVO.getFeeId());
-								if (RepayPlanFeeTypeEnum.PRINCIPAL_PENALTY.getUuid().equals(feeId)) {
-									liquidatedDamage = liquidatedDamage.add(feeValue);
-								}
-								if (RepayPlanFeeTypeEnum.SUB_COMPANY_PENALTY.getUuid().equals(feeId)) {
-									orgAmount = orgAmount.add(feeValue);
-								}
-								if (RepayPlanFeeTypeEnum.PLAT_PENALTY.getUuid().equals(feeId)) {
-									platformAmount = platformAmount.add(feeValue);
+								if (RepayPlanFeeTypeEnum.PRINCIPAL_PENALTY.getUuid().equals(settleFeesVO.getFeeId())) {
+									liquidatedDamage = liquidatedDamage.add(settleFeesVO.getAmount() == null ? BigDecimal.ZERO : settleFeesVO.getAmount());
+									break;
 								}
 							}
 						}

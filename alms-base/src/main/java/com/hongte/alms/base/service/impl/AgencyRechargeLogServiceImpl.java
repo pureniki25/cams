@@ -136,17 +136,6 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 			Map<String, Object> paramMap = new HashMap<>();
 
 			for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
-				
-				if ("".equals(StringUtil.nullToStr(tdrepayRechargeLog.getRequestNo()))) {
-					if (tdrepayRechargeLog.getProcessStatus() != null && tdrepayRechargeLog.getProcessStatus().intValue() == 1) {
-						tdrepayRechargeLog.setProcessStatus(3);
-						tdrepayRechargeLog.setRemark("资金分发失败");
-						tdrepayRechargeLog.setUpdateTime(new Date());
-						tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
-					}
-					continue;
-				}
-				
 				paramMap.put("oidPartner", tdrepayRechargeLog.getOidPartner());
 				paramMap.put("batchId", tdrepayRechargeLog.getBatchId());
 				paramMap.put("requestNo", tdrepayRechargeLog.getRequestNo());
@@ -200,7 +189,6 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 							case "3":
 							case "4":
 							case "500":
-								tdrepayRechargeLog.setRequestNo("");
 								tdrepayRechargeLog.setProcessStatus(3);
 								tdrepayRechargeLog.setRemark((String) resultMap.get("codeDesc"));
 								break;
@@ -210,17 +198,14 @@ public class AgencyRechargeLogServiceImpl extends BaseServiceImpl<AgencyRecharge
 								tdrepayRechargeLog.setRemark((String) resultMap.get("codeDesc"));
 								break;
 							}
+							tdrepayRechargeLog.setUpdateTime(new Date());
+							tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
 						}
-					} else if ("未找到此订单".equals(result.getCodeDesc())) {
+					} else {
 						tdrepayRechargeLog.setProcessStatus(3);
-						tdrepayRechargeLog.setRequestNo("");
-						tdrepayRechargeLog.setRemark(result.getCodeDesc());
-					}else {
 						tdrepayRechargeLog.setRemark(result.getCodeDesc());
 					}
-					tdrepayRechargeLog.setUpdateTime(new Date());
-					tdrepayRechargeLog.setUpdateUser(loginUserInfoHelper.getUserId());
-					tdrepayRechargeLogService.updateAllColumnById(tdrepayRechargeLog);
+					tdrepayRechargeLogService.updateById(tdrepayRechargeLog);
 				}
 			}
 		}

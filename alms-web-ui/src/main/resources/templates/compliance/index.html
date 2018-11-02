@@ -256,8 +256,8 @@
                 <span class="marginRight">{{ infoBasicData.projectId }}</span>
                 <span>客户姓名:</span>
                 <span class="marginRight">{{ infoBasicData.customerName }}</span>
-                <span v-if="!yidianchedaiFlag">标的金额:</span>
-                <span class="marginRight" v-if="!yidianchedaiFlag">{{infoBasicData.amount?numeral(infoBasicData.amount).format('0,0.00') + '元' : ''}}</span>
+                <span>标的金额:</span>
+                <span class="marginRight">{{infoBasicData.amount?numeral(infoBasicData.amount).format('0,0.00') + '元' : ''}}</span>
             </div>
             
 	        <tabs v-model="infoTabValue" :animated="true" @on-click="initFunction($event)">
@@ -310,8 +310,8 @@
 				    <tabs :animated="true" @on-click="initProjectFunction($event)">
 				    	<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
 							<row>
-								<i-col span='6' v-if="!yidianchedaiFlag">标的号：{{ item.projectId }}</i-col>
-								<i-col span='4' v-if="!yidianchedaiFlag">上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
+								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
+								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
 								<i-col span='4'>账户余额：{{ platformRepaymentInfoaviMoney?numeral(platformRepaymentInfoaviMoney).format('0,0.00'):0 }}</i-col>
 								<i-col span='10' >
 									今天结清应还本息平台费：{{ platformPrincipalAndInterestAndPlatformCharge?numeral(platformPrincipalAndInterestAndPlatformCharge).format('0,0.00'):0 }}，
