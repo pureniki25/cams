@@ -47,6 +47,7 @@ import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Business;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.Flow;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowAccountIdentifier;
 import com.hongte.alms.base.vo.cams.CreateBatchFlowCommand.FlowDetail;
+import com.hongte.alms.common.util.DateUtil;
 import com.ht.ussp.core.Result;
 
 import io.swagger.annotations.Api;
@@ -70,6 +71,7 @@ public class CamsFlowController {
     private String dMainIdCash = "85dbddef27e3475c966da7b6ed0a343e";//现金账户
     private String mainIdnull = "无";//无的虚拟账号
     private String dMainIdnull = "786fd138695a4c53a7a45f3f323c8b0e";//无的现金账号
+    private Date fiterSegmentationDate = DateUtil.getDate("2016-03-11",DateUtil.DEFAULT_FORMAT_DATE);
 //    @Autowired
 //    private AccountListHandlerClient accountListHandlerClient;
     
@@ -360,6 +362,9 @@ public class CamsFlowController {
             	flow1.setSourceAccountIdentifierId(sourceAccountIdentifierId);
             	flow1.setTargetAccountIdentifierId(targetAccountIdentifierId);
             	flows.add(flow1);
+            	if(fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
+            		return;
+            	}
             	//}
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
             	paramFlowItemMap.put("repaySourceId", listId);
@@ -691,6 +696,11 @@ public class CamsFlowController {
             	//if(repayType != 7) {//|| listOnlineFlow.size() == 1
             		flows.add(flow);
             	//}
+            		
+        		if(fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
+            		return;
+            	}	
+            	
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
             	paramFlowItemMap.put("repaySourceId", listId);
             	List<Map<String,Object>> listFlowItem = basicBusinessService.selectlPushBusinessFlowItem(paramFlowItemMap);
@@ -896,7 +906,11 @@ public class CamsFlowController {
     	for (Map<String, Object> mapFlow : listRepayFlow) {
 			String businessId = mapFlow.get("business_id").toString();
 			String afterId = mapFlow.get("after_id").toString();
-			Date queryFullsuccessDate = (Date) mapFlow.get("queryFullsuccessDate");
+			
+           	BasicBusiness basicBusiness = basicBusinessService.selectById(businessId);
+        	Date businessInputTime = basicBusiness == null?null:basicBusiness.getInputTime();
+        	
+			Date queryFullsuccessDate = mapFlow.get("queryFullsuccessDate") == null?businessInputTime:(Date) mapFlow.get("queryFullsuccessDate");
 			String logId = mapFlow.get("confirm_log_id").toString();
 			//String flowType = mapFlow.get("flowType").toString();
 			String clientId = "ALMS";
@@ -918,6 +932,7 @@ public class CamsFlowController {
 	    	if(null == updateTime) {
 	    		updateTime = repaymentConfirmLog.getCreateTime();
 	    	}
+	    	
 	    	command.setCreateTime(updateTime); //new Date()
 	    	command.setTriggerEventSystem("1");
 	    	command.setEventType("FlowCanceled");
@@ -933,6 +948,10 @@ public class CamsFlowController {
 	    	camsMessage.setMessageId(UUID.randomUUID().toString());
 	    	camsMessage.setQueueName("cams.account.ms.queue.bizAccountListCanceledQueue");
 	    	camsMessage.setMessage(command);
+	    	
+    		if(fiterSegmentationDate.compareTo(queryFullsuccessDate) >0 ) {
+        		continue;
+        	}	
 	    	
 	    	int retryTimes = 0;
 	    	String retStr = "";

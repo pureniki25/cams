@@ -126,6 +126,8 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
     private String danbao = "深圳市天大联合融资担保有限公司";
     private String mainIdDanbao = "45BC0637-412F-45AF-A44A-14348BEB400C";//深圳市天大联合融资担保有限公司
     private String dMainIdDanbao = "45BC0637-412F-45AF-A44A-14348BEB400C";
+    
+    private Date fiterSegmentationDate = DateUtil.getDate("2016-03-11",DateUtil.DEFAULT_FORMAT_DATE);
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowPushLogServiceImpl.class);
 	
@@ -546,6 +548,9 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	flow.setSegmentationDate(segmentationDate);
             	flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
             	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
+            	if(fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
+            		continue;
+            	}
             	flows.add(flow);
             	
             	if(actionId != 201) {  //你我金融流水 不构建支出流水
