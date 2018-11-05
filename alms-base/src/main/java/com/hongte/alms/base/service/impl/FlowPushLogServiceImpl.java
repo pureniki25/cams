@@ -548,7 +548,7 @@ public class FlowPushLogServiceImpl extends BaseServiceImpl<FlowPushLogMapper, F
             	flow.setSegmentationDate(segmentationDate);
             	flow.setSourceAccountIdentifierId(targetAccountIdentifierId);
             	flow.setTargetAccountIdentifierId(sourceAccountIdentifierId);
-            	if(fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
+            	if(segmentationDate != null && fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
             		continue;
             	}
             	flows.add(flow);

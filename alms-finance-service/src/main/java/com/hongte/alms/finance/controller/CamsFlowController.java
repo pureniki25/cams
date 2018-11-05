@@ -362,7 +362,7 @@ public class CamsFlowController {
             	flow1.setSourceAccountIdentifierId(sourceAccountIdentifierId);
             	flow1.setTargetAccountIdentifierId(targetAccountIdentifierId);
             	flows.add(flow1);
-            	if(fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
+            	if(segmentationDate != null && fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
             		return;
             	}
             	//}
@@ -697,7 +697,7 @@ public class CamsFlowController {
             		flows.add(flow);
             	//}
             		
-        		if(fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
+        		if(segmentationDate != null && fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
             		return;
             	}	
             	
@@ -949,7 +949,7 @@ public class CamsFlowController {
 	    	camsMessage.setQueueName("cams.account.ms.queue.bizAccountListCanceledQueue");
 	    	camsMessage.setMessage(command);
 	    	
-    		if(fiterSegmentationDate.compareTo(queryFullsuccessDate) >0 ) {
+    		if(queryFullsuccessDate != null && fiterSegmentationDate.compareTo(queryFullsuccessDate) >0 ) {
         		continue;
         	}	
 	    	
@@ -1250,7 +1250,7 @@ public class CamsFlowController {
 	    	camsMessage.setQueueName("cams.account.ms.queue.bizAccountListCanceledQueue");
 	    	camsMessage.setMessage(command);
 	    	
-    		if(fiterSegmentationDate.compareTo(queryFullsuccessDate) >0 ) {
+    		if(queryFullsuccessDate != null && fiterSegmentationDate.compareTo(queryFullsuccessDate) >0 ) {
         		continue;
         	}	
 	    	
