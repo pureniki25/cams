@@ -363,7 +363,7 @@ public class CamsFlowController {
             	flow1.setTargetAccountIdentifierId(targetAccountIdentifierId);
             	flows.add(flow1);
             	if(segmentationDate != null && fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
-            		return;
+            		break;
             	}
             	//}
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
@@ -698,7 +698,7 @@ public class CamsFlowController {
             	//}
             		
         		if(segmentationDate != null && fiterSegmentationDate.compareTo(segmentationDate) >0 ) {
-            		return;
+            		break;
             	}	
             	
             	Map<String,Object> paramFlowItemMap = new HashMap<>();
