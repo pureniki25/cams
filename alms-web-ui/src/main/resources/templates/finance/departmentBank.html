@@ -21,7 +21,7 @@
                                 <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
                             </button>
 
-                            <button class="layui-btn layui-btn-sm" @click="editModal=true" v-if="authValid('add')">新增</button>
+                            <button class="layui-btn layui-btn-sm" @click="editForm.accountId=null;editModal=true;" v-if="authValid('add')">新增</button>
                         </div>
 
                         <Row :gutter="0">
