@@ -1122,20 +1122,34 @@ AND plan_id = #{planListId})
     	SELECT 
 		  <include refid="TableName_Column_List"/> 
 		FROM
-		  tb_repayment_biz_plan_list planList 
-		WHERE planList.`overdue_days` >= #{overDueDays,jdbcType=INTEGER} 
-		  AND planList.current_status IN ("还款中", "逾期") 
-		  AND IFNULL(planList.`repay_status`, 0) NOT IN (2, 3) 
-		  AND NOT EXISTS 
+		  tb_repayment_biz_plan_list t,
 		  (SELECT 
-		    1 
+		    MIN(planList.`due_date`),
+		    planList.`plan_list_id` 
 		  FROM
-		    `tb_collection_status` t2 
-		  WHERE t2.`collection_status` IN (100, 200) 
-		    AND t2.`original_business_id` = planList.`orig_business_id`)
-		<if test = "origBusinessId != null and origBusinessId !=''">
-		  AND planList.`orig_business_id` = #{origBusinessId,jdbcType=VARCHAR}
-		</if>
+		    tb_repayment_biz_plan_list planList 
+		  WHERE planList.`overdue_days` >= 61 
+		    AND planList.current_status IN ("还款中", "逾期") 
+		    AND IFNULL(planList.`repay_status`, 0) NOT IN (2, 3) 
+		    AND NOT EXISTS 
+		    (SELECT 
+		      1 
+		    FROM
+		      `tb_collection_status` t2 
+		    WHERE t2.`collection_status` = 100 
+		      AND t2.`original_business_id` = planList.`orig_business_id`) 
+		    AND EXISTS 
+		    (SELECT 
+		      1 
+		    FROM
+		      `tb_repayment_biz_plan` plan 
+		    WHERE plan.`plan_id` = planList.`plan_id` 
+		      AND plan.`plan_status` = 0) 
+		    <if test = "origBusinessId != null and origBusinessId !=''">
+			  AND planList.`orig_business_id` = #{origBusinessId,jdbcType=VARCHAR}
+			</if> 
+		  GROUP BY planList.`orig_business_id`) t2 
+		WHERE t.`plan_list_id` = t2.plan_list_id
     </select>
     
      <select id="searchNoCancelList" resultType="com.hongte.alms.base.entity.WithholdingRepaymentLog">
