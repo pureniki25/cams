@@ -118,7 +118,7 @@ public class WithholdingServiceimpl implements WithholdingService {
 				    			pList=rechargeService.getEarlyPeriod(pList);
 				    				if((myRedisTemplate.get(pList.getPlanListId())==null||myRedisTemplate.get(pList.getPlanListId()).equals("0"))) {//没有被其他线程执行才能代扣
 					    				myRedisTemplate.set(pList.getPlanListId(),"1");
-					    				myRedisTemplate.expire(merchOrderId, 600, TimeUnit.SECONDS);
+					    				myRedisTemplate.expire(pList.getPlanListId(), 3600, TimeUnit.SECONDS);
 					    				try {
 					    				    // 是否符合自动代扣规则
 							    			if (rechargeService.EnsureAutoPayIsEnabled(pList, days).getCode().equals("1")) {
@@ -134,11 +134,9 @@ public class WithholdingServiceimpl implements WithholdingService {
 				    		
 				    			
 				        	}					
-						}
 					});
 		        
 		        });
-				
 			}
 		});
 
