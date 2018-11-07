@@ -62,6 +62,7 @@ import com.hongte.alms.withhold.feignClient.EipOutRechargeRemote;
 import com.hongte.alms.withhold.feignClient.FinanceClient;
 import com.hongte.alms.withhold.service.RechargeService;
 import com.hongte.alms.withhold.service.RedisService;
+import com.hongte.alms.withhold.util.MyRedisTemple;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import com.hongte.alms.base.process.entity.Process;
 import java.math.BigDecimal;
@@ -75,6 +76,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -148,6 +150,9 @@ public class RechargeServiceImpl implements RechargeService {
 
 	@Autowired
 	private RedisService redisService;
+	
+	@Autowired
+	private  MyRedisTemple myRedisTemplate;
 
 	@Value("${tuandai_pay_cm_orderno}")
 	private String oidPartner;
@@ -815,8 +820,9 @@ public class RechargeServiceImpl implements RechargeService {
 		String merchOrderId = "";
 		while (true) {
 			merchOrderId = MerchOrderUtil.getMerchOrderId();
-			if (redisService.hasKey(merchOrderId) == false) {
-				redisService.set(merchOrderId, merchOrderId);
+			if (myRedisTemplate.hasKey(merchOrderId) == false) {
+				myRedisTemplate.set(merchOrderId, merchOrderId);
+				myRedisTemplate.expire(merchOrderId, 43200, TimeUnit.SECONDS);
 				break;
 			} else {
 				continue;
