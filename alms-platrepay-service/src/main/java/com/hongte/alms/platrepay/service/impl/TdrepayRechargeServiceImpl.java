@@ -2479,15 +2479,11 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 					vo.setCreateTimeStr(DateUtil.formatDate(vo.getCreateTime()));
 					vo.setFactRepayDateStr(DateUtil.formatDate(vo.getFactRepayDate()));
 					IssueSendOutsideLog issueSendOutsideLog = batchIdMap.get(tdrepayRechargeLog.getBatchId());
-					if (issueSendOutsideLog != null && StringUtil.isJsonObject(issueSendOutsideLog.getReturnJson())) {
+					if (issueSendOutsideLog != null) {
 						JSONObject parseObject = JSONObject.parseObject(issueSendOutsideLog.getReturnJson());
 						if (parseObject != null) {
 							vo.setRemark(parseObject.getString("codeDesc"));
-						}else {
-							vo.setRemark((vo.getProcessStatus() != null && vo.getProcessStatus().intValue() == 2) ? "资金分发成功" : "");
 						}
-					}else {
-						vo.setRemark((vo.getProcessStatus() != null && vo.getProcessStatus().intValue() == 2) ? "资金分发成功" : "");
 					}
 					vo.setDetails(tdrepayRechargeDetailService.selectList(
 							new EntityWrapper<TdrepayRechargeDetail>().eq("log_id", tdrepayRechargeLog.getLogId())));

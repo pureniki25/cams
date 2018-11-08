@@ -5,9 +5,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 public class StringUtil {
 	private StringUtil() {
 	}
@@ -230,39 +227,4 @@ public class StringUtil {
 		return str == null ? "" : str;
 	}
 
-	/**
-	* 判断字符串是否可以转化为json对象
-	* @param content
-	* @return
-	*/
-	public static boolean isJsonObject(String content) {
-	    // 此处应该注意，当content为"  "空格字符串时，JSONObject.parseObject可以解析成功，
-	    if(!notEmpty(content)) {
-	    	return false;
-	    }
-	    try {
-	        JSONObject.parseObject(content);
-	        return true;
-	    } catch (Exception e) {
-	        return false;
-	    }
-	}
-	
-	/**
-	* 判断字符串是否可以转化为JSON数组
-	* @param content
-	* @return
-	*/
-	public static boolean isJsonArray(String content) {
-		if(!notEmpty(content)) {
-	    	return false;
-	    }
-	    try {
-	        JSONArray.parseArray(content);
-	        return true;
-	    } catch (Exception e) {
-	        return false;
-	    }
-	}
-	
 }
