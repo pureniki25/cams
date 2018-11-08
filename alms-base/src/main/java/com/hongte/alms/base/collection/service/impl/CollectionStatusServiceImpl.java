@@ -1041,8 +1041,9 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 							status.setUpdateUser(Constant.ADMIN_ID);
 							status.setCollectionStatus(CollectionStatusEnum.TO_LAW_WORK.getKey());
 							status.setDescribe(describe);
+							collectionStatusService.update(status, new EntityWrapper<CollectionStatus>()
+									.eq("business_id", status.getBusinessId()).eq("crp_id", status.getCrpId()));
 						}
-						collectionStatusService.updateBatchById(statusList);
 					}
 				}
 			}
