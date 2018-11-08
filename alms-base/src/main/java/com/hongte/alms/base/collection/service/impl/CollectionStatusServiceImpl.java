@@ -205,8 +205,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 				for (CollectionStatus status : list) {
 
 					// 跳过crpId一致的记录
-					if (status.getCrpId().equals(vo.getCrpId())) {
-						continue;
+					if (!staffType.equals(CollectionStatusEnum.TO_LAW_WORK.getPageStr())) {
+						if (status.getCrpId().equals(vo.getCrpId())) {
+							continue;
+						}
 					}
 					// 去除已存在催收记录的还款计划
 					bizPlanListMap.remove(status.getCrpId());
@@ -531,13 +533,15 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 bizStauts = bizColStatus.getCollectionStatus();
             }else {
                 //历史的催收状态为已关闭，则直接置位为已关闭
-                if(bizColStatus.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())){
+            	if (setTypeStatus != null && setTypeStatus.intValue() == 100) {
+                	bizStauts = null;
+    			}else if (bizColStatus.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())) {
                     bizStauts = bizColStatus.getCollectionStatus();
                 }else if(bizColStatus.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())){
                     //历史的催收状态为“已移交诉讼”，则非“已关闭”的状态置位为“已移交法务”
-                    if(!bizStauts.equals(CollectionStatusEnum.CLOSED.getKey())){
+//                    if(!bizStauts.equals(CollectionStatusEnum.CLOSED.getKey())){
                         bizStauts = bizColStatus.getCollectionStatus();
-                    }
+//                    }
                 }else if(bizColStatus.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
                     //历史的催收状态为“已拖车登记”，则非“已关闭”，非“已移交法务”的状态置位为“已拖车登记”
                     if(!bizStauts.equals(CollectionStatusEnum.CLOSED.getKey())
@@ -562,6 +566,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
                 }
 
             }
+            
 //            if (status.getCollectionStatus().equals(CollectionStatusEnum.TO_LAW_WORK.getKey())
 //                    ||status.getCollectionStatus().equals(CollectionStatusEnum.CLOSED.getKey())
 //                    ||status.getCollectionStatus().equals(CollectionStatusEnum.TRAILER_REG.getKey())){
