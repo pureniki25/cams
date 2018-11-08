@@ -136,6 +136,10 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
     @Autowired
     @Qualifier("ProcessService")
     private ProcessService processService;
+    
+    @Autowired
+    @Qualifier("CollectionStatusService")
+    private CollectionStatusService collectionStatusService;
 
     /**
      * 设置电催/人员(界面手动设置)
@@ -205,10 +209,8 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 				for (CollectionStatus status : list) {
 
 					// 跳过crpId一致的记录
-					if (!staffType.equals(CollectionStatusEnum.TO_LAW_WORK.getPageStr())) {
-						if (status.getCrpId().equals(vo.getCrpId())) {
-							continue;
-						}
+					if (!staffType.equals(CollectionStatusEnum.TO_LAW_WORK.getPageStr()) && status.getCrpId().equals(vo.getCrpId())) {
+						continue;
 					}
 					// 去除已存在催收记录的还款计划
 					bizPlanListMap.remove(status.getCrpId());
@@ -1010,6 +1012,7 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 
 	public void setOneRepaymentBizPlanToLaw(RepaymentBizPlanList planList) {
 		String origBusinessId = "";
+		String[] typeCodes = {ProcessTypeEnums.CAR_LOAN_LITIGATION.getTypeId(), ProcessTypeEnums.HOUSE_LOAN_LITIGATION.getTypeId()};
 		try {
 			origBusinessId = planList.getOrigBusinessId();
 			Result result = litigationFeignClient.isImportLitigation(origBusinessId);
@@ -1022,6 +1025,25 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 				if (!(Boolean) result.getData()) {
 					// 调用移交诉讼接口
 					transferLitigationService.sendTransferLitigationData(origBusinessId, null, 1);
+				}else {
+					// 若移交成功，更新我们的移交诉讼状态
+					List<CollectionStatus> statusList = collectionStatusService.selectList(
+							new EntityWrapper<CollectionStatus>().eq("original_business_id", origBusinessId));
+					if (CollectionUtils.isNotEmpty(statusList) && statusList.get(0).getCollectionStatus().intValue() != 100) {
+						List<Process> processes = processService.selectList(new EntityWrapper<Process>()
+								.eq("business_id", origBusinessId).in("process_typeid", typeCodes));
+						String describe = "自动移交法务";
+						if (CollectionUtils.isNotEmpty(processes)) {
+							describe = "手动移交法务";
+						}
+						for (CollectionStatus status : statusList) {
+							status.setUpdateTime(new Date());
+							status.setUpdateUser(Constant.ADMIN_ID);
+							status.setCollectionStatus(CollectionStatusEnum.TO_LAW_WORK.getKey());
+							status.setDescribe(describe);
+						}
+						collectionStatusService.updateBatchById(statusList);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -1030,10 +1052,13 @@ public class CollectionStatusServiceImpl extends BaseServiceImpl<CollectionStatu
 		}
 		
 		try {
-			String[] typeCodes = {ProcessTypeEnums.CAR_LOAN_LITIGATION.getTypeId(), ProcessTypeEnums.HOUSE_LOAN_LITIGATION.getTypeId()};
-			List<Process> processes = processService.selectList(new EntityWrapper<Process>().eq("business_id", origBusinessId).in("process_typeid", typeCodes));
+			List<Process> processes = processService.selectList(
+					new EntityWrapper<Process>().eq("business_id", origBusinessId).in("process_typeid", typeCodes));
 			if (CollectionUtils.isNotEmpty(processes)) {
 				for (Process process : processes) {
+					if (process.getStatus().intValue() == 2) {
+						continue;
+					}
 					process.setProcessDesc("已自动移交法务，结束审批流程");
 					process.setStatus(2);
 					process.setProcessResult(1);
