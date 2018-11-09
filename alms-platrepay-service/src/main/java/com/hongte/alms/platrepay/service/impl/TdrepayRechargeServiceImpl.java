@@ -2225,12 +2225,18 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 	 */
 	private List<TdrepayRechargeLog> handleMoveUpSettle(List<TdrepayRechargeLog> tdrepayRechargeLogs) {
 		List<TdrepayRechargeLog> isSettleData = new ArrayList<>();
-		List<TdPlatformPlanRepaymentDTO> tdPlatformPlanRepaymentDTOs = null;
+		List<TdPlatformPlanRepaymentDTO> dtos = null;
 		for (TdrepayRechargeLog tdrepayRechargeLog : tdrepayRechargeLogs) {
 			try {
-				tdPlatformPlanRepaymentDTOs = remotePlatformRepaymentPlan(tdrepayRechargeLog.getProjectId());
-				if (CollectionUtils.isNotEmpty(tdPlatformPlanRepaymentDTOs)) {
-					for (TdPlatformPlanRepaymentDTO dto : tdPlatformPlanRepaymentDTOs) {
+				dtos = remotePlatformRepaymentPlan(tdrepayRechargeLog.getProjectId());
+				if (CollectionUtils.isNotEmpty(dtos)) {
+					// 获取最后一期的平台还款计划的应还日期，与当期日期进行对比
+					String cycDate = dtos.get(dtos.size() - 1).getCycDate();
+
+					if (DateUtil.getDate(cycDate).after(new Date())) {
+						isSettleData.add(tdrepayRechargeLog);
+					}
+					/*for (TdPlatformPlanRepaymentDTO dto : dtos) {
 						if (dto.getPeriod() == tdrepayRechargeLog.getPeriod().intValue()) {
 							if (new Date().before(DateUtil.getDate(dto.getCycDate()))) {
 								isSettleData.add(tdrepayRechargeLog);
@@ -2238,7 +2244,7 @@ public class TdrepayRechargeServiceImpl implements TdrepayRechargeService {
 							}
 							break;
 						}
-					}
+					}*/
 				} else {
 					tdrepayRechargeLog.setRemark("没有查询到平台还款计划");
 				}
