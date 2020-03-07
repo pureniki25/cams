@@ -1,6 +1,5 @@
 package com.hongte.alms.webui;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -21,6 +20,8 @@ public class WebUIApplication {
 
 		SpringApplication.run(WebUIApplication.class, args);
 		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    WebUI项目启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
+
+
 	}
 
 

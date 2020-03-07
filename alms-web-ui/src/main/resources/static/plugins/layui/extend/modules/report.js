@@ -20,6 +20,11 @@ var useModules = [
 layui.define(useModules, function (exports) {
 
     var Report = function (code) {
+        var reportThat = this;
+        window[code] = {
+            selRows: []
+        };
+
         // 页面全局预定义变量 START
         var TAG = '报表模板驱动',
             RESOURCE = 'bu/report';
@@ -47,6 +52,7 @@ layui.define(useModules, function (exports) {
             defaultOptions = {},
             options = {},
             widgets = {},
+            opt={},
             echartsPngs = {}, /* Echarts图 */
             DISABLED = 'layui-btn-disabled',
             timer = 0,
@@ -90,7 +96,8 @@ layui.define(useModules, function (exports) {
                             if (that.is('select') && 'undefined' != that.attr('lay-ignore')) {
                                 if (value) {
                                     that.empty();
-                                    that.append(value.opt);
+                                    //that.append(value.opt);
+                                    that.append(opt[name]);
                                     that.trigger('change');
                                     that.trigger({
                                         type: 'select2:select',
@@ -100,6 +107,7 @@ layui.define(useModules, function (exports) {
                                     });
                                 } else {
                                     that.empty();
+                                    that.append(opt[name]);
                                     that.val('').trigger("change");
                                 }
                             } else {
@@ -107,10 +115,14 @@ layui.define(useModules, function (exports) {
                             }
                         });
                     });
+                    form.render();
                 },
                 search: function () {
                     $('div[lay-filter="' + code + '_auth"] form').find('input,select').each(function name() {
                         options[$(this).attr('name')] = null == $(this).val() ? '' : $(this).val();
+                    });
+                    $('div[id="289148336710713344"] input[name="hot_row_sel"]').each(function(index){
+                        this.checked = false;
                     });
                     // 发起报表搜索，搜索数据如果页码大于可搜索的，后端接口自动缩小页码，并返回页码信息
                     var qps = [];
@@ -218,7 +230,6 @@ layui.define(useModules, function (exports) {
                 export: function () {
                     var pv = 0;
                     layer.open({
-                        pv: 0,
                         type: 1,
                         area: ['400px', '200px'],
                         shadeClose: true,
@@ -286,9 +297,12 @@ layui.define(useModules, function (exports) {
                     });
                 }
             },
-            evil = function (fn) {
+            evil = function (fn, paramName, param) {
                 var Fn = Function;
-                return new Fn('return ' + fn)();
+                if (paramName && param)
+                    return new Fn(paramName, 'return ' + fn)(param);
+                else
+                    return new Fn('return ' + fn)();
             },
             dataURItoBlob = function (dataURI, callback) {
                 // convert base64 to raw binary data held in a string
@@ -606,11 +620,18 @@ layui.define(useModules, function (exports) {
                 for (var i = 0; i < data.length; i++) {
                     var dt = data[i];
                     var dfv = dt.defaultValue;
-                    var htmlContent = '<div class="layui-inline">' +
-                        '<label class="layui-form-label">' +
-                        '${label}：</label>' +
-                        '<div class="layui-input-inline">${param}</div' +
-                        '</div>';
+                    var htmlContent;
+                    if(dt.label == undefined || dt.label == ""){
+                         htmlContent = '<div class="layui-inline" >' +
+                            '<div class="layui-input-inline" >${param}</div>' +
+                            '</div>';
+                    }else{
+                         htmlContent = '<div class="layui-inline">' +
+                            '<label class="layui-form-label">' +
+                            '${label}：</label>' +
+                            '<div class="layui-input-inline" >${param}</div' +
+                            '</div>';
+                    }
                     htmlContent = htmlContent.replace('${label}', dt.label);
                     var param = '';
                     if ('TIME' == dt.sourceType) {
@@ -642,6 +663,7 @@ layui.define(useModules, function (exports) {
                             }
                         }
                         param += option + '</select>';
+                        opt[dt.name] = option;
                     } else if ('SQL' == dt.sourceType) {
                         param = '<select name="' +
                             dt.name +
@@ -682,10 +704,12 @@ layui.define(useModules, function (exports) {
                 renderForm();
             },
             loadData = function (_page, _size, _options, _qps) {
+                console.log(window.location.search);
                 makeQueryParams(_page, _size, _options, _qps);
                 loading = layer.load(0, {
                     shade: [0.3, '#333']
                 });
+                console.log(queryParams);
                 $.ajax({
                     type: 'POST',
                     url: config.basePath1 + RESOURCE + '/load',
@@ -712,6 +736,50 @@ layui.define(useModules, function (exports) {
                     }
                 });
             },
+            hotRowSelect = function (instance, td, row, col, prop, value, cellProperties) {
+                var cb = $('<input name="hot_row_sel" value="' + value + '" type="checkbox">');
+                $(td).html(cb);
+                if ($(td).attr('tag')) {
+                    cb.prop('checked', true);
+                }
+                cb.click(function () {
+                    window[code].selRows = [];
+                    var othis = this;
+                    var table = 'div[lay-filter="' + code + '_auth"] table';
+                    $(table).each(function () {
+                        var index = $(this).find('input:checkbox:visible[name=hot_row_sel]').index(othis);
+                        if (0 == index && $(othis).prop('checked')) {
+                            $(table + ' input:checkbox:visible[name=hot_row_sel]').prop('checked', true);
+                            $(table + ' input:checkbox:visible[name=hot_row_sel]').parent().attr('tag', true);
+                        } else if (0 == index && !$(othis).prop('checked')) {
+                            $(table + ' input:checkbox:visible[name=hot_row_sel]').prop('checked', false);
+                            $(table + ' input:checkbox:visible[name=hot_row_sel]').parent().removeAttr('tag');
+                        } else if (0 < index && $(othis).prop('checked')) {
+                            $(othis).parent().attr('tag', true);
+                            var allCheck = true;
+                            $(this).find('input:checkbox:visible[name=hot_row_sel]:gt(0)').each(function () {
+                                allCheck = $(this).prop('checked') && allCheck;
+                            });
+                            if (allCheck) {
+                                $(table + ' input:checkbox:visible[name=hot_row_sel]').prop('checked', true);
+                                $(table + ' input:checkbox:visible[name=hot_row_sel]').parent().attr('tag', true);
+                            }
+                        } else if (0 < index && !$(othis).prop('checked')) {
+                            $(othis).parent().removeAttr('tag');
+                            $(table).each(function () {
+                                $(this).find('input:checkbox:visible[name=hot_row_sel]:first').prop('checked', false);
+                                $(this).find('input:checkbox:visible[name=hot_row_sel]:first').parent().removeAttr('tag');
+                            });
+                        }
+                    });
+                    $(table).each(function () {
+                        $(this).find('input:checkbox:visible[name=hot_row_sel]:gt(0)').each(function () {
+                            if ($(this).parent().attr('tag'))
+                                window[code].selRows.push($(this).attr('value'));
+                        });
+                    });
+                });
+            },
             hotCellsRenderer = function (row, col, prop) {
                 var that = this;
                 if (null != that.cusCells && 0 < that.cusCells.length) {
@@ -725,6 +793,10 @@ layui.define(useModules, function (exports) {
                                 (null == cusCell.ecol || null != cusCell.ecol && cusCell.ecol >= col)) {
                                 if (null != cusCell.cusFun && 'function' == typeof cusCell.cusFun) {
                                     cusCell.cusFun(instance, td, row, col, prop, value, cellProperties);
+                                    return;
+                                }
+                                if (cusCell.rowSel) {
+                                    hotRowSelect(instance, td, row, col, prop, value, cellProperties);
                                     return;
                                 }
                                 if (null != cusCell.css) {
@@ -867,12 +939,34 @@ layui.define(useModules, function (exports) {
                     });
                 });
             },
+            loadScript = function () {
+                clearQueryParams();
+                $.ajax({
+                    type: 'POST',
+                    url: config.basePath1 + RESOURCE + '/script',
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    data: JSON.stringify(queryParams),
+                    success: function (result) {
+                        successHandler(result, function (data) {
+                            setTimeout(function () {
+                                evil('(function () {' + data + '}).call(reportThat);', 'reportThat', reportThat);
+                            }, 800);
+                        });
+                    },
+                    error: function (message) {
+                        errorHandler(message, '获取报表内容数据发生异常，请联系管理员。');
+                    }
+                });
+            },
             load = function () {
                 loadParam();
                 loadData(0, laypageConf.limit);
+                loadScript();
             };
         load();
         ht_auth.render(code + '_auth');
+        reportThat.active = active;
     };
 
     exports('report', function (code) {

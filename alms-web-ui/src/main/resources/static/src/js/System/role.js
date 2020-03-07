@@ -48,7 +48,10 @@ window.layinit(function (htConfig) {
                         return "只能查看信用贷";
                     }else  if(d.roleAreaType == 8){
                         return "只能查看优房贷";
-                    }else{
+                    }else  if(d.roleAreaType == 9){
+                        return "只查看自己审核";
+                    }
+                    else{
                         return "未定义的类型";
                     }
                 }

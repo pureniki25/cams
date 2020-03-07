@@ -91,8 +91,22 @@ window.layinit(function (htConfig) {
                 tt.resetFields();
                 vm.toLoading();
             },
-            openModal(){
-                if(vm.selectedRowInfo.processTypeCode=="derate"){
+            openModal(){debugger
+                if(vm.selectedRowInfo.processTypeCode=="houseAndCar_month_overRate_less_than_24"||
+                   vm.selectedRowInfo.processTypeCode=="houseAndCar_month_overRate_more_than_24"||
+                   vm.selectedRowInfo.processTypeCode=="houseAndCar_month_principal_less"||	
+                   vm.selectedRowInfo.processTypeCode=="houseAndCar_settle_otherFee_less_than_50000"||	
+                   vm.selectedRowInfo.processTypeCode=="houseAndCar_settle_otherFee_more_than_50000"||	
+                   vm.selectedRowInfo.processTypeCode=="houseAndCar_settle_principal_less_than_50000"||	
+                   vm.selectedRowInfo.processTypeCode=="houseAndCar_settle_principal_more_than_50000"||	
+                   vm.selectedRowInfo.processTypeCode=="xw_yfd_month_overRate_less_than_24"||	
+                   vm.selectedRowInfo.processTypeCode=="xw_yfd_month_overRate_more_than_24"||	
+                   vm.selectedRowInfo.processTypeCode=="xw_yfd_month_principle_less"||	
+                   vm.selectedRowInfo.processTypeCode=="xw_yfd_settle_otherFee_less_than_50000"||	
+                   vm.selectedRowInfo.processTypeCode=="xw_yfd_settle_otherFee_more_than_50000"||	
+                   vm.selectedRowInfo.processTypeCode=="xw_yfd_settle_principle_less_than_50000"||	
+                   vm.selectedRowInfo.processTypeCode=="xw_yfd_settle_principle_more_than_50000"
+                ){
                     title ="减免申请";
                     url = getDerateProcessUrl();
                 }else if (vm.selectedRowInfo.processTypeCode=="houseLoanLitigation") {
@@ -110,7 +124,7 @@ window.layinit(function (htConfig) {
                     type: 2,
                     title: title,
                     maxmin: true,
-                    area: ['80%', '80%'],
+                    area: ['90%', '90%'],
                     content:url
                 });
             }
@@ -188,13 +202,33 @@ window.layinit(function (htConfig) {
                         align: 'left',
                         // toolbar: '#barTools',
                         templet:function(d){
+                            console.log("模板参数d：",d);
+                            //根本审批类型判断
                             let sp = '<a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" @click="openModal" >审批</a>' 
                             let dt = '<a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" @click="openModal" >详情</a>' 
+                            let cancle = '<a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" @click="openModal" >详情</a> <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="cancelReduce" >撤销</a>'
                             let url = window.location.href 
                             if(url.indexOf('waitToApprove')>-1){
                                 return sp ;
                             }else{
-                                return dt ;
+                                if ((d.processTypeCode=="houseAndCar_month_overRate_less_than_24"||
+                                    d.processTypeCode=="houseAndCar_month_overRate_more_than_24"||
+                                    d.processTypeCode=="houseAndCar_month_principal_less"||
+                                    d.processTypeCode=="houseAndCar_settle_otherFee_less_than_50000"||
+                                    d.processTypeCode=="houseAndCar_settle_otherFee_more_than_50000"||
+                                    d.processTypeCode=="houseAndCar_settle_principal_less_than_50000"||
+                                    d.processTypeCode=="houseAndCar_settle_principal_more_than_50000"||
+                                    d.processTypeCode=="xw_yfd_month_overRate_less_than_24"||
+                                    d.processTypeCode=="xw_yfd_month_overRate_more_than_24"||
+                                    d.processTypeCode=="xw_yfd_month_principle_less"||
+                                    d.processTypeCode=="xw_yfd_settle_otherFee_less_than_50000"||
+                                    d.processTypeCode=="xw_yfd_settle_otherFee_more_than_50000"||
+                                    d.processTypeCode=="xw_yfd_settle_principle_less_than_50000"||
+                                    d.processTypeCode=="xw_yfd_settle_principle_more_than_50000") && url.indexOf('SelfStart')>-1){
+                                    return cancle;
+                                }else {
+                                    return dt ;
+                                }
                             }
                         }
 
@@ -227,7 +261,21 @@ window.layinit(function (htConfig) {
                     var title;
                     var url;
                     if(obj.event ==='info'){
-                        if(vm.selectedRowInfo.processTypeCode=="derate"){
+                    	   if(vm.selectedRowInfo.processTypeCode=="houseAndCar_month_overRate_less_than_24"||
+                                   vm.selectedRowInfo.processTypeCode=="houseAndCar_month_overRate_more_than_24"||
+                                   vm.selectedRowInfo.processTypeCode=="houseAndCar_month_principal_less"||	
+                                   vm.selectedRowInfo.processTypeCode=="houseAndCar_settle_otherFee_less_than_50000"||	
+                                   vm.selectedRowInfo.processTypeCode=="houseAndCar_settle_otherFee_more_than_50000"||	
+                                   vm.selectedRowInfo.processTypeCode=="houseAndCar_settle_principal_less_than_50000"||	
+                                   vm.selectedRowInfo.processTypeCode=="houseAndCar_settle_principal_more_than_50000"||	
+                                   vm.selectedRowInfo.processTypeCode=="xw_yfd_month_overRate_less_than_24"||	
+                                   vm.selectedRowInfo.processTypeCode=="xw_yfd_month_overRate_more_than_24"||	
+                                   vm.selectedRowInfo.processTypeCode=="xw_yfd_month_principle_less"||	
+                                   vm.selectedRowInfo.processTypeCode=="xw_yfd_settle_otherFee_less_than_50000"||	
+                                   vm.selectedRowInfo.processTypeCode=="xw_yfd_settle_otherFee_more_than_50000"||	
+                                   vm.selectedRowInfo.processTypeCode=="xw_yfd_settle_principle_less_than_50000"||	
+                                   vm.selectedRowInfo.processTypeCode=="xw_yfd_settle_principle_more_than_50000"
+                                ){
                             title ="减免申请";
                             url = getDerateProcessUrl();
                         }else if (vm.selectedRowInfo.processTypeCode=="houseLoanLitigation") {
@@ -245,18 +293,94 @@ window.layinit(function (htConfig) {
                             type: 2,
                             title: title,
                             maxmin: true,
-                            area: ['80%', '80%'],
+                            area: ['90%', '90%'],
                             content:url
                         });
+                    }else if (obj.event ==='cancelReduce') {
+                        layer.confirm('是否确认撤销该表单，撤销后该表单数据则为无效数据', function(index) {
+                            cancelReduceFun(vm.selectedRowInfo.processId);
+                            layer.close(index);
+                        });
+
                     }
+                    
+                    
                 });
 
             });
         }
     });
 
-})
+});
 
+//重载表格
+function reLoading() {
+    if (table == null) return;
+    vm.$refs['searchForm'].validate((valid) => {
+        if (valid) {
+            this.loading = true;
+            console.log(vm.searchForm);
+
+            var dateObj = getData();
+
+            table.reload('listTable', {
+                where: {
+
+                    keyWord: vm.searchForm.keyWord,   //关键字  (标题、业务编号、客户名称、发起人)
+                    createTimeBegin: dateObj.createTimeBegin,	//发起时间  开始
+                    createTimeEnd: dateObj.createTimeEnd,	//发起时间   结束
+                    processTypeId: vm.searchForm.processTypeId,	//流程类型
+
+                    finishTimeBegin:dateObj.finishTimeBegin,  //结束时间 开始
+                    finishTimeEnd:dateObj.finishTimeEnd,   //结束时间   结束
+
+                    processStatus:vm.searchForm.processStatus,  //审批状态,
+                    companyId:vm.searchForm.companyId,  //分公司
+
+                }
+                , page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+
+        }
+
+        // this.loading = false;
+    })
+}
+
+function cancelReduceFun(processId) {
+
+    $.ajax({
+        type : 'GET',
+        async : false,
+        url : basePath +'ApplyDerateController/cancelApplyProcess?processId='+processId,
+        headers : {
+            app : 'ALMS',
+            Authorization : "Bearer " + getToken()
+        },
+        success : function(data) {
+            if(data.code == '1'){
+                layer.confirm('撤销成功', function(index) {
+                    reLoading()
+                    layer.close(index);
+                });
+            }else {
+                layer.confirm(data.msg, function(index) {
+                    reLoading()
+                    layer.close(index);
+                });
+            }
+        },
+        error : function() {
+            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+                layer.close(index);
+            });
+            return false;
+        }
+    });
+
+}
 //设置申请减免的url路径
 function getDerateProcessUrl(){
     var url
@@ -270,11 +394,49 @@ function getDerateProcessUrl(){
         },
         success : function(data) {
             var applyDerateProcess = data.data;
-            url =  '/collectionUI/applyDerateUI?businessId='+vm.selectedRowInfo.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+vm.selectedRowInfo.status+"&processId="+vm.selectedRowInfo.processId+"&businessTypeId="+vm.selectedRowInfo.businessTypeId
-        },
+            if(applyDerateProcess.isSettle==1){//结清
+                url =  '/collectionUI/businessApplyDerateUI?businessId='+vm.selectedRowInfo.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+vm.selectedRowInfo.status+"&processId="+vm.selectedRowInfo.processId+"&businessTypeId="+vm.selectedRowInfo.businessTypeId
+            }else{
+                url =  '/collectionUI/applyDerateUI?businessId='+vm.selectedRowInfo.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+vm.selectedRowInfo.status+"&processId="+vm.selectedRowInfo.processId+"&businessTypeId="+vm.selectedRowInfo.businessTypeId
+            }
+         },
         error : function() {
             layer.confirm('Navbar error:AJAX请求出错!', function(index) {
                 top.location.href = loginUrl;
+                layer.close(index);
+            });
+            return false;
+        }
+    });
+
+    return url;
+}
+
+
+function getDerateProcessUrl(){
+    var url
+    $.ajax({
+        type : 'GET',
+        async : false,
+        url : basePath +'ApplyDerateController/getApplyDerateInfoByProcessId?processId='+vm.selectedRowInfo.processId,
+        headers : {
+            app : 'ALMS',
+            Authorization : "Bearer " + getToken()
+        },
+        success : function(data) {
+            var applyDerateProcess = data.data;
+            if(applyDerateProcess.isSettle == '1'){
+                //跳转结清减免
+                url =  '/collectionUI/businessApplyDerateUI?businessId='+vm.selectedRowInfo.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+vm.selectedRowInfo.status+"&processId="+vm.selectedRowInfo.processId+"&businessTypeId="+vm.selectedRowInfo.businessTypeId+"&pResult="+vm.selectedRowInfo.pResult+"&reqPageeType="+reqPageeType
+            }else {
+                //跳转月还减免
+                url =  '/collectionUI/applyDerateUI?businessId='+vm.selectedRowInfo.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+vm.selectedRowInfo.status+"&processId="+vm.selectedRowInfo.processId+"&businessTypeId="+vm.selectedRowInfo.businessTypeId+"&pResult="+vm.selectedRowInfo.pResult+"&reqPageeType="+reqPageeType
+            }
+
+        },
+        error : function() {
+            layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+                // top.location.href = loginUrl;
                 layer.close(index);
             });
             return false;

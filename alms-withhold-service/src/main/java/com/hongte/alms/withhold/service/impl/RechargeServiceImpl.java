@@ -1072,21 +1072,24 @@ public class RechargeServiceImpl implements RechargeService {
 		Optional<RepaymentBizPlanList> max=notRepayLists.stream().max((a1,a2)->a1.getPeriod().compareTo(a2.getPeriod()));
 		RepaymentBizPlanList maxRepayBizPlanList=max.get();
 		
+		return getEarylyPlanListToRepay(maxRepayBizPlanList);
+		
+	
+		
+	 }
+
+	private RepaymentBizPlanList getEarylyPlanListToRepay(RepaymentBizPlanList maxRepayBizPlanList) {
 		RepaymentBizPlanList last=getLast(maxRepayBizPlanList);
 		if(last!=null) {
 			   if(last.getRepayStatus()==SectionRepayStatusEnum.ONLINE_REPAID.getKey()||(last.getCurrentStatus().equals("已还款"))) {	//判断是否在线上已还款或者已还款
 				    return maxRepayBizPlanList;
 				}else {
-					return last;
+					return getEarylyPlanListToRepay(last);
 				}
 		}else {
 			return maxRepayBizPlanList;
 		}
-		
-	
-		
-	 }
-	
+	}
 	
 	
 	

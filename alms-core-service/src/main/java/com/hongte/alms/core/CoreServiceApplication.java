@@ -15,9 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 /**
  * 服务提供者<br>
@@ -28,9 +25,9 @@ import org.springframework.web.filter.CorsFilter;
  */
 @EnableFeignClients(basePackages = {"com.ht.ussp.client","com.hongte.alms.base.feignClient","com.hongte.alms.core.feginClient"})
 @SpringCloudApplication
-@MapperScan(basePackages = {"com.hongte.alms.core.mapper","com.hongte.alms.base"})
+@MapperScan(basePackages = {"com.hongte.alms.core.mapper","com.hongte.alms.base","com.ht.framework.generator.mapper"})
 @EnableTransactionManagement 
-@ComponentScan(basePackages= {"com.hongte.alms.core","com.hongte.alms.common","com.hongte.alms.base.*","com.ht.ussp.bean"})
+@ComponentScan(basePackages= {"com.hongte.alms.core","com.hongte.alms.common","com.hongte.alms.base.*","com.ht.ussp.bean","com.ht.framework.generator"})
 public class CoreServiceApplication {
 
 	@Bean
@@ -43,8 +40,5 @@ public class CoreServiceApplication {
 		SpringApplication.run(CoreServiceApplication.class, args);
 		System.err.println("ヾ(◍°∇°◍)ﾉﾞ    core-service启动成功      ヾ(◍°∇°◍)ﾉﾞ\n");
 	}
-
-
-
 
 }

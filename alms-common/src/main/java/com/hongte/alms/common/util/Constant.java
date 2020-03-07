@@ -1,6 +1,8 @@
 package com.hongte.alms.common.util;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -115,6 +117,30 @@ public class Constant {
 	 */
 	public static final String INTERFACE_NAME_ADVANCE_SHARE_PROFIT = "请求EIP偿还垫付接口";
 	/**
+	 * 还垫付分润接口 接口代码（适用于18.06.28上标的数据）
+	 */
+	public static final String INTERFACE_CODE_RETURN_ADVANCE_SHARE_PROFIT_OLD = "/eip/td/returnAdvanceShareProfit";
+	/**
+	 * 还垫付分润接口 接口名称（适用于18.06.28上标的数据）
+	 */
+	public static final String INTERFACE_NAME_RETURN_ADVANCE_SHARE_PROFIT_OLD = "请求EIP还垫付分润接口";
+	/**
+	 * 修改还款分润金额 接口代码（适用于18.06.28上标的数据）
+	 */
+	public static final String INTERFACE_CODE_UPDATE_RETURN_SHARE_PROFIT = "/eip/td/updateReturnShareProfit";
+	/**
+	 * 修改还款分润金额 接口名称（适用于18.06.28上标的数据）
+	 */
+	public static final String INTERFACE_NAME_UPDATE_RETURN_SHARE_PROFIT = "请求EIP修改还款分润金额接口";
+	/**
+	 * 提前结清接口 接口代码（适用于18.06.28上标的数据）
+	 */
+	public static final String INTERFACE_CODE_REPAYMENT_EARLIER_OLD = "/eip/td/repaymentAdvance";
+	/**
+	 * 提前结清接口 接口名称（适用于18.06.28上标的数据）
+	 */
+	public static final String INTERFACE_NAME_REPAYMENT_EARLIER_OLD = "请求EIP提前结清接口";
+	/**
 	 * 标的还款信息查询接口（/repayment/queryProjectPayment） 接口代码
 	 */
 	public static final String INTERFACE_CODE_QUERY_PROJECT_PAYMENT = "/eip/td/repayment/queryProjectPayment";
@@ -162,6 +188,14 @@ public class Constant {
 	 * 调用platrepay 服务的平台还款接口
 	 */
 	public static final String INTERFACE_NAME_PLATREPAY_REPAYMENT = "平台合规化还款接口";
+	/**
+	 * 查询项目垫付记录(.net) 接口代码
+	 */
+	public static final String INTERFACE_CODE_PROJECT_ADVANCE_DETAIL = "/eip/td/projectAdvanceDetail";
+	/**
+	 * 查询项目垫付记录(.net) 接口名称
+	 */
+	public static final String INTERFACE_NAME_PROJECT_ADVANCE_DETAIL = "请求EIP查询项目垫付记录接口(.net)";
 	/**
 	 * 提前结清类型（坏账结清）BAD
 	 */
@@ -298,4 +332,24 @@ public class Constant {
 		TRADE_TYPE_MAP_KUAIQIAN.put("F", "失败");
 		TRADE_TYPE_MAP_KUAIQIAN.put("P", "挂起");
 	}
+
+	/**
+	 * 区分6.28之前和之后上标的数据
+	 */
+	public static final String DEADLINE = "2018-06-28";
+	
+	/**
+	 * 调用平台提前结清接口坏账结清返回"借款人余额充足，请调用正常提前结清"对应的错误代码
+	 */
+	public static final String EIP_TD_774 = "EIP_TD_774";
+
+    public static final Map<String, String> feeSwich;
+    static
+    {
+    	feeSwich = new HashMap<String, String>();
+    	feeSwich.put("分公司费用", "月收分公司服务费");
+    	feeSwich.put("团贷网平台费用", "月收平台费");
+    }
+
+	
 }

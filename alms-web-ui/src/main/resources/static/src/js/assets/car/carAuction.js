@@ -137,6 +137,8 @@ window.layinit(function (htConfig) {
 				,paymentMethod:''//付款方式
 				,auctionPosition:''//交易地点
                 ,remark:''// 备注
+                ,viewSampleStartTime:''//看样开始时间
+                ,viewSampleEndTime:''//看样结束时间
 	       }
 	       
 	       ,  // 可发送审批信息的用户列表
@@ -274,6 +276,20 @@ window.layinit(function (htConfig) {
 		        }
 		    });
 
+	   	    laydate.render({
+		        elem: '#viewSampleStartTime',
+		        type:'date',
+		        done: (value) => {
+		          this.carAuction.viewSampleStartTime = value
+		        }
+		    });
+	   	 laydate.render({
+		        elem: '#viewSampleEndTime',
+		        type:'date',
+		        done: (value) => {
+		          this.carAuction.viewSampleEndTime = value
+		        }
+		    });
 	    }, 
 	    
 	    methods: {
@@ -444,8 +460,8 @@ window.layinit(function (htConfig) {
 						vm.detection=data.data.detection;
 						vm.detection.createTime = moment(vm.detection.createTime).format("YYYY-MM-DD")
 						//vm.detection.vehicleLicenseRegistrationDate=moment(vm.detection.vehicleLicenseRegistrationDate).format("YYYY年MM月DD日")
-						vm.detection.annualVerificationExpirationDate=moment(vm.detection.annualVerificationExpirationDate).format("YYYY-MM")
-						vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD")
+						//vm.detection.annualVerificationExpirationDate=moment(vm.detection.annualVerificationExpirationDate).format("YYYY-MM")
+						//vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD")
 						vm.mortgageDetection=data.data.mortgageDetection;
 						vm.mortgageDetection.createTime = moment(vm.mortgageDetection.createTime).format("YYYY-MM-DD")
 	                	if(data.data.repayPlan!=null&&data.data.repayPlan!=''){
@@ -567,11 +583,11 @@ window.layinit(function (htConfig) {
 	    		var that = this;
 	    		that.carAuction.businessId=businessId;
 	    		// 页面信息验证
-	    		if(vm.detection.annualVerificationExpirationDate==''||vm.detection.annualVerificationExpirationDate==null){
+	  /*  		if(vm.detection.annualVerificationExpirationDate==''||vm.detection.annualVerificationExpirationDate==null){
                     layer.msg("年审到期日期必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#annualVerificationExpirationDate").css("border","1px solid #FF3030");
 	    			return ;
-	    		}
+	    		}*/
 	    		
 	    		if(vm.detection.odometer==''||vm.detection.odometer==null){
                     layer.msg("里程表读数！",{icon:5,shade: [0.8, '#393D49']});
@@ -617,7 +633,7 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}
 	
-	    		if(vm.detection.insuranceExpirationDate !=null&&vm.detection.insuranceExpirationDate!=''){
+	 /*   		if(vm.detection.insuranceExpirationDate !=null&&vm.detection.insuranceExpirationDate!=''){
 	    			
 	    			var inputDate=new Date(vm.detection.insuranceExpirationDate.replace("-", "/").replace("-", "/")); 
 	    			var lastDate=new Date(vm.detection.viewInsuranceExpirationDate.replace("-", "/").replace("-", "/"));
@@ -627,7 +643,7 @@ window.layinit(function (htConfig) {
 	    				return ;
 	    			}
 	    			
-	    		}
+	    		}*/
 	    		if(vm.detection.userNature==''||vm.detection.userNature==null){
                     layer.msg("车辆使用性质必填！",{icon:5,shade: [0.8, '#393D49']});
 	    			$("#userNature").css("border","1px solid #FF3030");
@@ -729,6 +745,37 @@ window.layinit(function (htConfig) {
                         return;
                     }
                 }
+                //-----------------------
+       /*   		if(vm.carAuction.viewSampleStartTime==''||vm.carAuction.viewSampleStartTime==null){
+                    layer.msg("看样开始时间必填！",{icon:5,shade: [0.8, '#393D49']});
+	    			$("#viewSampleStartTime").css("border","1px solid #FF3030");
+	    			return ;
+	    		}else{
+	    			
+	    			var inputDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/"));  
+
+	    			if(inputDate<currentDate){
+	    				$("#viewSampleStartTime").css("border","1px solid #FF3030");
+	    				layer.msg("看样开始时间不能小于当前日期！",{icon:5,shade: [0.8, '#393D49']});
+	    				return ;
+	    			}
+	    			
+	    		}
+	    		if(vm.carAuction.viewSampleEndTime==''||vm.carAuction.viewSampleEndTime==null){
+                    layer.msg("看样结束时间必填！",{icon:5,shade: [0.8, '#393D49']});
+	    			$("#viewSampleEndTime").css("border","1px solid #FF3030");
+	    			return ;
+	    		}else{
+	    			var startDate=new Date(vm.carAuction.viewSampleStartTime.replace("-", "/").replace("-", "/"));
+	    			var inputDate=new Date(vm.carAuction.viewSampleEndTime.replace("-", "/").replace("-", "/"));  
+	    			if(inputDate<=startDate){
+	    				$("#viewSampleEndTime").css("border","1px solid #FF3030");
+	    				layer.msg("看样结束时间不能小于等于开始时间！",{icon:5,shade: [0.8, '#393D49']});
+	    				return ;
+	    			}
+	    			
+	    		}*/
+	    		//--------------------------
                 if(vm.carAuction.auctionPosition==''||vm.carAuction.auctionPosition==null){
                     layer.msg("交易地点必填！",{icon:5,shade: [0.8, '#393D49']});
                     $("#carPosition").css("border","1px solid #FF3030");

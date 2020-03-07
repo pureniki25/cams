@@ -5,7 +5,7 @@ let notice
 let aboutSys
 window.layinit(function (htConfig) {
     var _htConfig = htConfig;
-    basePath = htConfig.coreBasePath;
+    basePath = htConfig.gatewayUrl;
     let table = layui.table
     let element = layui.element
     main = new Vue({
@@ -35,19 +35,6 @@ window.layinit(function (htConfig) {
                 show: false,
                 url: ''
             }
-        },
-        created: function () {
-            axios.get(basePath + 'notice/list', {
-                headers: { 'userId': 'admin-alms' },
-            }).then(function (res) {
-                if (res.data.code == '1') {
-                    main.notices = res.data.data;
-                } else {
-                    main.$Modal.error({ content: '接口调用异常!' });
-                }
-            }).catch(function (e) {
-                main.$Modal.error({ content: '接口调用异常!' });
-            })
         },
         methods: {
             openNoticeModal: function (id) {
@@ -149,12 +136,23 @@ window.layinit(function (htConfig) {
                 success: function (data) {
                     if(data.code=='1'){
                         var applyDerateProcess = data.data;
-                        layer.open({
-                            type: 2,
-                            title: '减免申请',
-                            area: ['1250px', '800px'],
-                            content: '/collectionUI/applyDerateUI?businessId=' + obj.data.businessId + '&crpId=' + applyDerateProcess.crpId + "&processStatus=" + obj.data.processStatus + "&processId=" + obj.data.processId
-                        });
+                        if(applyDerateProcess.isSettle==1){//结清
+                        	   layer.open({
+                                   type: 2,
+                                   title: '减免申请',
+                                   area: ['1250px', '800px'],
+                                   content:'/collectionUI/businessApplyDerateUI?businessId='+obj.data.businessId +'&crpId='+applyDerateProcess.crpId+"&processStatus="+obj.data.processStatus+"&processId="+obj.data.processId+"&businessTypeId="+obj.data.businessTypeId
+                                   
+                        	   });  
+                         }else{
+                        	   layer.open({
+                                   type: 2,
+                                   title: '减免申请',
+                                   area: ['1250px', '800px'],
+                                   content: '/collectionUI/applyDerateUI?businessId=' + obj.data.businessId + '&crpId=' + applyDerateProcess.crpId + "&processStatus=" + obj.data.processStatus + "&processId=" + obj.data.processId
+                               }); 
+                         }
+                     
                     }else{
                         main.$Modal.error({ content: '接口调用异常!'+(data.msg||'') });
                     }
@@ -229,9 +227,23 @@ window.layinit(function (htConfig) {
             return url;
         }
 
-        if (obj.event === 'info') {
+        if (obj.event === 'info') {debugger
             //设置申请减免的url路径
-            if (obj.data.processTypeCode == "derate") {
+            if (obj.data.processTypeCode=="houseAndCar_month_overRate_less_than_24"||
+                    obj.data.processTypeCode=="houseAndCar_month_overRate_more_than_24"||
+                    obj.data.processTypeCode=="houseAndCar_month_principal_less"||	
+                    obj.data.processTypeCode=="houseAndCar_settle_otherFee_less_than_50000"||	
+                    obj.data.processTypeCode=="houseAndCar_settle_otherFee_more_than_50000"||	
+                    obj.data.processTypeCode=="houseAndCar_settle_principal_less_than_50000"||	
+                    obj.data.processTypeCode=="houseAndCar_settle_principal_more_than_50000"||	
+                    obj.data.processTypeCode=="xw_yfd_month_overRate_less_than_24"||	
+                    obj.data.processTypeCode=="xw_yfd_month_overRate_more_than_24"||	
+                    obj.data.processTypeCode=="xw_yfd_month_principle_less"||	
+                    obj.data.processTypeCode=="xw_yfd_settle_otherFee_less_than_50000"||	
+                    obj.data.processTypeCode=="xw_yfd_settle_otherFee_more_than_50000"||	
+                    obj.data.processTypeCode=="xw_yfd_settle_principle_less_than_50000"||	
+                    obj.data.processTypeCode=="xw_yfd_settle_principle_more_than_50000"
+                 ) {
                 main.approvalModal.url = getDerateProcessUrl();
             } else if (obj.data.processTypeCode == "houseLoanLitigation") {
                 main.approvalModal.url = getHouseLoanProcessUrl();

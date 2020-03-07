@@ -204,7 +204,7 @@ window.layinit(function (htConfig) {
                                     marginRight: '10px'
                                 },
                                 on: {
-                                    click() {
+                                    click() {debugger
                                         let repayDate = moment(p.row.tradeDate).format('YYYY-MM-DD');
                                         let accountMoney = p.row.accountMoney;
                                         let acceptBank = p.row.bankAccount;
@@ -215,7 +215,9 @@ window.layinit(function (htConfig) {
                                             afterId + '&repayDate=' +
                                             repayDate + '&accountMoney=' +
                                             accountMoney + '&acceptBank=' +
-                                            acceptBank + '&timestamp=' +
+                                            acceptBank  +'&beforeOverAmount=' +
+                                            app.beforeOverAmount + '&beforeOverdueDays=' +
+                                            app.beforeOverdueDays + '&timestamp=' +
                                             new Date().getTime() + '&mprid=' +
                                             mrpid;
                                     }
@@ -422,6 +424,8 @@ window.layinit(function (htConfig) {
                 derateDetails: [],
                 moneyPoolRepayDates: []
             },
+            beforeOverdueDays:0,
+            beforeOverAmount:0,
             factRepaymentInfo: {
                 repayDate: '',
                 surplusFund: 0,
@@ -513,20 +517,20 @@ window.layinit(function (htConfig) {
                     app[target].style = style
                 }
             },
-            openMatchBankStatementModal(p) {
-                let url = '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId;
+            openMatchBankStatementModal(p) {debugger
+                let url = '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId+"&beforeOverAmount="+app.beforeOverAmount+"&beforeOverdueDays="+app.beforeOverdueDays;
                 layer.open({
                     type: 2,
                     title: '手动匹配流水',
                     content: [url],
                     area: ['95%', '95%'],
-                    success: function (layero, index) {
+                    success: function (layero, index) { 
                         curIndex = index;
                     }
                 })
             },
-            openAddBankStatementModal() {
-                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId;
+            openAddBankStatementModal() {debugger
+                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId+"&beforeOverAmount="+app.beforeOverAmount+"&beforeOverdueDays="+app.beforeOverdueDays;
                 layer.open({
                     type: 2,
                     title: '手动新增流水',
@@ -538,7 +542,7 @@ window.layinit(function (htConfig) {
                 })
             },
             openEditBankStatementModal(mprid) {
-                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId + "&mprid=" + mprid;
+                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId + "&mprid=" + mprid+"&beforeOverAmount="+app.beforeOverAmount+"&beforeOverdueDays="+app.beforeOverdueDays;
                 layer.open({
                     type: 2,
                     title: '手动编辑流水',
@@ -591,9 +595,11 @@ window.layinit(function (htConfig) {
             getThisTimeRepayment() {
                 axios.get(fpath + 'finance/thisTimeRepayment?businessId=' + businessId + "&afterId=" + afterId)
                     .then(function (res) {
-                        if (res.data.code == '1') {
+                        if (res.data.code == '1') {debugger
                             app.thisTimeRepaymentInfo = Object.assign(app.thisTimeRepaymentInfo, res.data.data);
-                            app.factRepaymentInfo.repayDate = res.data.data.moneyPoolRepayDates[0]
+                            app.factRepaymentInfo.repayDate = res.data.data.moneyPoolRepayDates[0];
+                            app.beforeOverAmount=app.thisTimeRepaymentInfo.offlineOverDue+app.thisTimeRepaymentInfo.onlineOverDue;
+                            app.beforeOverdueDays=app.thisTimeRepaymentInfo.overDays;
                         } else {
                             app.$Message.error({
                                 content: res.data.msg

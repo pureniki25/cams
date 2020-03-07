@@ -108,6 +108,8 @@
       				<i-option :value="2">第三方代扣</i-option>
       				<i-option :value="3">银行代扣</i-option>
       				<i-option :value="4">网关充值</i-option>
+      				<i-option :value="6">尾差</i-option>
+      				<i-option :value="7">手动创建</i-option>
   				</i-select>
 			</i-col>
 			<i-col span="3">
@@ -161,17 +163,35 @@
     
     <Card>
     	<row>
-			<i-button type="primary" @click="userDistributeFund" style="margin-right:1rem">资金分发</i-button>
-			<i-button type="primary" @click="openRechargeModal" style="margin-right:1rem">充值</i-button>
-			<i-button type="primary" @click="openRechargeRecordModal" style="margin-right:1rem">查看充值记录</i-button>
-			<i-button type="primary" @click="queryRechargeAccountBalance" :loading="queryRechargeAccountBalanceLoading" style="margin-right:1rem">查看账户余额</i-button>
+    		<i-col span='1' style="margin-right:1rem">
+				<i-button type="primary" @click="userDistributeFund" style="margin-right:1rem">资金分发</i-button>
+			</i-col>
+    		<i-col span='1' style="margin-left:10px">
+				<i-button type="primary" @click="openRechargeModal" style="margin-right:1rem">充值</i-button>
+			</i-col>
+    		<i-col span='1' style="margin-right:3rem">
+				<i-button type="primary" @click="openRechargeRecordModal" style="margin-right:1rem">查看充值记录</i-button>
+			</i-col>
+    		<i-col span='1' style="margin-right:3rem">
+				<i-button type="primary" @click="queryRechargeAccountBalance" :loading="queryRechargeAccountBalanceLoading" style="margin-right:1rem">查看账户余额</i-button>
+			</i-col>
+    		<i-col span='1' style="margin-right:1rem">
+				<i-button type="primary" @click="createPrincipalAndInterestDifferentData" :loading="createPrincipalAndInterestDifferentDataLoading" style="margin-right:1rem" v-if="authValid('createPrincipalAndInterestDifferentData')">创建尾差</i-button>
+			</i-col>
+			<i-col span='2' style="margin-left:10px" v-if="authValid('createTdrepayRechargeLog')">
+				<i-button type="primary" @click="openCreateTdrepayRechargeLog" :loading="createTdrepayRechargeLogLoading" style="margin-right:1rem" v-if="tdrepayRechargeInfoReqList.length > 0">创建资金分发记录</i-button>
+				<i-button type="primary" @click="openCreateTdrepayRechargeLog" :loading="createTdrepayRechargeLogLoading" style="margin-right:1rem" v-else disabled>创建资金分发记录</i-button>
+			</i-col>
 		</row>
 		<row style="margin-top:1rem">
 			<i-col span='6'>
 				{{ rechargeAccountType }}：代充值存管账号余额为：
 				{{ rechargeAccountBalance?numeral(rechargeAccountBalance).format('0,0.00'):0 }}元
 			</i-col>
-			<i-col span='6'>已勾选待分发金额为：{{ selectAmount?numeral(selectAmount).format('0,0.00'):0 }}元</i-col>
+			<i-col span='4'>已勾选待分发金额为：{{ selectAmount?numeral(selectAmount).format('0,0.00'):0 }}元</i-col>
+			<i-col span='4'>实收合计：{{ factRepayAmountTotal?numeral(factRepayAmountTotal).format('0,0.00'):0 }}元</i-col>
+			<i-col span='4'>充值合计：{{ rechargeAmountTotal?numeral(rechargeAmountTotal).format('0,0.00'):0 }}元</i-col>
+			<i-col span='4'>尾差合计：{{ weichaTotal?numeral(weichaTotal).format('0,0.00'):0 }}元</i-col>
 		</row>
 	</Card>
 	
@@ -181,6 +201,80 @@
                 <a class="layui-btn layui-btn-xs" lay-event="info">详情</a>
             </script>
 	</Card>
+	
+	<Modal v-model="createTdrepayRechargeLogModal" title="创建资金分发记录" width="500">
+		<i-form ref="createTdrepayRechargeLogForm" :model="createTdrepayRechargeLogForm" label-position="right" label-width="150" :rules="createTdrepayRechargeLogRules">
+			<form-item label="业务编号：" prop="businessId">
+				<row>
+					<i-col>
+						{{tdrepayRechargeLogBaseInfo.origBusinessId}}
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="被充值人：" prop="rechargeUser">
+				<row>
+					<i-col>
+						{{tdrepayRechargeLogBaseInfo.person}}
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="借款人：" prop="customerName">
+				<row>
+					<i-col>
+						{{tdrepayRechargeLogBaseInfo.customerName}}
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="还款期数：" prop="afterId">
+				<row>
+					<i-col>
+						{{tdrepayRechargeLogBaseInfo.afterId}}
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="分公司：" prop="companyName">
+				<row>
+					<i-col>
+						{{tdrepayRechargeLogBaseInfo.companyName}}
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="实还日期：" prop="factRepayDate">
+				<row>
+					<i-col>
+						<date-picker v-model="createTdrepayRechargeLogForm.factRepayDate" type="date" split-panels format="yyyy-MM-dd" style="width: 200px"/>
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="充值金额：" prop="rechargeAmount">
+				<row>
+					<i-col>
+						<i-input v-model="createTdrepayRechargeLogForm.rechargeAmount" style="width: 200px"/> 
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="实收合计：" prop="factRepayAmount">
+				<row>
+					<i-col>
+						<i-input v-model="createTdrepayRechargeLogForm.factRepayAmount" style="width: 200px"/> 
+					</i-col>
+				</row>
+			</form-item>
+			<form-item label="流水合计：" prop="resourceAmount">
+				<row>
+					<i-col>
+						<i-input v-model="createTdrepayRechargeLogForm.resourceAmount" style="width: 200px"/> 
+					</i-col>
+				</row>
+			</form-item>
+		</i-form>
+		<row slot="footer" >
+            <div class="layui-btn-group" style ="float: right">
+                <button class="layui-btn" @click="createTdrepayRechargeLog">保存</button>
+                <button class="layui-btn layui-btn-danger" @click="closeModal">取消</button>
+            </div>
+   		</row>
+	</Modal>
 	
 	<Modal v-model="rechargeModal" title="代充值账户充值" width="1500">
 		<i-form ref="rechargeModalForm" :model="rechargeModalForm" label-position="right" label-width="150" :rules="rechargeModalFormRules">
@@ -256,8 +350,8 @@
                 <span class="marginRight">{{ infoBasicData.projectId }}</span>
                 <span>客户姓名:</span>
                 <span class="marginRight">{{ infoBasicData.customerName }}</span>
-                <span>标的金额:</span>
-                <span class="marginRight">{{infoBasicData.amount?numeral(infoBasicData.amount).format('0,0.00') + '元' : ''}}</span>
+                <span v-if="!yidianchedaiFlag">标的金额:</span>
+                <span class="marginRight" v-if="!yidianchedaiFlag">{{infoBasicData.amount?numeral(infoBasicData.amount).format('0,0.00') + '元' : ''}}</span>
             </div>
             
 	        <tabs v-model="infoTabValue" :animated="true" @on-click="initFunction($event)">
@@ -310,14 +404,17 @@
 				    <tabs :animated="true" @on-click="initProjectFunction($event)">
 				    	<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
 							<row>
-								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
-								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
+								<i-col span='6' v-if="!yidianchedaiFlag">标的号：{{ item.projectId }}</i-col>
+								<i-col span='4' v-if="!yidianchedaiFlag">上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
 								<i-col span='4'>账户余额：{{ platformRepaymentInfoaviMoney?numeral(platformRepaymentInfoaviMoney).format('0,0.00'):0 }}</i-col>
-								<i-col span='10' >
+								<i-col span='10' v-if="!isOldDataFlag">
 									今天结清应还本息平台费：{{ platformPrincipalAndInterestAndPlatformCharge?numeral(platformPrincipalAndInterestAndPlatformCharge).format('0,0.00'):0 }}，
 									本金：{{ platformPrincipal?numeral(platformPrincipal).format('0,0.00'):0 }}，
 									利息：{{ platformInterest?numeral(platformInterest).format('0,0.00'):0 }}，
 									平台费：{{ platformRepaymentInfoPlatformCharge?numeral(platformRepaymentInfoPlatformCharge).format('0,0.00'):0 }}
+								</i-col>
+								<i-col span='10' v-else>
+									今天结清应还本息：{{ platformPrincipalAndInterestAndPlatformCharge?numeral(platformPrincipalAndInterestAndPlatformCharge).format('0,0.00'):0 }}
 								</i-col>
 							</row>
 							
@@ -345,7 +442,7 @@
 				        </p>
 				    </row>
 				    <tabs :animated="true" @on-click="initAdvancePaymentFunction($event)">
-						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
+						<tab-pane v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId" v-if="!isOldDataFlag">
 							<row style="margin-top:1rem">
 								<p slot="title">
 						            <h3>还垫付记录</h3>
@@ -370,6 +467,31 @@
 								<i-table border ref="guaranteePaymentData" :columns="queryGuaranteePaymentColumns" 
 										@on-selection-change="selectGuaranteePaymentData($event)" :data="queryGuaranteePaymentData" style="margin-top:1rem"></i-table>
 							</row>
+						</tab-pane>
+						
+						<tab-pane v-if="isOldDataFlag" v-for="item in projectInfoList" :key="item.projectId" :label="item.realName" :name="item.projectId">
+							<row>
+								<i-col span='6'>标的号：{{ item.projectId }}</i-col>
+								<i-col span='4'>上标金额：{{ item.fullBorrowMoney?numeral(item.fullBorrowMoney).format('0,0.00'):0 }}</i-col>
+							</row>
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>全部垫付记录</h3>
+						        </p>
+						    </row>
+							<row style="margin-top:1rem">
+								<i-table highlight-row border :columns="oldAllGuaranteePaymentColumns" :data="oldAllGuaranteePaymentData" style="margin-top:1rem"></i-table>
+							</row>
+							
+							<row style="margin-top:1rem">
+								<p slot="title">
+						            <h3>未还垫付记录</h3>
+						        </p>
+						    </row>
+						    <row style="margin-top:1rem">
+								<i-table highlight-row border :columns="oldSurplusGuaranteePaymentColumns" :data="oldSurplusGuaranteePaymentData" style="margin-top:1rem"></i-table>
+							</row>
+							
 						</tab-pane>
 					</tabs>
 				</tab-pane>
@@ -429,6 +551,12 @@
 	<Modal v-model="rechargeAccountBalanceFlag" width="1000" title="代充值账户余额">
    		<row style="margin-top:1rem">
    			<i-table border :columns="queryRechargeAccountBalanceColumns" :data="queryRechargeAccountBalanceData"></i-table>
+   		</row>
+	</Modal>
+	
+	<Modal v-model="oldSurplusGuaranteePaymentModal" width="1700" title="垫付人ID当期垫付明细">
+   		<row style="margin-top:1rem">
+   			<i-table border :columns="oldGuaranteePaymentDetailColumns" :data="oldGuaranteePaymentDetailData"></i-table>
    		</row>
 	</Modal>
 </div>

@@ -27,6 +27,14 @@ public class CollectionUIController {
 //        map.addAttribute("staffType","phoneStaff");
         return "/Collection/index";
     }
+    
+    
+    //业务管理
+    @RequestMapping("business")
+    public String business(ModelMap map){
+//        map.addAttribute("staffType","phoneStaff");
+        return "/Collection/business";
+    }
 
 
     //设置电催
@@ -70,13 +78,37 @@ public class CollectionUIController {
             @RequestParam("crpId") String crpId,
             @RequestParam("processStatus") String processStatus,
             @RequestParam(value="processId",required=false) String processId,
+            @RequestParam(value="pResult",required=false) String pResult,
+            @RequestParam(value="reqPageeType",required=false) String reqPageeType,
            ModelMap map
             ){
         map.addAttribute("businessId",businessId);
         map.addAttribute("crpId",crpId);
         map.addAttribute("processStatus",processStatus);
         map.addAttribute("processId",processId);
+        map.addAttribute("pResult",pResult);
+        map.addAttribute("reqPageeType",reqPageeType);
         return "/Collection/ApplyDerate";
+    }
+   
+   //业务管理减免申请界面
+   @RequestMapping("businessApplyDerateUI")
+    public String businessApplyDerateUI(
+           @RequestParam("businessId") String businessId,
+            @RequestParam("crpId") String crpId,
+            @RequestParam("processStatus") String processStatus,
+            @RequestParam(value="processId",required=false) String processId,
+           @RequestParam(value="pResult",required=false) String pResult,
+           @RequestParam(value="reqPageeType",required=false) String reqPageeType,
+           ModelMap map
+            ){
+        map.addAttribute("businessId",businessId);
+        map.addAttribute("crpId",crpId);
+        map.addAttribute("processStatus",processStatus);
+        map.addAttribute("processId",processId);
+        map.addAttribute("pResult",pResult);
+        map.addAttribute("reqPageeType",reqPageeType);
+        return "/Collection/BusinessApplyDerate";
     }
 
     //减免管理界面

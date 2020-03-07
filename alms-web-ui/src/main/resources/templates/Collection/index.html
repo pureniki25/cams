@@ -52,11 +52,11 @@
 
 
                 <!--右上侧按钮列表-->
-                <!-- <i-button v-if="authValid('search')" slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
+                <!-- <i-button  slot="extra" type="info" :loading="loading" icon="ios-search" @click="toLoading" style="margin-right:10px">
                     <span v-if="!loading">查询</span>
                     <span v-else>查询中...</span>
                 </i-button>
-                <i-button v-if="authValid('reset')" slot="extra"  @click="handleReset('searchForm')" style="margin-right:10px">
+                <i-button slot="extra"  @click="handleReset('searchForm')" style="margin-right:10px">
                     <span>重置</span>
                 </i-button> -->
                 <!--@click="clickExport"-->
@@ -255,16 +255,16 @@
                     <button class="layui-btn layui-btn-sm" @click="isShowMoreQuery=!isShowMoreQuery" v-if="isShowMoreQuery" >
                         <span>收起高级查询</span>
                     </button>
-                    <button class="layui-btn layui-btn-sm" @click="toLoading" v-if="authValid('search')">
+                    <button class="layui-btn layui-btn-sm" @click="toLoading">
                         <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
                         <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
                     </button>
-                    <button class="layui-btn layui-btn-sm" v-if="authValid('reset')" @click="handleReset('searchForm')">
+                    <button class="layui-btn layui-btn-sm"  @click="handleReset('searchForm')">
                         <span>重置</span>
                     </button>
-                    <button class="layui-btn layui-btn-sm" id="exportBtn" v-if="authValid('export')"
+                    <button class="layui-btn layui-btn-sm" id="exportBtn"  :disabled="exporting"
                             @click="clickExport">
-                        <span v-if="!exporting">导出</span>
+                         <span v-if="!exporting">导出</span>
                         <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>导出中...</span>
                     </button>
                 </div>

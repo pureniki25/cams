@@ -8,10 +8,10 @@ spring:
       name: alms-withhold-service,base,rabbitmq,mongo,redis
       discovery:
         service-id: ussp-config-app
-        enabled: true
+        enabled: true 
       enabled: true
     bus:
-      enabled: true
+      enabled: false
 eureka:
   instance:
     prefer-ip-address: true

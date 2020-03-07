@@ -31,7 +31,9 @@ window.layinit(function (htConfig) {
                 derateMoneyBegin	:'',    //减免金额 开始
                 derateMoneyEnd		:'', 
                 derateDateBegin		:'', 
-                derateDateEnd       :''
+                derateDateEnd       :'',
+                derateStatus:''
+
             },
             ruleValidate:setSearchFormValidate, //表单验证
 
@@ -67,8 +69,24 @@ window.layinit(function (htConfig) {
             businessStatusList:'',//business_status_array,        //业务状态列表
             repayStatusList:'',//repay_status_array,        //还款状态列表
             collectLevelList:'',//collect_level_array, //催收级别列表
+            derateStatusList       :[
+                {
+                    statusId:1,
+                    statusName:'有效'
+                },
+                {
+                    statusId:2,
+                    statusName:'无效'
+                },
+                {
+                    statusId:3,
+                    statusName:'未核销'
+                }
+            ],
 
-
+            showPayMoneyTotal:'',//当页 应收总额
+            derateMoneyTotal:'',//当页 减免总额
+            realPayMoneyTotal:'',// 当页 实收总额
             selectedRowInfo:'',//存储当前选中行信息
             edit_modal:false,//控制编辑项选择modal显示的标志位
             menu_modal:false,
@@ -99,6 +117,7 @@ window.layinit(function (htConfig) {
 
                                 derateMoneyBegin:vm.searchForm.derateMoneyBegin, //减免金额  开始
                                 derateMoneyEnd:vm.searchForm.derateMoneyEnd,  //减免金额 结束
+                                derateStatus:vm.searchForm.derateStatus  //减免状态
 
                             }
                             , page: {
@@ -119,7 +138,7 @@ window.layinit(function (htConfig) {
     		                    if (valid) {debugger
     		                    	getData();
     		                        vm.exporting = true;
-    		                        expoertExcel(basePath + "ApplyDerateController/saveExcel",vm.searchForm,"减免管理.xlsx");
+    		                        expoertExcel(basePath + "ApplyDerateController/saveDerateExcel",vm.searchForm,"减免管理.xlsx");
 
     		                        vm.exporting = false;
     		
@@ -153,9 +172,10 @@ window.layinit(function (htConfig) {
                     field: 'businessId',
                     width:200,
                     title: '业务编号',
+                    event: 'openDerateProcess',
                     align:'center'
                 }, {
-                    field: 'periods',
+                    field: 'afterId',
                     title: '期数',
                     align:'center'
                 },{
@@ -177,6 +197,10 @@ window.layinit(function (htConfig) {
                 },{
                     field: 'createrName',
                     title: '发起减免人',
+                    align:'center'
+                },{
+                    field: 'fiveLevelName',
+                    title: '资产五级分类',
                     align:'center'
                 },{
                     field: 'derateTypeName',
@@ -209,13 +233,19 @@ window.layinit(function (htConfig) {
                     templet:function(d){
                         return d.derateTime?moment(d.derateTime).format("YYYY年MM月DD日"):''
                     }
-                }/* {
+                },
+                {
+                    field: 'derateStatus',
+                    title: '减免状态',
+                    align:'center'
+                },
+                {
                         fixed: 'right',
                         title: '操作',
-                        width: 178,
-                        align: 'left',
+                        width: 80,
+                        align: 'center',
                         toolbar: '#barTools'
-                    }*/
+                    }
             ]], //设置表头
             url: basePath +'ApplyDerateController/selectApplyDeratVoPage',
             //method: 'post' //如果无需自定义HTTP类型，可不加该参数
@@ -226,17 +256,49 @@ window.layinit(function (htConfig) {
                 //数据渲染完的回调。你可以借此做一些其它的操作
                 //如果是异步请求数据方式，res即为你接口返回的信息。
                 //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                getPageTotalMoney();
                 vm.loading = false;
             }
         });
 
         //监听工具条
         table.on('tool(listTable)', function (obj) {
-            vm.selectedRowInfo = obj.data;
-            if (obj.event === 'edit') {
-                // vm.edit_modal = true;
-            }else  if(obj.event ==='info'){
-                // vm.menu_modal = false;
+            var selectedRowInfo = obj.data;
+            var url = '';
+            if (obj.event === 'info') {
+
+                $.ajax({
+                    type : 'GET',
+                    async : false,
+                    url : basePath +'ApplyDerateController/getApplyDerateInfoByProcessId?processId='+selectedRowInfo.processId,
+                    headers : {
+                        app : 'ALMS',
+                        Authorization : "Bearer " + getToken()
+                    },
+                    success : function(data) {
+                        var applyDerateProcess = data.data;
+                        if(applyDerateProcess.isSettle==1){//结清
+                            url =  '/collectionUI/businessApplyDerateUI?businessId='+selectedRowInfo.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+selectedRowInfo.status+"&processId="+selectedRowInfo.processId+"&businessTypeId="+selectedRowInfo.businessTypeId
+                        }else{
+                            url =  '/collectionUI/applyDerateUI?businessId='+selectedRowInfo.businessId+'&crpId='+applyDerateProcess.crpId+"&processStatus="+selectedRowInfo.status+"&processId="+selectedRowInfo.processId+"&businessTypeId="+selectedRowInfo.businessTypeId
+                        }
+                    },
+                    error : function() {
+                        layer.confirm('Navbar error:AJAX请求出错!', function(index) {
+                            top.location.href = loginUrl;
+                            layer.close(index);
+                        });
+                        return false;
+                    }
+                });
+                layer.open({
+                    type: 2,
+                    title: '减免申请',
+                    maxmin: true,
+                    area: ['90%', '90%'],
+                    content:url
+                });
+
             }
         });
 
@@ -250,6 +312,31 @@ window.layinit(function (htConfig) {
 function getMousePos(event) {
     var e =  window.event;
     return {'x':e.clientX,'y':e.clientY}
+}
+var getPageTotalMoney = function () {
+
+    $.ajax({
+        type: "POST",
+        url: basePath+'ApplyDerateController/getPageTotalMoney',
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(vm.searchForm),
+        success: function (res) {
+            console.log("res============",res)
+            if(res.code == "1"){debugger
+            	if(res.data==null){  
+            		   vm.showPayMoneyTotal=0;
+                       vm.derateMoneyTotal=0;
+                       vm.realPayMoneyTotal=0;
+            	}else{
+                vm.showPayMoneyTotal=res.data.showPayMoneyTotal;
+                vm.derateMoneyTotal=res.data.derateMoneyTotal;
+                vm.realPayMoneyTotal=res.data.realPayMoneyTotal;
+            	}
+
+            }
+        }
+    });
+
 }
 
 //从后台获取下拉框数据

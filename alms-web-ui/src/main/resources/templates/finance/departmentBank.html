@@ -16,29 +16,25 @@
                         <p slot="title"><Icon type="ios-search" />搜索条件</p>
 
                         <div class="layui-btn-group" slot="extra">
-                            <button class="layui-btn layui-btn-sm" v-if="authValid('search')" @click="search" ht-auth="search">
+                            <button class="layui-btn layui-btn-sm"  @click="search" ht-auth="search">
                                 <span v-if="!loading">  <i class="layui-icon">&#xe615;</i>查询</span>
                                 <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
                             </button>
 
-                            <button class="layui-btn layui-btn-sm" @click="editForm.accountId=null;editModal=true;" v-if="authValid('add')">新增</button>
+                            <button class="layui-btn layui-btn-sm" @click="editForm.accountId=null;editModal=true;">新增</button>
                         </div>
 
                         <Row :gutter="0">
-                            <i-form ref="searchForm" :model="searchForm" rules="ruleValidate" label-position="right" label-width="100">
+                            <i-form ref="searchForm" :model="searchForm"  label-position="right" label-width="100">
                                 <i-col span="6">
-                                    <Form-item label="分公司:" >
-                                        <i-select v-model="searchForm.condition.LIKE_dept_id" clearable filterable>
+                                    <Form-item label="公司名称:" >
+                                        <i-select v-model="searchForm.condition.LIKE_company_name" clearable filterable>
                                             <!--<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>-->
-                                            <i-option v-for="item in companies" :value="item.areaName" :key="item.areaName">{{item.areaName}}</i-option>
+                                            <i-option v-for="item in companys" :value="item.companyName" :key="item.companyName">{{item.companyName}}</i-option>
                                         </i-select>
                                     </Form-item>
                                 </i-col>
-                                <i-col span="6">
-                                    <Form-item label="账户名:" >
-                                        <i-input v-model="searchForm.condition.LIKE_repayment_name"></i-input>
-                                    </Form-item>
-                                </i-col>
+                             
                                <!-- <i-co span="12"></i-co>-->
                             </i-form>
                         </Row>
@@ -48,11 +44,10 @@
 
             <Row style="padding:10px">
                 <i-col span="24">
-                    <!--<table id="main_table" lay-filter="main_table"></table>
-                    <script type="text/html" id="bar_tools">
-                        &lt;!&ndash;<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="detail">查看</a>
+                  <table id="main_table" lay-filter="main_table"></table>
+<!--                     <script type="text/html" id="bar_tools"> 
                         <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">编辑</a>&ndash;&gt;
-                        <a class="layui-btn layui-btn-xs layui-btn-danger " lay-event="del" v-if="authValid('del')">删除</a>
+                        <a class="layui-btn layui-btn-xs layui-btn-danger " lay-event="del">删除</a>
                     </script>-->
                     <i-table :columns="table.col" :data="table.data" :loading="table.loading" stripe></i-table>
                     <p style="text-align: center; margin-top: 20px;"><Page :total="table.total" :page-size="searchForm.size" @on-change="paging" :current="searchForm.current" show-total></Page></p>
@@ -64,53 +59,10 @@
                    @on-cancel="hideEditModal" :styles="{top: '5px'}">
                         <i-form ref="editForm" :model="editForm" :rules="ruleValidate" label-position="right" label-width="150">
                             <!--<input type="hidden" v-model="editForm.accountId"/>-->
-                            <Form-item label="财务导入流水账号：" prop="financeName">
-                                <i-input v-model="editForm.financeName" ></i-input>
+                            <Form-item label="公司名称：" prop="companyId">
+                                <i-input v-model="editForm.companyName" ></i-input>
                             </Form-item>
-                            <Form-item label="银行账户名：" prop="repaymentName">
-                                <i-input v-model="editForm.repaymentName" ></i-input>
-                            </Form-item>
-                            <Form-item label="银行卡账号："  prop="repaymentId">
-                                <i-input v-model="editForm.repaymentId" ></i-input>
-                            </Form-item>
-                            <Form-item label="开户行："  prop="repaymentBank">
-                                <i-select v-model="editForm.repaymentBank" clearable filterable>
-                                    <i-option v-for="bank in banks" :value="bank.bankName" :key="bank.bankName">{{bank.bankName}}</i-option>
-                                </i-select>
-                            </Form-item>
-                            <Form-item label="支行名称：" prop="repaymentSubBank">
-                                <i-input v-model="editForm.repaymentSubBank" ></i-input>
-                            </Form-item>
-                            <Form-item label="账户类型："  prop="mainType">
-                                <Radio-group v-model="editForm.mainType">
-                                    <Radio label="1">个人</Radio>
-                                    <Radio label="2">企业</Radio>
-                                </Radio-group>
-                            </Form-item>
-                            <Form-item label="账户主体编码："  prop="mainId">
-                                <i-input v-model="editForm.mainId" ></i-input>
-                            </Form-item>
-                            <Form-item label="银行卡归属地："  prop="bankProvinceCity">
-                                <i-select v-model="editForm.bankProvince" @on-change="initCityData" clearable filterable  style="width:150px">
-                                    <i-option v-for="province in provinces" :value="province.name" :key="province.name">{{province.name}}</i-option>
-                                </i-select>
-                                <i-select v-model="editForm.bankCity" clearable filterable  style="width:150px">
-                                    <i-option v-for="city in cities" :value="city.name" :key="city.name">{{city.name}}</i-option>
-                                </i-select>
-                            </Form-item>
-                            <Form-item label="银行预留手机号:"  prop="phoneNumber">
-                                <i-input v-model="editForm.phoneNumber" ></i-input>
-                            </Form-item>
-                            <Form-item label="关联分公司："  prop="deptIds">
-                                <i-select v-model="editForm.deptIds" multiple clearable filterable>
-                                    <i-option v-for="company in companies" :value="company.areaName" :key="company.areaName">{{company.areaName}}</i-option>
-                                </i-select>
-                            </Form-item>
-                            <!--<Form-item label="：">-->
-                                <!--<div slot="footer">-->
-                                    <!--<i-button type="error" size="large" long :loading="" @click="del">删除</i-button>-->
-                                <!--</div>-->
-                            <!--</Form-item>-->
+                       
                         </i-form>
                     </Modal>
 
@@ -118,46 +70,13 @@
 
             <Modal title="详情" v-model="detailModal" :closable="false" :mask-closable="false">
                 <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">财务导入流水账号：</i-col>
-                    <i-col span="18">{{editForm.financeName}}</i-col>
+                    <i-col span="6">公司名称：</i-col>
+                    <i-col span="18">{{editForm.companyName}}</i-col>
                 </Row>
-                <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">银行账户名：</i-col>
-                    <i-col span="18">{{editForm.repaymentName}}</i-col>
-                </Row>
-                <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">银行卡账号：</i-col>
-                    <i-col span="18">{{editForm.repaymentId}}</i-col>
-                </Row>
-                <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">开户行：</i-col>
-                    <i-col span="18">{{editForm.repaymentBank}}</i-col>
-                </Row>
-                <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">支行名称：</i-col>
-                    <i-col span="18">{{editForm.repaymentSubBank}}</i-col>
-                </Row>
-                <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">账户类型：</i-col>
-                    <i-col span="18">{{editForm.mainType=='1'?'个人':'企业'}}</i-col>
-                </Row>
-                <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">账户主体编码：</i-col>
-                    <i-col span="18">{{editForm.mainId}}</i-col>
-                </Row>
-                <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">银行卡归属地：</i-col>
-                    <i-col span="18">{{editForm.bankProvince}} {{editForm.bankCity}}</i-col>
-                </Row>
-                <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">银行预留手机号:</i-col>
-                    <i-col span="18">{{editForm.phoneNumber}}</i-col>
-                </Row>
-                <Row :gutter="16" style="margin-top: 15px;">
-                    <i-col span="6">关联分公司：</i-col>
-                    <i-col span="18">{{editForm.deptId}}</i-col>
-                </Row>
+           
             </Modal>
+            
+          
         </div>
         <script src="/plugins/vue/vue.min.js"></script>
         <script src="/plugins/iview/js/iview.js"></script>
@@ -167,6 +86,6 @@
         <script src="/properties/config.js"></script>
         <script src="/build/js/appToken.js"></script>
         <script src="/src/js/comm.js"></script>
-        <script src="/src/js/finance/departmentBank.js"></script>
-    </body>
+	<script src="/src/js/finance/departmentBank.js"></script>
+</body>
 </html>

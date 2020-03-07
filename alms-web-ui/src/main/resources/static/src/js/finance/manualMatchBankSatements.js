@@ -8,6 +8,7 @@ window.layinit(function (htConfig) {
 
     let cpath = htConfig.coreBasePath;
     let fpath = htConfig.financeBasePath;
+   
     app = new Vue({
         el: "#app",
         data: {
@@ -18,6 +19,8 @@ window.layinit(function (htConfig) {
             acceptBank: decodeURI(getQueryStr('acceptBank')),
             moenyPoolId: getQueryStr('moenyPoolId'),
             status: decodeURI(getQueryStr('status')),
+             beforeOverAmount:getQueryStr('beforeOverAmount'),
+            beforeOverdueDays :getQueryStr('beforeOverdueDays'),
             bankAccounts: [],
             selections: [],
             curPage: 1,
@@ -148,7 +151,7 @@ window.layinit(function (htConfig) {
             onSelectChange: function (selections) {
                 this.selections = selections;
             },
-            submit: function () {
+            submit: function () {debugger
                 app.submitLoading = true
                 if (this.selections.length == 0) {
                     this.$Message.warning({
@@ -160,7 +163,9 @@ window.layinit(function (htConfig) {
                 let params = {
                     array: this.selections,
                     businessId: this.businessId,
-                    afterId: this.afterId
+                    afterId: this.afterId,
+                    beforeOverAmount:this.beforeOverAmount,
+                    beforeOverdueDays:this.beforeOverdueDays
                 }
                 
                 let mprid = getQueryStr('mprid')

@@ -321,8 +321,8 @@ var setSearchFormValidate = {
 var getData = function(){debugger
 
     var dataObject ={
-        derateDateBegin:'',
-        derateDateEnd:'',
+		sendDateBegin:'',
+		sendDateEnd:'',
     }
     if(vm.searchForm.sendDateRange.length>0){
     	if(vm.searchForm.sendDateRange[0]!=null){
@@ -330,7 +330,7 @@ var getData = function(){debugger
     	}
     	if(vm.searchForm.sendDateRange[1]!=null){
       	   var date =vm.searchForm.sendDateRange[1];
-           date.setDate(date.getDate() + 1);
+           date.setDate(date.getDate());
            dataObject.sendDateEnd=date.getTime();
     	}
 

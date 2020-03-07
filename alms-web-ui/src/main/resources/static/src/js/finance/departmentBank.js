@@ -6,8 +6,10 @@ var layer, table, basePath, coreBasePath, vm;
 
 
 window.layinit(function (htConfig) {
-    basePath = htConfig.financeBasePath;
-    coreBasePath = htConfig.coreBasePath;
+	debugger
+    var _htConfig = htConfig;
+    basePath = _htConfig.gatewayUrl;
+    coreBasePath = _htConfig.gatewayUrl;
     table = layui.table;
 
     vm = new Vue({
@@ -72,32 +74,32 @@ let data = {
     editModalTitle: '新增',
     editModalLoading: true,
     detailModal: false,
-    companies: [],
+    companys: [],
+	upload: { 
+		url: coreBasePath + 'departmentBank/importCompanyExcel',
+		headers: {
+		 Authorization: axios.defaults.headers.common['Authorization'],
+		},
+   },
     provinces: [],
     cities: [],
     banks: [],
     searchForm: {
         condition: {
-            LIKE_dept_id: '',
-            LIKE_repayment_name: '',
+            LIKE_company_name: ''
         },
         current: 1,
-        size: 10
+        size: 100
     },
     editForm: {
-        accountId: '',
-        financeName: '',
-        repaymentName: '',
-        repaymentId: '',
-        repaymentBank: '',
-        repaymentSubBank: '',
-        mainType: '2',
-        mainId: '',
-        bankProvince: '',
-        bankCity: '',
-        phoneNumber: '',
-        deptId: '',
-        deptIds: [],
+        companyId: '',
+        companyName: '',
+        createTime: '',
+        companyNo:'',
+        companyOwner:'',
+        companyStatus:'',
+        companyRule:'',
+        companyType:''
     },
     ruleValidate: {
         //表单验证
@@ -128,27 +130,47 @@ let data = {
             width: 60,
             align: 'center'
         }, {
-            title: '财务导入流水账号',
-            key: 'financeName'
+            title: '序号',
+            key: 'idx'
+        },  {
+            title: '公司名称',
+            key: 'companyName'
         }, {
-            title: '账户名',
-            key: 'repaymentName'
+            title: '纳税识别码',
+            key: 'companyNo'
+        },{
+            title: '纳税法人',
+            key: 'companyOwner'
         }, {
-            title: '账号',
-            key: 'repaymentId'
+            title: '公司状态',
+            key: 'companyStatus',
+            render:(h, params) => {
+                let companyStatus = params.row.companyStatus; //公司状态：1：小规模，2：一般纳税人，3：个体户
+                if (companyStatus==='1'){ return "小规模" };
+                if (companyStatus==='2'){ return "一般纳税人"};
+                if (companyStatus==='3'){ return "个体户" }
+            }
         }, {
-            title: '开户行',
-            key: 'repaymentBank'
+            title: '财务制度',
+            key: 'companyRule',
+            render:(h, params) => {
+                let companyRule = params.row.companyRule; //公司制度：1：企业会计制度，2：小企业会计制度
+                if (companyRule==='1'){ return "企业会计制度" };
+                if (companyRule==='2'){ return "小企业会计制度"};
+            }
         }, {
-            title: '支行名',
-            key: 'repaymentSubBank'
+            title: '公司类型',
+            key: 'companyType',
+            render:(h, params) => {
+                let companyType = params.row.companyType; //公司类型：1：生产型，2：贸易型，3：进出口型
+                if (companyType==='1'){ return "生产型" };
+                if (companyType==='2'){ return "贸易型"};
+                if (companyType==='3'){ return "进出口型" }
+            }	
         }, {
-            title: '分公司',
-            key: 'deptId'
-        }, {
-            title: '更新时间',
-            key: 'updateTime'
-        }, {
+            title: '创建时间',
+            key: 'createTime'
+        },{
             title: '操作',
             key: 'action',
             // fixed: 'right',
@@ -167,7 +189,7 @@ let data = {
                             vm.detail(params.row)
                         }
                     }
-                }, '详情');
+                }, '编辑');
 
                 let edit = h('Button', {
                     props: {
@@ -196,13 +218,10 @@ let data = {
 
                 let btnArr = [];
                 btnArr.push(detail);
+                btnArr.push(del);
 
-                if( authValid('edit') ){
-                    btnArr.push(edit);
-                }
-                if(authValid('delete')){
-                    btnArr.push(del);
-                }
+              
+                
                 return h('div', btnArr);
             }
         }],
@@ -213,6 +232,26 @@ let data = {
 }
 
 let methods = {
+	
+    beforeUpLoadFile() {
+   debugger
+        //  vm.condata.companyId=vm.editForm.companyId;
+        //  vm.condata.productPropertiesId.companyId=vm.editForm.productPropertiesId;
+
+    },
+
+    uploadSuccess(response) {
+        if (response.code == '1') {
+            vm.$Modal.success({
+                content: "导入成功"
+            })
+        } else {
+            vm.$Modal.error({
+                content: response.msg
+            })
+        }
+
+    },
     showEditModal() {
         this.editModal = true;
     },
@@ -227,11 +266,12 @@ let methods = {
     //初始化数据
     initData() {
         var self = this;
-        //省
-        axios.get(coreBasePath + 'sysProvince/findAll')
+        self.upload.url=coreBasePath + 'departmentBank/importCompanyExcel';
+        //公司列表
+        axios.get(coreBasePath + 'departmentBank/findAll')
             .then(res => {
                 if (!!res.data && res.data.code == '1') {
-                    self.provinces = res.data.data;
+                    self.companys = res.data.data;
                 } else {
                     self.$Modal.error({content: '调用接口失败,消息:' + res.data.msg});
                 }
@@ -240,31 +280,7 @@ let methods = {
                 self.$Modal.error({content: '操作失败!'});
             });
 
-        //银行
-        axios.get(coreBasePath + 'sysBank/findAll')
-            .then(res => {
-                if (!!res.data && res.data.code == '1') {
-                    self.banks = res.data.data;
-                } else {
-                    self.$Modal.error({content: '调用接口失败,消息:' + res.data.msg});
-                }
-            })
-            .catch(err => {
-                self.$Modal.error({content: '操作失败!'});
-            });
-
-        //分公司列表
-        axios.get(coreBasePath + 'basicCompany/findAllBranchCompany')
-            .then(res => {
-                if (res.data.code == "1") {
-                    self.companies = res.data.data;
-                } else {
-                    self.$Modal.error({content: '调用接口失败,消息:' + res.data.msg});
-                }
-            })
-            .catch(err => {
-                self.$Modal.error({content: '操作失败!'});
-            });
+  
     },
     initCityData() {
         var self = this;
@@ -290,7 +306,7 @@ let methods = {
         this.searchForm.current = 1;
         this.searchData();
     },
-    searchData() {
+    searchData() {debugger
         /* table.reload('main_table', {
              where: vm.search,
              page: {curr: 1}
@@ -300,7 +316,7 @@ let methods = {
         //self.table.loading = true;
         axios.post(basePath + 'departmentBank/search', this.searchForm).then(res => {
             self.table.loading = false;
-            if (!!res.data && res.data.code == 0) {
+            if (!!res.data && res.data.code == 0) {debugger
                 self.table.data = res.data.data;
                 self.table.total = res.data.count;
             } else {
@@ -309,7 +325,6 @@ let methods = {
         }
     ).catch(err => {
         self.table.loading = false;
-        self.$Message.error({content: err})
     }
 );
 // self.loading =  false;
@@ -320,12 +335,13 @@ submitEditForm() {
         if(valid){
             axios.post(basePath + 'departmentBank/edit', self.editForm)
             .then(res => {
-                if (!!res.data && res.data.code == '1') {
+                if (!!res.data && res.data.code == '1') {debugger
                     self.search();
                     self.hideEditModal();
                     this.editModalLoading = true;
                 } else {
                     self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
+                    this.editModalLoading = false;
                 }
             })
             .catch(err => {
@@ -349,6 +365,7 @@ edit(row) {
     this.showEditModal();
 },
 detail(row) {
+	debugger
     Object.assign(this.editForm, row);
     this.showDetailModal();
 },
@@ -357,8 +374,8 @@ delete(row) {
     this.$Modal.confirm({
         title: '提示',
         content: '确定要删除吗?',
-        onOk: () => {
-            axios.get(basePath + 'departmentBank/delete', {params: {id: row.accountId}})
+        onOk: () => {debugger
+            axios.get(basePath + 'departmentBank/delete', {params: {id: row.companyId}})
             .then(res => {
                 if (!!res.data && res.data.code == '1') {
                     

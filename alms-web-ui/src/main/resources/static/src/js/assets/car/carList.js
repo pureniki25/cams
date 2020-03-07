@@ -282,7 +282,7 @@ window.layinit(function (htConfig) {
                         field: 'trailerDate',
                         title: '拖车日期',
                         templet:function(d){
-                            return moment(d.evaluationDate).format("YYYY-MM-DD")
+                            return moment(d.trailerDate).format("YYYY-MM-DD")
                         }
                     }, {
 

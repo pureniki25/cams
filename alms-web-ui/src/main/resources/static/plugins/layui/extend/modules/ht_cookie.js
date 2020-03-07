@@ -2,7 +2,7 @@
  * add by tanrq 2018/1/20
  */
 layui.define([], function (exports) {
-    var tokenCookieName = "token", refreshTokenCookieName = "refreshToken";
+    var tokenCookieName = "alms_token", refreshTokenCookieName = "alms_refreshToken",appCookieName = "appName";
     var cookie = {
         /**
          * 新建cookie。
@@ -41,7 +41,11 @@ layui.define([], function (exports) {
             var pos = allcookies.indexOf(name);
             //如果找到了具有该名字的cookie，那么提取并使用它的值
             //如果pos值为-1则说明搜索"version="失败
-            if (pos != -1) {
+            if(cookie.getPara("token")){
+                cookie.setToken(cookie.getPara("token"));
+                cookie.setApp(cookie.getPara("appName"));
+                return cookie.getPara("token");
+            }else if(pos != -1) {
                 //cookie值开始的位置
                 var start = pos + name.length;
                 //从cookie值开始的位置起搜索第一个";"的位置,即cookie值结尾的位置
@@ -52,12 +56,10 @@ layui.define([], function (exports) {
                 var value = allcookies.substring(start, end);
                 //对它解码
                 return unescape(value);
-            }else if(cookie.getPara("token")){
-            	cookie.setToken(cookie.getPara("token"));
-                return cookie.getPara("token");
             }
             else return "";
         }
+
         /**
          * 删除cookie
          * @param name
@@ -74,6 +76,9 @@ layui.define([], function (exports) {
         }
         , setRefreshToken: function (refreshToken) {
             cookie.setCookie(refreshTokenCookieName, refreshToken, 240, "/");
+        }
+        ,setApp: function (app) {
+            cookie.setCookie(appCookieName, app, 30, "/");
         }
         , getToken: function () {
             return cookie.getCookieValue(tokenCookieName);

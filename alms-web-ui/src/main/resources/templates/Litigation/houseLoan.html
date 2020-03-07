@@ -605,7 +605,7 @@ color: #FF3030;
                         <i-col span="20">
                             <row :gutter="16">
                                 <form-item label="选择抄送人员：" >
-                                    <i-select v-model="approvalInfoForm.sendUserIds"  multiple >
+                                    <i-select v-model="approvalInfoForm.sendUserIds"  multiple filterable>
                                         <i-option v-for="item in canSendUserList" :value="item.userId" :key="item.userName">{{ item.userName }}</i-option>
                                     </i-select>
                                 </form-item>

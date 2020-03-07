@@ -58,7 +58,7 @@ window.layinit(function (htConfig) {
                             }else if (p.row.plateType == 3) {
                                 color = 'blue';
                                 platform = '粤';
-                            }else if (p.row.plateType == 4) {
+                            }else if (p.row.plateType == 0) {
                                 color = 'red';
                                 platform = '线';
                             }
@@ -376,19 +376,20 @@ window.layinit(function (htConfig) {
                             let planSettle = initMenuItem('还款计划结清', null, 'planSettle')
                             let withhold = initMenuItem('支付公司代扣', null, 'withhold')
 
-                            if (p.row.srcType == 2 && !isFinalPeroid ) {
+                            if ((p.row.srcType == 2 || p.row.srcType == 4 )&& !isFinalPeroid ) {
                                 menu.push(repayConfirm)
                                 menu.push(revokeConfirm)
                                 menu.push(confirmWithhold)
                                 menu.push(planSettle)
                                 menu.push(settle)
-                              
-                            }
-                            if(p.row.srcType == 2 &&p.row.plateType==1){//是贷后系统生成并且资金端是团贷网的才能代扣
-                            	  menu.push(withhold)
+
+                                if ((p.row.srcType == 2 || p.row.srcType == 4) && (p.row.plateType == 1 || p.row.plateType == 0)) {//是贷后系统生成并且资金端是团贷网的才能代扣
+                                    menu.push(withhold)
+                                }
                             }
                             
-                            if (p.row.srcType == 2 && isFinalPeroid ) {
+
+                            if ((p.row.srcType == 2|| p.row.srcType == 4) && isFinalPeroid ) {
                                 // menu.push(repayConfirm)
                                 // menu.push(revokeConfirm)
                                 // menu.push(confirmWithhold)
@@ -402,14 +403,14 @@ window.layinit(function (htConfig) {
                             }
 
                             let poptipContent;
-                            if (p.row.srcType == 2) {
+                            if (p.row.srcType == 2 ||p.row.srcType == 4) {
                                 poptipContent = [
                                     h('i-button', '操作'),
                                     h('ul', {
                                         slot: 'content'
                                     }, menu)
                                 ]
-                            } 
+                            }
                             if(p.row.srcType == 1) {
                                 poptipContent = '暂不能处理信贷生成的业务'
                             }
@@ -432,7 +433,7 @@ window.layinit(function (htConfig) {
                                 on: {
                                     click: function () {
                                         console.log(p)
-                                        let url = '/finance/repaymentPlanInfo?businessId=' + p.row.businessId;
+                                        let url = '/finance/repaymentPlanInfo?businessId=' + p.row.businessId + '&afterId=' + p.row.afterId + '&display=1';
                                         layer.open({
                                             type: 2,
                                             title: '计划详情',
@@ -559,7 +560,7 @@ window.layinit(function (htConfig) {
                 let url = fpath+'finance/check?businessId='+businessId+'&afterId='+afterId;
                 if(planId){
                     url += ( '&planId=' + planId )
-                } 
+                }
                 url += ( '&action=' + action )
                 $.ajax({
                     type : 'GET',
@@ -568,13 +569,13 @@ window.layinit(function (htConfig) {
                     headers : {
                         app : 'ALMS',
                         Authorization : "Bearer " + getToken()
-                    }, 
+                    },
                     success : function(data) {
                             console.log(data);
                             if(data.code=='1'){
-                                app.checkFlag = false 
+                                app.checkFlag = false
                             }else{
-                                app.checkMsg = data.msg 
+                                app.checkMsg = data.msg
                                 app.checkFlag = true
                             }
                         },

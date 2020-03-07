@@ -47,7 +47,9 @@ window.layinit(function (htConfig) {
                 planRepayBalance: '',
                 total: '',
                 otherFees:[],
-                moneyPoolRepayDates:[]
+                moneyPoolRepayDates:[],
+                beforeOverdueDays:0,
+                beforeOverAmount:0,
             },
             table: {
                 reg: {
@@ -130,7 +132,9 @@ window.layinit(function (htConfig) {
                                             businessId + "&afterId=" +
                                             afterId + '&repayDate=' +
                                             repayDate + '&accountMoney=' +
-                                            accountMoney + '&acceptBank=' +
+                                            accountMoney  +'&beforeOverAmount=' +
+                                            app.beforeOverAmount + '&beforeOverdueDays=' +
+                                            app.beforeOverdueDays+'&acceptBank=' + 
                                             acceptBank + '&timestamp=' +
                                             new Date().getTime() + '&mprid=' +
                                             mrpid;
@@ -633,7 +637,7 @@ window.layinit(function (htConfig) {
                   }
               },
             openMatchBankStatementModal(p) {
-                let url = '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId;
+                let url = '/finance/manualMatchBankSatements?businessId=' + businessId + "&afterId=" + afterId+"&beforeOverAmount="+app.beforeOverAmount+"&beforeOverdueDays="+app.beforeOverdueDays;
                 layer.open({
                     type: 2,
                     title: '手动匹配流水',
@@ -645,7 +649,7 @@ window.layinit(function (htConfig) {
                 })
             },
             openAddBankStatementModal() {
-                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId;
+                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId+"&beforeOverAmount="+app.beforeOverAmount+"&beforeOverdueDays="+app.beforeOverdueDays;
                 layer.open({
                     type: 2,
                     title: '手动新增流水',
@@ -657,7 +661,7 @@ window.layinit(function (htConfig) {
                 })
             },
             openEditBankStatementModal(mprid) {
-                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId + "&mprid=" + mprid;
+                let url = '/finance/manualAddBankSatements?businessId=' + businessId + "&afterId=" + afterId + "&mprid=" + mprid+"&beforeOverAmount="+app.beforeOverAmount+"&beforeOverdueDays="+app.beforeOverdueDays;
                 layer.open({
                     type: 2,
                     title: '手动编辑流水',
@@ -745,6 +749,8 @@ window.layinit(function (htConfig) {
                             app.thisTimeRepaymentInfo.penaltyFeesBiz = data.penaltyFeesBiz
                             app.thisTimeRepaymentInfo.other = data.other
                             app.thisTimeRepaymentInfo.lackFees = data.lackFees 
+                            app.beforeOverAmount=app.thisTimeRepaymentInfo.offlineOverDue+app.thisTimeRepaymentInfo.onlineOverDue;
+                            app.beforeOverdueDays=app.thisTimeRepaymentInfo.overDays;
                             if( app.thisTimeRepaymentInfo.moneyPoolRepayDates.length==0){
                                 app.thisTimeRepaymentInfo.moneyPoolRepayDates = data.moneyPoolRepayDates
                                 app.factRepaymentInfo.repayDate = data.moneyPoolRepayDates[0] 
@@ -833,7 +839,7 @@ window.layinit(function (htConfig) {
                             ,app.factRepayPreview.surplus))
                     ,app.factRepayPreview.item70),app.factRepayPreview.otherMoney)
             },
-            previewSettle(){
+            previewSettle(){debugger
                 let params = {}
                 params.businessId = businessId
                 params.afterId = afterId

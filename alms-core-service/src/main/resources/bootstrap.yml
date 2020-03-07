@@ -22,6 +22,4 @@ eureka:
   client:
       serviceUrl:
 #        defaultZone: http://192.168.12.101:30101/eureka/  # 配置注册中心url
-        defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url
-
-      
+        defaultZone: http://localhost:30101/eureka/  # 配置注册中心url

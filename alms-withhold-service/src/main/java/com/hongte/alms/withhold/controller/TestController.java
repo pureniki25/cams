@@ -54,13 +54,13 @@ public class TestController {
 	RechargeService rechargeService;
 	
 	
-	@Value("${tuandai_pay_cm_orderno}")
+//	@Value("${tuandai_pay_cm_orderno}")
 	private String oidPartner;
 	
-	@Value("${tuandai_org_username}")
+//	@Value("${tuandai_org_username}")
 	private String orgUserName;
 	
-	@Value("${tuandai_org_userid}")
+//	@Value("${tuandai_org_userid}")
 	private String rechargeUserId;
     /**
      * test

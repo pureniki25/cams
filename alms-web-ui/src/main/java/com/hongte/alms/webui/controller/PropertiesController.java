@@ -1,7 +1,6 @@
 package com.hongte.alms.webui.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.hongte.alms.common.result.Result;
 import com.ht.ussp.bean.LoginUserInfoHelper;
 import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +32,7 @@ public class PropertiesController {
 
 
 
-    @Value("${ht.config.ui.useGateWayflage:true}")
+    @Value("${ht.config.ui.useGateWayflage:false}")
     private Boolean useGateWayflage;//是否使用网关的标志位
 
     //修改密码的跳转地址

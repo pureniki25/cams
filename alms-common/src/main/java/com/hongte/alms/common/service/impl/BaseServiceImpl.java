@@ -32,7 +32,6 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<Bas
             if (page.isOpenSort() && StringUtils.isNotEmpty(page.getOrderByField())) {
                 wrapper.orderBy(page.getOrderByField(), page.isAsc());
             }
-
             // MAP 参数查询
             /*if (MapUtils.isNotEmpty(page.getCondition())) {
                 wrapper.allEq(page.getCondition());
@@ -60,6 +59,9 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<Bas
                     }
 
                     switch (operator.toUpperCase()) {
+                        case "IN":
+                        wrapper.in(key, String.valueOf(value).split(","));
+                        break;
                         case "EQ":
                             wrapper.eq(key, value);
                             break;

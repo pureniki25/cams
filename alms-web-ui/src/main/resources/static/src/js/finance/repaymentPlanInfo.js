@@ -4,6 +4,8 @@ window.layinit(function (htConfig) {
     let financeBasePath = htConfig.financeBasePath;
     let platRepayBasePath = htConfig.platRepayBasePath;
     let businessId = getQueryStr('businessId');	// 业务编号
+    let afterId = getQueryStr('afterId');	// 贷后期数
+    let display = getQueryStr('display');	// 是否显示代扣记录
     
     app = new Vue({
         el: "#app",
@@ -34,6 +36,10 @@ window.layinit(function (htConfig) {
         	repayProjOtherFeeFlag: false, // 其他费用弹窗控制标识（标维度）
         	businessSurplus:0, // 用户账户结余
         	plateTypeFlag: '', // 数据来源：1、团贷网；2、你我金融；0、线下出款；
+        	isOldDataFlag: false, // 是否6.28之前上标的数据
+        	display:1, // 是否显示除代扣记录以外的tab（0、不显示、1、显示）
+        	repayDerateMoneyFlag:false, // 减免明细弹窗控制标识
+        	repayDerateMoneyList: [],	// 减免费用明细
         	
         	// -- 实还流水 --
         	actualPaymentRecordList: [],
@@ -41,6 +47,9 @@ window.layinit(function (htConfig) {
         	actualPaymentRecordAfterIdNullList: [],	// -- 实还流水afterId为空的数据 --
         	
         	projectInfoList: [], 	//  标信息LIST
+        	
+        	oldSurplusGuaranteePaymentModal: false, // 6.28之前上标数据垫付记录弹窗控制
+        	
             tableHeight:450,
             paneHeight:"height:450px",
         	// 还款计划表头  -- start --
@@ -279,6 +288,29 @@ window.layinit(function (htConfig) {
         			width: 100,
         		},
         		{
+                	title: '减免',
+                	key: 'derateMoney',
+                    align: 'center',
+                    render:(h,p)=>{
+                    	if(p.row.repayment=='计划还款'){
+                    		return h('a',{
+                        		style:{
+                        			textDecoration:'underline'
+                        		},
+                        		on:{
+                        			click:function(){
+                        				app.openRepayDerateMoney(p.row)
+                        			}
+                        		}
+                        	},p.row.derateMoney)
+                    	}else{
+                    		return p.row.derateMoney
+                    	}
+                    	
+                    },
+                    width: 100,
+                },
+        		{
         			title: '还款合计（含滞纳金）',
         			key: 'total',
         			align: 'center',
@@ -374,6 +406,11 @@ window.layinit(function (htConfig) {
                     title: '其他费用',
                     key: 'otherAmount',
                     align: 'center',
+                },
+                {
+                	title: '还款状态',
+                	key: 'repaymentStatus',
+                	align: 'center',
                 },
             ],
             /*
@@ -581,13 +618,254 @@ window.layinit(function (htConfig) {
         		 * 查看担保公司垫付记录数据
         		 */
         		queryGuaranteePaymentData:[],
+        		
+        		/*
+        		 * 6.28之前的数据 全部垫付记录 表头
+        		 */
+        		oldAllGuaranteePaymentColumns:[
+        			{
+        				title: '期数',
+            			key: 'periodMerge',
+            			align: 'center',
+        			},
+        			{
+        				title: '总垫付金额',
+        				key: 'advanceAmountTotal',
+        				align: 'center',
+        			},
+        			{
+        				title: '总垫付滞纳金',
+        				key: 'penaltyTotal',
+        				align: 'center',
+        			},
+        			{
+        				title: '已还垫付金额',
+        				key: 'advanceAmountFactTotal',
+        				align: 'center',
+        			},
+        			{
+        				title: '已还垫付滞纳金',
+        				key: 'penaltyFactTotal',
+        				align: 'center',
+        			},
+        			{
+        				title: '未还垫付金额',
+        				key: 'advanceAmountSurplus',
+        				align: 'center',
+        			},
+        		],
+        	
+        		/*
+        		 * 6.28之前的数据 全部垫付记录 表体
+        		 */
+        		oldAllGuaranteePaymentData: [],
+        		
+        		/*
+        		 * 6.28之前的数据 未还垫付记录 表头
+        		 */
+        		oldSurplusGuaranteePaymentColumns:[
+        			{
+        				title: '期数',
+        				key: 'periodMerge',
+        				align: 'center',
+        			},
+        			{
+        				title: '未还垫付金额',
+        				key: 'advanceAmountSurplus',
+        				align: 'center',
+        			},
+        			{
+        				title: '滞纳金',
+        				key: 'penaltySurplus',
+        				align: 'center',
+        			},
+        			{
+        				title: '垫付人ID',
+        				key: 'overDueUserIds',
+        				align: 'center',
+        				render:(h,p)=>{
+        					return h('a',{
+                        		style:{
+                        			textDecoration:'underline'
+                        		},
+                        		on:{
+                        			click:function(){
+                        				app.openOldSurplusGuaranteePaymentModal(p.row);
+                        			}
+                        		}
+                        	},p.row.overDueUserIds)
+                        }
+        			},
+        			{
+        				title: '垫付时间',
+        				key: 'addDate',
+        				align: 'center',
+        			},
+    			],
+        			
+    			/*
+    			 * 6.28之前的数据 未还垫付记录 表体
+    			 */
+    			oldSurplusGuaranteePaymentData: [],
+    			
+    			/*
+    			 * 代扣记录 表头
+    			 */
+    			withholdingRepaymentLogColumns:[
+    				{
+    					title: '期数',
+    					key: 'afterId',
+    					align: 'center',
+    				},
+    				{
+    					title: '代扣金额',
+    					key: 'currentAmount',
+    					align: 'center',
+    				},
+    				{
+    					title: '支付公司',
+    					key: 'platformName',
+    					align: 'center',
+    				},
+    				{
+    					title: '代扣人',
+    					key: 'createUser',
+    					align: 'center',
+    				},
+    				{
+    					title: '代扣时间',
+    					key: 'createTime',
+    					align: 'center',
+    				},
+    				{
+    					title: '代扣结果',
+    					key: 'repayStatusStr',
+    					align: 'center',
+    				},
+    				{
+    					title: '备注',
+    					key: 'remark',
+    					align: 'center',
+    				},
+				],
+				
+				/*
+				 * 代扣记录 表体
+				 */
+				withholdingRepaymentLogData: [],
+				
+				/*
+				 * 6.28之前的数据 垫付人垫付记录明细 表头
+				 */
+				oldGuaranteePaymentDetailColumns:[
+					{
+						title: '期数',
+						key: 'period',
+						align: 'center',
+					},
+					{
+						title: '垫付ID',
+						key: 'advanceId',
+						align: 'center',
+					},
+					{
+						title: '垫付金额',
+						key: 'advanceAmount',
+						align: 'center',
+					},
+					{
+						title: '滞纳金',
+						key: 'penalty',
+						align: 'center',
+					},
+					{
+						title: '借款人ID',
+						key: 'borrowUserid',
+						align: 'center',
+					},
+					{
+						title: '垫付人ID',
+						key: 'overDueUserId',
+						align: 'center',
+					},
+					{
+						title: '垫付时间',
+						key: 'addDate',
+						align: 'center',
+					},
+					{
+						title: '还款时间',
+						key: 'refundDate',
+						align: 'center',
+					},
+					{
+						title: '已还垫付金额',
+						key: 'refundAmount',
+						align: 'center',
+					},
+					{
+						title: '是否已还',
+						key: 'isRefund',
+						align: 'center',
+						render:(h,p)=>{
+							if (p.row.isRefund == 1) {
+								return '已还';
+							}else if (p.row.isRefund == 0) {
+								return '未还';
+							}
+	                    }
+					},
+					{
+						title: '是否结清',
+						key: 'isComplete',
+						align: 'center',
+						render:(h,p)=>{
+							if (p.row.isComplete == 1) {
+								return '已结清';
+							}else if (p.row.isComplete == 0) {
+								return '未结清';
+							}
+	                    }
+					},
+				],
+				
+				/*
+				 * 6.28之前的数据 垫付人垫付记录明细 表体
+				 */
+				oldGuaranteePaymentDetailData: [],
+					
         },
         methods: {
         	/*
         	 * 初始化业务基本信息
         	 */
             initBaseInfo: function(){
-            	axios.get(financeBasePath +"finance/queryBaseInfoByBusinessId?businessId=" + businessId)
+            	this.display = display; 
+            	// 若是 00 期，取上一次的业务编号
+				if (afterId.indexOf("00") != -1) {
+					axios.get(platRepayBasePath +"tdrepayRecharge/getLastBusinessId?businessId=" + businessId)
+	    	        .then(function (res) {
+	    	            if (res.data.data != null && res.data.code == 1) {
+	    	            	businessId = res.data.data;
+	    	            	app.queryBaseInfoByBusinessId(businessId);
+	    	            	app.queryRepaymentPlanInfoByBusinessId();
+	    	            	app.getProjectInfoByBusinessId();
+	    	            } else {
+	    	            	app.$Modal.error({content: res.data.msg });
+	    	            }
+	    	        })
+	    	        .catch(function (error) {
+	    	        	app.$Modal.error({content: '接口调用异常!'});
+	    	        });
+				}else {
+					this.queryBaseInfoByBusinessId(businessId);
+					this.queryRepaymentPlanInfoByBusinessId();
+	            	this.getProjectInfoByBusinessId();
+				}
+            },
+            
+            queryBaseInfoByBusinessId: function(param){
+            	axios.get(financeBasePath +"finance/queryBaseInfoByBusinessId?businessId=" + param)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
     	            	app.baseInfo.businessId = res.data.data.businessId;
@@ -638,6 +916,9 @@ window.layinit(function (htConfig) {
 					if (this.firstProjectId != '') {
 						this.queryDistributeFundRecord(this.firstProjectId);
 					}
+				}else if (event == 'withholdingRepaymentLog') {
+                    this.paneHeight="";
+					this.queryWithholdingRepaymentLogByCondition();
 				}else{
                     var that = this;
                     setTimeout(function(){
@@ -770,6 +1051,22 @@ window.layinit(function (htConfig) {
             	});
             },
             /*
+             * 查询减免费用明细
+             */
+            queryDerateMoneyGroupByDerateTypeName: function(obj){
+            	axios.get(financeBasePath +"finance/queryDerateMoneyGroupByDerateTypeName?planListId=" + obj.planListId + "&businessId=" + businessId)
+            	.then(function (res) {
+            		if (res.data.data != null && res.data.code == 1) {
+            			app.repayDerateMoneyList = res.data.data;
+            		} else {
+            			app.$Modal.error({content: res.data.msg });
+            		}
+            	})
+            	.catch(function (error) {
+            		app.$Modal.error({content: '接口调用异常!'});
+            	});
+            },
+            /*
              * 根据业务编号查找实还流水
              */
             queryActualPaymentByBusinessId: function(){
@@ -852,6 +1149,13 @@ window.layinit(function (htConfig) {
             	this.repayProjOtherFeeFlag = true;
             	this.queryProjOtherFee(obj);
             },
+            /*
+             * 打开其他费用，查看其他费用明细项，相应的点击标的中的其他费用也看查看相应的其他费用项（标维度）
+             */
+            openRepayDerateMoney: function(obj){
+            	this.repayDerateMoneyFlag = true;
+            	this.queryDerateMoneyGroupByDerateTypeName(obj);
+            },
             
             /*
 			 * 根据业务ID获取标信息
@@ -883,6 +1187,9 @@ window.layinit(function (htConfig) {
     	            if (res.data.data != null && res.data.code == 1) {
     	            	app.platformRepaymentInfoData = res.data.data.periodsList;
     	            	app.platformActualRepaymentInfoData = res.data.data.tdProjectPaymentDTOs;
+    	            	if (res.data.data.isOldDataFlag != null) {
+    	            		app.isOldDataFlag = res.data.data.isOldDataFlag;
+						}
     	            	if (res.data.data.aviMoney != null) {
     	            		app.platformRepaymentInfoaviMoney = res.data.data.aviMoney.aviMoney;
 						}
@@ -898,7 +1205,15 @@ window.layinit(function (htConfig) {
     	            	app.platformPrincipal = res.data.data.principal;
     	            	app.platformInterest = res.data.data.interest;
     	            	app.platformRepaymentInfoPlatformCharge = res.data.data.platformCharge;
-    	            	app.platformPrincipalAndInterestAndPlatformCharge = res.data.data.principal + res.data.data.interest + res.data.data.platformCharge;
+    	            	var principalAndInterest = 0;
+    	            	if (res.data.data.dueOutMoney != null) {
+    	            		app.platformPrincipalAndInterest = res.data.data.dueOutMoney;
+    	            		principalAndInterest = res.data.data.dueOutMoney;
+						}else {
+							principalAndInterest = res.data.data.principal + res.data.data.interest;
+						}
+    	            	app.platformPrincipalAndInterest = principalAndInterest;
+    	            	app.platformPrincipalAndInterestAndPlatformCharge = principalAndInterest + res.data.data.platformCharge;
     	            } else {
     	            	app.$Modal.error({content: res.data.msg });
     	            }
@@ -914,8 +1229,19 @@ window.layinit(function (htConfig) {
 				axios.get(platRepayBasePath +"tdrepayRecharge/returnAdvanceShareProfit?projectId=" + projectId)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
-    	            	app.advancePaymentInfoData = res.data.data.returnAdvanceShareProfits;
-    	            	app.queryGuaranteePaymentData = res.data.data.tdGuaranteePaymentVOs;
+    	            	if (res.data.data.isOldDataFlag != null) {
+    	            		app.isOldDataFlag = res.data.data.isOldDataFlag;
+						}
+    	            	if (res.data.data.returnAdvanceShareProfits != null) {
+    	            		app.advancePaymentInfoData = res.data.data.returnAdvanceShareProfits;
+						}
+    	            	if (res.data.data.tdGuaranteePaymentVOs != null) {
+    	            		app.queryGuaranteePaymentData = res.data.data.tdGuaranteePaymentVOs;
+						}
+    	            	if (res.data.data.advanceRecordDTOs != null) {
+    	            		app.oldAllGuaranteePaymentData = res.data.data.advanceRecordDTOs;
+    	            		app.oldSurplusGuaranteePaymentData = res.data.data.advanceRecordDTOs;
+    	            	}
     	            } else {
     	            	app.$Modal.error({content: res.data.msg });
     	            }
@@ -942,6 +1268,43 @@ window.layinit(function (htConfig) {
     	        });
 			},
 			/*
+			 * 查询资金分发记录
+			 */
+			queryWithholdingRepaymentLogByCondition: function(projectId){
+				axios.get(financeBasePath +"finance/queryWithholdingRepaymentLogByCondition?businessId=" + businessId + "&afterId=" + afterId)
+				.then(function (res) {
+					if (res.data.data != null && res.data.code == 1) {
+						app.withholdingRepaymentLogData = res.data.data;
+					} else {
+						app.$Modal.error({content: res.data.msg });
+					}
+				})
+				.catch(function (error) {
+					app.$Modal.error({content: '接口调用异常!'});
+				});
+			},
+			
+			/**
+			 * 根据overDueUserIds查询垫付记录明细
+			 */
+			openOldSurplusGuaranteePaymentModal: function(obj){
+				axios.get(platRepayBasePath +"tdrepayRecharge/queryOldSurplusGuaranteePaymentDetail?projectId=" + obj.projectId 
+						+ "&period=" + obj.periodMerge + "&overDueUserIds=" + obj.overDueUserIds)
+				.then(function (res) {
+					if (res.data.data != null && res.data.code == 1) {
+						app.oldGuaranteePaymentDetailData = res.data.data;
+						app.oldSurplusGuaranteePaymentModal = true;
+					}else {
+						app.$Modal.error({ content: result.data.msg });
+						app.oldSurplusGuaranteePaymentModal = false;
+					}
+				})
+				.catch(function (error) {
+					app.$Modal.error({content: '接口调用异常!'});
+					app.oldSurplusGuaranteePaymentModal = false;
+				});
+			},
+			/*
 			 * 定义背景颜色
 			 */
 			rowClassName (row) {
@@ -958,8 +1321,6 @@ window.layinit(function (htConfig) {
         },
         created: function() {
         	this.initBaseInfo();
-        	this.queryRepaymentPlanInfoByBusinessId();
-        	this.getProjectInfoByBusinessId();
             this.tableHeight = window.innerHeight-180;
             this.paneHeight = "height:"+this.tableHeight+"px";
 		}

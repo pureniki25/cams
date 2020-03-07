@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>贷后管理系统</title>
+    <title>宜计账（云账本）</title>
     <script>
         if (window != window.top) top.location.href = self.location.href;
     </script>
@@ -87,7 +87,7 @@
                 <canvas id="demo-canvas"></canvas>
                 <div class="kit-login-box">
                     <header>
-                        <h1>贷后管理系统</h1>
+                        <h1>宜计账（云账本）</h1>
                     </header>
                     <div class="kit-login-main">
                         <form class="layui-form" method="post">
@@ -151,7 +151,7 @@
                 top.location.href = 'index.html';
             }
 
-            $('#changeCode').on('click', function () {
+            $('#changeCode').on('click', function () {b
                 $('#changeCode > img')[0].src = './build/images/GetVerfiyCode.png';
             });
 
@@ -169,10 +169,11 @@
                     async: false,
                     dataType: "json",
                     beforeSend: function (xhr) {
+                    	debugger
                         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
                         xhr.setRequestHeader("app", config.app);
                     },
-                    success: function (data) {
+                    success: function (data) {debugger
                     	
                     	if(data.code=='0009'){
                             layer.confirm('您的密码过于简单，需要重新设置密码', {
@@ -189,9 +190,9 @@
                         }
 
                     	
-                        if (data && data["token"] != null & data["token"] != "") {
-                            cookie.setToken(data["token"]);
-                            cookie.setRefreshToken(data["refreshToken"]);
+                        if (data && data["data"]["token"] != null & data["data"]["token"] != "") {
+                            cookie.setToken(data["data"]["token"]);
+                            cookie.setRefreshToken(data["data"]["token"]);
                             top.location.href = config.indexPath;
                         } else {
                             layer.alert("登录失败，请联系管理员");

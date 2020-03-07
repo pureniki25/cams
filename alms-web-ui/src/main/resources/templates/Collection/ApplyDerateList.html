@@ -110,6 +110,13 @@
                                 <date-picker type="daterange"  v-model="searchForm.derateDateRange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></date-picker>
                             </form-item>
                         </i-col>
+                        <i-col span="6">
+                            <form-item label="减免状态："   prop="derateStatus">
+                                <i-select v-model="searchForm.derateStatus" clearable filterable >
+                                    <i-option v-for="item in derateStatusList" :value="item.statusId" :key="item.statusId">{{ item.statusName }}</i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
                     </i-form>
                 </row>
                 <div style="text-align: center">
@@ -141,15 +148,19 @@
     <!-- 批量操作按钮 结束-->
 
 
+    <div style="background-color:rgba(204, 235, 248, 1);height:30px;padding:5px 20px">
+        <span style="color:#169BD5">
+           当页合计,应收金额总额(元):{{showPayMoneyTotal}},减免金额总额(元):{{derateMoneyTotal}},实收金额总额(元):{{realPayMoneyTotal}}
+        </span>
+    </div>
+
     <!-- 表单Grid，使用layerUI的表格组件 开始 -->
     <row style="padding: 10px">
         <i-col span="24">
             <!-- 使用方法渲染模式 -->
             <table id="listTable" lay-filter="listTable"></table>
             <script type="text/html" id="barTools">
-                <!--layui-btn layui-btn-xs-->
-<!--                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">操作</a>
-                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>-->
+                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
             </script>
         </i-col>
     </row>

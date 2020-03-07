@@ -172,7 +172,7 @@
 	    
 	       <tr>
 	      <td class="column">线下滞纳金</td>
-	      <td>{{ajax_data.planOverDueMoney?numeral(ajax_data.planOverDueMoney).format('0,0.00'):0 }}</td>
+	      <td>{{ajax_data.underLineOverDueMoney?numeral(ajax_data.underLineOverDueMoney).format('0,0.00'):0 }}</td>
 	      <td class="column">本次代扣线下滞纳金</td>
 	      <td ><i-input v-model="ajax_data.underLineFactOverDueMoney" class="td-box" @on-blur="getTotalShouldPay()" v-if="isBankFlag" disabled> </i-input>
 	      <i-input v-model="ajax_data.underLineFactOverDueMoney" class="td-box" @on-blur="getTotalShouldPay()" v-if="!isBankFlag" > </i-input>
@@ -180,7 +180,9 @@
           <td class="column" >本期应还金额</td>
 	      <td><i-input v-model="ajax_data.repayAmount" class="td-box" v-if="isBankFlag" disabled> </i-input>
 	      <i-input v-model="ajax_data.repayAmount" class="td-box" v-if="!isBankFlag"> </i-input>
-	      (本次最大可代扣金额{{ajax_data.restAmount?numeral(ajax_data.restAmount).format('0,0.00'):0}})元</td>
+	      (本次最大可代扣金额{{ajax_data.restAmount?numeral(ajax_data.restAmount).format('0,0.00'):0}})元
+	         <p style="color:red">   (已减免金额{{ajax_data.derateAmount?numeral(ajax_data.derateAmount).format('0,0.00'):0}})元</p>
+	      </td>
 	    </tr>
 	    
 	    

@@ -19,7 +19,7 @@ import java.util.*;
  * @Date: 2018/1/13 0013 下午 11:15
  */
 public class GeneratorUtil {
-    public static final String  DB_URL = "jdbc:mysql://10.110.1.240:3306/hongte_alms?characterEncoding=utf8";
+    public static final String  DB_URL = "jdbc:mysql://localhost:3306/cams?characterEncoding=utf8";
 
     /**
      * 配置数据源

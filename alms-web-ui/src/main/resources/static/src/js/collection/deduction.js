@@ -25,6 +25,7 @@ var layer;
         	data:{
         		loading: false,
         		isBankFlag:false,
+        		isDerate:false,
         		ajax_data:{
                     businessId:""	, //业务编号
                     originalBusinessId:""  ,  
@@ -68,7 +69,8 @@ var layer;
                     business:[],
                     bankCardInfo:'',
                     pList:[],
-                    userId:''
+                    userId:'',
+                    derateAmount:''
                
 
                     
@@ -134,9 +136,9 @@ var layer;
 		   return;
 		   }
 		var isAmountWithheld="false";
-		if(vm.ajax_data.repayAmount<vm.ajax_data.restAmount){
+		if(vm.ajax_data.repayAmount<vm.ajax_data.restAmount.toFixed(2)){
 			isAmountWithheld="true";//部分代扣
-		}else if(vm.ajax_data.repayAmount==vm.ajax_data.restAmount){
+		}else if(vm.ajax_data.repayAmount==vm.ajax_data.restAmount.toFixed(2)){
 			isAmountWithheld="false";//全部代扣
 		}
 		
@@ -147,7 +149,7 @@ var layer;
 			   return;
 		   }
 			   
-	   if(vm.ajax_data.repayAmount>vm.ajax_data.restAmount){debugger
+	   if(vm.ajax_data.repayAmount>vm.ajax_data.restAmount.toFixed(2)){debugger
 		   vm.$Modal.error({content:"代扣金额不能大于本次最大可代扣金额"});
 		   vm.loading = false;
 		   return;
@@ -187,7 +189,7 @@ var layer;
 	    		return;
 	       }
 	   //贷后生成的走贷后的代扣接口,否则走信贷的代扣接口
-	   if(vm.ajax_data.strType==2){debugger
+	   if(vm.ajax_data.strType==2||vm.ajax_data.strType==4){debugger
 		   vm.ajax_data.platformId=vm.platformId;
 		    var url=withholdPath+ "repay/handRepay"
 		    $.ajax({
@@ -389,15 +391,16 @@ var layer;
                     vm.platformId=result.data.data.platformId;
                     vm.platformId=5;
                     vm.isBankFlag=true;
+                    if( vm.ajax_data.derateAmount!=0){
+                    	vm.isDerate=true;
+                    }
+                    
                     
                  
-                    if(result.data.data.underLineOverDueMoney>0){
                      	vm.ajax_data.planOverDueMoney=result.data.data.underLineOverDueMoney;
                      	vm.ajax_data.onLineOverDueMoney=result.data.data.onLineOverDueMoney;
-               
-                    }
                  	
-                      if(vm.ajax_data.strType==2){
+                      if(vm.ajax_data.strType==2||vm.ajax_data.strType==4){
                       	url=basePath+ "RepaymentLogController/searchAfterRepayLog?businessId="+vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
                       }else{
                       	url=openPath+ "WithHoldingController/searchRepayLog?originalBusinessId=" +vm.ajax_data.originalBusinessId+"&afterId="+vm.ajax_data.afterId;
@@ -495,7 +498,6 @@ var layer;
 	var getTotalShouldPay = function () {debugger
 	var total=0;
 		vm.ajax_data.total=0;
-	
 	vm.ajax_data.total=vm.ajax_data.planPrincipal+vm.ajax_data.planAccrual+vm.ajax_data.planServiceCharge+vm.ajax_data.platformCharge+Number(vm.ajax_data.onLineOverDueMoney)+Number(vm.ajax_data.underLineFactOverDueMoney)
 	var total=vm.ajax_data.total;
 	if(total<0){
@@ -503,6 +505,11 @@ var layer;
 	}
 	vm.ajax_data.total=total.toFixed(2);
 	vm.ajax_data.repayAmount=total.toFixed(2);
+	  if(vm.platformId=='5'){
+			vm.ajax_data.restAmount=total+Number(vm.ajax_data.underLineOverDueMoney);
+	    }else{
+	    	vm.ajax_data.restAmount=total;
+	    }
 
 	return vm.ajax_data.total;
 	}

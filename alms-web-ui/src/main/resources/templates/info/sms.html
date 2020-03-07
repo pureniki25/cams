@@ -51,11 +51,11 @@
                 </p>
                 <!--右上侧按钮列表-->
 
-                <button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')">
-                    <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
-                    <span v-else><i
-                            class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
-                </button>
+<!--                 <button class="layui-btn layui-btn-sm" slot="extra" @click="toLoading" v-if="authValid('search')"> -->
+<!--                     <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span> -->
+<!--                     <span v-else><i -->
+<!--                             class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span> -->
+<!--                 </button> -->
                 <!--                <i-button slot="extra"  @click="handleReset('searchForm')" style="margin-right:10px">
                                     <span>重置</span>
                                 </i-button>-->
@@ -79,15 +79,15 @@
                                 </i-select>
                             </form-item>
                         </i-col>
-                        <i-col span="6">
-                            <form-item label="分公司：" prop="companyId">
-                                <i-select v-model="searchForm.companyId" clearable filterable>
-                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{
-                                        item.areaName }}
-                                    </i-option>
-                                </i-select>
-                            </form-item>
-                        </i-col>
+<!--                         <i-col span="6"> -->
+<!--                             <form-item label="分公司：" prop="companyId"> -->
+<!--                                 <i-select v-model="searchForm.companyId" clearable filterable> -->
+<!--                                     <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{ -->
+<!--                                         item.areaName }} -->
+<!--                                     </i-option> -->
+<!--                                 </i-select> -->
+<!--                             </form-item> -->
+<!--                         </i-col> -->
                         <i-col span="6">
                             <form-item label="发送时间：" prop="sendDateRange">
                                 <date-picker type="daterange" v-model="searchForm.sendDateRange" placement="bottom-end"

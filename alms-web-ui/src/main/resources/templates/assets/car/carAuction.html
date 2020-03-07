@@ -270,7 +270,7 @@
 								<i-input type="text" v-model="detection.trafficViolationFee"></i-input>
 							</td>
 							<td class="td_label">年审到期日期
-								<label class="input_label">*</label>
+								<!-- <label class="input_label">*</label> -->
 							</td>
 							<td>
 								<input type="text" v-model="detection.annualVerificationExpirationDate" id="annualVerificationExpirationDate" placeholder="yyyy-MM"></input>
@@ -316,7 +316,7 @@
 								<i-input type="text" v-model="detection.differAmount" readonly="readonly" id="differAmount"></i-input>
 							</td>
 							<td class="td_label">保险到期日
-								<label class="input_label">*</label>
+								<!-- <label class="input_label">*</label> -->
 							</td>
 							<td>
 								<input type="text" v-model="detection.insuranceExpirationDate" id="insuranceExpirationDate" placeholder="yyyy-MM-dd"
@@ -436,7 +436,27 @@
 							</td>
 
 						</tr>
-
+						<tr>
+					
+							<td class="td_label">看样开始时间
+								<!-- <label class="input_label">*</label> -->
+							</td>
+							<td>
+								<input type="text" v-model="carAuction.viewSampleStartTime" id="viewSampleStartTime" placeholder="yyyy-MM-dd"></input>
+							</td>
+							<td class="td_label">看样结束时间
+							<!-- 	<label class="input_label">*</label> -->
+							</td>
+							<td>
+								<input type="text" v-model="carAuction.viewSampleEndTime" id="viewSampleEndTime" placeholder="yyyy-MM-dd"></input>
+							</td>
+							<td class="td_label">
+								
+							</td>
+							<td>
+								
+							</td>
+						</tr>
 						<tr>
 							<td class="td_label">付款方式
 								<label class="input_label">*</label>

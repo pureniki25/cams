@@ -137,6 +137,8 @@ window.layinit(function (htConfig) {
                 ,paymentMethod:''//付款方式
                 ,auctionPosition:''//交易地点
                 ,remark:''// 备注
+                ,viewSampleStartTime:''//看样开始时间
+                ,viewSampleEndTime:''//看样结束时间
 	       }
 	       
 	       ,  //可发送审批信息的用户列表
@@ -382,6 +384,20 @@ window.layinit(function (htConfig) {
                 this.carAuction.auctionEndTime = value
         }
         });
+       	    laydate.render({
+		        elem: '#viewSampleStartTime',
+		        type:'date',
+		        done: (value) => {
+		          this.carAuction.viewSampleStartTime = value
+		        }
+		    });
+	   	 laydate.render({
+		        elem: '#viewSampleEndTime',
+		        type:'date',
+		        done: (value) => {
+		          this.carAuction.viewSampleEndTime = value
+		        }
+		    });
 	    }, 
 	    
 	    methods: {
@@ -559,8 +575,8 @@ window.layinit(function (htConfig) {
 						vm.drag.dragDate = moment(vm.drag.dragDate).format("YYYY-MM-DD");
 	                 	vm.detection=data.data.detection;
 						vm.detection.createTime = moment(vm.detection.createTime).format("YYYY-MM-DD");
-                        vm.detection.annualVerificationExpirationDate=moment(vm.detection.annualVerificationExpirationDate).format("YYYY-MM")
-						vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD");
+                       // vm.detection.annualVerificationExpirationDate=moment(vm.detection.annualVerificationExpirationDate).format("YYYY-MM")
+					   //	vm.detection.insuranceExpirationDate = moment(vm.detection.insuranceExpirationDate).format("YYYY-MM-DD");
 	                	vm.mortgageDetection=data.data.mortgageDetection;
 	                	vm.mortgageDetection.createTime = moment(vm.mortgageDetection.createTime).format("YYYY-MM-DD")
 	                	
@@ -612,6 +628,8 @@ window.layinit(function (htConfig) {
                         vm.carAuction.paymentMethod=data.data.carAuction.paymentMethod!=null&&data.data.carAuction.paymentMethod!=''?data.data.carAuction.paymentMethod:'买卖双方实地交易';
                         vm.carAuction.auctionPosition=data.data.carAuction.auctionPosition!=null&&data.data.carAuction.auctionPosition!=''?data.data.carAuction.auctionPosition:'车辆所在地';
                         vm.carAuction.remark=data.data.carAuction.remark;
+                        vm.carAuction.viewSampleStartTime=data.data.carAuction.viewSampleStartTime;
+                        vm.carAuction.viewSampleEndTime=data.data.carAuction.viewSampleEndTime;
 
 	                	//alert(JSON.stringify(vm.carAuction));
 	                	var docFiles=data.data.returnRegFiles;
@@ -714,11 +732,11 @@ window.layinit(function (htConfig) {
 	    		
 	    		//页面信息验证
 
-	    		if(vm.detection.annualVerificationExpirationDate==''||vm.detection.annualVerificationExpirationDate==null){
+	    /*		if(vm.detection.annualVerificationExpirationDate==''||vm.detection.annualVerificationExpirationDate==null){
 	    			$("#annualVerificationExpirationDate").css("border","1px solid #FF3030");
 	    			return ;
 	    		}
-	    		
+	    		*/
 	    		if(vm.detection.odometer==''||vm.detection.odometer==null){
 	    			$("#odometer").css("border","1px solid #FF3030");
 	    			return ;
@@ -761,7 +779,7 @@ window.layinit(function (htConfig) {
 	    			return ;
 	    		}
 	
-	    		if(vm.detection.insuranceExpirationDate !=null&&vm.detection.insuranceExpirationDate!=''){
+	  /*  		if(vm.detection.insuranceExpirationDate !=null&&vm.detection.insuranceExpirationDate!=''){
 	    			
 	    			var inputDate=new Date(vm.detection.insuranceExpirationDate.replace("-", "/").replace("-", "/")); 
 	    			var lastDate=new Date(vm.detection.viewInsuranceExpirationDate.replace("-", "/").replace("-", "/"));
@@ -771,7 +789,7 @@ window.layinit(function (htConfig) {
 	    				return ;
 	    			}
 	    			
-	    		}
+	    		}*/
 	    		if(vm.detection.userNature==''||vm.detection.userNature==null){
 	    			$("#userNature").css("border","1px solid #FF3030");
 	    			return ;
@@ -891,7 +909,7 @@ window.layinit(function (htConfig) {
 	    	    	 reqUrl=basePath+'car/auctionAply';
 	    	    	 param={"carBasic":vm.carBasic,"detection":vm.detection,"carAuction":vm.carAuction,"returnRegFiles":vm.reqRegFiles,"subType":"audit","processId":processId}
 	    	     }
-	    		//alert(JSON.stringify(vm.audit));
+	    		//alert("11111");
 		          $.ajax({
 		               type: "POST",
 		               url: reqUrl,

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 //@EnableWebMvc
 @Configuration
-public class WebConfig extends WebMvcConfigurerAdapter {
+public class WebConfig  extends WebMvcConfigurerAdapter {
 
     @Value("${ht.config.ui.useGateWayflage:true}")
     private Boolean useGateWayflage;
@@ -59,13 +59,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         //使用配置中心的标志位为false时才设置这个配置
-        if(!useGateWayflage){
             registry.addMapping("/**")
                     .allowedOrigins("*")
                     .allowCredentials(true)
                     .allowedMethods("GET", "POST", "DELETE", "PUT")
                     .maxAge(3600);
-        }
 
     }
 

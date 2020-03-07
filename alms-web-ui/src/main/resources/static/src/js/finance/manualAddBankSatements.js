@@ -9,9 +9,11 @@ window.layinit(function (htConfig) {
     let cpath = htConfig.coreBasePath;
     let fpath = htConfig.financeBasePath;
 
-    let businessId = getQueryStr('businessId')
-    let afterId = getQueryStr('afterId')
-    let mprid = getQueryStr('mprid')
+    let businessId = getQueryStr('businessId');
+    let afterId = getQueryStr('afterId');
+    let mprid = getQueryStr('mprid');
+    let beforeOverAmount= getQueryStr('beforeOverAmount');
+    let beforeOverdueDays =getQueryStr('beforeOverdueDays');
 
     app = new Vue({
         el: "#app",
@@ -104,7 +106,7 @@ window.layinit(function (htConfig) {
                     app.$Message.error({content:'获取银行转入账户数据失败'})
                 })
             },
-            submit:function(){
+            submit:function(){debugger
                 let params = {}
                 Object.keys(this.form).forEach(element => {
                     if (this.form[element] &&
@@ -114,6 +116,8 @@ window.layinit(function (htConfig) {
                 })
                 params.businessId = businessId;
                 params.afterId = afterId;
+                params.beforeOverAmount=beforeOverAmount;
+                params.beforeOverdueDays=beforeOverdueDays;
                 if(mprid){
                     params.mprid = mprid
                 }

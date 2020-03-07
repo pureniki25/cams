@@ -350,6 +350,10 @@ window.layinit(function (htConfig) {
             {
                 field: 'id',
                 title: '编号'
+            },{
+                field: 'createTime',
+                title: '登记日期',
+                width: 160
             }, {
                 field: 'tradeDate',
                 title: '还款日期',

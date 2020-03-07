@@ -5,6 +5,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 public class StringUtil {
 	private StringUtil() {
 	}
@@ -226,5 +229,104 @@ public class StringUtil {
 	public static String nullToStr(String str) {
 		return str == null ? "" : str;
 	}
+
+	/**
+	* 判断字符串是否可以转化为json对象
+	* @param content
+	* @return
+	*/
+	public static boolean isJsonObject(String content) {
+	    // 此处应该注意，当content为"  "空格字符串时，JSONObject.parseObject可以解析成功，
+	    if(!notEmpty(content)) {
+	    	return false;
+	    }
+	    try {
+	        JSONObject.parseObject(content);
+	        return true;
+	    } catch (Exception e) {
+	        return false;
+	    }
+	}
+	
+	/**
+	* 判断字符串是否可以转化为JSON数组
+	* @param content
+	* @return
+	*/
+	public static boolean isJsonArray(String content) {
+		if(!notEmpty(content)) {
+	    	return false;
+	    }
+	    try {
+	        JSONArray.parseArray(content);
+	        return true;
+	    } catch (Exception e) {
+	        return false;
+	    }
+	}
+	
+	/**
+	 * 中文标点符号转英文字标点符号
+	 * 
+	 * @param str
+	 *            原字符串
+	 * @return str 新字符串
+	 */
+	public static final String cToe(String str) {
+		String[] regs = { "！", "，", "。", "；", "~", "《", "》", "（", "）", "？",
+				"”", "｛", "｝", "“", "：", "【", "】", "”", "‘", "’", "!", ",",
+				".", ";", "`", "<", ">", "(", ")", "?", "'", "{", "}", "\"",
+				":", "{", "}", "\"", "\'", "\'" };
+		for (int i = 0; i < regs.length / 2; i++) {
+			str = str.replaceAll(regs[i], regs[i + regs.length / 2]);
+		}
+		return str;
+	}
+ 
+
+ 
+	/**
+	 * 全角转半角:
+	 * 
+	 * @param fullStr
+	 * @return
+	 */
+	public static final String full2Half(String fullStr) {
+		if (isEmpty(fullStr)) {
+			return fullStr;
+		}
+		char[] c = fullStr.toCharArray();
+		for (int i = 0; i < c.length; i++) {
+			System.out.println((int) c[i]);
+			if (c[i] >= 65281 && c[i] <= 65374) {
+				c[i] = (char) (c[i] - 65248);
+			} else if (c[i] == 12288) { // 空格
+				c[i] = (char) 32;
+			}
+		}
+		return new String(c);
+	}
+ 
+	/**
+	 * 半角转全角
+	 * 
+	 * @param halfStr
+	 * @return
+	 */
+	public static final String half2Full(String halfStr) {
+		if (isEmpty(halfStr)) {
+			return halfStr;
+		}
+		char[] c = halfStr.toCharArray();
+		for (int i = 0; i < c.length; i++) {
+			if (c[i] == 32) {
+				c[i] = (char) 12288;
+			} else if (c[i] < 127) {
+				c[i] = (char) (c[i] + 65248);
+			}
+		}
+		return new String(c);
+	}
+
 
 }

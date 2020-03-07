@@ -40,27 +40,7 @@
 <!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
 <!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
 <div id="main" v-cloak>
-    <Row>
-        <i-col span="12" style="padding:1em">
-                <Card   >
-                    <p slot="title">需我审批<span style="float:right;color:#169BD5;cursor:pointer" @click="openMore('/ProcessUI/ProcessWaitToApproveUI/waitToApprove','需要我审批的')">More</span></p>
-                    <table id="approvalTable" lay-filter="approvalTable"></table>
-                    <script type="text/html" id="approvalTable_tool_bar">
-                        <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
-                    </script>
-                </Card>
-        </i-col>
-        <i-col span="12" style="padding:1em">
-                
-                <Card  >
-                    <p slot="title">我跟进的业务<span style="float:right;color:#169BD5;cursor:pointer" @click="openMore('/collectionUI/index','贷后管理')" >More</span></p>
-                    <table id="businessTable" lay-filter="businessTable"></table>
-                    <script type="text/html" id="businessTable_tool_bar">
-                        <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info">详情</a>
-                    </script>
-                </Card>
-        </i-col>
-    </Row>
+
     <Row>
         <i-col span="12" style="padding:1em">
                 <Card  >
@@ -77,10 +57,10 @@
         <i-col span="12" style="padding:1em">
                 <Card  >
                     <p slot="title">关于系统<span style="float:right;color:#169BD5;display:none;;cursor:pointer">More</span></p>
-                    <p v-for="item in aboutSyss" @click="checkNotice(item.noticeId)" style="border-bottom:1px solid rgba(242, 242, 242, 1);margin-top:10px">
-                            <span>{{item.title}}</span>
-                            <span style="float:right">{{item.date}}</span>
-                        </p>
+<!--                     <p v-for="item in aboutSyss" @click="checkNotice(item.noticeId)" style="border-bottom:1px solid rgba(242, 242, 242, 1);margin-top:10px"> -->
+                            <span>云账本系统试用版</span>
+                            <span style="float:right">2019.2.4</span>
+<!--                         </p> -->
                 </Card>
         </i-col>
     </Row>

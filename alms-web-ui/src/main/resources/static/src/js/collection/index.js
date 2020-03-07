@@ -202,15 +202,40 @@ window.layinit(function(htConfig){
             ////  ----   单行操作界面显示  结束 -----------------
             clickExport() {//导出Excel表格
 
-                layui.use(['layer', 'table','ht_config'], function () {debugger
+                layui.use(['layer', 'table','ht_config'], function () {
                     vm.$refs['searchForm'].validate((valid) => {
-                        if (valid) {debugger
+                        if (valid) {
                             getData();
-                            vm.exporting = true;
-                            expoertExcel(basePath + "collection/saveExcel",vm.searchForm,"贷后管理.xlsx");
+                            // expoertExcel(basePath + "ApplyDerateController/saveExcel",vm.searchForm,"贷后管理.xlsx",vm.exporting);
+                            vm.exporting = true ;
+                            axios.post(basePath + "ApplyDerateController/saveExcel",vm.searchForm)
+                                    .then(function (res) {
+                                        if (res.data.code == "1") {
+                                            vm.exporting = false ;
+                                            var docUrl = res.data.data;
+                                            console.log(docUrl);
+                                            var ExportForm = document.createElement("FORM");
+                                            document.body.appendChild(ExportForm);
+                                            ExportForm.method = "GET";
+                                            ExportForm.action = basePath + "downLoadController/excelFiles";
+                                            addInput(ExportForm, "text", "docUrl", docUrl);
+                                            addInput(ExportForm, "text", "downloadFile", "贷后管理.xlsx");
+                                            // http://localhost:30111/alms/core/collection/saveExcel?files=64eda1f0-8f76-4833-94f2-3407380ab37b.xls
+                                            ExportForm.submit();
 
-                            vm.exporting = false;
 
+                                            document.body.removeChild(ExportForm);
+                                            vm.$Modal.success({
+                                                title: '',
+                                                content: '操作成功'
+                                            });
+                                        } else {
+                                            vm.$Modal.error({content: '操作失败，消息：' + res.data.msg});
+                                        }
+                                    })
+                                    .catch(function (error) {
+                                        vm.$Modal.error({content: '接口调用异常!'});
+                                    });
                         }
                     })
                 });
@@ -389,7 +414,14 @@ window.layinit(function(htConfig){
                     field: 'visitStaffName',
                     width:80,
                     title: '清算二'
-                }, {
+                },   {
+
+                    field: 'registerStatus',
+                    width:90,
+                    title: '登记状态',
+                    templet:'<div><span title="{{d.registerTips}}">{{#if(d.registerStatus!=undefined){}}{{d.registerStatus}}{{#}}}</span></div>'
+              
+                },{
 
                     field: 'statusName',
                     width:120,
@@ -475,30 +507,30 @@ window.layinit(function(htConfig){
                                 )
                             }
                             if (authValid('applyDerate')) {
-                                if(e.statusName != '已还款' && e.statusName != '已结清'
+                                if(e.statusName != '已还款' && e.statusName != '已结清' && e.statusName !='还款中' && e.repayStatus != '部分还款'
                                     &&  e.afterColStatusName!='已移交法务' &&
                                     e.repaymentTypeId!=9 && e.repaymentTypeId!=4
                                         //你我金融的单，不需要申请减免
-                                && e.plateType != 2){
+                                && e.plateType == 1){
                                     buttons.push(
                                         {
 
-                                            "name": "减免申请", click: function (e, currentItem) {debugger
+                                            "name": "减免申请", click: function (e, currentItem) {
                                             if (currentItem.statusName == '已还款'||currentItem.statusName == '已结清'){
                                                 vm.$Modal.error({content: '已还款或已结清的不能发起减免申请！'});
                                             }else{
                                                 if (currentItem.afterColStatusName=='已移交法务'){
                                                     vm.$Modal.error({content: '已移交法务的不能发起减免申请！'});
                                                 }else{
-                                                	if(currentItem.businessTypeId=='25'){
-                                                	     vm.$Modal.error({content: '信用贷不能发起减免申请！'});
+                                                	if(currentItem.businessTypeId=='9'||currentItem.businessTypeId=='11'||currentItem.businessTypeId=='25'||currentItem.businessTypeId=='35'){
+                                                	      if (currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
+  	                                                        vm.$Modal.error({content: '现在只支持等额本息,先息后本,分期还本付息5年,分期还本付息10年还款方式的减免申请！'});
+  	                                                    }else{
+  	                                                        var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
+  	                                                        showOneLineOprLayer(url, "减免申请")
+  	                                                    }
                                                 	}else{
-	                                                    if (currentItem.repaymentTypeId==9||currentItem.repaymentTypeId==4){
-	                                                        vm.$Modal.error({content: '现在只支持等额本息,先息后本,分期还本付息5年,分期还本付息10年还款方式的减免申请！'});
-	                                                    }else{
-	                                                        var url = '/collectionUI/applyDerateUI?businessId=' + currentItem.businessId + '&crpId=' + currentItem.crpId + "&processStatus=-1"+'&businessTypeId='+currentItem.businessTypeId+"&afterId="+currentItem.afterId
-	                                                        showOneLineOprLayer(url, "减免申请")
-	                                                    }
+                                                		vm.$Modal.error({content: '现在只支持房贷，车贷，信用贷，有房贷减免申请'});
                                                 	}
 
                                                 }
@@ -716,7 +748,7 @@ window.layinit(function(htConfig){
                                     {
                                         "name": "还款详情", click: function (e, currentItem) {
                                         	console.log("currentItem:", currentItem)
-        	                                var url = '/finance/repaymentPlanInfo?businessId=' + currentItem.businessId;
+        	                                var url = '/finance/repaymentPlanInfo?businessId=' + currentItem.businessId + '&afterId=' + currentItem.afterId + '&display=1';
         	                                showOneLineOprLayer(url, "还款详情")
 
                                         }
@@ -983,7 +1015,7 @@ var getData = function(){
         realRepayDateBegin:'',
         realRepayDateEnd:''
     }
-    if(vm.searchForm.showRepayDateRange.length>0){debugger
+    if(vm.searchForm.showRepayDateRange.length>0){
         if(vm.searchForm.showRepayDateRange[0]!=null){
             dataObject.showRepayDateBegin = vm.searchForm.showRepayDateRange[0].getTime();
             vm.searchForm.showRepayDateBegin=vm.searchForm.showRepayDateRange[0].getTime();

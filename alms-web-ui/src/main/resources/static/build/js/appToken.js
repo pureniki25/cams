@@ -10,19 +10,24 @@ window.layinit = function (cb) {
     layui.config({
         base : '/plugins/layui/extend/modules/',
         version : '1.0.11'
-    }).use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config','laydate','upload','numeral','moment'], function () {
+    }).use(['layer', 'table','ht_ajax', 'ht_auth', 'ht_config','laydate','upload','numeral','moment','ht_cookie'], function () {
         // htConfig = window.properties.config;
 		// if(!(window.properties.config.useGateWayflage)){
          //    axios.defaults.headers.common['userId'] = window.properties.config.loginUserId;
         // }
-        
+        var cookie = layui.ht_cookie;
+
+        if( cookie.getPara("appName")){
+            axios.defaults.headers.common['app'] = cookie.getPara("appName");
+        }
+
         numeral.defaultFormat('0,0.00');
         htConfig = layui.ht_config;
         _loadBtnAndTabUrl =  htConfig.loadBtnAndTabUrl;
 
        if(!htConfig.useGateWayflage){
-            htConfig.basePath = htConfig.localBasePath;
-            htConfig.coreBasePath = htConfig.localBasePath;
+            htConfig.basePath = htConfig.basePath;
+            htConfig.coreBasePath = htConfig.coreBasePath;
             htConfig.financeBasePath = htConfig.financeBasePath;
             htConfig.withholdBasePath = htConfig.withholdBasePath;
             htConfig.platRepayBasePath = htConfig.platRepayBasePath;

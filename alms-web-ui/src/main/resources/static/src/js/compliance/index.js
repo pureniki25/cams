@@ -15,6 +15,18 @@ var rechargeModalFormRules = {
 	],
 };
 
+var createTdrepayRechargeLogRules = {
+		rechargeAmount: [
+			{pattern:/^\d{0,9}(\.\d{1,2})?$/, required: true,  message: '请填写整数位数不大于9位，小数位数不超过两位的数字', trigger: 'blur'}
+		],
+		factRepayAmount: [
+			{pattern:/^\d{0,9}(\.\d{1,2})?$/, required: true,  message: '请填写整数位数不大于9位，小数位数不超过两位的数字', trigger: 'blur'}
+		],
+		resourceAmount: [
+			{pattern:/^\d{0,9}(\.\d{1,2})?$/, required: true,  message: '请填写整数位数不大于9位，小数位数不超过两位的数字', trigger: 'blur'}
+		],
+};
+
 window.layinit(function(htConfig) {
 	basePath = htConfig.platRepayBasePath;
 	coreBasePath = htConfig.coreBasePath;
@@ -50,7 +62,16 @@ window.layinit(function(htConfig) {
 			guaranteePaymentDataList:[], // 担保公司垫付信息
 			handleAdvancePaymentLoading: false, // 执行还垫付加载状态控制
 			handleAdvancePaymentLateFeeLoading: false, // 执行还垫付(含滞纳金)加载状态控制
-				
+			yidianchedaiFlag: false, // 是否新商标一点车贷业务
+			createPrincipalAndInterestDifferentDataLoading: false, // 创建尾差加载状态
+			createTdrepayRechargeLogLoading: false, // 创建资金分发加载状态
+			rechargeAmountTotal: 0, // 分发合计
+			factRepayAmountTotal: 0, // 实收合计
+			weichaTotal: 0, // 尾差合计
+			createTdrepayRechargeLogModal: false, // 创建资金分发记录弹窗控制
+			isOldDataFlag: false, // 是否6.28之前上标的数据
+			oldSurplusGuaranteePaymentModal: false, // 6.28之前上标数据垫付记录弹窗控制
+
 			/*
 			 *  详情基础信息
 			 */
@@ -79,6 +100,28 @@ window.layinit(function(htConfig) {
 				page: 1, // 当前页
 			},
 			
+			tdrepayRechargeLogBaseInfo: {}, // 资金分发记录基础信息
+			
+			/*
+			 * 创建资金分发记录form
+			 */
+			createTdrepayRechargeLogForm: {
+				logId: '', // 资金分发logId
+				rechargeAmount: '', // 充值金额（元）
+				factRepayAmount: '', // 实收合计
+				resourceAmount: '', //	流水合计
+				factRepayDate: '', // 实还日期
+			},
+			/*
+			 * 初始化创建资金分发记录form
+			 */
+			initCreateTdrepayRechargeLogForm: {
+				logId: '', // 资金分发logId
+				rechargeAmount: '', // 充值金额（元）
+				factRepayAmount: '', // 实收合计
+				resourceAmount: '', //	流水合计
+				factRepayDate: '', // 实还日期
+			},
 			/*
 			 * 代充值账户充值form
 			 */
@@ -195,6 +238,11 @@ window.layinit(function(htConfig) {
                     title: '其他费用',
                     key: 'otherAmount',
                     align: 'center',
+                },
+                {
+                	title: '还款状态',
+                	key: 'repaymentStatus',
+                	align: 'center',
                 },
             ],
             /*
@@ -488,7 +536,177 @@ window.layinit(function(htConfig) {
     		 * 查看担保公司垫付记录数据
     		 */
     		queryGuaranteePaymentData:[],
-        	
+
+    		/*
+    		 * 6.28之前的数据 全部垫付记录 表头
+    		 */
+    		oldAllGuaranteePaymentColumns:[
+    			{
+    				title: '期数',
+        			key: 'periodMerge',
+        			align: 'center',
+    			},
+    			{
+    				title: '总垫付金额',
+    				key: 'advanceAmountTotal',
+    				align: 'center',
+    			},
+    			{
+    				title: '总垫付滞纳金',
+    				key: 'penaltyTotal',
+    				align: 'center',
+    			},
+    			{
+    				title: '已还垫付金额',
+    				key: 'advanceAmountFactTotal',
+    				align: 'center',
+    			},
+    			{
+    				title: '已还垫付滞纳金',
+    				key: 'penaltyFactTotal',
+    				align: 'center',
+    			},
+    			{
+    				title: '未还垫付金额',
+    				key: 'advanceAmountSurplus',
+    				align: 'center',
+    			},
+    		],
+
+    		/*
+    		 * 6.28之前的数据 全部垫付记录 表体
+    		 */
+    		oldAllGuaranteePaymentData: [],
+
+    		/*
+    		 * 6.28之前的数据 未还垫付记录 表头
+    		 */
+    		oldSurplusGuaranteePaymentColumns:[
+    			{
+    				title: '期数',
+    				key: 'periodMerge',
+    				align: 'center',
+    			},
+    			{
+    				title: '未还垫付金额',
+    				key: 'advanceAmountSurplus',
+    				align: 'center',
+    			},
+    			{
+    				title: '滞纳金',
+    				key: 'penaltySurplus',
+    				align: 'center',
+    			},
+    			{
+    				title: '垫付人ID',
+    				key: 'overDueUserIds',
+    				align: 'center',
+    				render:(h,p)=>{
+    					return h('a',{
+                    		style:{
+                    			textDecoration:'underline'
+                    		},
+                    		on:{
+                    			click:function(){
+                    				vm.openOldSurplusGuaranteePaymentModal(p.row);
+                    			}
+                    		}
+                    	},p.row.overDueUserIds)
+                    }
+    			},
+    			{
+    				title: '垫付时间',
+    				key: 'addDate',
+    				align: 'center',
+    			},
+			],
+
+			/*
+			 * 6.28之前的数据 未还垫付记录 表体
+			 */
+			oldSurplusGuaranteePaymentData: [],
+
+
+			/*
+			 * 6.28之前的数据 垫付人垫付记录明细 表头
+			 */
+			oldGuaranteePaymentDetailColumns:[
+				{
+					title: '期数',
+					key: 'period',
+					align: 'center',
+				},
+				{
+					title: '垫付ID',
+					key: 'advanceId',
+					align: 'center',
+				},
+				{
+					title: '垫付金额',
+					key: 'advanceAmount',
+					align: 'center',
+				},
+				{
+					title: '滞纳金',
+					key: 'penalty',
+					align: 'center',
+				},
+				{
+					title: '借款人ID',
+					key: 'borrowUserid',
+					align: 'center',
+				},
+				{
+					title: '垫付人ID',
+					key: 'overDueUserId',
+					align: 'center',
+				},
+				{
+					title: '垫付时间',
+					key: 'addDate',
+					align: 'center',
+				},
+				{
+					title: '还款时间',
+					key: 'refundDate',
+					align: 'center',
+				},
+				{
+					title: '已还垫付金额',
+					key: 'refundAmount',
+					align: 'center',
+				},
+				{
+					title: '是否已还',
+					key: 'isRefund',
+					align: 'center',
+					render:(h,p)=>{
+						if (p.row.isRefund == 1) {
+							return '已还';
+						}else if (p.row.isRefund == 0) {
+							return '未还';
+						}
+                    }
+				},
+				{
+					title: '是否结清',
+					key: 'isComplete',
+					align: 'center',
+					render:(h,p)=>{
+						if (p.row.isComplete == 1) {
+							return '已结清';
+						}else if (p.row.isComplete == 0) {
+							return '未结清';
+						}
+                    }
+				},
+				],
+
+				/*
+				 * 6.28之前的数据 垫付人垫付记录明细 表体
+				 */
+				oldGuaranteePaymentDetailData: [],
+
 		},
 
 		methods : {
@@ -611,6 +829,7 @@ window.layinit(function(htConfig) {
 			 * 当业务类型改变时触发
 			 */
 			onChangeBusinessType: function(value){
+				console.log("value",value);
 				axios.get(basePath +"recharge/queryRechargeAccountTypeByBusinessType?businessType=" + value)
 				.then(function (res) {
 					if (res.data.data != null && res.data.code == 1) {
@@ -637,8 +856,10 @@ window.layinit(function(htConfig) {
 			closeModal: function(){
 				vm.rechargeModalForm = vm.initRechargeModalForm;
 				vm.queryRechargeRecordModel = vm.initQueryRechargeRecordModel;
+				vm.createTdrepayRechargeLogForm = vm.initCreateTdrepayRechargeLogForm;
 				this.rechargeModal = false;
 				this.rechargeRecordFlag = false;
+				this.createTdrepayRechargeLogModal = false;
 			},
 			
 			/*
@@ -755,7 +976,18 @@ window.layinit(function(htConfig) {
 			    			this.selectAmount = 0;
 			    			this.ComplianceRepaymentData = res.data;
 			    			this.queryConditionModel.page = curr;
-			    			console.log("res:",res)
+			    			this.factRepayAmountTotal = 0;
+			    			this.rechargeAmountTotal = 0;
+			    			this.weichaTotal = 0;
+			    			if (res.data != null && res.data.length > 0) {
+								for (var i = 0; i < res.data.length; i++) {
+									this.factRepayAmountTotal = this.factRepayAmountTotal + res.data[i].factRepayAmount;
+									this.rechargeAmountTotal = this.rechargeAmountTotal + res.data[i].rechargeAmount;
+									if (res.data[i].repaySource == 6) {
+										this.weichaTotal = this.weichaTotal + res.data[i].rechargeAmount;
+									}
+								}
+							}
 			    		}
 			    })
 			},
@@ -902,42 +1134,6 @@ window.layinit(function(htConfig) {
             	this.infoTabValue = 'fundDistributionRecord';
             },
             
-			/*
-			 * 根据标ID获取垫付记录
-			 */
-			/*returnAdvanceShareProfit: function(){
-				axios.get(basePath +"tdrepayRecharge/returnAdvanceShareProfit?projectId=" + this.projectId)
-    	        .then(function (res) {
-    	            if (res.data.data != null && res.data.code == 1) {
-    	            	vm.advancePaymentInfoData = res.data.data.returnAdvanceShareProfits;
-    	            	vm.queryGuaranteePaymentData = res.data.data.tdGuaranteePaymentVOs;
-    	            } else {
-    	            	vm.$Modal.error({content: res.data.msg });
-    	            }
-    	        })
-    	        .catch(function (error) {
-    	        	vm.$Modal.error({content: '接口调用异常!'});
-    	        });
-			},*/
-			
-			/*
-			 * 标的还款信息查询接口
-			 */
-			/*getProjectPayment: function(){
-				axios.get(basePath +"tdrepayRecharge/getProjectPayment?projectId=" + this.projectId)
-    	        .then(function (res) {
-    	            if (res.data.data != null && res.data.code == 1) {
-    	            	vm.platformRepaymentInfoData = res.data.data.periodsList;
-    	            	vm.platformActualRepaymentInfoData = res.data.data.tdProjectPaymentDTOs;
-    	            } else {
-    	            	vm.$Modal.error({content: res.data.msg });
-    	            }
-    	        })
-    	        .catch(function (error) {
-    	        	vm.$Modal.error({content: '接口调用异常!'});
-    	        });
-			},*/
-            
             /*
 			 * 根据标ID获取垫付记录
 			 */
@@ -945,8 +1141,19 @@ window.layinit(function(htConfig) {
 				axios.get(basePath +"tdrepayRecharge/returnAdvanceShareProfit?projectId=" + projectId)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
-    	            	vm.advancePaymentInfoData = res.data.data.returnAdvanceShareProfits;
-    	            	vm.queryGuaranteePaymentData = res.data.data.tdGuaranteePaymentVOs;
+    	            	if (res.data.data.isOldDataFlag != null) {
+    	            		vm.isOldDataFlag = res.data.data.isOldDataFlag;
+						}
+    	            	if (res.data.data.returnAdvanceShareProfits != null) {
+    	            		vm.advancePaymentInfoData = res.data.data.returnAdvanceShareProfits;
+						}
+    	            	if (res.data.data.tdGuaranteePaymentVOs != null) {
+    	            		vm.queryGuaranteePaymentData = res.data.data.tdGuaranteePaymentVOs;
+						}
+    	            	if (res.data.data.advanceRecordDTOs != null) {
+    	            		vm.oldAllGuaranteePaymentData = res.data.data.advanceRecordDTOs;
+    	            		vm.oldSurplusGuaranteePaymentData = res.data.data.advanceRecordDTOs;
+    	            	}
     	            } else {
     	            	vm.$Modal.error({content: res.data.msg });
     	            }
@@ -960,11 +1167,19 @@ window.layinit(function(htConfig) {
 			 * 标的还款信息查询接口
 			 */
 			getProjectPayment: function(projectId){
+				this.platformRepaymentInfoaviMoney = 0;
+				this.platformPrincipal = 0;
+				this.platformInterest = 0;
+				this.platformRepaymentInfoPlatformCharge = 0;
+				this.platformPrincipalAndInterestAndPlatformCharge = 0;
 				axios.get(basePath +"tdrepayRecharge/getProjectPayment?projectId=" + projectId)
     	        .then(function (res) {
     	            if (res.data.data != null && res.data.code == 1) {
     	            	vm.platformRepaymentInfoData = res.data.data.periodsList;
     	            	vm.platformActualRepaymentInfoData = res.data.data.tdProjectPaymentDTOs;
+    	            	if (res.data.data.isOldDataFlag != null) {
+    	            		vm.isOldDataFlag = res.data.data.isOldDataFlag;
+						}
     	            	if (res.data.data.aviMoney != null) {
     	            		vm.platformRepaymentInfoaviMoney = res.data.data.aviMoney.aviMoney;
 						}
@@ -977,10 +1192,16 @@ window.layinit(function(htConfig) {
     	            	if (res.data.data.platformCharge == null) {
     	            		res.data.data.platformCharge = 0;
 						}
+    	            	
     	            	vm.platformPrincipal = res.data.data.principal;
     	            	vm.platformInterest = res.data.data.interest;
     	            	vm.platformRepaymentInfoPlatformCharge = res.data.data.platformCharge;
-    	            	vm.platformPrincipalAndInterestAndPlatformCharge = res.data.data.principal + res.data.data.interest + res.data.data.platformCharge;
+    	            	if (res.data.data.dueOutMoney != null) {
+    	            		vm.platformPrincipalAndInterestAndPlatformCharge = res.data.data.dueOutMoney;
+						}else {
+							vm.platformPrincipalAndInterestAndPlatformCharge = res.data.data.principal + res.data.data.interest + res.data.data.platformCharge;
+						}
+
     	            } else {
     	            	vm.$Modal.error({content: res.data.msg });
     	            }
@@ -1093,7 +1314,12 @@ window.layinit(function(htConfig) {
 			 * 根据业务ID获取标信息
 			 */
 			getProjectInfoByBusinessId: function(obj){
-				var businessId = obj.data.origBusinessId;
+				var businessId = '';
+				if (obj.data.businessId != null && obj.data.businessId != '') {
+					businessId = obj.data.businessId;
+				}else {
+					businessId = obj.data.origBusinessId;
+				}
 				$.ajax({
 		            type : 'GET',
 		            async : false,
@@ -1174,6 +1400,127 @@ window.layinit(function(htConfig) {
 					vm.$Modal.error({content: '接口调用异常!'});
 				});
 			},
+			
+			/**
+			 * 创建尾差
+			 */
+			createPrincipalAndInterestDifferentData: function(){
+				if (vm.tdrepayRechargeInfoReqList == null || vm.tdrepayRechargeInfoReqList.length == 0) {
+					vm.$Modal.error({ content: "请选择要创建差额的数据" });
+					return;
+				}
+				axios.post(basePath + 'tdrepayRecharge/createPrincipalAndInterestDifferentData', vm.tdrepayRechargeInfoReqList)
+				.then(function(result){
+					vm.createPrincipalAndInterestDifferentDataLoading = true;
+					if (result.data.code == "1") {
+						vm.$Modal.success(
+							{   
+								content: result.data.data,
+								onOk: () => {
+									vm.queryComplianceRepaymentData();
+			                    },
+		                    }
+						);
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+					vm.createPrincipalAndInterestDifferentDataLoading = false;
+				}).catch(function (error) {
+					vm.createPrincipalAndInterestDifferentDataLoading = false;
+					vm.$Modal.error({content: '接口调用异常!'});
+            	});
+			},
+			/**
+			 * 创建资金分发记录
+			 */
+			createTdrepayRechargeLog: function(){
+				vm.$refs['createTdrepayRechargeLogForm'].validate((valid) => {
+		            if(valid){
+		            	this.createTdrepayRechargeLogForm.logId = this.tdrepayRechargeLogBaseInfo.logId;
+		            	axios.post(basePath + 'tdrepayRecharge/createTdrepayRechargeLog', this.createTdrepayRechargeLogForm)
+						.then(function(result){
+							vm.tdrepayRechargeLogBaseInfo = {};
+							vm.createTdrepayRechargeLogLoading = true;
+							if (result.data.code == "1") {
+								vm.$Modal.success(
+										{   
+											content: '执行成功',
+											onOk: () => {
+												vm.queryComplianceRepaymentData();
+											},
+										}
+								);
+							} else {
+								vm.$Modal.error({ content: result.data.msg });
+							}
+							vm.createTdrepayRechargeLogLoading = false;
+							vm.createTdrepayRechargeLogModal = false;
+							vm.createTdrepayRechargeLogForm = vm.initCreateTdrepayRechargeLogForm;
+						}).catch(function (error) {
+							vm.createTdrepayRechargeLogForm = vm.initCreateTdrepayRechargeLogForm;
+							vm.createTdrepayRechargeLogLoading = false;
+							vm.createTdrepayRechargeLogModal = false;
+							vm.$Modal.error({content: '接口调用异常!'});
+						});
+		            }else{
+		                vm.$Message.error({content: '表单校验失败!'});
+		            }
+		        })
+			},
+			
+			/**
+			 * 打开创建资金分发弹窗
+			 */
+			openCreateTdrepayRechargeLog: function(){
+				this.tdrepayRechargeLogBaseInfo = {};
+				if (vm.tdrepayRechargeInfoReqList == null || vm.tdrepayRechargeInfoReqList.length == 0) {
+					vm.$Modal.error({ content: "请选择要创建资金分发的数据" });
+					return;
+				}
+				if (vm.tdrepayRechargeInfoReqList.length > 1) {
+					vm.$Modal.error({ content: "一次只能选择一条需创建资金分发记录的数据" });
+					return;
+				}
+				this.queryTdrepayRechargeLogBaseInfo();
+				this.createTdrepayRechargeLogModal = true;
+			},
+			/**
+			 * 获取资金分发记录基础信息
+			 */
+			queryTdrepayRechargeLogBaseInfo: function(){
+				axios.post(basePath + 'tdrepayRecharge/queryTdrepayRechargeLogBaseInfo', vm.tdrepayRechargeInfoReqList)
+				.then(function(result){
+					if (result.data.code == "1" && result.data.data != null) {
+						vm.createTdrepayRechargeLogForm.rechargeAmount = result.data.data.totalSurplusAdvance;
+						vm.tdrepayRechargeLogBaseInfo = result.data.data;
+					} else {
+						vm.$Modal.error({ content: result.data.msg });
+					}
+				}).catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+				});
+			},
+			/**
+			 * 根据overDueUserIds查询垫付记录明细
+			 */
+			openOldSurplusGuaranteePaymentModal: function(obj){
+				console.log("obj", obj)
+				axios.get(basePath +"tdrepayRecharge/queryOldSurplusGuaranteePaymentDetail?projectId=" + obj.projectId
+						+ "&period=" + obj.periodMerge + "&overDueUserIds=" + obj.overDueUserIds)
+				.then(function (res) {
+					if (res.data.data != null && res.data.code == 1) {
+						vm.oldGuaranteePaymentDetailData = res.data.data;
+						vm.oldSurplusGuaranteePaymentModal = true;
+					}else {
+						vm.$Modal.error({ content: result.data.msg });
+						vm.oldSurplusGuaranteePaymentModal = false;
+					}
+				})
+				.catch(function (error) {
+					vm.$Modal.error({content: '接口调用异常!'});
+					vm.oldSurplusGuaranteePaymentModal = false;
+				});
+			}
 		},
 
 		mounted: function() {
@@ -1188,6 +1535,11 @@ window.layinit(function(htConfig) {
 	
 	table.on('tool(complianceRepaymentData)', function (obj) {
 		let event = obj.event;
+		if (obj.data.businessType == 20 || obj.data.businessType == 33) {
+			vm.yidianchedaiFlag = true;
+		}else {
+			vm.yidianchedaiFlag = false;
+		}
 		if (event == 'info') {
 			vm.projectId = obj.data.projectId;
 			vm.getProjectInfoByBusinessId(obj);
