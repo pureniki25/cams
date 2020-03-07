@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.SellDatMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.SellDat">
+        <id column="sell_id" property="sellId" />
+        <result column="company_code" property="companyCode" />
+        <result column="dan_ju_lei_xing" property="danJuLeiXing" />
+        <result column="ye_wu_lei_xing" property="yeWuLeiXing" />
+        <result column="kuai_ji_nian_du" property="kuaiJiNianDu" />
+        <result column="account_period" property="accountPeriod" />
+        <result column="document_no" property="documentNo" />
+        <result column="customer_code" property="customerCode" />
+        <result column="mo_ban" property="moBan" />
+        <result column="produce_date" property="produceDate" />
+        <result column="zhi_dan_ren" property="zhiDanRen" />
+        <result column="zhi_yuan" property="zhiYuan" />
+        <result column="bu_men" property="buMen" />
+        <result column="ke_mu" property="keMu" />
+        <result column="hui_lv" property="huiLv" />
+        <result column="bi_zhong" property="biZhong" />
+        <result column="xiang_mu" property="xiangMu" />
+        <result column="tong_ji" property="tongJi" />
+        <result column="due_date" property="dueDate" />
+        <result column="open_date" property="openDate" />
+        <result column="fu_kuan_tiao_jian" property="fuKuanTiaoJian" />
+        <result column="invoice_number" property="invoiceNumber" />
+        <result column="fa_piao_lei_xing" property="faPiaoLeiXing" />
+        <result column="kai_piao_biao_zhi" property="kaiPiaoBiaoZhi" />
+        <result column="dan_wei_di_zhi" property="danWeiDiZhi" />
+        <result column="dan_wei_kai_hu_hang" property="danWeiKaiHuHang" />
+        <result column="qi_ye_di_zhi" property="qiYeDiZhi" />
+        <result column="qi_ye_kai_hu_hang" property="qiYeKaiHuHang" />
+        <result column="bei_zhu" property="beiZhu" />
+        <result column="chong_xiao_lai_yuan_dan_ju" property="chongXiaoLaiYuanDanJu" />
+        <result column="row_number" property="rowNumber" />
+        <result column="produce_code" property="produceCode" />
+        <result column="xuan_ze_dan_ju" property="xuanZeDanJu" />
+        <result column="huo_wei" property="huoWei" />
+        <result column="cal_unit" property="calUnit" />
+        <result column="number" property="number" />
+        <result column="unit_price" property="unitPrice" />
+        <result column="yue_ding_ri_qi" property="yueDingRiQi" />
+        <result column="kou_lv" property="kouLv" />
+        <result column="original_amount" property="originalAmount" />
+        <result column="local_amount" property="localAmount" />
+        <result column="tax_rate" property="taxRate" />
+        <result column="original_tax" property="originalTax" />
+        <result column="localhost_tax" property="localhostTax" />
+        <result column="sheng_chan_pi_hao" property="shengChanPiHao" />
+        <result column="sheng_chan_ri_qi" property="shengChanRiQi" />
+        <result column="dao_qi_ri_qi" property="daoQiRiQi" />
+        <result column="bao_zhi_qi" property="baoZhiQi" />
+        <result column="gong_cheng" property="gongCheng" />
+        <result column="zi_ding_yi_xiang_mu0" property="ziDingYiXiangMu0" />
+        <result column="zi_ding_yi_xiang_mu1" property="ziDingYiXiangMu1" />
+        <result column="zi_ding_yi_xiang_mu2" property="ziDingYiXiangMu2" />
+        <result column="zi_ding_yi_xiang_mu3" property="ziDingYiXiangMu3" />
+        <result column="zi_ding_yi_xiang_mu4" property="ziDingYiXiangMu4" />
+        <result column="zi_ding_yi_xiang_mu5" property="ziDingYiXiangMu5" />
+        <result column="pi_ci_shang_pin_ming_xi" property="piCiShangPinMingXi" />
+        <result column="cheng_ben_cha_yi" property="chengBenChaYi" />
+        <result column="cheng_ben_jin_e" property="chengBenJinE" />
+        <result column="guan_bi_biao_zhi" property="guanBiBiaoZhi" />
+        <result column="dai_da_yin_biao_zhi" property="daiDaYinBiaoZhi" />
+        <result column="dai_shi_xian_xiao_xiang_shui" property="daiShiXianXiaoXiangShui" />
+        <result column="ping_jun_cheng_ben_jine" property="pingJunChengBenJine" />
+        <result column="pin_zheng0" property="pinZheng0" />
+        <result column="ping_zheng1" property="pingZheng1" />
+        <result column="chu_ru_lei_bie" property="chuRuLeiBie" />
+        <result column="shen_he_ren" property="shenHeRen" />
+        <result column="he_tong_hao" property="heTongHao" />
+        <result column="zeng_pin_biao_zhi" property="zengPinBiaoZhi" />
+        <result column="create_time" property="createTime" />
+         <result column="idx" property="idx" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        sell_id AS sellId, company_code AS companyCode, dan_ju_lei_xing AS danJuLeiXing, ye_wu_lei_xing AS yeWuLeiXing, kuai_ji_nian_du AS kuaiJiNianDu, account_period AS accountPeriod, document_no AS documentNo, customer_code AS customerCode, mo_ban AS moBan, produce_date AS produceDate, zhi_dan_ren AS zhiDanRen, zhi_yuan AS zhiYuan, bu_men AS buMen, ke_mu AS keMu, hui_lv AS huiLv, bi_zhong AS biZhong, xiang_mu AS xiangMu, tong_ji AS tongJi, due_date AS dueDate, open_date AS openDate, fu_kuan_tiao_jian AS fuKuanTiaoJian, invoice_number AS invoiceNumber, fa_piao_lei_xing AS faPiaoLeiXing, kai_piao_biao_zhi AS kaiPiaoBiaoZhi, dan_wei_di_zhi AS danWeiDiZhi, dan_wei_kai_hu_hang AS danWeiKaiHuHang, qi_ye_di_zhi AS qiYeDiZhi, qi_ye_kai_hu_hang AS qiYeKaiHuHang, bei_zhu AS beiZhu, chong_xiao_lai_yuan_dan_ju AS chongXiaoLaiYuanDanJu, row_number AS rowNumber, produce_code AS produceCode, xuan_ze_dan_ju AS xuanZeDanJu, huo_wei AS huoWei, cal_unit AS calUnit, number, unit_price AS unitPrice, yue_ding_ri_qi AS yueDingRiQi, kou_lv AS kouLv, original_amount AS originalAmount, local_amount AS localAmount, tax_rate AS taxRate, original_tax AS originalTax, localhost_tax AS localhostTax, sheng_chan_pi_hao AS shengChanPiHao, sheng_chan_ri_qi AS shengChanRiQi, dao_qi_ri_qi AS daoQiRiQi, bao_zhi_qi AS baoZhiQi, gong_cheng AS gongCheng, zi_ding_yi_xiang_mu0 AS ziDingYiXiangMu0, zi_ding_yi_xiang_mu1 AS ziDingYiXiangMu1, zi_ding_yi_xiang_mu2 AS ziDingYiXiangMu2, zi_ding_yi_xiang_mu3 AS ziDingYiXiangMu3, zi_ding_yi_xiang_mu4 AS ziDingYiXiangMu4, zi_ding_yi_xiang_mu5 AS ziDingYiXiangMu5, pi_ci_shang_pin_ming_xi AS piCiShangPinMingXi, cheng_ben_cha_yi AS chengBenChaYi, cheng_ben_jin_e AS chengBenJinE, guan_bi_biao_zhi AS guanBiBiaoZhi, dai_da_yin_biao_zhi AS daiDaYinBiaoZhi, dai_shi_xian_xiao_xiang_shui AS daiShiXianXiaoXiangShui, ping_jun_cheng_ben_jine AS pingJunChengBenJine, pin_zheng0 AS pinZheng0, ping_zheng1 AS pingZheng1, chu_ru_lei_bie AS chuRuLeiBie, shen_he_ren AS shenHeRen, he_tong_hao AS heTongHao, zeng_pin_biao_zhi AS zengPinBiaoZhi, create_time AS createTime
+    </sql>
+
+</mapper>

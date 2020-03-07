@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.SalaryDatMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.SalaryDat">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="idcard_no" property="idcardNo" />
+        <result column="suo_de_qi_jian_qi" property="suoDeQiJianQi" />
+        <result column="suo_de_qi_jian_zhi" property="suoDeQiJianZhi" />
+        <result column="ben_qi_shou_ru" property="benQiShouRu" />
+        <result column="ji_ben_yang_lao_bao_xian" property="jiBenYangLaoBaoXian" />
+        <result column="ji_ben_yi_liao_bao_xian" property="jiBenYiLiaoBaoXian" />
+        <result column="shi_ye_bao_xian" property="shiYeBaoXian" />
+        <result column="zhu_fang_gong_ji_jin" property="zhuFangGongJiJin" />
+        <result column="lei_ji_zi_nv_jiao_yu" property="leiJiZiNvJiaoYu" />
+        <result column="lei_ji_zhu_fang_dai_kuan_li_xi" property="leiJiZhuFangDaiKuanLiXi" />
+        <result column="lei_ji_zhu_fang_zu_jin" property="leiJiZhuFangZuJin" /> 
+        <result column="lei_ji_shan_yang_lao_ren" property="leiJiShanYangLaoRen" />
+        <result column="lei_ji_ji_xu_jiao_yu" property="leiJiJiXuJiaoYu" />
+        <result column="qi_ye_nian_jin" property="qiYeNianJin" />
+        <result column="shang_ye_jian_kang_bao_xian" property="shangYeJianKangBaoXian" />
+        <result column="shui_yan_yang_lao_bao_xian" property="shuiYanYangLaoBaoXian" />
+        <result column="qi_ta" property="qiTa" />
+        <result column="zhun_yu_kou_chu_juan_zeng_kuan" property="zhunYuKouChuJuanZengKuan" />
+        <result column="shui_qian_kou_chu_xiang_mu_he_ji" property="shuiQianKouChuXiangMuHeJi" />
+        <result column="jian_mian_shui_e" property="jianMianShuiE" />
+        <result column="jian_chu_fei_yong_biao_zhun" property="jianChuFeiYongBiaoZhun" />
+        <result column="yi_kou_jiao_shui_e" property="yiKouJiaoShuiE" />
+         <result column="ben_qi_yi_kou_shui_e" property="benQiYiKouShuiE" />
+                <result column="salary_date" property="salaryDate" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+   </sql>
+
+</mapper>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.ProductDatMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.hongte.alms.base.entity.ProductDat">
+		<id column="product_code" property="productCode" />
+		<result column="product_name" property="productName" />
+		<result column="product_type" property="productType" />
+		<result column="open_date" property="openDate" />
+		<result column="fengcun_biaozhi" property="fengcunBiaozhi" />
+		<result column="product_category" property="productCategory" />
+		<result column="product_properties"
+			property="productProperties" />
+		<result column="min_cal_unit" property="minCalUnit" />
+		<result column="rest_cal_unit" property="restCalUnit" />
+		<result column="product_unit" property="productUnit" />
+		<result column="chan_di" property="chanDi" />
+		<result column="gong_ying_shang" property="gongYingShang" />
+		<result column="shang_pin_huo_hao" property="shangPinHuoHao" />
+		<result column="zui_xiao_ku_cun_liang"
+			property="zuiXiaoKuCunLiang" />
+		<result column="zui_da_ku_cun_liang" property="zuiDaKuCunLiang" />
+		<result column="ti_qian_shi_jian" property="tiQianShiJian" />
+		<result column="han_shui_cai_gou_jia"
+			property="hanShuiCaiGouJia" />
+		<result column="bu_han_shui_cai_gou_jia"
+			property="buHanShuiCaiGouJia" />
+		<result column="han_shui_xiao_shou_jia"
+			property="hanShuiXiaoShouJia" />
+		<result column="bu_han_shui_xiaos_shou_jia"
+			property="buHanShuiXiaosShouJia" />
+		<result column="bu_han_shui_ji_hua_jia"
+			property="buHanShuiJiHuaJia" />
+		<result column="han_shui_ling_shou_jia"
+			property="hanShuiLingShouJia" />
+		<result column="bao_zhi_qi" property="baoZhiQi" />
+		<result column="pi_ci_guan_li_biao_zhi"
+			property="piCiGuanLiBiaoZhi" />
+		<result column="zu_jian_shang_pin_biao_zhi"
+			property="zuJianShangPinBiaoZhi" />
+		<result column="zu_zhuang_biao_zhi" property="zuZhuangBiaoZhi" />
+		<result column="shou_tuo_shang_pin_biao_zhi"
+			property="shouTuoShangPinBiaoZhi" />
+		<result column="bei_zhu" property="beiZhu" />
+		<result column="zi_ding_xiang_mu_0" property="ziDingXiangMu0" />
+		<result column="zi_ding_xiang_mu_1" property="ziDingXiangMu1" />
+		<result column="zi_ding_xiang_mu_2" property="ziDingXiangMu2" />
+		<result column="zi_ding_xiang_mu_3" property="ziDingXiangMu3" />
+		<result column="zi_ding_xiang_mu_4" property="ziDingXiangMu4" />
+		<result column="zi_ding_xiang_mu_5" property="ziDingXiangMu5" />
+		<result column="ku_cun_liang" property="kuCunLiang" />
+		<result column="bu_han_shui_zui_di_xiao_shou_jia"
+			property="buHanShuiZuiDiXiaoShouJia" />
+		<result column="bu_han_xiao_shou_jia_bu_da_zhe_jine"
+			property="buHanXiaoShouJiaBuDaZheJine" />
+		<result column="cal_unit" property="calUnit" />
+		<result column="fa_piao_pin_ming" property="faPiaoPinMing" />
+		<result column="tiao_ma" property="tiaoMa" />
+		<result column="pi_zhun_wen_hao" property="piZhunWenHao" />
+		<result column="zhu_ce_shang_biao" property="zhuCeShangBiao" />
+		<result column="package_unit" property="packageUnit" />
+		<result column="bao_zhuang_gui_ge" property="baoZhuangGuiGe" />
+		<result column="ti_ji_dan_wei" property="tiJiDanWei" />
+		<result column="zhong_liang_dan_wei"
+			property="zhongLiangDanWei" />
+		<result column="pi_ci_xiao_shou_jia_jia_lv"
+			property="piCiXiaoShouJiaJiaLv" />
+		<result column="shang_pin_ming" property="shangPinMing" />
+		<result column="zui_gao_cai_gou_jia" property="zuiGaoCaiGouJia" />
+		<result column="zui_di_cai_gou_jia" property="zuiDiCaiGouJia" />
+		<result column="ABC_deng_ji" property="ABCDengJi" />
+		<result column="wang_shang_xiao_shou_biao_zhi"
+			property="wangShangXiaoShouBiaoZhi" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		open_date as openDate, product_code AS productCode,
+		product_name AS
+		productName, product_type AS productType,
+		fengcun_biaozhi AS
+		fengcunBiaozhi, product_category AS productCategory,
+		product_properties AS productProperties, min_cal_unit AS minCalUnit,
+		rest_cal_unit AS restCalUnit, product_unit AS productUnit, chan_di AS
+		chanDi, gong_ying_shang AS gongYingShang, shang_pin_huo_hao AS
+		shangPinHuoHao, zui_xiao_ku_cun_liang AS zuiXiaoKuCunLiang,
+		zui_da_ku_cun_liang AS zuiDaKuCunLiang, ti_qian_shi_jian AS
+		tiQianShiJian, han_shui_cai_gou_jia AS hanShuiCaiGouJia,
+		bu_han_shui_cai_gou_jia AS buHanShuiCaiGouJia, han_shui_xiao_shou_jia
+		AS hanShuiXiaoShouJia, bu_han_shui_xiaos_shou_jia AS
+		buHanShuiXiaosShouJia, bu_han_shui_ji_hua_jia AS buHanShuiJiHuaJia,
+		han_shui_ling_shou_jia AS hanShuiLingShouJia, bao_zhi_qi AS baoZhiQi,
+		pi_ci_guan_li_biao_zhi AS piCiGuanLiBiaoZhi,
+		zu_jian_shang_pin_biao_zhi AS zuJianShangPinBiaoZhi,
+		zu_zhuang_biao_zhi AS zuZhuangBiaoZhi, shou_tuo_shang_pin_biao_zhi AS
+		shouTuoShangPinBiaoZhi, bei_zhu AS beiZhu, zi_ding_xiang_mu_0 AS
+		ziDingXiangMu0, zi_ding_xiang_mu_1 AS ziDingXiangMu1,
+		zi_ding_xiang_mu_2 AS ziDingXiangMu2, zi_ding_xiang_mu_3 AS
+		ziDingXiangMu3, zi_ding_xiang_mu_4 AS ziDingXiangMu4,
+		zi_ding_xiang_mu_5 AS ziDingXiangMu5, ku_cun_liang AS kuCunLiang,
+		bu_han_shui_zui_di_xiao_shou_jia AS buHanShuiZuiDiXiaoShouJia,
+		bu_han_xiao_shou_jia_bu_da_zhe_jine AS buHanXiaoShouJiaBuDaZheJine,
+		cal_unit AS calUnit, fa_piao_pin_ming AS faPiaoPinMing, tiao_ma AS
+		tiaoMa, pi_zhun_wen_hao AS piZhunWenHao, zhu_ce_shang_biao AS
+		zhuCeShangBiao, package_unit AS packageUnit, bao_zhuang_gui_ge AS
+		baoZhuangGuiGe, ti_ji_dan_wei AS tiJiDanWei, zhong_liang_dan_wei AS
+		zhongLiangDanWei, pi_ci_xiao_shou_jia_jia_lv AS piCiXiaoShouJiaJiaLv,
+		shang_pin_ming AS shangPinMing, zui_gao_cai_gou_jia AS
+		zuiGaoCaiGouJia, zui_di_cai_gou_jia AS zuiDiCaiGouJia, ABC_deng_ji AS
+		ABCDengJi, wang_shang_xiao_shou_biao_zhi AS wangShangXiaoShouBiaoZhi,
+		create_time AS createTime, update_time AS updateTime
+	</sql>
+
+	<select id="inventoryPage"
+		resultType="com.hongte.alms.base.vo.cams.RestProductVo"
+		parameterType="com.hongte.alms.base.vo.cams.RestProductVo">
+		SELECT a.*, b.incomeCount,b.incomeJine,b.outcomeCount,b.outcomeJine,
+		b.restKuCunLiang
+		FROM
+		(
+		SELECT pd.company_name as companyName,
+		pd.product_code AS productCode,
+		pd.product_name AS productName,
+		pd.product_type AS productType,
+		pd.package_unit AS unit,
+		pd.ku_cun_liang AS kuCunLiang,
+		pd.qi_chu_jine AS qiChuJine
+		FROM
+		tb_product_dat pd
+
+
+		WHERE 1=1
+
+		<if test="companyName != null and companyName != ''">
+			AND pd.company_name like '${companyName}%'
+		</if>
+
+		<if test="productCode != null and productCode != ''">
+			AND pd.product_code = #{productCode}
+		</if>
+		<if test="productName != null and productName != ''">
+			AND pd.product_name like '${productName}%'
+		</if>
+		) a
+		LEFT JOIN
+		(
+		SELECT IFNULL(sell.open_date,buy.open_date),
+		pd.company_name as companyName,
+		pd.product_code AS productCode,
+		pd.product_name AS productName,
+		pd.product_type AS
+		productType,
+		pd.package_unit AS unit,
+		pd.ku_cun_liang AS kuCunLiang,
+		pd.qi_chu_jine
+		AS qiChuJine,
+		buy.number AS incomeCount,
+		ifnull(buy.original_amount,0)
+		AS incomeJine,
+		sell.number AS outcomeCount,
+		ifnull(sell.original_amount,0) AS outcomeJine,
+		((IFNULL(pd.ku_cun_liang,0)+0)+(IFNULL(buy.number,0)+0)-(IFNULL(sell.number,0)+0))
+		restKuCunLiang
+		FROM tb_product_dat pd
+		LEFT JOIN tb_sell_dat sell ON
+		pd.product_code=sell.produce_code AND
+		pd.company_name
+		=sell.company_code
+		LEFT JOIN tb_buy_dat buy ON
+		buy.produce_code=pd.product_code AND
+		pd.company_name =buy.company_code
+		WHERE 1=1
+
+		<if test="companyName != null and companyName != ''">
+			AND pd.company_name like '${companyName}%'
+		</if>
+
+		<if test="productCode != null and productCode != ''">
+			AND pd.product_code = #{productCode}
+		</if>
+		<if test="productName != null and productName != ''">
+			AND pd.product_name like '${productName}%'
+		</if>
+
+		AND
+		((DATE_FORMAT(sell.open_date,'%Y-%m') &gt;=
+		date_format(#{beginDate},'%Y-%m') AND
+		DATE_FORMAT(sell.open_date,'%Y-%m') &lt;=
+		date_format(#{endDate},'%Y-%m')) OR
+		(DATE_FORMAT(buy.open_date,'%Y-%m') &gt;=
+		date_format(#{beginDate},'%Y-%m') AND
+		DATE_FORMAT(buy.open_date,'%Y-%m') &lt;=
+		date_format(#{endDate},'%Y-%m')))
+		) b ON a.productCode=b.productCode
+
+
+	</select>
+
+
+
+
+
+</mapper>

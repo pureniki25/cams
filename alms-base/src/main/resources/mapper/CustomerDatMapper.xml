@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.CustomerDatMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CustomerDat">
+        <id column="customer_code" property="customerCode" />
+        <result column="type" property="type" />
+          <result column="open_date" property="openDate" />
+        <result column="company_code" property="companyCode" />
+        <result column="customer_name" property="customerName" />
+        <result column="customer_type" property="customerType" />
+        <result column="customer_category" property="customerCategory" />
+        <result column="fu_kuan_tiao_jian" property="fuKuanTiaoJian" />
+        <result column="xin_yong_e_du" property="xinYongEDu" />
+        <result column="zhe_kou_lv" property="zheKouLv" />
+        <result column="yuan_gong" property="yuanGong" />
+        <result column="di_qu" property="diQu" />
+        <result column="lian_xi_ren" property="lianXiRen" />
+        <result column="zhi_wu" property="zhiWu" />
+        <result column="dian_hua1" property="dianHua1" />
+        <result column="dian_hua2" property="dianHua2" />
+        <result column="chuan_zhen" property="chuanZhen" />
+        <result column="dian_zi_you_jian" property="dianZiYouJian" />
+        <result column="shui_hao" property="shuiHao" />
+        <result column="di_zhi" property="diZhi" />
+        <result column="you_bian" property="youBian" />
+        <result column="bei_zhu" property="beiZhu" />
+        <result column="yingshou_category" property="yingshouCategory" />
+        <result column="yingfu_category" property="yingfuCategory" />
+        <result column="yingshou_zhekou_category" property="yingshouZhekouCategory" />
+        <result column="yingfu_zhekou_category" property="yingfuZhekouCategory" />
+        <result column="kai_hu_ri_qi" property="kaiHuRiQi" />
+        <result column="guan_bi_ri_qi" property="guanBiRiQi" />
+        <result column="ting_yong_biao_zhi" property="tingYongBiaoZhi" />
+        <result column="tiexi_zhekou_biao_zhi" property="tiexiZhekouBiaoZhi" />
+        <result column="jishi_tongxun_hao" property="jishiTongxunHao" />
+        <result column="xie_tong_she_zhi" property="xieTongSheZhi" />
+        <result column="jia_ge_deng_ji" property="jiaGeDengJi" />
+        <result column="shou_ji" property="shouJi" />
+        <result column="ying_ye_zhi_zhao" property="yingYeZhiZhao" />
+        <result column="yao_ye_xu_ke" property="yaoYeXuKe" />
+        <result column="yao_ye_he_ge" property="yaoYeHeGe" />
+        <result column="qi_ye_wang_zhan" property="qiYeWangZhan" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        customer_code AS customerCode, type, company_code AS companyCode, customer_name AS customerName, customer_type AS customerType, customer_category AS customerCategory, fu_kuan_tiao_jian AS fuKuanTiaoJian, xin_yong_e_du AS xinYongEDu, zhe_kou_lv AS zheKouLv, yuan_gong AS yuanGong, di_qu AS diQu, lian_xi_ren AS lianXiRen, zhi_wu AS zhiWu, dian_hua1 AS dianHua1, dian_hua2 AS dianHua2, chuan_zhen AS chuanZhen, dian_zi_you_jian AS dianZiYouJian, shui_hao AS shuiHao, di_zhi AS diZhi, you_bian AS youBian, bei_zhu AS beiZhu, yingshou_category AS yingshouCategory, yingfu_category AS yingfuCategory, yingshou_zhekou_category AS yingshouZhekouCategory, yingfu_zhekou_category AS yingfuZhekouCategory, kai_hu_ri_qi AS kaiHuRiQi, guan_bi_ri_qi AS guanBiRiQi, ting_yong_biao_zhi AS tingYongBiaoZhi, tiexi_zhekou_biao_zhi AS tiexiZhekouBiaoZhi, jishi_tongxun_hao AS jishiTongxunHao, xie_tong_she_zhi AS xieTongSheZhi, jia_ge_deng_ji AS jiaGeDengJi, shou_ji AS shouJi, ying_ye_zhi_zhao AS yingYeZhiZhao, yao_ye_xu_ke AS yaoYeXuKe, yao_ye_he_ge AS yaoYeHeGe, qi_ye_wang_zhan AS qiYeWangZhan, create_time AS createTime, update_time AS updateTime
+    </sql>
+	<select id="queryKuCunYe" resultType="com.hongte.alms.base.vo.module.AdminVO"> 
+		SELECT 
+		  t1.`user_id` userId,
+		  t1.`user_name` username,
+		  t2.`business_id` businessId 
+		FROM
+		  `tb_sys_user` t1 
+		  LEFT JOIN `tb_sys_user_permission` t2 
+		    ON t1.`user_id` = t2.`user_id` 
+		<where>
+			<if test="username != null">
+				t1.`user_name` LIKE CONCAT('%', #{username,jdbcType=VARCHAR}, '%')
+			</if>
+		</where>
+	</select>
+
+</mapper>

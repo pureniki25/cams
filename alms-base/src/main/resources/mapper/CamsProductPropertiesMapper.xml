@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.CamsProductPropertiesMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CamsProductProperties">
+        <id column="product_properties_id" property="productPropertiesId" />
+        <result column="product_properties_name" property="productPropertiesName" />
+        <result column="tax_name" property="taxName" />
+        <result column="category_name" property="categoryName" />
+        <result column="in_subject" property="inSubject" />
+        <result column="cost_subject" property="costSubject" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        product_properties_id AS productPropertiesId, product_properties_name AS productPropertiesName, tax_name AS taxName, category_name AS categoryName, in_subject AS inSubject, cost_subject AS costSubject, create_time AS createTime
+    </sql>
+
+</mapper>

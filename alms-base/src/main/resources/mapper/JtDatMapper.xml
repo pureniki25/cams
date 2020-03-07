@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.JtDatMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.JtDat">
+        <id column="id" property="id" />
+        <result column="uuid" property="uuid" />
+        <result column="company_name" property="companyName" />
+        <result column="customer_code" property="customerCode" />
+        <result column="invoice_number" property="invoiceNumber" />
+        <result column="buy_type" property="buyType" />
+        <result column="jt_type" property="jtType" />
+        <result column="deduction_type" property="deductionType" />
+        <result column="qi_jian" property="qiJian" />
+        <result column="ping_zheng_ri_qi" property="pingZhengRiQi" />
+        <result column="ping_zheng_zi" property="pingZhengZi" />
+        <result column="ping_zheng_hao" property="pingZhengHao" />
+        <result column="zhai_yao" property="zhaiYao" />
+        <result column="ke_mu_dai_ma" property="keMuDaiMa" />
+        <result column="huo_bi_dai_ma" property="huoBiDaiMa" />
+        <result column="hui_lv" property="huiLv" />
+        <result column="local_amount" property="localAmount" />
+        <result column="borrow_amount" property="borrowAmount" />
+        <result column="alms_amount" property="almsAmount" />
+        <result column="shu_liang" property="shuLiang" />
+        <result column="dan_jia" property="danJia" />
+        <result column="zhi_dan_ren" property="zhiDanRen" />
+        <result column="shen_he_ren" property="shenHeRen" />
+        <result column="guo_zhang_ren" property="guoZhangRen" />
+        <result column="fu_dan_ju_shu" property="fuDanJuShu" />
+        <result column="shi_fou_yi_guo_zhang" property="shiFouYiGuoZhang" />
+        <result column="mo_ban" property="moBan" />
+        <result column="hang_hao" property="hangHao" />
+        <result column="dan_wei" property="danWei" />
+        <result column="bu_men" property="buMen" />
+        <result column="yuan_gong" property="yuanGong" />
+        <result column="tong_ji" property="tongJi" />
+        <result column="xiang_mu" property="xiangMu" />
+        <result column="fu_kuan_fang_fa" property="fuKuanFangFa" />
+        <result column="piao_ju_hao" property="piaoJuHao" />
+        <result column="yuan_bi_fu_kuan_jin_e" property="yuanBiFuKuanJinE" />
+        <result column="ping_zheng_lai_yuan" property="pingZhengLaiYuan" />
+        <result column="lai_yuan_ping_zheng" property="laiYuanPingZheng" />
+        <result column="dai_da_yin" property="daiDaYin" />
+        <result column="zuo_fei_biao_zhi" property="zuoFeiBiaoZhi" />
+        <result column="cuo_wu_biao_zhi" property="cuoWuBiaoZhi" />
+        <result column="ping_zheng_ce_hao" property="pingZhengCeHao" />
+        <result column="chu_na_ren" property="chuNaRen" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, uuid, company_name AS companyName, customer_code AS customerCode, invoice_number AS invoiceNumber, buy_type AS buyType, jt_type AS jtType, deduction_type AS deductionType, qi_jian AS qiJian, ping_zheng_ri_qi AS pingZhengRiQi, ping_zheng_zi AS pingZhengZi, ping_zheng_hao AS pingZhengHao, zhai_yao AS zhaiYao, ke_mu_dai_ma AS keMuDaiMa, huo_bi_dai_ma AS huoBiDaiMa, hui_lv AS huiLv, local_amount AS localAmount, borrow_amount AS borrowAmount, alms_amount AS almsAmount, shu_liang AS shuLiang, dan_jia AS danJia, zhi_dan_ren AS zhiDanRen, shen_he_ren AS shenHeRen, guo_zhang_ren AS guoZhangRen, fu_dan_ju_shu AS fuDanJuShu, shi_fou_yi_guo_zhang AS shiFouYiGuoZhang, mo_ban AS moBan, hang_hao AS hangHao, dan_wei AS danWei, bu_men AS buMen, yuan_gong AS yuanGong, tong_ji AS tongJi, xiang_mu AS xiangMu, fu_kuan_fang_fa AS fuKuanFangFa, piao_ju_hao AS piaoJuHao, yuan_bi_fu_kuan_jin_e AS yuanBiFuKuanJinE, ping_zheng_lai_yuan AS pingZhengLaiYuan, lai_yuan_ping_zheng AS laiYuanPingZheng, dai_da_yin AS daiDaYin, zuo_fei_biao_zhi AS zuoFeiBiaoZhi, cuo_wu_biao_zhi AS cuoWuBiaoZhi, ping_zheng_ce_hao AS pingZhengCeHao, chu_na_ren AS chuNaRen, create_time AS createTime
+    </sql>
+
+</mapper>

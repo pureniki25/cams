@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.CamsTaxMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CamsTax">
+        <id column="tax_id" property="taxId" />
+        <result column="tax_name" property="taxName" />
+        <result column="buy_tax" property="buyTax" />
+        <result column="sell_tax" property="sellTax" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        tax_id AS taxId, tax_name AS taxName, buy_tax AS buyTax, sell_tax AS sellTax, create_time AS createTime
+    </sql>
+
+</mapper>

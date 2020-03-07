@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.hongte.alms.base.mapper.SubjectRestDatMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.hongte.alms.base.entity.SubjectRestDat">
+		<id column="id" property="id" />
+		<result column="company_name" property="companyName" />
+		<result column="subject" property="subject" />
+		<result column="subject_name" property="subjectName" />
+		<result column="borrow_amount" property="borrowAmount" />
+		<result column="alms_amount" property="almsAmount" />
+		<result column="open_date" property="openDate" />
+		<result column="create_time" property="createTime" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, company_name AS companyName, subject, subject_name AS
+		subjectName,
+		borrow_amount AS borrowAmount, alms_amount AS almsAmount,
+		open_date AS
+		openDate, create_time AS createTime
+	</sql>
+	<delete id="deleteSubjectRest">
+		delete from tb_subject_rest_dat
+	</delete>
+	<insert id="syncPingZhengData">
+		insert into tb_subject_rest_dat
+		select * from (
+
+		SELECT
+		null,fee.company_name,fee.ke_mu_dai_ma as
+		subject,
+
+		(
+		SELECT
+		sub.subject_name
+		FROM tb_cams_subject sub
+		WHERE
+		sub.id=fee.ke_mu_dai_ma)
+		as subject_name,
+
+		(
+		SELECT f.first_amount
+		FROM
+		tb_subject_first_dat f
+		WHERE
+		f.subject=fee.ke_mu_dai_ma and
+		f.company_name=fee.company_name) as
+		first_amount,
+		fee.borrow_amount ,
+		fee.alms_amount ,
+		fee.ping_zheng_ri_qi
+		as open_Date,
+		sysdate() as
+		create_time
+		FROM
+
+		tb_fee_dat fee union all
+
+
+
+		SELECT null,
+		bank.company_name,bank.ke_mu_dai_ma as subject,
+
+		(
+		SELECT
+		sub.subject_name
+		FROM tb_cams_subject sub
+		WHERE
+		sub.id=bank.ke_mu_dai_ma) as subject_name,
+		(
+		SELECT f.first_amount
+		FROM
+		tb_subject_first_dat f
+		WHERE f.subject=bank.ke_mu_dai_ma and
+		f.company_name=bank.company_name) as
+		first_amount,
+		bank.borrow_amount ,
+		bank.alms_amount ,
+		bank.ping_zheng_ri_qi as open_date,
+		sysdate() as
+		create_time
+		FROM
+
+		tb_bank_income_dat bank
+
+		union all
+
+
+
+		SELECT
+		null,jt.company_name,jt.ke_mu_dai_ma as subject,
+
+		(
+		SELECT
+		sub.subject_name
+		FROM tb_cams_subject sub
+		WHERE sub.id=jt.ke_mu_dai_ma)
+		as subject_name,
+		(
+		SELECT f.first_amount
+		FROM tb_subject_first_dat f
+		WHERE f.subject=jt.ke_mu_dai_ma and f.company_name=jt.company_name) as
+		first_amount,
+		jt.borrow_amount , jt.alms_amount ,
+		jt.ping_zheng_ri_qi as
+		open_date,
+		sysdate() as create_time
+		FROM
+
+		tb_jt_dat jt
+
+
+		) a
+
+	</insert>
+
+
+
+	<select id="selectSubjectRestList"
+		resultType="com.hongte.alms.base.vo.cams.SubjectRestVo"
+		parameterType="com.hongte.alms.base.vo.cams.SubjectRestVo">
+
+		select rest.company_name,rest.subject,
+		rest.subject_name, ifnull(rest.first_amount,0) as first_amount,
+		sum(rest.borrow_amount) as borrow_Amount,
+		SUM(rest.alms_amount) as alms_Amount,
+		(sum(rest.alms_amount)+ifnull(rest.first_amount,0)-sum(rest.borrow_amount))
+		as rest_amount,
+		rest.open_date from (
+
+		select * from tb_subject_rest_dat t 
+		where 1=1
+			<if test="companyName != null and companyName != ''">
+			AND t.company_name =  #{companyName}
+		</if>
+		
+		<if test="beginDate != null ">
+			AND 
+		DATE_FORMAT(t.open_date,'%Y-%m-%d') &gt;=
+		date_format(#{beginDate},'%Y-%m-%d')
+		</if>
+		
+		<if test="endDate != null">
+			AND 
+			DATE_FORMAT(t.open_date,'%Y-%m-%d') &lt;=
+		date_format(#{endDate},'%Y-%m-%d')
+		</if>
+		
+
+	
+
+
+		) rest group by rest.subject
+
+
+
+	</select>
+
+</mapper>

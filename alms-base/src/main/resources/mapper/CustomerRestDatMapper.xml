@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongte.alms.base.mapper.CustomerRestDatMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.CustomerRestDat">
+        <id column="id" property="id" />
+        <result column="company_name" property="companyName" />
+        <result column="subject" property="subject" />
+        <result column="subject_name" property="subjectName" />
+        <result column="customer_code" property="customerCode" />
+        <result column="customer_name" property="customerName" />
+        <result column="first_amount" property="firstAmount" />
+        <result column="borrow_amount" property="borrowAmount" />
+        <result column="alms_amount" property="almsAmount" />
+        <result column="open_date" property="openDate" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, company_name AS companyName, subject, subject_name AS subjectName, customer_code AS customerCode, customer_name AS customerName, first_amount AS firstAmount, borrow_amount AS borrowAmount, alms_amount AS almsAmount, open_date AS openDate, create_time AS createTime
+    </sql>
+	<delete id="deleteCustomerRest">
+		delete from tb_customer_rest_dat
+	</delete>
+	
+	<insert id="syncCustomerRestData">
+        INSERT INTO tb_customer_rest_dat
+	  SELECT *
+		FROM (
+		SELECT null,fee.company_name,fee.customer_code, 
+		
+		(
+		SELECT customer_name
+		FROM tb_customer_dat
+		WHERE customer_code=fee.customer_code AND company_code=fee.company_name) AS customer_name, IFNULL((
+		SELECT first_amount
+		FROM tb_customer_first_dat
+		WHERE company_name=fee.company_name AND customer_code=fee.customer_code),0) AS first_amount,
+		fee.borrow_amount,fee.alms_amount,fee.ping_zheng_ri_qi AS open_date, SYSDATE() AS create_time
+		FROM tb_fee_dat fee
+		WHERE fee.customer_code IS NOT NULL  and fee.ke_mu_dai_ma in ('1131','2121') UNION
+		SELECT null, bank.company_name, bank.customer_code,
+		(
+		SELECT customer_name
+		FROM tb_customer_dat
+		WHERE customer_code=bank.customer_code AND company_code=bank.company_name) AS customer_name, IFNULL((
+		SELECT first_amount
+		FROM tb_customer_first_dat
+		WHERE company_name=bank.company_name AND customer_code=bank.customer_code),0) AS first_amount, 
+		bank.borrow_amount,bank.alms_amount,bank.ping_zheng_ri_qi AS open_date, SYSDATE() AS create_time
+		FROM tb_bank_income_dat bank
+		WHERE bank.customer_code IS NOT NULL and bank.ke_mu_dai_ma in ('1131','2121')) a
+		
+
+
+	</insert>
+	
+	
+	
+	<select id="selectCustomerRestList"
+		resultType="com.hongte.alms.base.vo.cams.CustomerRestVo"
+		parameterType="com.hongte.alms.base.vo.cams.CustomerRestVo">
+
+	select rest.company_name,rest.customer_code,
+		rest.customer_name, ifnull(rest.first_amount,0) as first_amount,
+		sum(rest.borrow_amount) as borrow_Amount,
+		SUM(rest.alms_amount) as alms_Amount,
+		(sum(rest.alms_amount)+ifnull(rest.first_amount,0)-sum(rest.borrow_amount))
+		as rest_amount,
+		rest.open_date from (
+
+			select * from tb_customer_rest_dat t
+		where 1=1
+			<if test="companyName != null and companyName != ''">
+			AND t.company_name =  #{companyName}
+		</if>
+		
+		<if test="beginDate != null ">
+			AND 
+		DATE_FORMAT(t.open_date,'%Y-%m-%d') &gt;=
+		date_format(#{beginDate},'%Y-%m-%d')
+		</if>
+		
+		<if test="endDate != null">
+			AND 
+			DATE_FORMAT(t.open_date,'%Y-%m-%d') &lt;=
+		date_format(#{endDate},'%Y-%m-%d')
+		</if>
+		
+
+	
+
+
+		) rest group by rest.customer_code
+
+
+
+	</select>
+	
+</mapper>
