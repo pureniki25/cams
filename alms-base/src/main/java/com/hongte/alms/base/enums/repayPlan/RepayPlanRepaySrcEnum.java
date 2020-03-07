@@ -51,7 +51,11 @@ public enum RepayPlanRepaySrcEnum implements IEnum {
     /**
      * 60协议代扣
      */
-    BY_AGGREMENT(60,"协议代扣",5)
+    BY_AGGREMENT(60,"协议代扣",5),
+    /**
+     * 70减免
+     */
+    BY_APPLY_DREATE(70,"减免",8)
     ;
 
     private int value;

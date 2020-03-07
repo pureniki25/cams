@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.ToString;
 
 /**
  * <p>
@@ -18,7 +17,6 @@ import lombok.ToString;
  * @since 2018-03-01
  */
 @Data
-@ToString
 public class BusinessCar implements Serializable{
 
 	private static final long serialVersionUID = 2248300875789582950L;
@@ -86,7 +84,7 @@ public class BusinessCar implements Serializable{
 	 * 拖车时间
 	 */
 	@ApiModelProperty(required = true, value = "拖车时间")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date dragDate;
 	/**
 	 * 车辆状态

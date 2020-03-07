@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
-import lombok.ToString;
 
 @Data
-@ToString
 public class ActualPaymentLogDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;

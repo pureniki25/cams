@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hongte.alms.base.enums.PaymentPlatformEnums;
+import com.hongte.alms.base.enums.RegisterEnum;
 
 /**
  * @author zengkun
@@ -45,37 +46,42 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
     private String operatorName; //业务获取 对应tb_basic_business表中业务主办人姓名
 
 //    private String customerId; //用户ID 对应 tb_basic_business 表中 客户ID
-    @Excel(name = "用户姓名", orderNum = "6",   isImportField = "true_st")
+    @Excel(name = "客户名称", orderNum = "6",   isImportField = "true_st")
     private String customerName; //用户姓名  对应 tb_basic_business 表中 客户名称
-
+   // @Excel(name = "放款时间", orderNum = "7",   isImportField = "true_st")
+    private Date outputTime;
+    private Date lastDueTime;//到期日期，每个还款计划的最后一期到期时间
+    
     private Integer businessTypeId; //业务类型Id  对应 tb_basic_business_type 表中 业务类型Id
-    @Excel(name = "业务类型", orderNum = "7",   isImportField = "true_st")
+    @Excel(name = "业务类型", orderNum = "8",   isImportField = "true_st")
     private String businessTypeName; //业务类型名称  对应 tb_basic_business_type 表中 业务类型名称
 
-    @Excel(name = "借款金额", orderNum = "8",   isImportField = "true_st")
+    @Excel(name = "借款金额", orderNum = "9",   isImportField = "true_st")
     private double borrowMoney;    //借款金额  对应tb_basic_business表中 borrow_money借款金额(元)字段
 
-    @Excel(name = "应还金额", orderNum = "9",   isImportField = "true_st")
+    @Excel(name = "应还金额", orderNum = "10",   isImportField = "true_st")
     private double totalBorrowAmount;    //本期应还款金额  对应tb_repayment_biz_plan_list表中 total_borrow_amount 总计划应还金额字段
 
-    @Excel(name = "逾期天数", orderNum = "10",   isImportField = "true_st")
+    @Excel(name = "逾期天数", orderNum = "11",   isImportField = "true_st")
     private Integer delayDays; //逾期天数  对应 当前日期减去应还款日期
+    
+    private String registerTips;//贷后管理页面显示的还款登记提示
 
-
-
+   
+   
     //@DateTimeFormat(pattern="yyyy-MM-dd")
-    @Excel(name = "应还日期", orderNum = "11", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
+    @Excel(name = "应还日期", orderNum = "12", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
     private Date dueDate;   //应还日期  对应 tb_repayment_biz_plan_list 表中 应还日期
 
     //@DateTimeFormat(pattern="yyyy-MM-dd")
-    @Excel(name = "实还日期", orderNum = "12", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
+    @Excel(name = "实还日期", orderNum = "13", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
     private Date repaymentDate;   //实还日期
 
-    @Excel(name = "清算一", orderNum = "13",  isImportField = "true_st")
+    @Excel(name = "清算一", orderNum = "14",  isImportField = "true_st")
     private String phoneStaffName;          //电催人员名字  (清算一)
     private String phoneStaffId;           //电催人员ID    (清算一)
 
-    @Excel(name = "清算二", orderNum = "14",   isImportField = "true_st")
+    @Excel(name = "清算二", orderNum = "15",   isImportField = "true_st")
     private String visitStaffName;          //上门催收人员名字   (清算二)
     private String visitStaffId;           //上门催收人员ID  (清算二)
 
@@ -83,29 +89,68 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
 
 
 //    private Integer status; //还款状态
-    @Excel(name = "还款状态", orderNum = "15",   isImportField = "true_st")
+    @Excel(name = "还款状态", orderNum = "16",   isImportField = "true_st")
     private String statusName; //还款状态 名称
     
-    @Excel(name = "部分还款子状态", orderNum = "15",   isImportField = "true_st")
+    @Excel(name = "部分还款子状态", orderNum = "17",   isImportField = "true_st")
     private String repayStatus; //还款状态 名称
 
-    @Excel(name = "业务状态", orderNum = "16",   isImportField = "true_st")
+    @Excel(name = "业务状态", orderNum = "18",   isImportField = "true_st")
     private String afterColStatusName;//贷后状态 名称
     private Integer  colStatus;  //贷后状态 数据库值
 
     private Integer borrowLimit ;//借款期限,用于判断是否最后一期
     private Integer repaymentTypeId ;//还款方式
-    @Excel(name = "业务类别", orderNum = "17",   isImportField = "true_st")
+    @Excel(name = "业务类别", orderNum = "19",   isImportField = "true_st")
     private String className; // 分类名称
     
-    @Excel(name = "期数状态", orderNum = "18",   isImportField = "true_st")
+    @Excel(name = "期数状态", orderNum = "20",   isImportField = "true_st")
     private String peroidStatus ;//期数状态,首期/本金期/末期
     
-    @Excel(name = "平台标志位", orderNum = "19",   isImportField = "true_st")
+    @Excel(name = "平台标志位", orderNum = "21",   isImportField = "true_st")
     @TableField(exist = false)
     private String plateTypeText;//1.团贷网;2.你我金融;3.粤财;4.线下出款
+    @Excel(name = "登记状态", orderNum = "22",   isImportField = "true_st")
+    private String registerStatus;
+    private Date registerTime;
     
-    /**
+    
+    
+
+    
+    
+    
+    public String getRegisterTips() {
+		return registerTips;
+	}
+
+
+	public void setRegisterTips(String registerTips) {
+		this.registerTips = registerTips;
+	}
+
+
+	public Date getLastDueTime() {
+		return lastDueTime;
+	}
+
+
+	public void setLastDueTime(Date lastDueTime) {
+		this.lastDueTime = lastDueTime;
+	}
+
+
+	public Date getOutputTime() {
+		return outputTime;
+	}
+
+
+	public void setOutputTime(Date outputTime) {
+		this.outputTime = outputTime;
+	}
+
+
+	/**
      * 平台标志位：1.团贷网;2.你我金融;3.粤财;4.线下出款
      */
     private Integer plateType;
@@ -120,7 +165,48 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
      */
     private String repaymentType;
     
-    public String getPlateTypeText() {
+    /**
+     * 业务编号
+     */
+    private String businessIdM;
+    
+    
+    public String getRegisterStatus() {
+    	if(registerStatus == null) {
+    		plateTypeText = "";
+    	}else if(registerStatus.equals(RegisterEnum.PART_REGISTER.getValue())){
+    		registerStatus =RegisterEnum.PART_REGISTER.getName();
+    	}else if(registerStatus.equals(RegisterEnum.ONLINE_REGISTER.getValue())){
+    		registerStatus =RegisterEnum.ONLINE_REGISTER.getName();
+    	}
+    	else if(registerStatus.equals(RegisterEnum.ALL_REGISTER.getValue())){
+    		registerStatus =RegisterEnum.ALL_REGISTER.getName();
+    	}else if(registerStatus.equals(RegisterEnum.NO_REGISTER.getValue())){
+    		registerStatus =RegisterEnum.NO_REGISTER.getName();
+    	}
+		return registerStatus;
+	}
+
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
+		
+	}
+
+
+	
+
+	public Date getRegisterTime() {
+		return registerTime;
+	}
+
+
+	public void setRegisterTime(Date registerTime) {
+		this.registerTime = registerTime;
+	}
+
+
+	public String getPlateTypeText() {
     	if(plateType == null) {
     		plateTypeText = "";
     	}else {
@@ -467,6 +553,16 @@ public class AfterLoanStandingBookVo implements java.io.Serializable  {
 
 	public void setRepaymentType(String repaymentType) {
 		this.repaymentType = repaymentType;
+	}
+
+
+	public String getBusinessIdM() {
+		return businessIdM;
+	}
+
+
+	public void setBusinessIdM(String businessIdM) {
+		this.businessIdM = businessIdM;
 	}
 	
 	

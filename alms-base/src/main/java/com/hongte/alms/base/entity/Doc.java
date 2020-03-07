@@ -101,6 +101,10 @@ public class Doc extends Model<Doc> {
 	@ApiModelProperty(required= true,value = "文件属性")
 	private String docAttr;
 
+	@TableField("extend_one")
+	@ApiModelProperty(required= true,value = "扩展字段")
+	private String extendOne;
+
 
 	public String getDocId() {
 		return docId;
@@ -211,22 +215,31 @@ public class Doc extends Model<Doc> {
 		this.docAttr = docAttr;
 	}
 
+	public String getExtendOne() {
+		return extendOne;
+	}
+
+	public void setExtendOne(String extendOne) {
+		this.extendOne = extendOne;
+	}
+
 	@Override
 	public String toString() {
 		return "Doc{" +
-			", docId=" + docId +
-			", businessId=" + businessId +
-			", docName=" + docName +
-			", docUrl=" + docUrl +
-			", originalName=" + originalName +
-			", fileSize=" + fileSize +
-			", fileType=" + fileType +
-			", docTypeId=" + docTypeId +
-			", createUser=" + createUser +
-			", createTime=" + createTime +
-			", updateUser=" + updateUser +
-			", updateTime=" + updateTime +
-			", docAttr=" + docAttr +
-			"}";
+				"docId='" + docId + '\'' +
+				", businessId='" + businessId + '\'' +
+				", docName='" + docName + '\'' +
+				", docUrl='" + docUrl + '\'' +
+				", originalName='" + originalName + '\'' +
+				", fileSize=" + fileSize +
+				", fileType='" + fileType + '\'' +
+				", docTypeId='" + docTypeId + '\'' +
+				", createUser='" + createUser + '\'' +
+				", createTime=" + createTime +
+				", updateUser='" + updateUser + '\'' +
+				", updateTime=" + updateTime +
+				", docAttr='" + docAttr + '\'' +
+				", extendOne='" + extendOne + '\'' +
+				'}';
 	}
 }

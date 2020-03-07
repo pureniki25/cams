@@ -3,7 +3,6 @@ package com.hongte.alms.base.service;
 import java.util.List;
 
 import com.hongte.alms.base.entity.DepartmentBank;
-import com.hongte.alms.base.vo.module.DepartmentBankVO;
 import com.hongte.alms.common.service.BaseService;
 
 /**
@@ -15,6 +14,5 @@ import com.hongte.alms.common.service.BaseService;
  * @since 2018-03-05
  */
 public interface DepartmentBankService extends BaseService<DepartmentBank> {
-	List<DepartmentBankVO> listDepartmentBank(String businessId) ;
 	List<DepartmentBank> listDepartmentBank() ;
 }

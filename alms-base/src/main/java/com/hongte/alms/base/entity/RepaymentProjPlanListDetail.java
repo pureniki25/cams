@@ -173,6 +173,13 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
+	
+	/**
+     * 0系统生成1线下出款生成2单标生成3多标拆标生成
+     */
+	@TableField("generate_type")
+	@ApiModelProperty(required= true,value = "0系统生成1线下出款生成2单标生成3多标拆标生成")
+	private Integer generateType;
 
 
 	@TableField(exist=false)
@@ -416,6 +423,14 @@ public class RepaymentProjPlanListDetail extends Model<RepaymentProjPlanListDeta
 	 */
 	public void setRepaySource(Integer repaySource) {
 		this.repaySource = repaySource;
+	}
+
+	public Integer getGenerateType() {
+		return generateType;
+	}
+
+	public void setGenerateType(Integer generateType) {
+		this.generateType = generateType;
 	}
 
 	/**

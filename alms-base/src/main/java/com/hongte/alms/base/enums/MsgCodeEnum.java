@@ -31,7 +31,9 @@ public enum MsgCodeEnum implements IEnum {
 	AFTER_BINDING_REPAY_REMIND("after_binding_repay_remind","还款提醒（已绑卡用户）单笔还款，还款日前7天/1天提醒"),
 	AFTER_BINDING_SETTLE_REMIND("after_binding_settle_remind","还款提醒（已绑卡用户），结清提醒，提前15天/1天提醒"),
 	ATER_BINDING_MUTIPLE_REPAY_REMIND("ater_binding_mutiple_repay_remind","还款提醒（已绑卡用户），多笔还款，还款日前7天/1天提醒"),
-	AFTER_OVERDUE_REMIND("after_overdue_remind","贷后逾期提醒（逾期的第1~3天）");
+	AFTER_OVERDUE_REMIND("after_overdue_remind","贷后逾期提醒（逾期的第1~3天）"),
+	REPAY_RECHARGE_EXCEPTION_MONITOR("repay_recharge_exception_monitor","合规化异常监控"),
+	;
 	
 	
 	

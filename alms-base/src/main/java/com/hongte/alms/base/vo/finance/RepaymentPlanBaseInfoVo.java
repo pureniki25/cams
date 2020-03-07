@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 import lombok.Data;
-import lombok.ToString;
 
 @Data
-@ToString
 public class RepaymentPlanBaseInfoVo implements Serializable {
 	
 	private static final long serialVersionUID = -975981272387174699L;

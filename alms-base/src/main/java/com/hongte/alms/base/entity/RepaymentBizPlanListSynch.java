@@ -1,14 +1,14 @@
 package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
+
 import java.math.BigDecimal;
 import java.util.Date;
-
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-
+import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author 刘正全
- * @since 2018-07-09
+ * @since 2018-11-06
  */
 @ApiModel
 @TableName("tb_repayment_biz_plan_list_synch")
@@ -88,7 +88,7 @@ public class RepaymentBizPlanListSynch extends Model<RepaymentBizPlanListSynch> 
      * 当前还款状态，目前只有三种，分别为"还款中"，"逾期"，"已还款"
      */
 	@TableField("current_status")
-	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为\"还款中\"，\"逾期\"，\"已还款\"")
+	@ApiModelProperty(required= true,value = "当前还款状态，目前只有三种，分别为还款中，逾期，已还款")
 	private String currentStatus;
     /**
      * 当前还款子状态
@@ -365,6 +365,60 @@ public class RepaymentBizPlanListSynch extends Model<RepaymentBizPlanListSynch> 
 	@TableField("fact_amount_ext")
 	@ApiModelProperty(required= true,value = "tb_repayment_biz_plan_list_detail实还金额(元)")
 	private BigDecimal factAmountExt;
+    /**
+     * tb_basic_company父级区域ID
+     */
+	@TableField("area_pid_ext")
+	@ApiModelProperty(required= true,value = "tb_basic_company父级区域ID")
+	private String areaPidExt;
+    /**
+     * tb_basic_company资产端区域ID
+     */
+	@TableField("area_id_ext")
+	@ApiModelProperty(required= true,value = "tb_basic_company资产端区域ID")
+	private String areaIdExt;
+    /**
+     * tb_tuandai_project_info真实姓名
+     */
+	@TableField("real_name_ext")
+	@ApiModelProperty(required= true,value = "tb_tuandai_project_info真实姓名")
+	private String realNameExt;
+    /**
+     * tb_money_pool_repayment转入时间
+     */
+	@TableField("trade_date_ext")
+	@ApiModelProperty(required= true,value = "tb_money_pool_repayment转入时间")
+	private Date tradeDateExt;
+    /**
+     * 是否支持代扣描述
+     */
+	@TableField("can_withhold_desc_ext")
+	@ApiModelProperty(required= true,value = "是否支持代扣描述")
+	private String canWithholdDescExt;
+    /**
+     * tb_basic_business_customer证件号
+     */
+	@TableField("identify_card_ext")
+	@ApiModelProperty(required= true,value = "tb_basic_business_customer证件号")
+	private String identifyCardExt;
+    /**
+     * 是否展期还款计划,0:否，1:是
+     */
+	@TableField("is_defer_ext")
+	@ApiModelProperty(required= true,value = "是否展期还款计划,0:否，1:是")
+	private Integer isDeferExt;
+    /**
+     * 还款登记状态 null或0：未登记 ，1：部分登记，2：线上部分足额登记, 3:全款足额登记
+     */
+	@TableField("register_status")
+	@ApiModelProperty(required= true,value = "还款登记状态 null或0：未登记 ，1：部分登记，2：线上部分足额登记, 3:全款足额登记")
+	private Integer registerStatus;
+    /**
+     * 最后一次登记还款时间
+     */
+	@TableField("register_time")
+	@ApiModelProperty(required= true,value = "最后一次登记还款时间")
+	private Date registerTime;
 
 
 	public String getPlanListId() {
@@ -823,6 +877,78 @@ public class RepaymentBizPlanListSynch extends Model<RepaymentBizPlanListSynch> 
 		this.factAmountExt = factAmountExt;
 	}
 
+	public String getAreaPidExt() {
+		return areaPidExt;
+	}
+
+	public void setAreaPidExt(String areaPidExt) {
+		this.areaPidExt = areaPidExt;
+	}
+
+	public String getAreaIdExt() {
+		return areaIdExt;
+	}
+
+	public void setAreaIdExt(String areaIdExt) {
+		this.areaIdExt = areaIdExt;
+	}
+
+	public String getRealNameExt() {
+		return realNameExt;
+	}
+
+	public void setRealNameExt(String realNameExt) {
+		this.realNameExt = realNameExt;
+	}
+
+	public Date getTradeDateExt() {
+		return tradeDateExt;
+	}
+
+	public void setTradeDateExt(Date tradeDateExt) {
+		this.tradeDateExt = tradeDateExt;
+	}
+
+	public String getCanWithholdDescExt() {
+		return canWithholdDescExt;
+	}
+
+	public void setCanWithholdDescExt(String canWithholdDescExt) {
+		this.canWithholdDescExt = canWithholdDescExt;
+	}
+
+	public String getIdentifyCardExt() {
+		return identifyCardExt;
+	}
+
+	public void setIdentifyCardExt(String identifyCardExt) {
+		this.identifyCardExt = identifyCardExt;
+	}
+
+	public Integer getIsDeferExt() {
+		return isDeferExt;
+	}
+
+	public void setIsDeferExt(Integer isDeferExt) {
+		this.isDeferExt = isDeferExt;
+	}
+
+	public Integer getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(Integer registerStatus) {
+		this.registerStatus = registerStatus;
+	}
+
+	public Date getRegisterTime() {
+		return registerTime;
+	}
+
+	public void setRegisterTime(Date registerTime) {
+		this.registerTime = registerTime;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.planListId;
@@ -888,6 +1014,15 @@ public class RepaymentBizPlanListSynch extends Model<RepaymentBizPlanListSynch> 
 			", phoneNumberExt=" + phoneNumberExt +
 			", businessCtypeExt=" + businessCtypeExt +
 			", factAmountExt=" + factAmountExt +
+			", areaPidExt=" + areaPidExt +
+			", areaIdExt=" + areaIdExt +
+			", realNameExt=" + realNameExt +
+			", tradeDateExt=" + tradeDateExt +
+			", canWithholdDescExt=" + canWithholdDescExt +
+			", identifyCardExt=" + identifyCardExt +
+			", isDeferExt=" + isDeferExt +
+			", registerStatus=" + registerStatus +
+			", registerTime=" + registerTime +
 			"}";
 	}
 }

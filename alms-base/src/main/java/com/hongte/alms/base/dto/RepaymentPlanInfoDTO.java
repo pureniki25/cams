@@ -6,10 +6,8 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
-import lombok.ToString;
 
 @Data
-@ToString
 public class RepaymentPlanInfoDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -102,4 +100,8 @@ public class RepaymentPlanInfoDTO implements Serializable {
 	 * 是否原业务 1、是；2、否
 	 */
 	private int isOrig;
+	/**
+	 * 减免金额
+	 */
+	private double derateMoney;
 }

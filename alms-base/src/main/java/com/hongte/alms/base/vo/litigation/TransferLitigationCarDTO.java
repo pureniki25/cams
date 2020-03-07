@@ -4,11 +4,9 @@ import java.io.Serializable;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
-import lombok.ToString;
 
 @ApiModel(value = "移交诉讼信息查询接口返回车辆信息模型", description = "移交诉讼信息查询接口返回车辆信息模型")
 @Data
-@ToString
 public class TransferLitigationCarDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	

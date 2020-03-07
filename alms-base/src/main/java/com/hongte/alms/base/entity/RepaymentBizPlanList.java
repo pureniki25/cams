@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
@@ -56,6 +58,20 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@ApiModelProperty(required= true,value = "当前还款计划期数，若期数为0，表示为展期还款计划第0期或者线下出款业务的第0期")
 	private Integer period;
+	   /**
+     * 当前登记状态，还款登记状态 null或0：未登记 ，1：部分登记，2：线上部分足额登记, 3:全款足额登记
+     */
+	@TableField("register_status")
+	@ApiModelProperty(required= true,value = "当前登记状态，还款登记状态 null或0：未登记 ，1：部分登记，2：线上部分足额登记, 3:全款足额登记")
+	private String registerStatus;
+	
+	   /**
+     * 最后一次登记还款时间
+     */
+	@TableField("register_time")
+	@ApiModelProperty(required= true,value = "最后一次登记还款时间")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date registerTime;
     /**
      * 总批次期数，唯一，对应信贷系统的还款计划编号
      */
@@ -245,6 +261,7 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
      */
 	@TableField("last_push_datetime")
 	@ApiModelProperty(required= true,value = "最后推送时间")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date lastPushDatetime;
     /**
      * 最后推送备注
@@ -258,8 +275,9 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	@TableField("is_running")
 	@ApiModelProperty(required= true,value = "是否正在被执行 0：否  1：是")
 	private Integer isRunning;
-     
-
+	
+	@TableField(exist=false)
+	private List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails;
 
 	public Integer getIsRunning() {
 		return isRunning;
@@ -305,6 +323,22 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 		return period;
 	}
 
+	public String getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
+	}
+
+	public Date getRegisterTime() {
+		return registerTime;
+	}
+
+	public void setRegisterTime(Date registerTime) {
+		this.registerTime = registerTime;
+	}
+
 	public void setPeriod(Integer period) {
 		this.period = period;
 	}
@@ -334,6 +368,9 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	}
 
 	public BigDecimal getOverdueAmount() {
+		if(null == overdueAmount) {
+			overdueAmount = new BigDecimal(0);
+		}
 		return overdueAmount;
 	}
 
@@ -564,6 +601,9 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 	 * @return the derateAmount
 	 */
 	public BigDecimal getDerateAmount() {
+		if(derateAmount == null) {
+			derateAmount = new BigDecimal(0);
+		}
 		return derateAmount;
 	}
 
@@ -610,6 +650,14 @@ public class RepaymentBizPlanList extends Model<RepaymentBizPlanList> {
 
 	public void setLastPushRemark(String lastPushRemark) {
 		this.lastPushRemark = lastPushRemark;
+	}
+
+	public List<RepaymentBizPlanListDetail> getRepaymentBizPlanListDetails() {
+		return repaymentBizPlanListDetails;
+	}
+
+	public void setRepaymentBizPlanListDetails(List<RepaymentBizPlanListDetail> repaymentBizPlanListDetails) {
+		this.repaymentBizPlanListDetails = repaymentBizPlanListDetails;
 	}
 
 	/**

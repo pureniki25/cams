@@ -7,10 +7,8 @@ import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.ToString;
 
 @Data
-@ToString
 public class TransferOfLitigationVO implements Serializable {
 
 	private static final long serialVersionUID = -7083361271450973294L;
@@ -172,4 +170,9 @@ public class TransferOfLitigationVO implements Serializable {
 	 * 展期信息
 	 */
 	private List<ExtensionBusinessDTO> extensionInfo;
+	
+	/**
+	 * 实际出款时间
+	 */
+	private Date factOutputDate;
 }

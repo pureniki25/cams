@@ -138,7 +138,39 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新用户")
 	private String updateUser;
+	
+	@TableField(exist=false)
+	@ApiModelProperty(required= true,value = "拆标状态:0未拆标 1拆标未完成 2拆标完成 3 数据核对完成")
+	private Integer splitStatus;
+	
+	@TableField(exist=false)
+	@ApiModelProperty(required= true,value = "拆标备注")
+	private String splitRemark;
+	
+	@TableField(exist=false)
+	@ApiModelProperty(required= true,value = "拆标日期")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date splitTime;
+	
+	@TableField(exist=false)
+	@ApiModelProperty(required= true,value = "拆标类型")
+	private Integer splitType;
 
+	public Integer getSplitStatus() {
+		return splitStatus;
+	}
+
+	public void setSplitStatus(Integer splitStatus) {
+		this.splitStatus = splitStatus;
+	}
+
+	public String getSplitRemark() {
+		return splitRemark;
+	}
+
+	public void setSplitRemark(String splitRemark) {
+		this.splitRemark = splitRemark;
+	}
 
 	public String getPlanId() {
 		return planId;
@@ -283,6 +315,22 @@ public class RepaymentBizPlan extends Model<RepaymentBizPlan> {
 
 	public void setUpdateUser(String updateUser) {
 		this.updateUser = updateUser;
+	}
+
+	public Date getSplitTime() {
+		return splitTime;
+	}
+
+	public void setSplitTime(Date splitTime) {
+		this.splitTime = splitTime;
+	}
+
+	public Integer getSplitType() {
+		return splitType;
+	}
+
+	public void setSplitType(Integer splitType) {
+		this.splitType = splitType;
 	}
 
 	@Override

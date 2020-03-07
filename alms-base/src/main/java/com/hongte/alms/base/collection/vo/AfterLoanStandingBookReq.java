@@ -112,6 +112,11 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
 	private Integer needPermission = 1;
 
+	/**
+	 * 区分此请求来自贷后管理还是业务管理
+	 */
+	private Integer forBusinessExport = 0 ;
+	
 	public String getKeyName() {
 		return keyName;
 	}
@@ -405,6 +410,14 @@ public class AfterLoanStandingBookReq extends PageRequest {
 
 	public void setPaymentPlatformCode(Integer paymentPlatformCode) {
 		this.paymentPlatformCode = paymentPlatformCode;
+	}
+
+	public Integer getForBusinessExport() {
+		return forBusinessExport;
+	}
+
+	public void setForBusinessExport(Integer forBusinessExport) {
+		this.forBusinessExport = forBusinessExport;
 	}
 
 }

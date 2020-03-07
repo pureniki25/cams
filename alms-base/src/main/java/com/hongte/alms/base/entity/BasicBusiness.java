@@ -242,6 +242,24 @@ public class BasicBusiness extends Model<BasicBusiness> {
 	@ApiModelProperty(required= true,value = "最后推送备注")
 	private String lastPushRemark;
 
+	
+	/**
+	 * 系统来源
+	 */
+	@TableField("system_type")
+	@ApiModelProperty(required= true,value = "系统来源 null和1 ：信贷 2:crm系统")
+	private Integer systemType;
+	
+	
+	
+	public Integer getSystemType() {
+		return systemType;
+	}
+
+	public void setSystemType(Integer systemType) {
+		this.systemType = systemType;
+	}
+
 	public String getBusinessId() {
 		return businessId;
 	}

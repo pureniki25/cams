@@ -517,8 +517,6 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新人")
 	private String updateUser;
-	
-	
     /**
      * 资产端上标编号
      */
@@ -526,9 +524,39 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
 	@ApiModelProperty(required= true,value = "资产端上标编号")
 	private String requestNo;
 	
+	/**
+	 * 总的借款金额
+	 */
+	@TableField(exist=false)
+	private BigDecimal approveMoney;
 	
+	/**
+	 * 是否最后一个标
+	 */
+	@TableField(exist=false)
+	private Boolean isLast = false;
 	
+	/**
+	 * 拆标方式 0直接取信贷 费用项
+	 */
+	@TableField(exist=false)
+	private int splitType = 0;
 
+	public Boolean getIsLast() {
+		return isLast;
+	}
+
+	public void setIsLast(Boolean isLast) {
+		this.isLast = isLast;
+	}
+
+	public BigDecimal getApproveMoney() {
+		return approveMoney;
+	}
+
+	public void setApproveMoney(BigDecimal approveMoney) {
+		this.approveMoney = approveMoney;
+	}
 
 	public Boolean getIsBailorWithdraw() {
 		return isBailorWithdraw;
@@ -1192,6 +1220,14 @@ public class TuandaiProjectInfo extends Model<TuandaiProjectInfo> {
 
 	public void setUpdateUser(String updateUser) {
 		this.updateUser = updateUser;
+	}
+
+	public int getSplitType() {
+		return splitType;
+	}
+
+	public void setSplitType(int splitType) {
+		this.splitType = splitType;
 	}
 
 	@Override

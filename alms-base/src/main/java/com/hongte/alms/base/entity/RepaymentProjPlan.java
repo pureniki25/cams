@@ -204,13 +204,60 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 	private Integer rondmode;
 	
 	/**
+     * 0系统生产1线下出款生成2单标生成3多标拆标生成
+     */
+	@TableField("generate_type")
+	@ApiModelProperty(required= true,value = "0系统生成1线下出款生成2单标生成3多标拆标生成")
+	private Integer generateType;
+	
+	/**
      * 计算保留的小数位数
      */
 	@TableField("small_num")
 	@ApiModelProperty(required= true,value = "保留的小数位数")
 	private Integer smallNum;
-
 	
+	@TableField(exist=false)
+	private BigDecimal totalBorrowAmountSub1;
+	
+	@TableField(exist=false)
+	private BigDecimal overdueAmountSub1;
+	
+	@TableField(exist=false)
+	private BigDecimal derateAmountSub1;
+
+	public BigDecimal getTotalBorrowAmountSub1() {
+		if(totalBorrowAmountSub1 == null) {
+			totalBorrowAmountSub1 = new BigDecimal(0);
+		}
+		return totalBorrowAmountSub1;
+	}
+
+	public void setTotalBorrowAmountSub1(BigDecimal totalBorrowAmountSub1) {
+		this.totalBorrowAmountSub1 = totalBorrowAmountSub1;
+	}
+
+	public BigDecimal getOverdueAmountSub1() {
+		if(overdueAmountSub1 == null) {
+			overdueAmountSub1 = new BigDecimal(0);
+		}
+		return overdueAmountSub1;
+	}
+
+	public void setOverdueAmountSub1(BigDecimal overdueAmountSub1) {
+		this.overdueAmountSub1 = overdueAmountSub1;
+	}
+
+	public BigDecimal getDerateAmountSub1() {
+		if(derateAmountSub1 == null) {
+			derateAmountSub1 = new BigDecimal(0);
+		}
+		return derateAmountSub1;
+	}
+
+	public void setDerateAmountSub1(BigDecimal derateAmountSub1) {
+		this.derateAmountSub1 = derateAmountSub1;
+	}
 
 	public Integer getRondmode() {
 		return rondmode;
@@ -450,6 +497,14 @@ public class RepaymentProjPlan extends Model<RepaymentProjPlan> {
 
 	public void setUpdateUser(String updateUser) {
 		this.updateUser = updateUser;
+	}
+
+	public Integer getGenerateType() {
+		return generateType;
+	}
+
+	public void setGenerateType(Integer generateType) {
+		this.generateType = generateType;
 	}
 
 	@Override

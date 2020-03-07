@@ -34,4 +34,13 @@ public enum BizCustomerTypeEnum implements IEnum {
     public String getName(){
         return this.name;
     }
+    
+    public static BizCustomerTypeEnum convertByName(String name) {
+    	for (BizCustomerTypeEnum e : BizCustomerTypeEnum.values()) {
+			if (e.getName().equals(name)) {
+				return e;
+			}
+		}
+    	return null ;
+    }
 }

@@ -1,11 +1,17 @@
 package com.hongte.alms.base.vo.compliance;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.hongte.alms.base.entity.TdrepayRechargeDetail;
 import com.hongte.alms.base.entity.TdrepayRechargeLog;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class DistributeFundRecordVO extends TdrepayRechargeLog implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -35,51 +41,9 @@ public class DistributeFundRecordVO extends TdrepayRechargeLog implements Serial
 	 */
 	private String person;
 
-	public List<TdrepayRechargeDetail> getDetails() {
-		return details;
-	}
-
-	public void setDetails(List<TdrepayRechargeDetail> details) {
-		this.details = details;
-	}
-
-	public String getProcessStatusStr() {
-		return processStatusStr;
-	}
-
-	public void setProcessStatusStr(String processStatusStr) {
-		this.processStatusStr = processStatusStr;
-	}
-
-	public String getFactRepayDateStr() {
-		return factRepayDateStr;
-	}
-
-	public void setFactRepayDateStr(String factRepayDateStr) {
-		this.factRepayDateStr = factRepayDateStr;
-	}
-
-	public String getCreateTimeStr() {
-		return createTimeStr;
-	}
-
-	public void setCreateTimeStr(String createTimeStr) {
-		this.createTimeStr = createTimeStr;
-	}
-
-	public String getPerson() {
-		return person;
-	}
-
-	public void setPerson(String person) {
-		this.person = person;
-	}
-
-	@Override
-	public String toString() {
-		return "DistributeFundRecordVO [details=" + details + ", processStatusStr=" + processStatusStr
-				+ ", factRepayDateStr=" + factRepayDateStr + ", createTimeStr=" + createTimeStr + ", person=" + person
-				+ "]";
-	}
+	/**
+	 * 剩余垫付未还记录
+	 */
+	private BigDecimal totalSurplusAdvance;
 
 }

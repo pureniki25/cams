@@ -161,6 +161,8 @@ public class CreateBatchFlowCommand extends MessageCommand {
 
 	public static class Business{
         private String customerName;
+        
+        private String mainCustomerName;
 
         private String businessId;
 
@@ -182,7 +184,15 @@ public class CreateBatchFlowCommand extends MessageCommand {
             this.customerName = customerName;
         }
 
-        public String getBusinessId() {
+        public String getMainCustomerName() {
+			return mainCustomerName;
+		}
+
+		public void setMainCustomerName(String mainCustomerName) {
+			this.mainCustomerName = mainCustomerName;
+		}
+
+		public String getBusinessId() {
             return businessId;
         }
 

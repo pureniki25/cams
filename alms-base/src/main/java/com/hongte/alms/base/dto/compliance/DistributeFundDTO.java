@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
-import lombok.ToString;
 
 /**
  * 调用 eip 平台资金分发接口参数DTO
@@ -12,7 +11,6 @@ import lombok.ToString;
  *
  */
 @Data
-@ToString
 public class DistributeFundDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;

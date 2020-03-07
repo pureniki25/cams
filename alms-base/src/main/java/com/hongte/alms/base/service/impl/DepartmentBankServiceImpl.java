@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hongte.alms.base.entity.BasicBusiness;
 import com.hongte.alms.base.entity.DepartmentBank;
-import com.hongte.alms.base.mapper.BasicBusinessMapper;
 import com.hongte.alms.base.mapper.DepartmentBankMapper;
 import com.hongte.alms.base.service.DepartmentBankService;
 import com.hongte.alms.base.vo.module.DepartmentBankVO;
@@ -27,25 +26,7 @@ import com.hongte.alms.common.service.impl.BaseServiceImpl;
 public class DepartmentBankServiceImpl extends BaseServiceImpl<DepartmentBankMapper, DepartmentBank> implements DepartmentBankService {
 	@Autowired
 	DepartmentBankMapper departmentBankMapper ;
-	@Autowired
-	BasicBusinessMapper basicBusinessMapper ;
-	@Override
-	public List<DepartmentBankVO> listDepartmentBank(String businessId) {
-		BasicBusiness basicBusiness = new BasicBusiness() ;
-		basicBusiness.setBusinessId(businessId);
-		basicBusiness = basicBusinessMapper.selectOne(basicBusiness);
-		if (basicBusiness==null) {
-			throw new RuntimeException("business was not found");
-		}
-		EntityWrapper<DepartmentBank> ew = new EntityWrapper<>() ;
-		ew.eq("dept_id", basicBusiness.getCompanyName()).orderBy("finance_name") ;
-		List<DepartmentBank> list = departmentBankMapper.selectList(ew);
-		List<DepartmentBankVO> voList = new ArrayList<>() ;
-		for (DepartmentBank departmentBank : list) {
-			voList.add(new DepartmentBankVO(departmentBank));
-		}
-		return voList;
-	}
+
 
 	@Override
 	public List<DepartmentBank> listDepartmentBank() {

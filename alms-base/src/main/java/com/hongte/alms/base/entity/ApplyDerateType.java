@@ -96,7 +96,46 @@ public class ApplyDerateType extends Model<ApplyDerateType> {
 	@TableField("update_user")
 	@ApiModelProperty(required= true,value = "更新人")
 	private String updateUser;
+	   /**
+     * 标的ID
+     */
+	
+	@TableField("project_id")
+	@ApiModelProperty(required= true,value = "标Id")
+	private String projectId;
 
+	@TableField("master")
+	@ApiModelProperty(required= true,value = "是否主借")
+	private Integer master;
+
+	@TableField("user_name")
+	@ApiModelProperty(required= true,value = "用户名称")
+	private String userName;
+
+	@TableField("under_overdue_amount")
+	@ApiModelProperty(required= true,value = "线下滞纳金")
+	private BigDecimal underOverdueAmount;
+
+	@TableField("on_overdue_amount")
+	@ApiModelProperty(required= true,value = "线上滞纳金")
+	private BigDecimal onOverdueAmount;
+
+	@TableField("proj_amount")
+	@ApiModelProperty(required= true,value = "上标金额")
+	private BigDecimal projAmount;
+
+	@TableField("after_derate_amount")
+	@ApiModelProperty(required= true,value = "减免后应还金额")
+	private BigDecimal afterDerateAmount;
+
+
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
 
 	public String getDerateTypeName() {
 		return derateTypeName;
@@ -186,6 +225,54 @@ public class ApplyDerateType extends Model<ApplyDerateType> {
 		this.updateUser = updateUser;
 	}
 
+	public Integer getMaster() {
+		return master;
+	}
+
+	public void setMaster(Integer master) {
+		this.master = master;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public BigDecimal getUnderOverdueAmount() {
+		return underOverdueAmount;
+	}
+
+	public void setUnderOverdueAmount(BigDecimal underOverdueAmount) {
+		this.underOverdueAmount = underOverdueAmount;
+	}
+
+	public BigDecimal getOnOverdueAmount() {
+		return onOverdueAmount;
+	}
+
+	public void setOnOverdueAmount(BigDecimal onOverdueAmount) {
+		this.onOverdueAmount = onOverdueAmount;
+	}
+
+	public BigDecimal getProjAmount() {
+		return projAmount;
+	}
+
+	public void setProjAmount(BigDecimal projAmount) {
+		this.projAmount = projAmount;
+	}
+
+	public BigDecimal getAfterDerateAmount() {
+		return afterDerateAmount;
+	}
+
+	public void setAfterDerateAmount(BigDecimal afterDerateAmount) {
+		this.afterDerateAmount = afterDerateAmount;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.applyDerateTypeId;
@@ -194,14 +281,24 @@ public class ApplyDerateType extends Model<ApplyDerateType> {
 	@Override
 	public String toString() {
 		return "ApplyDerateType{" +
-			", applyDerateTypeId=" + applyDerateTypeId +
-			", applyDerateProcessId=" + applyDerateProcessId +
-			", derateType=" + derateType +
-			", derateMoney=" + derateMoney +
-			", createTime=" + createTime +
-			", createUser=" + createUser +
-			", updateTime=" + updateTime +
-			", updateUser=" + updateUser +
-			"}";
+				"applyDerateTypeId='" + applyDerateTypeId + '\'' +
+				", applyDerateProcessId='" + applyDerateProcessId + '\'' +
+				", feeId='" + feeId + '\'' +
+				", derateType='" + derateType + '\'' +
+				", derateTypeName='" + derateTypeName + '\'' +
+				", beforeDerateMoney=" + beforeDerateMoney +
+				", derateMoney=" + derateMoney +
+				", createTime=" + createTime +
+				", createUser='" + createUser + '\'' +
+				", updateTime=" + updateTime +
+				", updateUser='" + updateUser + '\'' +
+				", projectId='" + projectId + '\'' +
+				", master=" + master +
+				", userName='" + userName + '\'' +
+				", underOverdueAmount=" + underOverdueAmount +
+				", onOverdueAmount=" + onOverdueAmount +
+				", projAmount=" + projAmount +
+				", afterDerateAmount=" + afterDerateAmount +
+				'}';
 	}
 }

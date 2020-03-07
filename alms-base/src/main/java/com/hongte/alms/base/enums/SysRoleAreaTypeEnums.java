@@ -15,6 +15,7 @@ public enum SysRoleAreaTypeEnums {
 	,SEE_FINANCE_BUSINESS(6,"财务跟单方式控制")
 	,SEE_Credit_BUSINESS(7,"只查看有房贷业务")
 	,SEE_GOODHOURSE_BUSINESS(8,"只查看信用贷业务")
+	,SEE_APPROVED(9,"只查看自己审核过的")
 	;
 
 

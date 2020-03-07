@@ -1,6 +1,7 @@
 package com.hongte.alms.base.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 客户还款登记DTO
@@ -32,6 +33,17 @@ public class RepaymentRegisterInfoDTO implements Serializable{
 	 * 还款日期
 	 */
 	private String repaymentDate ;
+	
+	
+	private BigDecimal beforeOverAmount;//确认还款之前的逾期金额
+	
+	private BigDecimal beforeOverdueDays;//确认还款之前的逾期天数
+	
+	private BigDecimal afterOverdueDays;//确认还款之后的逾期天数
+	
+	
+	private BigDecimal afterOverAmount;//确认还款之后的逾期金额
+	
 	/**
 	 * 还款金额
 	 */
@@ -67,7 +79,33 @@ public class RepaymentRegisterInfoDTO implements Serializable{
 	/**
 	 * moneypool id / moneypool repayment id/ whatever
 	 */
+	
+	
 	private String moneyPoolId ;
+	public BigDecimal getAfterOverAmount() {
+		return afterOverAmount;
+	}
+	public void setAfterOverAmount(BigDecimal afterOverAmount) {
+		this.afterOverAmount = afterOverAmount;
+	}
+	public BigDecimal getBeforeOverAmount() {
+		return beforeOverAmount;
+	}
+	public void setBeforeOverAmount(BigDecimal beforeOverAmount) {
+		this.beforeOverAmount = beforeOverAmount;
+	}
+	public BigDecimal getBeforeOverdueDays() {
+		return beforeOverdueDays;
+	}
+	public void setBeforeOverdueDays(BigDecimal beforeOverdueDays) {
+		this.beforeOverdueDays = beforeOverdueDays;
+	}
+	public BigDecimal getAfterOverdueDays() {
+		return afterOverdueDays;
+	}
+	public void setAfterOverdueDays(BigDecimal afterOverdueDays) {
+		this.afterOverdueDays = afterOverdueDays;
+	}
 	public String getRepaymentDate() {
 		return repaymentDate;
 	}

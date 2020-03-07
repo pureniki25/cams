@@ -3,15 +3,18 @@ package com.hongte.alms.base.enums;
 /**
  * @author zengkun
  * @since 2018/6/16
- * 标的平台类型枚举
+ * 标的平台类型枚举(业务平台类型保持与标的一致)
  */
 public enum ProjPlatTypeEnum {
 
 //	平台标志位：1，团贷网； 2，你我金融
 
-
+	OFF_LINE(0,"线下出款"),
 	TUANDAI(1,"团贷网"),
-	NIWO_JR(2,"你我金融");
+	NIWO_JR(2,"你我金融"),
+	YUE_MONEY(3,"粤财"),
+	BOHAI_TRUST(4,"渤海信托")
+	;
 
 	private Integer key; // 数据保存的值
 	private String name; // 名称

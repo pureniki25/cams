@@ -55,10 +55,137 @@ public class BusinessInfoForApplyDerateVo  {
     private BigDecimal noSettleNeedPayInterest;//不结清时该业应付利息;  
     private BigDecimal noSettleNeedPayService;//不结清时该业应付月收服务费; 
     private BigDecimal noSettleNeedPayPrincipal;//不结清时应付本金;
+    private BigDecimal needPayOnlineOverAmount;//线上滞纳金
+    private BigDecimal noSettleOffOverAmount;//当期应还线下滞纳金
+    private BigDecimal settleOffOverAmount;//往期应还线下滞纳金总和;
     private Integer noSettleDelayDays;//不结清时的逾期天数
+    private BigDecimal companyYearRate;//分公司年利率
+    private BigDecimal platYearRate;//平台年利率
+    private BigDecimal gurrenteeYearRate;//担保年利率
+    
+    private BigDecimal monthServicePenalty;//月收分公司违约金
+    
+    private BigDecimal platServicePenalty;//平台服务费违约金
+    
+    private BigDecimal principlePenalty;//本金违约金
+
+    private BigDecimal doorFee;//上门费
+    private BigDecimal businessBorrowMoney;
+
     
     
-    public String getZqBusinessId() {
+    
+    public BigDecimal getBusinessBorrowMoney() {
+		return businessBorrowMoney;
+	}
+
+
+	public void setBusinessBorrowMoney(BigDecimal businessBorrowMoney) {
+		this.businessBorrowMoney = businessBorrowMoney;
+	}
+
+
+	public BigDecimal getMonthServicePenalty() {
+		return monthServicePenalty;
+	}
+
+
+	public void setMonthServicePenalty(BigDecimal monthServicePenalty) {
+		this.monthServicePenalty = monthServicePenalty;
+	}
+
+
+	public BigDecimal getPlatServicePenalty() {
+		return platServicePenalty;
+	}
+
+
+	public void setPlatServicePenalty(BigDecimal platServicePenalty) {
+		this.platServicePenalty = platServicePenalty;
+	}
+
+
+	public BigDecimal getPrinciplePenalty() {
+		return principlePenalty;
+	}
+
+
+	public void setPrinciplePenalty(BigDecimal principlePenalty) {
+		this.principlePenalty = principlePenalty;
+	}
+
+
+	public String getGeneralReturnRate() {
+		return generalReturnRate;
+	}
+
+
+	public void setGeneralReturnRate(String generalReturnRate) {
+		this.generalReturnRate = generalReturnRate;
+	}
+
+
+	public BigDecimal getCompanyYearRate() {
+		return companyYearRate;
+	}
+
+
+	public void setCompanyYearRate(BigDecimal companyYearRate) {
+		this.companyYearRate = companyYearRate;
+	}
+
+
+	public BigDecimal getPlatYearRate() {
+		return platYearRate;
+	}
+
+
+	public void setPlatYearRate(BigDecimal platYearRate) {
+		this.platYearRate = platYearRate;
+	}
+
+
+	public BigDecimal getGurrenteeYearRate() {
+		return gurrenteeYearRate;
+	}
+
+
+	public void setGurrenteeYearRate(BigDecimal gurrenteeYearRate) {
+		this.gurrenteeYearRate = gurrenteeYearRate;
+	}
+
+
+	public BigDecimal getNeedPayOnlineOverAmount() {
+		return needPayOnlineOverAmount;
+	}
+
+
+	public void setNeedPayOnlineOverAmount(BigDecimal needPayOnlineOverAmount) {
+		this.needPayOnlineOverAmount = needPayOnlineOverAmount;
+	}
+
+
+	public BigDecimal getNoSettleOffOverAmount() {
+		return noSettleOffOverAmount;
+	}
+
+
+	public void setNoSettleOffOverAmount(BigDecimal noSettleOffOverAmount) {
+		this.noSettleOffOverAmount = noSettleOffOverAmount;
+	}
+
+
+	public BigDecimal getSettleOffOverAmount() {
+		return settleOffOverAmount;
+	}
+
+
+	public void setSettleOffOverAmount(BigDecimal settleOffOverAmount) {
+		this.settleOffOverAmount = settleOffOverAmount;
+	}
+
+
+	public String getZqBusinessId() {
 		return zqBusinessId;
 	}
 
@@ -240,14 +367,6 @@ public class BusinessInfoForApplyDerateVo  {
 
 	
 
-	public String getGeneralReturnRate() {
-		return generalReturnRate;
-	}
-
-
-	public void setGeneralReturnRate(String generalReturnRate) {
-		this.generalReturnRate = generalReturnRate;
-	}
 
 
 	public BigDecimal getPreLateFees() {
@@ -493,5 +612,13 @@ public class BusinessInfoForApplyDerateVo  {
 
     public void setPayedPrincipal(BigDecimal payedPrincipal) {
         this.payedPrincipal = payedPrincipal;
+    }
+
+    public BigDecimal getDoorFee() {
+        return doorFee;
+    }
+
+    public void setDoorFee(BigDecimal doorFee) {
+        this.doorFee = doorFee;
     }
 }

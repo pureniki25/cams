@@ -48,6 +48,7 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
      * 所属期数
      */
 	@ApiModelProperty(required= true,value = "所属期数")
+	@TableField("period")
 	private Integer period;
     /**
      * 分润顺序（根据分润配置计算）
@@ -202,6 +203,9 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	}
 
 	public BigDecimal getPlanAmount() {
+		if(null == planAmount) {
+			planAmount = new BigDecimal(0);
+		}
 		return planAmount;
 	}
 
@@ -250,6 +254,9 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	}
 
 	public BigDecimal getFactAmount() {
+		if(null == factAmount) {
+			factAmount = new BigDecimal(0);
+		}
 		return factAmount;
 	}
 
@@ -357,6 +364,9 @@ public class RepaymentBizPlanListDetail extends Model<RepaymentBizPlanListDetail
 	 * @return the derateAmount
 	 */
 	public BigDecimal getDerateAmount() {
+		if(null == derateAmount) {
+			derateAmount = new BigDecimal(0);
+		}
 		return derateAmount;
 	}
 

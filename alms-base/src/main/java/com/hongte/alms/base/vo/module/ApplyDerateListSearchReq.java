@@ -26,6 +26,8 @@ public class ApplyDerateListSearchReq extends PageRequest{
     @ApiModelProperty(value="减免时间",name="derateDateEnd",example="test" ,dataType = "java.util.Date")
     private Date    derateDateEnd		; //减免时间 结束
 
+    private String derateStatus; //减免状态
+
     private BigDecimal derateMoneyBegin	;   //减免金额 开始
 //    @ApiModelProperty(value="减免金额",name="derateMoneyBeginStr",example="test",dataType = "String")
 //    private String derateMoneyBeginStr	;   //减免金额 开始
@@ -126,8 +128,16 @@ public class ApplyDerateListSearchReq extends PageRequest{
 	public void setNeedPermission(Integer needPermission) {
 		this.needPermission = needPermission;
 	}
-    
-//    public String getDerateMoneyBeginStr() {
+
+    public String getDerateStatus() {
+        return derateStatus;
+    }
+
+    public void setDerateStatus(String derateStatus) {
+        this.derateStatus = derateStatus;
+    }
+
+    //    public String getDerateMoneyBeginStr() {
 //        return derateMoneyBeginStr;
 //    }
 //

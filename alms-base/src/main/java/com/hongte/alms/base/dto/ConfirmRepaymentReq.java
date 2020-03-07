@@ -6,6 +6,7 @@ package com.hongte.alms.base.dto;
 import javax.validation.constraints.NotNull;
 
 import com.hongte.alms.base.entity.MoneyPool;
+import com.hongte.alms.base.enums.SysParameterEnums;
 
 import lombok.Data;
 
@@ -39,6 +40,10 @@ public class ConfirmRepaymentReq {
 	private List<Integer> logIds;
 	//网关充值/快捷充值必填项,充值记录ids
 	private List<String> rechargeIds;
+	
+	private BigDecimal applyMoney;//减免金额
+	
+	private SysParameterEnums sysParameterEnums;//减免枚举类型
 
 	/**
 	 * 手动选择的实还日期
@@ -60,4 +65,6 @@ public class ConfirmRepaymentReq {
 	 */
 	@NotNull(message = "调用方标志位(callFlage) 不能为空")
 	private Integer callFlage;
+	
+	private Integer isSettle;
 }

@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -70,12 +72,14 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
     /**
      * 上标日期
      */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@TableField("begin_date")
 	@ApiModelProperty(required= true,value = "上标日期")
 	private Date beginDate;
     /**
      * 实还日期
      */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
 	@TableField("fact_repay_date")
 	@ApiModelProperty(required= true,value = "实还日期")
 	private Date factRepayDate;
@@ -92,10 +96,10 @@ public class TdrepayRechargeLog extends Model<TdrepayRechargeLog> {
 	@ApiModelProperty(required= true,value = "分公司")
 	private String companyName;
     /**
-     * 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣
+     * 还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣,6:尾差,7:手动创建
      */
 	@TableField("repay_source")
-	@ApiModelProperty(required= true,value = "还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣")
+	@ApiModelProperty(required= true,value = "还款来源，1:线下转账,2:第三方代扣,3:银行代扣,4:APP网关充值,5:协议代扣,6:尾差,7:手动创建")
 	private Integer repaySource;
     /**
      * 资产端期数

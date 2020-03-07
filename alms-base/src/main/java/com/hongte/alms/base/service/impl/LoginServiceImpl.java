@@ -1,21 +1,13 @@
 package com.hongte.alms.base.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.hongte.alms.base.entity.SysRole;
-import com.hongte.alms.base.entity.SysUser;
-import com.hongte.alms.base.entity.SysUserRole;
+
 import com.hongte.alms.base.service.*;
-import com.hongte.alms.common.util.Constant;
 import com.ht.ussp.bean.LoginUserInfoHelper;
-import com.ht.ussp.client.dto.BoaInRoleInfoDto;
 import com.ht.ussp.client.dto.LoginInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author:喻尊龙
@@ -27,21 +19,6 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private LoginUserInfoHelper loginUserInfoHelper;
 
-    @Autowired
-    @Qualifier("SysUserService")
-    private SysUserService sysUserService;
-
-    @Autowired
-    @Qualifier("SysRoleService")
-    private SysRoleService sysRoleService;
-
-    @Autowired
-    @Qualifier("SysUserRoleService")
-    private SysUserRoleService sysUserRoleService;
-
-    @Autowired
-    @Qualifier("SysUserPermissionService")
-    private SysUserPermissionService sysUserPermissionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

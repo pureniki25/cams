@@ -8,7 +8,6 @@ import lombok.ToString;
 
 @ApiModel(value = "移交诉讼信息查询接口返回房产信息模型", description = "移交诉讼信息查询接口返回房产信息模型")
 @Data
-@ToString
 public class TransferLitigationHouseDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;

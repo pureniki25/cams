@@ -49,4 +49,26 @@ public enum PlatformEnum implements IEnum {
 		return null;
 
 	}
+	
+	/**
+	 * 根据key获取代扣平台名称
+	 * 
+	 * @param value
+	 * @return
+	 * @author huweiqian
+	 */
+	public static String getNameByKey(Integer value) {
+
+		if (value == null) {
+			return null;
+		}
+
+		PlatformEnum[] platformEnums = values();
+		for (PlatformEnum platformEnum : platformEnums) {
+			if (platformEnum.getPlatformId().intValue() == value.intValue()) {
+				return platformEnum.getName();
+			}
+		}
+		return null;
+	}
 }

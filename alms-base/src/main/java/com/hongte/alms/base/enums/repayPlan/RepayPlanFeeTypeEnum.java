@@ -18,6 +18,8 @@ public enum RepayPlanFeeTypeEnum implements IEnum {
     INTEREST(20,"利息","556bce4f-f3a9-4b7a-a8b1-43368bebb49c",2),    //uuid与信贷 固定费用id 一致
     SUB_COMPANY_CHARGE(30,"资产端分公司服务费","3df61688-d5a0-49c5-9c32-46b30855310a",3),
     BOND_COMPANY_CHARGE(40,"担保公司费用","78269549-3c3c-4ed0-937d-c077ee87dbe0",3),
+    MONTH_COMPANY_CHARGE(30,"月收分公司服务费","203e172b-9102-4820-9e06-76a64aa119e3",3),
+    MONTH_PLAT_CHARGE(50,"月收平台费","d0c27c1d-8963-401d-b909-e08725c43171",3),
     PLAT_CHARGE(50,"资金端平台服务费","cf7a15e1-9bc8-44fc-b53e-de3c84234211",3),
     OVER_DUE_AMONT(60,"滞纳金","097e7d7b-9671-4027-a329-b07375092028",5), //uuid与信贷 固定费用id 一致
     OVER_DUE_AMONT_ONLINE(60,"线上滞纳金","2e646c87-5721-11e8-8a00-0242ac110002",5),
@@ -33,7 +35,8 @@ public enum RepayPlanFeeTypeEnum implements IEnum {
     DEPOSIT_FEE(90,"押金类费用","3aeef26a-9685-4148-98cb-fa3f88181c67",4)
     ,RUSH_RECEIVABLES(100,"冲应收","d5596127-530f-4083-95c5-01e5a75635aa",6)
     ,REBATE(110,"返点","b8c5c29f-dd2c-4a7c-8520-e1e8eb130021",110)  //UUID为随机生成
-    ,OTHER_FEE(120,"其他费用","cef85db3-6ece-448e-a9ba-a2db665e9be4",4)
+    ,OTHER_FEE(121,"其他费用","cef85db3-6ece-448e-a9ba-a2db665e9be4",4)
+    ,XD_OTHER_FEE(59,"其他费用","cef15db2-7ece-448e-a9ba-a6db665e9be4",3)
     ,DIFFERENT(25,"利差","f1f96007-aef3-4124-a009-b5d4f692fcc1",4)
     ;
 

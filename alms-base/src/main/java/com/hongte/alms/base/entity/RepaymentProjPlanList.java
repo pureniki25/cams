@@ -176,6 +176,13 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 	@ApiModelProperty(required= true,value = "更新日期")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
+	
+	/**
+     * 0系统生产1线下出款生成2单标生成3多标拆标生成
+     */
+	@TableField("generate_type")
+	@ApiModelProperty(required= true,value = "0系统生产1线下出款生成2单标生成3多标拆标生成")
+	private Integer generateType;
     /**
      * 更新用户
      */
@@ -366,6 +373,14 @@ public class RepaymentProjPlanList extends Model<RepaymentProjPlanList> {
 
 	public void setUpdateUser(String updateUser) {
 		this.updateUser = updateUser;
+	}
+	
+	public Integer getGenerateType() {
+		return generateType;
+	}
+
+	public void setGenerateType(Integer generateType) {
+		this.generateType = generateType;
 	}
 
 	@Override

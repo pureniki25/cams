@@ -278,6 +278,15 @@ public class InfoSmsListSearchVO {
 		case "200207":
 			this.smsType="还款提前7天发短信给业务获取人";
 			break;
+		case "10":
+			this.smsType="贷后逾期提醒";
+			break;
+		case "11":
+			this.smsType="贷后结清提醒";
+			break;
+		case "12":
+			this.smsType="贷后还款提醒";
+			break;
 			
 	}
 	}

@@ -4,14 +4,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 import lombok.Data;
-import lombok.ToString;
 
 /**
  * 平台标的还款计划信息DTO
  * @author 胡伟骞
  *
  */
-@ToString
 @Data
 public class TdPlatformPlanRepaymentDTO implements Serializable {
 
@@ -67,5 +65,8 @@ public class TdPlatformPlanRepaymentDTO implements Serializable {
 	 * 总金额
 	 */
 	private BigDecimal totalAmount;
-
+	/**
+	 * .net接口还款状态
+	 */
+	private String repaymentStatus;
 }

@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -51,6 +53,7 @@ public class ApplyDerateProcess extends Model<ApplyDerateProcess> {
 	@TableField("crp_id")
 	@ApiModelProperty(required= true,value = "用户还款计划ID")
 	private String crpId;
+	
 //    /**
 //     * 申请减免类型
 //     */
@@ -145,14 +148,131 @@ public class ApplyDerateProcess extends Model<ApplyDerateProcess> {
 	
 	@TableField("derate_money_total")
 	@ApiModelProperty(required= false,value = "减免总金额-统计字段")
-	private BigDecimal derateMoneyTotal;
+	private BigDecimal applyDerateMoney;
+	
+	 /**
+     * 上门费
+     */
+	@TableField("door_fee")
+	@ApiModelProperty(required= true,value = "上门费")
+	private BigDecimal doorFee;
+	
+	 /**
+     * 拖车费
+     */
+	@TableField("trailer_fee")
+	@ApiModelProperty(required= true,value = "拖车费")
+	private BigDecimal trailerFee;
+	
+	
+	 /**
+     * Gps费
+     */
+	@TableField("gps_fee")
+	@ApiModelProperty(required= true,value = "Gps费")
+	private BigDecimal gpsFee;
+	
+	 /**
+     * 停车费
+     */
+	@TableField("park_fee")
+	@ApiModelProperty(required= true,value = "停车费")
+	private BigDecimal parkFee;
+	
+	 /**
+     * 计划还款日期
+     */
+	@TableField("plan_repay_time")
+	@ApiModelProperty(required= true,value = "计划还款日期")
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date planRepayTime;
+	
+	 /**
+     * 是否生效
+     */
+	@TableField("is_active")
+	@ApiModelProperty(required= true,value ="是否生效")
+	private Integer isActive;
 
-	public BigDecimal getDerateMoneyTotal() {
-		return derateMoneyTotal;
+
+	/**
+	 * 本金违约金
+	 */
+	@TableField("principle_penalty")
+	@ApiModelProperty(required= true,value ="本金违约金")
+	private BigDecimal principlePenalty;
+
+	/**
+	 * 平台服务费违约金
+	 */
+	@TableField("plat_service_penalty")
+	@ApiModelProperty(required= true,value ="平台服务费违约金")
+	private BigDecimal platServicePenalty;
+
+	/**
+	 * 分公司服务费违约金
+	 */
+	@TableField("month_service_penalty")
+	@ApiModelProperty(required= true,value ="分公司服务费违约金")
+	private BigDecimal monthServicePenalty;
+
+
+	
+	public Integer getIsActive() {
+		return isActive;
 	}
 
-	public void setDerateMoneyTotal(BigDecimal derateMoneyTotal) {
-		this.derateMoneyTotal = derateMoneyTotal;
+	public void setIsActive(Integer isActive) {
+		this.isActive = isActive;
+	}
+
+	public BigDecimal getDoorFee() {
+		return doorFee;
+	}
+
+	public void setDoorFee(BigDecimal doorFee) {
+		this.doorFee = doorFee;
+	}
+
+	public BigDecimal getTrailerFee() {
+		return trailerFee;
+	}
+
+	public void setTrailerFee(BigDecimal trailerFee) {
+		this.trailerFee = trailerFee;
+	}
+
+	public BigDecimal getGpsFee() {
+		return gpsFee;
+	}
+
+	public void setGpsFee(BigDecimal gpsFee) {
+		this.gpsFee = gpsFee;
+	}
+
+	public BigDecimal getParkFee() {
+		return parkFee;
+	}
+
+	public void setParkFee(BigDecimal parkFee) {
+		this.parkFee = parkFee;
+	}
+
+	public Date getPlanRepayTime() {
+		return planRepayTime;
+	}
+
+	public void setPlanRepayTime(Date planRepayTime) {
+		this.planRepayTime = planRepayTime;
+	}
+
+
+	public BigDecimal getApplyDerateMoney() {
+		return applyDerateMoney;
+	}
+
+	public void setApplyDerateMoney(BigDecimal applyDerateMoney) {
+		this.applyDerateMoney = applyDerateMoney;
 	}
 
 	public BigDecimal getOutsideInterest() {
@@ -274,21 +394,60 @@ public class ApplyDerateProcess extends Model<ApplyDerateProcess> {
 		this.shouldReceiveMoney = shouldReceiveMoney;
 	}
 
+	public BigDecimal getPrinciplePenalty() {
+		return principlePenalty;
+	}
+
+	public void setPrinciplePenalty(BigDecimal principlePenalty) {
+		this.principlePenalty = principlePenalty;
+	}
+
+	public BigDecimal getPlatServicePenalty() {
+		return platServicePenalty;
+	}
+
+	public void setPlatServicePenalty(BigDecimal platServicePenalty) {
+		this.platServicePenalty = platServicePenalty;
+	}
+
+	public BigDecimal getMonthServicePenalty() {
+		return monthServicePenalty;
+	}
+
+	public void setMonthServicePenalty(BigDecimal monthServicePenalty) {
+		this.monthServicePenalty = monthServicePenalty;
+	}
+
 	@Override
 	public String toString() {
 		return "ApplyDerateProcess{" +
-			", applyDerateProcessId=" + applyDerateProcessId +
-			", processId=" + processId +
-			", businessId=" + businessId +
-			", crpId=" + crpId +
-
-			", realReceiveMoney=" + realReceiveMoney +
-			", derateReson=" + derateReson +
-			", createTime=" + createTime +
-			", createUser=" + createUser +
-			", updateTime=" + updateTime +
-			", updateUser=" + updateUser +
-			"}";
+				"applyDerateProcessId='" + applyDerateProcessId + '\'' +
+				", processId='" + processId + '\'' +
+				", businessId='" + businessId + '\'' +
+				", crpId='" + crpId + '\'' +
+				", outsideInterest=" + outsideInterest +
+				", preLateFees=" + preLateFees +
+				", generalReturnRate='" + generalReturnRate + '\'' +
+				", realReceiveMoney=" + realReceiveMoney +
+				", shouldReceiveMoney=" + shouldReceiveMoney +
+				", derateReson='" + derateReson + '\'' +
+				", createTime=" + createTime +
+				", createUser='" + createUser + '\'' +
+				", updateTime=" + updateTime +
+				", updateUser='" + updateUser + '\'' +
+				", title='" + title + '\'' +
+				", isSettle=" + isSettle +
+				", applyDerateMoney=" + applyDerateMoney +
+				", doorFee=" + doorFee +
+				", trailerFee=" + trailerFee +
+				", gpsFee=" + gpsFee +
+				", parkFee=" + parkFee +
+				", planRepayTime=" + planRepayTime +
+				", isActive=" + isActive +
+				", principlePenalty=" + principlePenalty +
+				", platServicePenalty=" + platServicePenalty +
+				", monthServicePenalty=" + monthServicePenalty +
+				'}';
 	}
 
 	public String getTitle() {

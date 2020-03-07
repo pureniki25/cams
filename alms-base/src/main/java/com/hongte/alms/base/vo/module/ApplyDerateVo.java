@@ -15,8 +15,9 @@ public class ApplyDerateVo {
     
     @Excel(name = "业务编号", orderNum = "1",  isImportField = "true_st")
     private String businessId			;		//业务编号
-    @Excel(name = "期数", orderNum = "2",  isImportField = "true_st")
     private String periods				;		//期数
+    @Excel(name = "after_Id", orderNum = "2",  isImportField = "true_st")
+    private String afterId;				;		//期数
     @Excel(name = "客户名称", orderNum = "3",  isImportField = "true_st")
     private String customerName			;	//客户名称
     @Excel(name = "业务类型名称", orderNum = "4",  isImportField = "true_st")
@@ -41,11 +42,29 @@ public class ApplyDerateVo {
     private String realPayMoney			;	//实收金额
     @Excel(name = "减免时间", orderNum = "12",   databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd", isImportField = "true_st", width = 20)
     private String derateTime			;		//减免时间
+    @Excel(name = "资产五级分类", orderNum = "13",  isImportField = "true_st")
+    private String fiveLevelName			;		//资产五级分类
+
+    @Excel(name = "减免状态", orderNum = "13",  isImportField = "true_st")
+    private String derateStatus;
 
     private String applyDerateProcessId;//减免流程ID
     private String origBusinessId;//还款计划所属原业务编号
-    
-    public String getOrigBusinessId() {
+
+    private String crpId;
+    private String processStatus;
+    private String processId;
+    private String businessTypeId;
+
+    public String getAfterId() {
+		return afterId;
+	}
+
+	public void setAfterId(String afterId) {
+		this.afterId = afterId;
+	}
+
+	public String getOrigBusinessId() {
 		return origBusinessId;
 	}
 
@@ -187,5 +206,53 @@ public class ApplyDerateVo {
 
     public void setDerateTypeId(String derateTypeId) {
         this.derateTypeId = derateTypeId;
+    }
+
+	public String getFiveLevelName() {
+		return fiveLevelName;
+	}
+
+	public void setFiveLevelName(String fiveLevelName) {
+		this.fiveLevelName = fiveLevelName;
+	}
+
+    public String getDerateStatus() {
+        return derateStatus;
+    }
+
+    public void setDerateStatus(String derateStatus) {
+        this.derateStatus = derateStatus;
+    }
+
+    public String getCrpId() {
+        return crpId;
+    }
+
+    public void setCrpId(String crpId) {
+        this.crpId = crpId;
+    }
+
+    public String getProcessStatus() {
+        return processStatus;
+    }
+
+    public void setProcessStatus(String processStatus) {
+        this.processStatus = processStatus;
+    }
+
+    public String getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(String processId) {
+        this.processId = processId;
+    }
+
+    public String getBusinessTypeId() {
+        return businessTypeId;
+    }
+
+    public void setBusinessTypeId(String businessTypeId) {
+        this.businessTypeId = businessTypeId;
     }
 }
