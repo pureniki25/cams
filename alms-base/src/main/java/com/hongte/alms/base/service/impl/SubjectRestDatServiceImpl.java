@@ -123,6 +123,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		for(SubjectRestVo restVo:list) {
 			for(SubjectFirstDat firstDat:firstDats) {
 				if(restVo.getSubject().equals(firstDat.getSubject())) {
+					restVo.setSubjectName(firstDat.getSubjectName());
 					resultMap.put(firstDat, true);
 				}
 			}
@@ -350,9 +351,11 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 			BigDecimal firstAmount2 = new BigDecimal(Double.valueOf(subjectRestVo.getFirstAmount())).setScale(2, BigDecimal.ROUND_HALF_UP);
 			BigDecimal restAmount2 = new BigDecimal(Double.valueOf(subjectRestVo.getRestAmount())).setScale(2, BigDecimal.ROUND_HALF_UP);
 			BigDecimal borrowAmount2 = new BigDecimal(Double.valueOf(subjectRestVo.getBorrowAmount())).setScale(2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal almsAmount2 = new BigDecimal(Double.valueOf(subjectRestVo.getAlmsAmount())).setScale(2, BigDecimal.ROUND_HALF_UP);
 			subjectRestVo.setFirstAmount(firstAmount2.toString());
 			subjectRestVo.setBorrowAmount(borrowAmount2.toString());
 			subjectRestVo.setRestAmount(restAmount2.toString());
+			subjectRestVo.setAlmsAmount(almsAmount2.toString());
 		}
 		pages.setRecords(finalResult);
 		return pages;

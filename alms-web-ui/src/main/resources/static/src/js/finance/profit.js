@@ -140,7 +140,7 @@ window.layinit(function (htConfig) {
                         key: 'rowNum',
                         sortable: true//开启排序
                     }, {
-                        title: '年初数',
+                        title: '本月数',
                         key: 'firstAmount',
                         render:(h,params)=>{
                         	if(params.row.balanceName.search("合计") != -1 ) {
@@ -163,7 +163,7 @@ window.layinit(function (htConfig) {
                         }
                     }, 
                   {
-                        title: '期末数',
+                        title: '本年累计数',
                         key: 'restAmount',
                         sortable: true,
                         render:(h,params)=>{

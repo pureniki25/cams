@@ -53,7 +53,7 @@ window.layinit(function (htConfig) {
                     LE_ping_zheng_ri_qi: ''
                 },
                 current: 1,
-                size: 30
+                size: 500
             },
             editForm: {
                 id: '',

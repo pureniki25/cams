@@ -52,6 +52,24 @@ public class CustomerFirstDat extends Model<CustomerFirstDat> {
 	@TableField("first_amount")
 	@ApiModelProperty(required= true,value = "期初金额")
 	private String firstAmount;
+	
+	
+    /**
+     * 科目代码
+     */
+	@TableField(exist = false)
+	@ApiModelProperty(required= true,value = "科目代码")
+	private String subject;
+	
+	
+    /**
+     * 科目名称
+     */
+	@TableField(exist = false)
+	@ApiModelProperty(required= true,value = "科目名称")
+	private String subjectName;
+	
+	
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "")
 	private Date createTime;
@@ -72,6 +90,24 @@ public class CustomerFirstDat extends Model<CustomerFirstDat> {
 
 	public String getCompanyName() {
 		return companyName;
+	}
+	
+	
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public String getSubjectName() {
+		return subjectName;
+	}
+
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
 	}
 
 	public void setCompanyName(String companyName) {
@@ -123,6 +159,9 @@ public class CustomerFirstDat extends Model<CustomerFirstDat> {
 		return this.id;
 	}
 
+	
+
+
 	@Override
 	public String toString() {
 		return "CustomerFirstDat{" +
@@ -132,6 +171,8 @@ public class CustomerFirstDat extends Model<CustomerFirstDat> {
 			", customerName=" + customerName +
 			", firstAmount=" + firstAmount +
 			", createTime=" + createTime +
+			", subject=" + subject +
+			", subjectName=" + subjectName +
 			", period=" + period +
 			"}";
 	}

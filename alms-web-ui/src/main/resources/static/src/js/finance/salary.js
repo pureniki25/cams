@@ -57,7 +57,7 @@ window.layinit(function (htConfig) {
                     LE_salary_date: ''
                 },
                 current: 1,
-                size: 100
+                size: 500
             },
             editForm: {
                 companyId: '',

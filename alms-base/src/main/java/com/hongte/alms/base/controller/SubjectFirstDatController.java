@@ -3,8 +3,11 @@ package com.hongte.alms.base.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,6 +30,7 @@ import com.hongte.alms.base.entity.SubjectFirstDat;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.SubjectFirstDatService;
 import com.hongte.alms.base.service.SubjectRestDatService;
+import com.hongte.alms.base.vo.cams.SubjectRestVo;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 
@@ -56,6 +60,9 @@ public class SubjectFirstDatController {
 		
 		page.setOrderByField("createTime").setAsc(false);
 		subjectFirstDatService.selectByPage(page);
+		List<SubjectFirstDat> list=page.getRecords();
+		list=list.stream().sorted(Comparator.comparing(SubjectFirstDat::getSubject)).collect(Collectors.toList());
+		page.setRecords(list);
 		return PageResult.success(page.getRecords(), page.getTotal());
 	}
 	

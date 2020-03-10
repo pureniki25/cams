@@ -46,7 +46,7 @@ window.layinit(function (htConfig) {
                 LE_open_date:''
             },
             current: 1,
-            size: 100
+            size: 500
         },
         editForm: {
             companyId: '',

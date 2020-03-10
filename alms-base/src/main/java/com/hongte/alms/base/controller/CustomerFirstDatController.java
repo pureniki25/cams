@@ -1,6 +1,7 @@
 package com.hongte.alms.base.controller;
 
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import com.hongte.alms.base.entity.SubjectFirstDat;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.CustomerFirstDatService;
 import com.hongte.alms.base.service.SubjectFirstDatService;
+import com.hongte.alms.base.vo.cams.CustomerRestVo;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.vo.PageResult;
 
@@ -51,6 +53,16 @@ public class CustomerFirstDatController {
 		
 		page.setOrderByField("createTime").setAsc(false);
 		customerFirstDatService.selectByPage(page);
+		List<CustomerFirstDat> list=page.getRecords();
+		 for(CustomerFirstDat customerRestVo:list) {
+			 if(customerRestVo.getCustomerCode().contains("A")) {
+				 customerRestVo.setSubject("1131"); 
+				 customerRestVo.setSubjectName("应收账款");
+			 }else {
+				 customerRestVo.setSubject("2121"); 
+				 customerRestVo.setSubjectName("应付账款");
+			 }
+		 }
 		return PageResult.success(page.getRecords(), page.getTotal());
 	}
 	

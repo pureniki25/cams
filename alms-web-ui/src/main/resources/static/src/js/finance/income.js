@@ -48,7 +48,7 @@ window.layinit(function (htConfig) {
              
                 },
                 current: 1,
-                size: 100
+                size: 500
             },
             editForm: {
             	id:'',
@@ -104,6 +104,21 @@ window.layinit(function (htConfig) {
                     width: 100,
                     key: 'companyName',
                     sortable: true,//开启排序
+                    render: (h,params) => {
+                        return h('div',{
+                         props: {
+                           value:params.row.companyName
+                         },
+                         attrs: {
+                            contenteditable: true
+                         },
+                            on: {
+                              "blur": event => {
+                                params.row.companyName = event.target.innerText;
+                              }}
+                        },params.row.companyName)
+                      }
+                    
                 },
                       {
                     title: '发票号码',
@@ -260,7 +275,25 @@ window.layinit(function (htConfig) {
 
  
 let methods = {
-
+	addRow(){
+		debugger
+		let obj={
+				companyName:null,
+				invoiceNumber:null,
+				qiJian:null,
+				pingZhengHao:null,
+				zhaiYao:null,
+				keMuDaiMa:null,
+				localAmount:null,
+				borrowAmount:null,
+				almsAmount:null,
+				hangHao:null,
+				danWei:null,
+				createTime:null
+				
+		}
+		vm.table.data.push(obj);
+	},
 beforeUpLoadFile() {debugger//导入Excel表格
 //  vm.condata.companyId=vm.editForm.companyId;
 //  vm.condata.productPropertiesId.companyId=vm.editForm.productPropertiesId;

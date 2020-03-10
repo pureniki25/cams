@@ -89,7 +89,7 @@ let data = {
             LIKE_company_name: ''
         },
         current: 1,
-        size: 100
+        size: 500
     },
     editForm: {
         companyId: '',
