@@ -174,6 +174,40 @@ window.layinit(function (htConfig) {
                     title: '导入时间',
                     key: 'createTime',
                     sortable: true,//开启排序
+                },{
+                    title: '操作',
+                    key: 'action',
+                    // fixed: 'right',
+                    align: 'center',
+                    render: (h, params) => {
+                       
+
+                  
+                        
+                        let update = h('Button', {
+                            props: {
+                                type: '',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '10px'
+                            },
+                            on: {
+                                click: () => {
+                                    vm.update(params.row);
+                                }
+                            },
+                        }, '编辑');
+
+              
+
+                        let btnArr = [];
+                        btnArr.push(update);
+
+                      
+                        
+                        return h('div', btnArr);
+                    }
                 }
                 ],
                 data: [],

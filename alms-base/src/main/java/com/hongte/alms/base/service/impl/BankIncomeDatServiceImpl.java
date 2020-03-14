@@ -1015,6 +1015,65 @@ public class BankIncomeDatServiceImpl extends BaseServiceImpl<BankIncomeDatMappe
 			String pingZhengHao = CamsUtil.generateCode(num);
 			System.out.println(pingZhengHao);
 		}
+
+		@Override
+		public void saveIncomeDat(List<BankIncomeDat> addDats, String openDate, String companyName,String customerCode) {
+			int month = DateUtil.getMonth(DateUtil.getDate(openDate));
+			String pingZhengHao=getPingZhengHao(companyName, month);
+			BankIncomeDat incomeDat = null;
+			String uuid=UUID.randomUUID().toString();
+			for(BankIncomeDat dat:addDats) {
+				incomeDat= new BankIncomeDat();
+				incomeDat.setUuid(uuid);
+				incomeDat.setPingZhengRiQi(openDate);
+				incomeDat.setPingZhengZi("记");
+				incomeDat.setPingZhengHao(pingZhengHao);
+				incomeDat.setBankType("2");
+				incomeDat.setZhaiYao(dat.getZhaiYao());
+				incomeDat.setKeMuDaiMa(dat.getKeMuDaiMa());
+				incomeDat.setHuoBiDaiMa("RMB");
+				incomeDat.setHuiLv("1");
+				incomeDat.setShuLiang("0");
+				incomeDat.setDanJia("0");
+				incomeDat.setZhiDanRen("系统主管");
+				incomeDat.setShenHeRen("");
+				incomeDat.setGuoZhangRen("");
+				incomeDat.setFuDanJuShu("0");
+				incomeDat.setShiFouYiGuoZhang("0");
+				incomeDat.setMoBan("11记账凭证");
+				incomeDat.setCustomerCode(dat.getDanWei());
+				incomeDat.setBuMen("");
+				incomeDat.setYuanGong("");
+				incomeDat.setTongJi("");
+				incomeDat.setXiangMu("");
+				incomeDat.setFuKuanFangFa("");
+				incomeDat.setPiaoJuHao("");
+				incomeDat.setYuanBiFuKuanJinE("0");
+				incomeDat.setPingZhengLaiYuan("1");
+				incomeDat.setLaiYuanPingZheng(",,,");
+				incomeDat.setDaiDaYin("");
+				incomeDat.setZuoFeiBiaoZhi("0");
+				incomeDat.setCuoWuBiaoZhi("0");
+				incomeDat.setPingZhengCeHao("00");
+				incomeDat.setChuNaRen("");
+				incomeDat.setCompanyName(companyName);
+				incomeDat.setDeductionType("1");
+				incomeDat.setInvoiceNumber(dat.getInvoiceNumber());
+				incomeDat.setQiJian(String.valueOf(month));
+				incomeDat.setCreateTime(new Date());
+				
+				incomeDat.setKeMuDaiMa(dat.getKeMuDaiMa());
+				incomeDat.setLocalAmount(dat.getLocalAmount());
+				incomeDat.setBorrowAmount(dat.getBorrowAmount());
+				incomeDat.setAlmsAmount(dat.getAlmsAmount());
+				incomeDat.setHangHao(dat.getHangHao());
+				incomeDat.setDanWei(customerCode);
+				incomeDat.setCustomerCode(customerCode);
+			    incomeDat.setDeductionType("1");
+				insert(incomeDat);
+			}
+			
+		}
 		
 	}
 

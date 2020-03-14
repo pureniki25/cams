@@ -35,4 +35,7 @@ public interface BankIncomeDatService extends BaseService<BankIncomeDat> {
      * 转换计提税金成支付税金
      */
     public void tranferJtTaxToZhiFu(List<JtDat> list);
+    
+    //手动增加
+    public void saveIncomeDat(List<BankIncomeDat>  addDats,String openDate,String companyName,String customerCode);
 }

@@ -32,13 +32,21 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.entity.BankIncomeDat;
+import com.hongte.alms.base.entity.CamsCompany;
+import com.hongte.alms.base.entity.CamsProductProperties;
+import com.hongte.alms.base.entity.CamsSubject;
+import com.hongte.alms.base.entity.CamsTax;
 import com.hongte.alms.base.entity.CustomerDat;
 import com.hongte.alms.base.entity.ProductDat;
 import com.hongte.alms.base.entity.SellDat;
 import com.hongte.alms.base.entity.SysUserRole;
+import com.hongte.alms.base.enums.SubjectEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.CustomerDatService;
 import com.hongte.alms.base.service.ProductDatService;
@@ -46,6 +54,7 @@ import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.CamsUtil;
 import com.hongte.alms.common.util.Convert;
 import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 
@@ -88,6 +97,19 @@ public class CustomerDatController {
         customerDatService.selectByPage(page);
         return PageResult.success(page.getRecords(), page.getTotal());
     }
+    
+	@ApiOperation(value = "获取所有单位")
+	@RequestMapping("/findAllCustomer")
+	public Result findAll(@RequestBody BankIncomeDat dat) {
+		LOGGER.info("@findAll@获取所有单位--开始[]");
+		Result result = null;
+		Map<String, JSONArray> retMap = new HashMap<String, JSONArray>();
+		List<CustomerDat> list=customerDatService.selectList(new EntityWrapper<CustomerDat>().eq("company_code", dat.getCompanyName()));
+		retMap.put("customers", (JSONArray) JSON.toJSON(list, JsonUtil.getMapping()));
+		result = Result.success(retMap);
+		LOGGER.info("@findAll@获取所有单位--结束[{}]", result);
+		return result;
+	}
 	
 	@ApiOperation(value = "导入往来单位excel")
 	@RequestMapping("/importCustomerFlowExcel")
