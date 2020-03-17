@@ -1,9 +1,11 @@
 package com.hongte.alms.base.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hongte.alms.base.entity.BankIncomeDat;
 import com.hongte.alms.base.entity.CustomerDat;
 import com.hongte.alms.base.entity.JtDat;
 import com.hongte.alms.common.service.BaseService;
@@ -40,5 +42,8 @@ public interface JtDatService extends BaseService<JtDat> {
 	 */
 	public void addTaxJt(String localJine,String invoiceNumber, String openDate,
 			String pingZhengHao,String type,String companyName) throws Exception;
+	
+    //手动增加
+    public void saveJtDat(List<JtDat>  addDats,String openDate,String companyName,String customerCode,String jtType);
 		
 }

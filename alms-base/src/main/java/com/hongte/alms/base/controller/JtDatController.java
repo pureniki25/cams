@@ -27,9 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.entity.BankIncomeDat;
 import com.hongte.alms.base.entity.JtDat;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.JtDatService;
@@ -126,12 +128,35 @@ public class JtDatController {
 		return result;
 	}
 	
+	@ApiOperation(value = "新增")
+	@RequestMapping("/save")
+	public Result save(@RequestParam Map<String, Object> map) {
+		String selects = (String) map.get("selects");
+		List<JtDat>  addDats = JSONObject.parseArray(selects, JtDat.class);
+		String openDateStr = (String) map.get("date");
+		String companyName = (String) map.get("companyName");
+		String customerCode = (String) map.get("customerCode");
+		String openDate = CamsUtil.getLastDate(openDateStr);
+		String jtType = (String) map.get("jtType");
+		if(StringUtil.isEmpty(companyName)) {
+			Result.error("公司名称不能为空");
+		}
+		if(StringUtil.isEmpty(openDate)) {
+			Result.error("开票日期不能为空");
+		}	
+		if(StringUtil.isEmpty(jtType)) {
+			Result.error("计提类型不能为空");
+		}		
+		jtDatService.saveJtDat(addDats, openDate, companyName, customerCode,jtType);
+		
+			return Result.success();
+	
+	}
 	
 	@ApiOperation(value = "查询费列表")
 	@RequestMapping("/search")
 	public PageResult search(@RequestBody Page<JtDat> page) {
 		
-		page.getCondition().put("EQ_deduction_type", 1);
 		page.setOrderByField("pingZhengHao").setAsc(true);
 		jtDatService.selectByPage(page);
 		return PageResult.success(page.getRecords(), page.getTotal());
@@ -292,5 +317,25 @@ public class JtDatController {
 			return Result.error(e.getMessage());
 		}
 	}
+	
+    @ApiOperation(value = "编辑")
+    @RequestMapping("/update")
+    public Result edit(@RequestBody BankIncomeDat vo) {
+    	JtDat dat=jtDatService.selectOne(new EntityWrapper<JtDat>().eq("id", vo.getId()));
+    	dat.setPingZhengHao(vo.getPingZhengHao());
+    	dat.setZhaiYao(vo.getZhaiYao());
+    	dat.setKeMuDaiMa(vo.getKeMuDaiMa());
+    	dat.setLocalAmount(vo.getLocalAmount());
+    	if(!StringUtil.isEmpty(vo.getBorrowAmount())&&!(vo.getBorrowAmount().equals("0")||vo.getBorrowAmount().equals("0.0")||vo.getBorrowAmount().equals("0.00"))) {
+    		dat.setBorrowAmount(vo.getLocalAmount());
+    	}
+    	if(!StringUtil.isEmpty(vo.getAlmsAmount())&&!(vo.getAlmsAmount().equals("0")||vo.getAlmsAmount().equals("0.0")||vo.getAlmsAmount().equals("0.00"))) {
+    		dat.setAlmsAmount(vo.getLocalAmount());
+    	}
+    	dat.setInvoiceNumber(vo.getInvoiceNumber());
+    	dat.setCreateTime(new Date());
+    	jtDatService.updateById(dat);
+    	return Result.success();
+    }
 }
 

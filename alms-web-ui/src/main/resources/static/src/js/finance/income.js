@@ -691,7 +691,8 @@ uploadSuccess(response) {
                        
                        self.search()
                    } else {
-                       self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
+                		   alert(res.data.msg)
+                     
                    }
                })
                .catch(err => {

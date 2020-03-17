@@ -115,6 +115,12 @@ window.layinit(function (htConfig) {
                         sortable: true,//开启排序
                     },
                     {
+                        title: '单位名称',
+                        key: 'customerName',
+                        sortable: true,//开启排序
+                    },
+                    
+                    {
                         title: '科目代码',
                         key: 'subject',
                         sortable: true,//开启排序

@@ -27,7 +27,7 @@ public class BalanceVo extends PageRequest {
 	private String subjectName;
 	private String borrowAmount;
 	private String restAmount;
-	private String firstAmount;
+	private String firstAmount; //本月数
 	private Integer rowNum;
 	
 	@JsonFormat(timezone = "GMT-16",pattern = "yyyy-MM-dd")

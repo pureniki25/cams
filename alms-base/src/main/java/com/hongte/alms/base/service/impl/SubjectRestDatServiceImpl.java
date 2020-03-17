@@ -38,7 +38,9 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1411,11 +1413,24 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 	@Override
 	public Page<BalanceVo> selectProfit(SubjectRestVo vo) throws Exception {
 		// 查询科目余额表数据
-		Page<SubjectRestVo> page = selectSubjectRest(vo);
+		Page<SubjectRestVo> page = selectSubjectRest(vo);//本年累计数
+		//获取最后1月第1天
+		Date endDate=vo.getEndDate();
+		Calendar  cale=Calendar.getInstance();
+		cale.setTime(endDate);
+		cale.set(Calendar.DAY_OF_MONTH, 1);
+		Date startDate=cale.getTime();
+		vo.setBeginDate(startDate);
+		Page<SubjectRestVo> monthPage = selectSubjectRest(vo); //本月数
 		List<SubjectRestVo> list = page.getRecords();
+		List<SubjectRestVo> monthList = monthPage.getRecords();
 		Map<String, List<SubjectRestVo>> subjectType = list.stream()
 				.collect(Collectors.groupingBy(SubjectRestVo::getSubject));
 
+		Map<String, List<SubjectRestVo>> monthSubjectType = monthList.stream()
+				.collect(Collectors.groupingBy(SubjectRestVo::getSubject));
+
+		
 		Page<BalanceVo> pages = new Page<>();
 		pages.setCurrent(vo.getPage());
 		pages.setSize(vo.getLimit());
@@ -1427,7 +1442,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo1.setRowNum(1);
 		vo1.setBalanceSubeType("一、主营业务收入");
 		vo1.setBalanceName("一、主营业务收入");
-		Double firstAmount_5101 = getBalaceAmount("5101", FIRST, subjectType);
+		Double firstAmount_5101 = getBalaceAmount("5101", REST, monthSubjectType);
 		Double restAmount_5101 = getBalaceAmount("5101", REST, subjectType);
 		String firstAmountVo1 = String.valueOf((firstAmount_5101));
 		String restAmountVo1 = String.valueOf((restAmount_5101));
@@ -1442,7 +1457,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo4.setRowNum(4);
 		vo4.setBalanceSubeType("减：主营业务成本");
 		vo4.setBalanceName("减：主营业务成本");
-		Double firstAmount_5401 = getBalaceAmount("5401", FIRST, subjectType);
+		Double firstAmount_5401 = getBalaceAmount("5401", REST, monthSubjectType);
 		Double restAmount_5401 = getBalaceAmount("5401", REST, subjectType);
 		String firstAmountVo2 = String.valueOf((firstAmount_5401));
 		String restAmountVo2 = String.valueOf((restAmount_5401));
@@ -1457,7 +1472,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo5.setRowNum(5);
 		vo5.setBalanceSubeType("主营业务税金及附加");
 		vo5.setBalanceName("主营业务税金及附加");
-		Double firstAmount_5402 = getBalaceAmount("5402", FIRST, subjectType);
+		Double firstAmount_5402 = getBalaceAmount("5402", REST, monthSubjectType);
 		Double restAmount_5402 = getBalaceAmount("5402", REST, subjectType);
 		String firstAmountVo3 = String.valueOf((firstAmount_5402));
 		String restAmountVo3 = String.valueOf((restAmount_5402));
@@ -1474,8 +1489,10 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo10.setBalanceName("二、主营业务利润（亏损以“－”号填列）");
 		String firstAmountVo10 = String.valueOf(firstAmount_5101 - firstAmount_5401 - firstAmount_5402);
 		String restAmountVo10 = String.valueOf(restAmount_5101 - restAmount_5401 - restAmount_5402);
-		vo10.setFirstAmount(firstAmountVo10);
-		vo10.setRestAmount(restAmountVo10);
+		BigDecimal firstAmountVo10scale = new BigDecimal(Double.valueOf(firstAmountVo10)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal restAmountVo10scale = new BigDecimal(Double.valueOf(restAmountVo10)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		vo10.setFirstAmount(firstAmountVo10scale.toString());
+		vo10.setRestAmount(restAmountVo10scale.toString());
 		vo10.setCompanyName(vo.getCompanyName());
 		balanceVos.add(vo10);
 
@@ -1485,14 +1502,16 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo11.setRowNum(11);
 		vo11.setBalanceSubeType("加：其他业务利润（亏损以“－”号填列）");
 		vo11.setBalanceName("加：其他业务利润（亏损以“－”号填列）");
-		Double firstAmount_5102 = getBalaceAmount("5102", FIRST, subjectType);
-		Double firstAmount_5405 = getBalaceAmount("5402", FIRST, subjectType);
+		Double firstAmount_5102 = getBalaceAmount("5102", REST, monthSubjectType);
+		Double firstAmount_5405 = getBalaceAmount("5405", REST, monthSubjectType);
 		Double restAmount_5102 = getBalaceAmount("5102", REST, subjectType);
 		Double restAmount_5405 = getBalaceAmount("5405", REST, subjectType);
 		String firstAmountVo11 = String.valueOf(firstAmount_5102 - firstAmount_5405);
 		String restAmountVo11 = String.valueOf(restAmount_5102 - restAmount_5405);
-		vo11.setFirstAmount(firstAmountVo11);
-		vo11.setRestAmount(restAmountVo11);
+		BigDecimal firstAmountVo11scale = new BigDecimal(Double.valueOf(firstAmountVo11)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal restAmountVo11scale = new BigDecimal(Double.valueOf(restAmountVo11)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		vo11.setFirstAmount(firstAmountVo11scale.toString());
+		vo11.setRestAmount(restAmountVo11scale.toString());
 		vo11.setCompanyName(vo.getCompanyName());
 		balanceVos.add(vo11);
 
@@ -1502,7 +1521,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo14.setRowNum(14);
 		vo14.setBalanceSubeType("减：营业费用");
 		vo14.setBalanceName("减：营业费用");
-		Double firstAmount_5501 = getBalaceAmount("5501", FIRST, subjectType);
+		Double firstAmount_5501 = getBalaceAmount("5501", REST, monthSubjectType);
 		Double restAmount_5501 = getBalaceAmount("5501", REST, subjectType);
 		String firstAmountVo14 = String.valueOf(firstAmount_5501);
 		String restAmountVo14 = String.valueOf(restAmount_5501);
@@ -1517,7 +1536,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo15.setRowNum(15);
 		vo15.setBalanceSubeType("管理费用");
 		vo15.setBalanceName("管理费用");
-		Double firstAmount_5502 = getBalaceAmount("5502", FIRST, subjectType);
+		Double firstAmount_5502 = getBalaceAmount("5502", REST, monthSubjectType);
 		Double restAmount_5502 = getBalaceAmount("5502", REST, subjectType);
 		String firstAmountVo15 = String.valueOf(firstAmount_5502);
 		String restAmountVo15 = String.valueOf(restAmount_5502);
@@ -1532,7 +1551,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo16.setRowNum(16);
 		vo16.setBalanceSubeType("财务费用");
 		vo16.setBalanceName("财务费用");
-		Double firstAmount_5503 = getBalaceAmount("5503", FIRST, subjectType);
+		Double firstAmount_5503 = getBalaceAmount("5503", REST, monthSubjectType);
 		Double restAmount_5503 = getBalaceAmount("5503", REST, subjectType);
 		String firstAmountVo16 = String.valueOf(firstAmount_5503);
 		String restAmountVo16 = String.valueOf(restAmount_5503);
@@ -1552,8 +1571,11 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 				- Double.valueOf(firstAmountVo14) - Double.valueOf(firstAmountVo15) - Double.valueOf(firstAmountVo16));
 		String restAmountVo18 = String.valueOf(Double.valueOf(restAmountVo10) + Double.valueOf(restAmountVo11)
 				- Double.valueOf(restAmountVo14) - Double.valueOf(restAmountVo15) - Double.valueOf(restAmountVo16));
-		vo18.setFirstAmount(firstAmountVo18);
-		vo18.setRestAmount(restAmountVo18);
+		
+		BigDecimal firstAmountVo18scale = new BigDecimal(Double.valueOf(firstAmountVo18)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal restAmountVo18scale = new BigDecimal(Double.valueOf(firstAmountVo18)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		vo18.setFirstAmount(firstAmountVo18scale.toString());
+		vo18.setRestAmount(restAmountVo18scale.toString());
 		vo18.setCompanyName(vo.getCompanyName());
 		balanceVos.add(vo18);
 		pages.setRecords(balanceVos);
@@ -1564,10 +1586,12 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo19.setRowNum(19);
 		vo19.setBalanceSubeType("加：投资收益（损失以“－”号填列）");
 		vo19.setBalanceName("加：投资收益（损失以“－”号填列）");
-		Double firstAmount_5201 = getBalaceAmount("5201", FIRST, subjectType);
-		Double restAmount_5201 = getBalaceAmount("5201", REST, subjectType);
-		String firstAmountVo19 = String.valueOf(firstAmount_5201);
-		String restAmountVo19 = String.valueOf(restAmount_5201);
+		Double firstAmount_5201 = getBalaceAmount("5201", REST, monthSubjectType);
+		Double restAmount_5201 = getBalaceAmount("5201", REST, monthSubjectType);
+		BigDecimal firstAmount_5201scale = new BigDecimal(Double.valueOf(firstAmount_5201)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal restAmount_5201scale = new BigDecimal(Double.valueOf(restAmount_5201)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		String firstAmountVo19 = String.valueOf(firstAmount_5201scale);
+		String restAmountVo19 = String.valueOf(restAmount_5201scale);
 		vo19.setFirstAmount(firstAmountVo19);
 		vo19.setRestAmount(restAmountVo19);
 		vo19.setCompanyName(vo.getCompanyName());
@@ -1580,7 +1604,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo22.setRowNum(22);
 		vo22.setBalanceSubeType(" 补贴收入");
 		vo22.setBalanceName(" 补贴收入");
-		Double firstAmount_5203 = getBalaceAmount("5203", FIRST, subjectType);
+		Double firstAmount_5203 = getBalaceAmount("5203", REST, monthSubjectType);
 		Double restAmount_5203 = getBalaceAmount("5203", REST, subjectType);
 		String firstAmountVo22 = String.valueOf(firstAmount_5203);
 		String restAmountVo22 = String.valueOf(restAmount_5203);
@@ -1596,7 +1620,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo23.setRowNum(23);
 		vo23.setBalanceSubeType(" 营业外收入");
 		vo23.setBalanceName(" 营业外收入");
-		Double firstAmount_5301 = getBalaceAmount("5301", FIRST, subjectType);
+		Double firstAmount_5301 = getBalaceAmount("5301", REST, monthSubjectType);
 		Double restAmount_5301 = getBalaceAmount("5301", REST, subjectType);
 		String firstAmountVo23 = String.valueOf(firstAmount_5301);
 		String restAmountVo23 = String.valueOf(restAmount_5301);
@@ -1612,7 +1636,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo25.setRowNum(25);
 		vo25.setBalanceSubeType("减：营业外支出");
 		vo25.setBalanceName("减：营业外支出");
-		Double firstAmount_5601 = getBalaceAmount("5601", FIRST, subjectType);
+		Double firstAmount_5601 = getBalaceAmount("5601", REST, monthSubjectType);
 		Double restAmount_5601 = getBalaceAmount("5601", REST, subjectType);
 		String firstAmountVo25 = String.valueOf(firstAmount_5601);
 		String restAmountVo25 = String.valueOf(restAmount_5601);
@@ -1632,8 +1656,11 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 				+ Double.valueOf(firstAmountVo22) + Double.valueOf(firstAmountVo23) - Double.valueOf(firstAmountVo25));
 		String restAmountVo27 = String.valueOf(Double.valueOf(restAmountVo18) + Double.valueOf(restAmountVo19)
 				+ Double.valueOf(restAmountVo22) + Double.valueOf(restAmountVo23) - Double.valueOf(restAmountVo25));
-		vo27.setFirstAmount(firstAmountVo27);
-		vo27.setRestAmount(restAmountVo27);
+		
+		BigDecimal firstAmountVo27scale = new BigDecimal(Double.valueOf(firstAmountVo27)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal restAmountVo27scale = new BigDecimal(Double.valueOf(restAmountVo27)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		vo27.setFirstAmount(firstAmountVo27scale.toString());
+		vo27.setRestAmount(restAmountVo27scale.toString());
 		vo27.setCompanyName(vo.getCompanyName());
 		balanceVos.add(vo27);
 		pages.setRecords(balanceVos);
@@ -1644,7 +1671,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		vo28.setRowNum(28);
 		vo28.setBalanceSubeType("减：所得税");
 		vo28.setBalanceName("减：所得税");
-		Double firstAmount_5701 = getBalaceAmount("5701", FIRST, subjectType);
+		Double firstAmount_5701 = getBalaceAmount("5701", REST, monthSubjectType);
 		Double restAmount_5701 = getBalaceAmount("5701", REST, subjectType);
 		String firstAmountVo28 = String.valueOf(firstAmount_5701);
 		String restAmountVo28 = String.valueOf(restAmount_5701);
@@ -1662,8 +1689,10 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		v30.setBalanceName("五、净利润（净亏损以“－”号填列）");
 		String firstAmountVo30 = String.valueOf(Double.valueOf(firstAmountVo27) - Double.valueOf(firstAmountVo28));
 		String restAmountVo30 = String.valueOf(Double.valueOf(restAmountVo27) - Double.valueOf(restAmountVo28));
-		v30.setFirstAmount(firstAmountVo30);
-		v30.setRestAmount(restAmountVo30);
+		BigDecimal firstAmountVo30scale = new BigDecimal(Double.valueOf(firstAmountVo30)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal restAmountVo30scale = new BigDecimal(Double.valueOf(restAmountVo30)).setScale(2, BigDecimal.ROUND_HALF_UP);
+		v30.setFirstAmount(firstAmountVo30scale.toString());
+		v30.setRestAmount(restAmountVo30scale.toString());
 		v30.setCompanyName(vo.getCompanyName());
 		balanceVos.add(v30);
 		pages.setRecords(balanceVos);

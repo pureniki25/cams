@@ -18,6 +18,7 @@ window.layinit(function (htConfig) {
             exporting: false, //导出标志位
             submitLoading: false,
             editModal: false,
+            updateModal: false,
             subjectModal:false,
             editModalTitle: '新增',
             editModalLoading: true,
@@ -65,6 +66,17 @@ window.layinit(function (htConfig) {
                 productPropertiesId:'',
                 openDate:'',
                 feeType:'1' //费用银现
+            },
+            updateForm:{
+            	id:'',
+            	invoiceNumber:'',
+            	pingZhengHao:'',
+            	zhaiYao:'',
+            	keMuDaiMa:'',
+            	localAmount:'',
+            	borrowAmount:'',
+            	almsAmount:'',
+            	hangHao:''
             },
             subjectForm:{
             	id:'',
@@ -197,8 +209,25 @@ window.layinit(function (htConfig) {
                         }, '设置科目');
 
               
+                        
+                        let update = h('Button', {
+                            props: {
+                                type: '',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '10px'
+                            },
+                            on: {
+                                click: () => {
+                                    vm.update(params.row);
+                                }
+                            },
+                        }, '编辑');
+              
 
                         let btnArr = [];
+                        btnArr.push(update);
                         btnArr.push(subject);
 
                       
@@ -266,6 +295,39 @@ window.layinit(function (htConfig) {
 
  
 let methods = {
+	
+	update(){
+		this.updateMode=true;
+	},
+	submitUpdateForm(){
+	   	 var self = this;
+        axios.post(basePath + 'FeeDatController/update', self.updateForm)
+        .then(res => {
+            if (!!res.data && res.data.code == '1') {
+                self.$Modal.success({
+                    content: "编辑成功"
+                })
+                self.search();
+                self.hideEditModal();
+            } else {
+                self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
+            }
+        })
+        .catch(err => {
+            self.$Modal.error({content: '操作失败!'})
+        });
+	},
+	update(row) {
+		debugger
+	    this.$refs['updateForm'].resetFields();
+	    Object.assign(this.updateForm, row);
+	  
+	    this.showUpdateModal();
+	},
+	   showUpdateModal() {
+       this.updateModal= true;
+   },
+
 
 beforeUpLoadFile() {debugger//导入Excel表格
 //  vm.condata.companyId=vm.editForm.companyId;
