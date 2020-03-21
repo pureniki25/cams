@@ -498,7 +498,7 @@ public class JtDatServiceImpl extends BaseServiceImpl<JtDatMapper, JtDat> implem
 		geRendat.setChuNaRen("");
 		geRendat.setCompanyName(companyName);
 		geRendat.setDeductionType("1");
-		geRendat.setQiJian(String.valueOf(DateUtil.getMonth(DateUtil.getDate(openDate))));
+		geRendat.setQiJian(String.valueOf(DateUtil.getMonth(lastDate)));
 		geRendat.setCreateTime(new Date());
 		geRendat.setLocalAmount(tax.toString());
 		geRendat.setBorrowAmount(tax.toString());

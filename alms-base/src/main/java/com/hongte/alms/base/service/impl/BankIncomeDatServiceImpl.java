@@ -13,6 +13,7 @@ import com.hongte.alms.base.mapper.BankIncomeDatMapper;
 import com.hongte.alms.base.service.BankIncomeDatService;
 import com.hongte.alms.base.service.CustomerDatService;
 import com.hongte.alms.base.service.JtDatService;
+import com.hongte.alms.base.service.SalaryDatService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.CamsUtil;
 import com.hongte.alms.common.util.ClassCopyUtil;
@@ -56,6 +57,11 @@ public class BankIncomeDatServiceImpl extends BaseServiceImpl<BankIncomeDatMappe
 	@Autowired
 	@Qualifier("CustomerDatService")
 	CustomerDatService customerDatService;
+	
+	@Autowired
+	@Qualifier("SalaryDatService")
+	SalaryDatService salaryDatService;
+	
 
 	@Autowired
 	@Qualifier("JtDatService")
@@ -285,6 +291,32 @@ public class BankIncomeDatServiceImpl extends BaseServiceImpl<BankIncomeDatMappe
 						insertOrUpdate(geRenSuoDeShuiDat);
 					}
 					if(geRenSheBao!=null) {
+						//查询上月扣的社保对应的工资单里，看看是否没有发工资，但是有交社保的数据，如果有，要单独另外生成凭证
+						List<SalaryDat> salarys = salaryDatService.selectList(new EntityWrapper<SalaryDat>().eq("company_name", companyName)
+								.eq("salary_date", lastPingZhengRiQi));
+						BigDecimal noSalarySheBao=BigDecimal.ZERO;
+						for(SalaryDat salaryDat:salarys) {
+							if(StringUtil.isEmpty(salaryDat.getBenQiShouRu())) {
+								noSalarySheBao=noSalarySheBao.add(new BigDecimal(salaryDat.getGeRenSheBaoSum()));
+							}
+						}
+						BigDecimal geRenSheBaoSum=new BigDecimal(geRenSheBao.getLocalAmount());
+						if(noSalarySheBao.doubleValue()>0) {
+							BankIncomeDat noSalarySheBaoDat = ClassCopyUtil.copyObject(incomeDat, BankIncomeDat.class);
+							noSalarySheBaoDat.setId(null);
+							noSalarySheBaoDat.setZhaiYao("其他应收款-代垫个人社保");
+							noSalarySheBaoDat.setBankType(bankType);
+							noSalarySheBaoDat.setDeductionType("0");
+							noSalarySheBaoDat.setKeMuDaiMa("2181");
+							noSalarySheBaoDat.setPingZhengHao(pingZhengHao);
+							noSalarySheBaoDat.setLocalAmount(noSalarySheBao.toString());
+							noSalarySheBaoDat.setBorrowAmount("0.00");
+							noSalarySheBaoDat.setAlmsAmount(noSalarySheBao.toString());
+							noSalarySheBaoDat.setHangHao(String.valueOf(i));
+							insertOrUpdate(noSalarySheBaoDat);
+							geRenSheBaoSum=geRenSheBaoSum.subtract(noSalarySheBao); //减去没有交工资的那部分社保
+							i++;
+						}
 						BankIncomeDat geRenSheBaoDat = ClassCopyUtil.copyObject(incomeDat, BankIncomeDat.class);
 						geRenSheBaoDat.setId(null);
 						geRenSheBaoDat.setZhaiYao("收回代垫社保");
@@ -292,11 +324,11 @@ public class BankIncomeDatServiceImpl extends BaseServiceImpl<BankIncomeDatMappe
 						geRenSheBaoDat.setDeductionType("0");
 						geRenSheBaoDat.setKeMuDaiMa(geRenSheBao.getKeMuDaiMa());
 						geRenSheBaoDat.setPingZhengHao(pingZhengHao);
-						geRenSheBaoDat.setLocalAmount(geRenSheBao.getLocalAmount());
+						geRenSheBaoDat.setLocalAmount(geRenSheBaoSum.toString());
 						geRenSheBaoDat.setBorrowAmount("0.00");
-						geRenSheBaoDat.setAlmsAmount(geRenSheBao.getLocalAmount());
+						geRenSheBaoDat.setAlmsAmount(geRenSheBaoSum.toString());
 						geRenSheBaoDat.setHangHao(String.valueOf(i));
-						restAlmsAmount=restAlmsAmount.subtract(new BigDecimal(geRenSheBao.getLocalAmount()));
+						restAlmsAmount=restAlmsAmount.subtract(geRenSheBaoSum).subtract(noSalarySheBao);
 						i++;
 						insertOrUpdate(geRenSheBaoDat);
 					}

@@ -291,8 +291,16 @@ public class SalaryDatServiceImpl extends BaseServiceImpl<SalaryDatMapper, Salar
 			SalaryDat salary = selectOne(new EntityWrapper<SalaryDat>().eq("company_name", companyName)
 					.eq("salary_date", openDate).eq("idcard_no", cardNo));
 			if (salary == null) {
-				continue;
-			}
+				salary=new SalaryDat();
+				salary.setCompanyName(companyName);
+				salary.setName(name);
+				salary.setDanWeiSheBaoSum(danWeiSheBaoSum);
+				salary.setGeRenSheBaoSum(geRenSheBaoSum);
+				salary.setSalaryDate(openDate);
+				salary.setCreateTime(new Date());
+				insert(salary);
+				salarys.add(salary);
+			}else {
 //			salary.setJiBenYangLaoBaoXian(yangLaoBaoXian);
 //			salary.setJiBenYiLiaoBaoXian(yiLiaoBaoXian);
 //			salary.setShiYeBaoXian(shiYeBaoXian);
@@ -300,6 +308,7 @@ public class SalaryDatServiceImpl extends BaseServiceImpl<SalaryDatMapper, Salar
 			salary.setGeRenSheBaoSum(geRenSheBaoSum);
 			updateById(salary);
 			salarys.add(salary);
+			}
 		}
 	    if(salarys.size()==0) {
 	    	throw new ApplicationContextException("导入的社保的人员名单对应不上当月的工资人员名单");

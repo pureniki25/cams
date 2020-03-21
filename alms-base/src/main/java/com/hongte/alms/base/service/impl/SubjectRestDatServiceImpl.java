@@ -149,7 +149,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		    	 temp.setBorrowAmount("0");
 		    	 temp.setAlmsAmount("0");
 		    	 CamsSubject camsSubjectTemp= camsSubjectService.selectOne(new EntityWrapper<CamsSubject>().eq("id", temp.getSubject()));
-		    	 if(camsSubjectTemp==null) {
+		    	 if(camsSubjectTemp.getId().equals("3141")) {
 		    		 System.out.println("stop");
 		    	 }
 		    	 String restAmountStr=getRestAmount(temp.getFirstAmount(), temp.getBorrowAmount(), temp.getAlmsAmount(), camsSubjectTemp.getDirection());
@@ -169,6 +169,10 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 			if(tempList.size()==1&&tempList.get(0).getSubject().equals(entry.getKey())) {
 				SubjectRestVo restVo=tempList.get(0);
 				   CamsSubject camsSubjectTemp= camsSubjectService.selectOne(new EntityWrapper<CamsSubject>().eq("id", restVo.getSubject()));
+				   if(camsSubjectTemp==null) {
+					   System.out.println("stop");
+				   }
+				   System.out.println(camsSubjectTemp.getId()+"====================================");
 				   String restAmountStr=getRestAmount(restVo.getFirstAmount(), restVo.getBorrowAmount(), restVo.getAlmsAmount(), camsSubjectTemp.getDirection());
 				   restVo.setRestAmount(restAmountStr);
 				   if(entry.getKey().equals("1002-01")) {  //1002-01科目取科目期初余额表的科目名称
@@ -1737,7 +1741,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 //        map.put("public.endYear","2020");
 //        map.put("public.endMonth","2");
 //        map.put("public.endDay","1");
-		File excelFile=createNewFile(beans, tempStream, path,companyName);
+		File excelFile=createNewFile(beans, tempStream, path,companyName,tempFile);
 		downLoad(response, excelFile);
 		//删除服务器生成的文件
 		deleteFile(excelFile);
@@ -1745,12 +1749,18 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 
 	}
 	
-	  private File createNewFile(Map<String,Object> beans,InputStream tempStream,String path,String companyName) throws ParsePropertyException, InvalidFormatException, IOException {
+	  private File createNewFile(Map<String,Object> beans,InputStream tempStream,String path,String companyName,String fileType) throws ParsePropertyException, InvalidFormatException, IOException {
 		
 		   // 实例化 XLSTransformer 对象
 	        XLSTransformer xlsTransformer = new XLSTransformer();
+	        String title="企业会计制度";
+	        if(fileType.equals(CamsConstant.COMPANY_TEMP)) {
+	        	title="企业会计制度.xls";
+	        }else {
+	        	title="小企业会计准则.xls";
+	        }
 	        
-	        String name=companyName+"_财务报表报送与信息采集.xls";
+	        String name=companyName+"__"+title;
 	        File newFile=new File(path+name);
 	        
 	        
