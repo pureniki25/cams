@@ -97,7 +97,7 @@ public class ProductDatController {
 
 	@ApiOperation(value = "导入商品excel")
 	@RequestMapping("/importProductFlowExcel")
-	public Result importCustomerFlowExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
+	public Result importProductFlowExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
 		Result result = null;
 		try {
@@ -131,6 +131,35 @@ public class ProductDatController {
 			LOGGER.error("====>>>>>导入往来单位出错{}", e);
 		}
 		LOGGER.info("====>>>>>导入往来单位excel结束");
+		return result;
+	}
+	
+	
+	
+	@ApiOperation(value = "导入库存期初余额")
+	@RequestMapping("/importProductRestExcel")
+	public Result importProductRestExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
+			MultipartRequest req) {
+		Result result = null;
+		try {
+			Map<String, String[]> map = request.getParameterMap();
+			String companyName = map.get("companyName")[0];
+			if (StringUtil.isEmpty(companyName)) {
+				return Result.error("请选择公司名");
+			}
+		
+			LOGGER.info("====>>>>>导入库存期初余额[{}]", file);
+				productDatService.updateKuCunLiang(file, companyName);
+
+			result = Result.success();
+		} catch (ServiceRuntimeException se) {
+			result = Result.error(se.getErrorCode(), se.getMessage());
+			LOGGER.error("====>>>>>导入库存期初余额{}", se.getMessage());
+		} catch (Exception e) {
+			result = Result.error("500", "导入出错");
+			LOGGER.error("====>>>>>导入库存期初余额{}", e);
+		}
+		LOGGER.info("====>>>>>导入库存期初余额excel结束");
 		return result;
 	}
 

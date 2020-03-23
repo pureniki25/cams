@@ -28,7 +28,7 @@ window.layinit(function (htConfig) {
             cities: [],
             banks: [],
             upload: {
-                url: basePath + 'productDat/importProductFlowExcel',
+                url: basePath + 'productDat/importProductRestExcel',
                 headers: {
                     Authorization: axios.defaults.headers.common['Authorization'],
                 },
@@ -157,7 +157,11 @@ window.layinit(function (htConfig) {
                         title: '本期发出金',
                         key: 'outcomeJine',
                         sortable: true//开启排序
-                    }, {
+                    },    {
+                        title: '期末单价',
+                        key: 'qiMoDanJia',
+                        sortable: true//开启排序
+                    },{
                         title: '期末结存数量',
                         key: 'restKuCunLiang',
                         sortable: true,//开启排序
@@ -171,14 +175,30 @@ window.layinit(function (htConfig) {
             	            		}
                         		},params.row.restKuCunLiang)
                         	}else {
-                        		return h('span',{},params.row.keMuDaiMa)  
+                        		return h('span',{},params.row.restKuCunLiang)  
                         	}
                         }
-                    }, {
-                        title: '期末单价',
-                        key: 'qiMoDanJia',
-                        sortable: true//开启排序
+                    }, 
+                    {
+                        title: '期末结存金额',
+                        key: 'restJieCunJine',
+                        sortable: true,//开启排序
+                        render:(h,params)=>{debugger
+                        	if(Number(params.row.restJieCunJine)<0) {
+            	            		return h('span',{
+            	            			style:{
+            	            			 'font-weight': 'bold',
+            	            			 'background-color': ' #FF9999',
+            	            			 'filter': 'Alpha(Opacity=30)'
+            	            		}
+                        		},params.row.restJieCunJine)
+                        	}else {
+                        		return h('span',{},params.row.restJieCunJine)  
+                        	}
+                        }
                     }
+                    
+                 
                 ],
                 data: [],
                 loading: false,

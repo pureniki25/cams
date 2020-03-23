@@ -134,29 +134,23 @@ window.layinit(function (htConfig) {
                         width: 100,
                         key: 'productCategory',
                         sortable: true//开启排序
-                    }, {
-                        title: '最小计量单位',
-                        width: 100,
-                        key: 'minCalUnit',
+                    },  {
+                        title: '期初数量',
+                        key: 'kuCunLiang',
                         sortable: true//开启排序
-                    }, {
-                        title: '存货计量单位',
-                        width: 100,
-                        key: 'restCalUnit',
+                    },  {
+                        title: '期初单价',
+                        key: 'qiChuDanJia',
                         sortable: true//开启排序
-                    }, {
-                        title: '货位',
-                        key: 'productUnit',
+                    },  {
+                        title: '期初金额',
+                        key: 'qiChuJine',
                         sortable: true//开启排序
-                    }, {
+                    },  {
                         title: '计量单位',
                         key: 'calUnit',
                         sortable: true//开启排序
-                    }, {
-                        title: '包装单位',
-                        key: 'packageUnit',
-                        sortable: true//开启排序
-                    }, {
+                    },  {
                         title: '导入日期',
                         key: 'createTime',
                         sortable: true//开启排序

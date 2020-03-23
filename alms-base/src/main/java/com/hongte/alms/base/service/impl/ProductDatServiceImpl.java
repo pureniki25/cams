@@ -13,6 +13,7 @@ import com.hongte.alms.base.invoice.vo.BeginProductExcel;
 import com.hongte.alms.base.invoice.vo.InvoiceCustomerExcel;
 import com.hongte.alms.base.invoice.vo.InvoiceProductExcel;
 import com.hongte.alms.base.mapper.ProductDatMapper;
+import com.hongte.alms.base.mapper.ProductRestDatMapper;
 import com.hongte.alms.base.service.CamsProductPropertiesService;
 import com.hongte.alms.base.service.PickStoreDatService;
 import com.hongte.alms.base.service.ProductDatService;
@@ -68,6 +69,9 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 	
 	@Autowired
 	private ProductDatMapper productDatMapper;
+	
+	@Autowired
+	private ProductRestDatMapper productRestDatMapper;
 
 	@Override
 	public ProductDat addProductDat(String openDate, String productType, String productName, String companyName,
@@ -422,7 +426,6 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 					.eq("company_name", companyName));
 			if (product != null) {
 				product.setKuCunLiang(excel1.getKuCunLiang());
-				product.setQiChuDanJia(excel1.getQiChuDanJia());
 				product.setQiChuJine(excel1.getQiChuJine());
 				update(product, new EntityWrapper<ProductDat>().eq("product_code", excel1.getProductCode())
 						.eq("company_name", companyName));
@@ -442,9 +445,9 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 			Calendar cale = Calendar.getInstance();
 			cale.setTime(new Date());
 			// 获取当前时间的上一个月 1号
-			cale.add(Calendar.MONTH, -1);
 			cale.set(Calendar.DAY_OF_MONTH, 1);
 			vo.setBeginDate(cale.getTime());
+			vo.setLocalBeginDate(cale.getTime());
 		}
 		if(vo.getEndDate()==null) {
 			Calendar cale = Calendar.getInstance();
@@ -452,45 +455,52 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 			// 获取当前时间的上一个月 1号
 			cale.set(Calendar.DAY_OF_MONTH, 1);
 			vo.setEndDate(cale.getTime());
+			vo.setLocalEndDate(cale.getTime());
 		}
-		List<RestProductVo> list = productDatMapper.inventoryPage(pages, vo);
-		for(RestProductVo product:list) {
-			if(product.getProductCode().equals("C0001")) {
-				System.out.println("123");
-			}
-			vo.setProductCode(product.getProductCode());
-			Map<String,Object> kuCunLiangMap=getBeforeKuCunLiang(vo);
-			Double beforPickCount=(Double) kuCunLiangMap.get("beforPickCount");
-			Double beforStoreCount=(Double) kuCunLiangMap.get("beforStoreCount");
-			Double beforPickJine= (Double) kuCunLiangMap.get("beforPickJine");
-			Double beforeStoreJine= (Double) kuCunLiangMap.get("beforeStoreJine");
-			Double thisPickCount=(Double) kuCunLiangMap.get("thisPickCount");
-			Double thisStoreCount=(Double) kuCunLiangMap.get("thisStoreCount");
-			Double thisPickJine= (Double) kuCunLiangMap.get("thisPickJine");
-			Double thisStoreJine= (Double) kuCunLiangMap.get("thisStoreJine");
-			Double danJia= Double.valueOf((String) kuCunLiangMap.get("qiMoDanJia"));
-		
-			//本期发出数
-			Double outComeCount=(product.getOutcomeCount()==null?0:Double.valueOf(product.getOutcomeCount()))+thisPickCount;
-			//本期发出金额
-			Double outComeJine=(product.getOutcomeJine()==null?0.0:Double.valueOf(product.getOutcomeJine()))+(thisPickCount.doubleValue()*danJia);
-			
-			//本期收入数
-			Double incomeCount=(product.getIncomeCount()==null?0:Double.valueOf(product.getIncomeCount()))+thisStoreCount;
-			//本期收入金额
-			Double incomeJine=(product.getIncomeJine()==null?0.0:Double.valueOf(product.getIncomeJine()))+(thisStoreCount.doubleValue()*danJia);
-			Double kuCunLiang=(product.getKuCunLiang()==null?0.0:Double.valueOf(product.getKuCunLiang()));
-			Double restKuCunLiang=product.getRestKuCunLiang()==null?0.0:Double.valueOf(product.getRestKuCunLiang());
-			restKuCunLiang=restKuCunLiang+kuCunLiang-beforPickCount-thisPickCount+beforStoreCount+thisStoreCount;
-		    
-		    
-			product.setOutcomeCount(outComeCount.toString());
-			product.setIncomeCount(incomeCount.toString());
-			product.setOutcomeJine(outComeJine.toString());
-			product.setRestKuCunLiang(restKuCunLiang.toString());
-			product.setIncomeJine(incomeJine.toString());
-			product.setQiMoDanJia(danJia.toString());
+		if(null!=vo.getEndDate()) {
+			Calendar cale = Calendar.getInstance();
+			cale.setTime(vo.getEndDate());
+			vo.setLocalBeginDate(cale.getTime());
+			vo.setLocalEndDate(cale.getTime());
 		}
+		List<RestProductVo> list = productRestDatMapper.productRestPage(pages, vo);
+//		for(RestProductVo product:list) {
+//			if(product.getProductCode().equals("C0001")) {
+//				System.out.println("123");
+//			}
+//			vo.setProductCode(product.getProductCode());
+//			Map<String,Object> kuCunLiangMap=getBeforeKuCunLiang(vo);
+//			Double beforPickCount=(Double) kuCunLiangMap.get("beforPickCount");
+//			Double beforStoreCount=(Double) kuCunLiangMap.get("beforStoreCount");
+//			Double beforPickJine= (Double) kuCunLiangMap.get("beforPickJine");
+//			Double beforeStoreJine= (Double) kuCunLiangMap.get("beforeStoreJine");
+//			Double thisPickCount=(Double) kuCunLiangMap.get("thisPickCount");
+//			Double thisStoreCount=(Double) kuCunLiangMap.get("thisStoreCount");
+//			Double thisPickJine= (Double) kuCunLiangMap.get("thisPickJine");
+//			Double thisStoreJine= (Double) kuCunLiangMap.get("thisStoreJine");
+//			Double danJia= Double.valueOf((String) kuCunLiangMap.get("qiMoDanJia"));
+//		
+//			//本期发出数
+//			Double outComeCount=(product.getOutcomeCount()==null?0:Double.valueOf(product.getOutcomeCount()))+thisPickCount;
+//			//本期发出金额
+//			Double outComeJine=(product.getOutcomeJine()==null?0.0:Double.valueOf(product.getOutcomeJine()))+(thisPickCount.doubleValue()*danJia);
+//			
+//			//本期收入数
+//			Double incomeCount=(product.getIncomeCount()==null?0:Double.valueOf(product.getIncomeCount()))+thisStoreCount;
+//			//本期收入金额
+//			Double incomeJine=(product.getIncomeJine()==null?0.0:Double.valueOf(product.getIncomeJine()))+(thisStoreCount.doubleValue()*danJia);
+//			Double kuCunLiang=(product.getKuCunLiang()==null?0.0:Double.valueOf(product.getKuCunLiang()));
+//			Double restKuCunLiang=product.getRestKuCunLiang()==null?0.0:Double.valueOf(product.getRestKuCunLiang());
+//			restKuCunLiang=restKuCunLiang+kuCunLiang-beforPickCount-thisPickCount+beforStoreCount+thisStoreCount;
+//		    
+//		    
+//			product.setOutcomeCount(outComeCount.toString());
+//			product.setIncomeCount(incomeCount.toString());
+//			product.setOutcomeJine(outComeJine.toString());
+//			product.setRestKuCunLiang(restKuCunLiang.toString());
+//			product.setIncomeJine(incomeJine.toString());
+//			product.setQiMoDanJia(danJia.toString());
+//		}
 		pages.setRecords(list);
 		return pages;
 	}
@@ -568,5 +578,10 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 		cale.add(Calendar.MONTH, -1);
 		
 		System.out.println(DateUtil.formatDate(cale.getTime()));
+	}
+
+	@Override
+	public void syncProductRestData() {
+		productDatMapper.syncProductRestData();
 	}
 }

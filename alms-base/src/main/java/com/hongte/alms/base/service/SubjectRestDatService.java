@@ -26,6 +26,9 @@ public interface SubjectRestDatService extends BaseService<SubjectRestDat> {
 	 */
 	void syncPingZhengData();
 	
+	
+	
+	
 	/**
 	 * 删除科目余额表数据
 	 */

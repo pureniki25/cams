@@ -17,13 +17,13 @@ public class BeginProductExcel implements Serializable {
     private String productCode;
     @Excel(name = "商品名称", orderNum = "2")
     private String productName;
-    @Excel(name = "规格", orderNum = "3")
+    @Excel(name = "商品规格", orderNum = "3")
     private String productType;
-    @Excel(name = "数量", orderNum = "4")
+    @Excel(name = "期初数量", orderNum = "4")
     private String kuCunLiang;
-    @Excel(name = "单价", orderNum = "5")
+    @Excel(name = "期初单价", orderNum = "5")
     private String qiChuDanJia;
-    @Excel(name = "金额", orderNum = "6")
+    @Excel(name = "期初金额", orderNum = "6")
     private String qiChuJine;
 
 

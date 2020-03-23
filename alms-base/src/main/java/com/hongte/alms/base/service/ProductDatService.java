@@ -22,6 +22,13 @@ import com.hongte.alms.common.vo.PageResult;
  * @since 2019-01-26
  */
 public interface ProductDatService extends BaseService<ProductDat> {
+	
+	/**
+	 * 同步库存余额表的数据到一张库存余额表
+	 */
+	void syncProductRestData();
+	
+	
 	ProductDat addProductDat(String openDate, String productType, String productName, String companyName,
 			String productPropertiesName, String minCalUnit, String restCalUnit, String productUnit, String calUnit,
 			String packageUnit) throws UnsupportedEncodingException;

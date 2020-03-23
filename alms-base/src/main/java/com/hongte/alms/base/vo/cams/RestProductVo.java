@@ -48,6 +48,8 @@ public class RestProductVo extends PageRequest {
 	private String outcomeJine;
 
 	private String restKuCunLiang;
+	
+	private String restJieCunJine;
 
 	private String qiMoDanJia;
 	
@@ -56,6 +58,12 @@ public class RestProductVo extends PageRequest {
 	
 	@JsonFormat(timezone = "GMT-16",pattern = "yyyy-MM-dd")
 	private Date endDate;
+	
+	@JsonFormat(timezone = "GMT-16",pattern = "yyyy-MM-dd")
+	private Date localBeginDate;
+	
+	@JsonFormat(timezone = "GMT-16",pattern = "yyyy-MM-dd")
+	private Date localEndDate;
 	
 
 

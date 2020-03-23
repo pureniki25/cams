@@ -200,6 +200,117 @@
 
 	</select>
 
+	<insert id="syncProductRestData">
+		insert into tb_product_rest_dat
+		select * from (
+		<!-- #销售单 -->
+		SELECT
+		t.produce_code,
+		t.company_code,
+		p.product_name,
+		p.product_type,
+		t.open_date,
+		t.cal_unit,
+		p.ku_cun_liang as qi_chu_shu_liang,
+		p.qi_chu_jine as qi_chu_jine,
+		0 as ben_qi_shou_ru_shu_linag ,
+		0 as ben_qi_shou_ru_jine,
+		t.number as ben_qi_fa_chu_shu_linag,
+		t.local_amount as ben_qi_fa_chu_jine,
+		0 as qi_mo_jie_cun_shu_linag,
+		0 as qi_mo_dan_jia,
+		0 as qi_mo_jie_cun_jine,
+		sysdate() as create_time
+
+
+		FROM tb_sell_dat t left join tb_product_dat p on
+		t.produce_code=p.product_code and p.company_name=t.company_code
+
+
+		union
+
+
+		<!-- #采购单 -->
+		SELECT t.produce_code,
+		t.company_code,
+		p.product_name,
+		p.product_type,
+		t.open_date,
+		t.cal_unit,
+		p.ku_cun_liang as qi_chu_shu_liang,
+		p.qi_chu_jine as qi_chu_jine,
+		t.number as ben_qi_shou_ru_shu_linag ,
+		t.local_amount as ben_qi_shou_ru_jine,
+		0 as ben_qi_fa_chu_shu_linag,
+		0 as ben_qi_fa_chu_jine,
+		0 as qi_mo_jie_cun_shu_linag,
+		0 as qi_mo_dan_jia,
+		0 as qi_mo_jie_cun_jine,
+		sysdate() as create_time
+
+
+		FROM tb_buy_dat t left join tb_product_dat p on
+		t.produce_code=p.product_code and p.company_name=t.company_code
+
+
+		union
+
+		<!-- #领料单 -->
+		select
+		t.produce_code,
+		t.company_name,
+		p.product_name,
+		p.product_type,
+		t.open_date,
+		t.cal_unit,
+		p.ku_cun_liang as qi_chu_shu_liang,
+		p.qi_chu_jine as qi_chu_jine,
+		0 as ben_qi_shou_ru_shu_linag ,
+		0 as ben_qi_shou_ru_jine,
+		t.number as ben_qi_fa_chu_shu_linag,
+		t.local_amount as ben_qi_fa_chu_jine,
+		0 as qi_mo_jie_cun_shu_linag,
+		0 as qi_mo_dan_jia,
+		0 as qi_mo_jie_cun_jine,
+		sysdate() as create_time
+		from tb_pick_store_dat t left join tb_product_dat p on
+		t.produce_code=p.product_code and p.company_name=t.company_name
+		where t.pick_store_type=1
+
+
+		union
+
+		<!-- #入库单 -->
+		select
+		t.produce_code,
+		t.company_name,
+		p.product_name,
+		p.product_type,
+		t.open_date,
+		t.cal_unit,
+		p.ku_cun_liang as qi_chu_shu_liang,
+		p.qi_chu_jine as qi_chu_jine,
+		t.number as ben_qi_shou_ru_shu_linag ,
+		t.local_amount as ben_qi_shou_ru_jine,
+		0 as ben_qi_fa_chu_shu_linag,
+		0 as ben_qi_fa_chu_jine,
+		0 as qi_mo_jie_cun_shu_linag,
+		0 as qi_mo_dan_jia,
+		0 as qi_mo_jie_cun_jine,
+		sysdate() as create_time
+
+		from tb_pick_store_dat t left join tb_product_dat p on
+		t.produce_code=p.product_code and p.company_name=t.company_name
+		where t.pick_store_type=2
+
+
+		) a
+
+
+
+
+
+	</insert>
 
 
 
