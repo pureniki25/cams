@@ -468,7 +468,7 @@ public class JtDatServiceImpl extends BaseServiceImpl<JtDatMapper, JtDat> implem
 		geRendat.setBankType("2");
 		geRendat.setPingZhengZi("记");
 		geRendat.setPingZhengHao(pingZhengHao);
-		geRendat.setZhaiYao(openDate + " " + "支付个人所得税");
+		geRendat.setZhaiYao(lastPingZhengRiQi + " " + "支付个人所得税");
 		geRendat.setKeMuDaiMa(SubjectEnum.YING_JIAO_GE_REN_SUBJECT.getValue().toString());
 		geRendat.setHuoBiDaiMa("RMB");
 		geRendat.setHuiLv("1");
@@ -506,7 +506,7 @@ public class JtDatServiceImpl extends BaseServiceImpl<JtDatMapper, JtDat> implem
 		BankIncomeDat bankDat = ClassCopyUtil.copyObject(geRendat, BankIncomeDat.class);
 		bankDat.setAlmsAmount(tax.toString());
 		bankDat.setBorrowAmount("0");
-		bankDat.setZhaiYao(openDate + " " + "支付上月税金");
+		bankDat.setZhaiYao(lastPingZhengRiQi + " " + "支付上月税金");
 		bankDat.setHangHao("2");
 		bankDat.setKeMuDaiMa(SubjectEnum.ZHI_FU_SUBJECT.getValue().toString());
 		bankdatService.insert(geRendat);

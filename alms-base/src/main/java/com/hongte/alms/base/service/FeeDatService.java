@@ -1,5 +1,6 @@
 package com.hongte.alms.base.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.hongte.alms.base.entity.CamsCash;
@@ -21,7 +22,7 @@ public interface FeeDatService extends BaseService<FeeDat> {
 			String shuLiang,String productDate,String faPiaoHao,String buyType,String hanShuiJine,String buHanShuiJine,String shuie,String danJia,String feeType) throws InstantiationException, IllegalAccessException;
 
 	public void addSellPingZheng(String feeName,String companyName, CustomerDat customerDat, 
-			String shuLiang,String productDate,String faPiaoHao,String buyType,String hanShuiJine,String buHanShuiJine,String shuie,String danJia,String feeType,String productCode) throws InstantiationException, IllegalAccessException;
+			String shuLiang,String productDate,String faPiaoHao,String buyType,String hanShuiJine,String buHanShuiJine,String shuie,String danJia,String feeType,String productCode,BigDecimal cash) throws InstantiationException, IllegalAccessException;
 
 	
 	public void addBuyPingZheng(String feeName,String companyName, CustomerDat customerDat, 

@@ -183,6 +183,17 @@ public class PickStoreDatController {
 			return Result.error(e.getMessage());
 		}
 	}
+	
+	@ApiOperation(value = "自动按比例领料")
+	@RequestMapping("/addPick")
+	public Result addPick(@RequestBody PickStoreDat pickStoreDat) {
+		String openDate= pickStoreDat.getOpenDate();
+		String pencent=pickStoreDat.getPencent();
+		String compoanyName=pickStoreDat.getCompanyName();
+		System.out.println(123);
+		return null;
+	}
+	
 
 	@ApiOperation(value = "导出领料入库单")
 	@PostMapping("/export")

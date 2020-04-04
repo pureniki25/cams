@@ -243,7 +243,7 @@ public class FeeDatServiceImpl extends BaseServiceImpl<FeeDatMapper, FeeDat> imp
 	@Override
 	public void addSellPingZheng(String feeName, String companyName, CustomerDat customerDat, String shuLiang,
 			String produceDate, String faPiaoHao, String buyType, String hanShuiJine, String buHanShuiJine,
-			String shuie, String danJia, String feeType,String productCode) throws InstantiationException, IllegalAccessException {
+			String shuie, String danJia, String feeType,String productCode,BigDecimal cash) throws InstantiationException, IllegalAccessException {
         String uuid=UUID.randomUUID().toString();
  		String customerCode = customerDat.getCustomerCode();
 		feeName = CamsUtil.getProductName(feeName);
@@ -325,51 +325,97 @@ public class FeeDatServiceImpl extends BaseServiceImpl<FeeDatMapper, FeeDat> imp
 		feeDat.setUuid(uuid);
 		FeeDat buHanShuiDat = ClassCopyUtil.copyObject(feeDat, FeeDat.class);
 		FeeDat shuieDat = ClassCopyUtil.copyObject(feeDat, FeeDat.class);
+		FeeDat cashDat = ClassCopyUtil.copyObject(feeDat, FeeDat.class);
 		feeDat.setDeductionType("1");// 不能抵扣
+		if(cash.doubleValue()>0) {
+			hanShuiJine=(new BigDecimal(hanShuiJine).subtract(cash)).toString();
+		}
 		ProductDat product=productDatService.selectOne(new EntityWrapper<ProductDat>().eq("product_code", productCode).eq("company_name", companyName));
 		if(CamsConstant.FeeTypeEnum.SELL.getValue().toString().equals(feeType)) {
+			Integer i=1;
 			feeDat.setBuyType("销售发票");
 			feeDat.setKeMuDaiMa(SubjectEnum.CLIENT_SUBJECT.getValue().toString());
 			shuieDat.setKeMuDaiMa("2171-01-05"); //销项税额科目
 			buHanShuiDat.setKeMuDaiMa("5101-01");
+			feeDat.setLocalAmount(hanShuiJine);
+			feeDat.setBorrowAmount(hanShuiJine);
+			feeDat.setAlmsAmount("0.00");
+			feeDat.setHangHao(i.toString());
+			insertOrUpdate(feeDat);
+			if(cash.doubleValue()>0) {
+				cashDat.setKeMuDaiMa("1001");
+				cashDat.setLocalAmount(cash.toString());
+				cashDat.setBorrowAmount(cash.toString());
+				cashDat.setAlmsAmount("0.00");
+				cashDat.setHangHao((++i).toString());
+				insertOrUpdate(cashDat);
+			}
+			
+		
+		
+			buHanShuiDat.setDeductionType("0");
+			buHanShuiDat.setLocalAmount(buHanShuiJine);
+			buHanShuiDat.setBorrowAmount("0.00");
+			buHanShuiDat.setAlmsAmount(buHanShuiJine);
+			buHanShuiDat.setHangHao((++i).toString());
+			insertOrUpdate(buHanShuiDat);
+
+
+			shuieDat.setDeductionType("0");
+			shuieDat.setLocalAmount(shuie);
+			shuieDat.setBorrowAmount("0.00");
+			shuieDat.setAlmsAmount(shuie);
+			if(!shuie.equals("0")&&!shuie.equals("0.00")) { //如果税额为0，不插入记录
+				insertOrUpdate(shuieDat);	
+			}
+			
 		}else {
-			feeDat.setBuyType("采购发票");
-			feeDat.setKeMuDaiMa(SubjectEnum.CUSTOMER_SUBJECT.getValue().toString());
-			shuieDat.setKeMuDaiMa("2171-01-01"); //应交税金-进项税额
+			Integer i=1;
 			if(product.getProductProperties().equals(ProductTypeEnum.SHANG_PIN.getValue().toString())
 					||product.getProductProperties().equals(ProductTypeEnum.CHAN_PIN.getValue().toString())) {
 				buHanShuiDat.setKeMuDaiMa("1243");
 			}else {
 				buHanShuiDat.setKeMuDaiMa("1211");
 			}
-	
-		}
-		feeDat.setLocalAmount(hanShuiJine);
-		feeDat.setBorrowAmount(hanShuiJine);
-		feeDat.setAlmsAmount("0.00");
+			buHanShuiDat.setDeductionType("0");
+			buHanShuiDat.setLocalAmount(buHanShuiJine);
+			buHanShuiDat.setBorrowAmount(buHanShuiJine);
+			buHanShuiDat.setAlmsAmount("0.00");
+			buHanShuiDat.setHangHao(i.toString());
+			insertOrUpdate(buHanShuiDat);
+
+			shuieDat.setKeMuDaiMa("2171-01-01"); //应交税金-进项税额
+			shuieDat.setDeductionType("0");
+			shuieDat.setLocalAmount(shuie);
+			shuieDat.setBorrowAmount(shuie);
+			shuieDat.setAlmsAmount("0.00");
+			shuieDat.setHangHao((++i).toString());
+			insertOrUpdate(shuieDat);
+			
+			feeDat.setBuyType("采购发票");
+			feeDat.setKeMuDaiMa(SubjectEnum.CUSTOMER_SUBJECT.getValue().toString());
+			feeDat.setLocalAmount(hanShuiJine);
+			feeDat.setBorrowAmount("0.00");
+			feeDat.setAlmsAmount(hanShuiJine);
+			feeDat.setHangHao((++i).toString());
+			insertOrUpdate(feeDat);
+
+			if(cash.doubleValue()>0) {
+				cashDat.setKeMuDaiMa("1001");
+				cashDat.setLocalAmount(cash.toString());
+				cashDat.setBorrowAmount("0.00");
+				cashDat.setAlmsAmount(cash.toString());
+				cashDat.setHangHao((++i).toString());
+				insertOrUpdate(cashDat);
+			}
 		
-
+		
+			
+		
 	
-		buHanShuiDat.setDeductionType("0");
-		buHanShuiDat.setLocalAmount(buHanShuiJine);
-		buHanShuiDat.setBorrowAmount("0.00");
-		buHanShuiDat.setAlmsAmount(buHanShuiJine);
-	
-
-
-		shuieDat.setDeductionType("0");
-		shuieDat.setLocalAmount(shuie);
-		shuieDat.setBorrowAmount("0.00");
-		shuieDat.setAlmsAmount(shuie);
-	
-		feeDat.setHangHao("1");
-		buHanShuiDat.setHangHao("2");
-		shuieDat.setHangHao("3");
-		insertOrUpdate(feeDat);
-		insertOrUpdate(buHanShuiDat);
-		if(!shuie.equals("0")&&!shuie.equals("0.00")) { //如果税额为0，不插入记录
-			insertOrUpdate(shuieDat);	
 		}
+	
+		
 	}
 
 	@Override

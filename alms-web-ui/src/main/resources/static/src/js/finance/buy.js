@@ -22,6 +22,7 @@ window.layinit(function (htConfig) {
         editModalTitle: '新增',
         editModalLoading: true,
         detailModal: false,
+        updateModal: false,
         companys: [],
         camsTaxs: [],
         camsProductProperties:[],
@@ -58,9 +59,10 @@ window.layinit(function (htConfig) {
             createTime: '',
             productPropertiesId:'',
             openDate:''
-            
-            
         },
+        updateForm:{
+            cash:''
+            },
         condata:{
       	  companyId:"123",
       	  productPropertiesId:"234"
@@ -127,11 +129,6 @@ window.layinit(function (htConfig) {
                 key: 'createTime',
                 sortable: true,//开启排序
             }, {
-                title: '到期日期',
-                width: 100,
-                key: 'dueDate',
-                sortable: true,//开启排序
-            }, {
                 title: '开票日期',
                 width: 100,
                 key: 'openDate',
@@ -153,16 +150,12 @@ window.layinit(function (htConfig) {
                 key: 'number',
                 sortable: true,//开启排序
             },{
-                title: '原币单位',
+                title: '原币单价',
                 key: 'unitPrice',
                 sortable: true,//开启排序
             },{
                 title: '原币金额',
                 key: 'originalAmount',
-                sortable: true,//开启排序
-            },{
-                title: '本币金额',
-                key: 'localAmount',
                 sortable: true,//开启排序
             },{
                 title: '税率',
@@ -173,65 +166,40 @@ window.layinit(function (htConfig) {
                 key: 'originalTax',
                 sortable: true,//开启排序
             },{
-                title: '本币税额',
-                key: 'localhostTax',
+                title: '现金',
+                key: 'cash',
                 sortable: true,//开启排序
             }
-//            ,{
-//                title: '操作',
-//                key: 'action',
-//                // fixed: 'right',
-//                align: 'center',
-//                render: (h, params) => {
-//                    let detail = h('Button', {
-//                        props: {
-//                            type: '',
-//                            size: 'small'
-//                        },
-//                        style: {
-//                            marginRight: '10px'
-//                        },
-//                        on: {
-//                            click: () => {
-//                                vm.detail(params.row)
-//                            }
-//                        }
-//                    }, '详情');
-    //
-//                    let edit = h('Button', {
-//                        props: {
-//                            type: '',
-//                            size: 'small'
-//                        },
-//                        style: {
-//                            marginRight: '10px'
-//                        },
-//                        on: {
-//                            click: () => {
-//                                vm.edit(params.row);
-//                            }
-//                        },
-//                    }, '编辑');
-    //
-//                    let del = h('Button', {
-//                        props: {type: '', size: 'small'},
-//                        style: {marginRight: '10px'},
-//                        on: {
-//                            click: () => {
-//                                vm.delete(params.row);
-//                            }
-//                        }
-//                    }, '删除');
-    //
-//                    let btnArr = [];
-//                    btnArr.push(detail);
-//                    btnArr.push(del);
-    //
-//                  
-//                    
-//                    return h('div', btnArr);
-//                }
-//            }
+            ,{
+                title: '操作',
+                key: 'action',
+                // fixed: 'right',
+                align: 'center',
+                render: (h, params) => {
+            	    let update = h('Button', {
+                        props: {
+                            type: '',
+                            size: 'small'
+                        },
+                        style: {
+                            marginRight: '10px'
+                        },
+                        on: {
+                            click: () => {
+                                vm.update(params.row);
+                            }
+                        },
+                    }, '编辑');
+
+          
+
+                    let btnArr = [];
+                    btnArr.push(update);
+                    return h('div', btnArr);
+                  
+                    
+                }
+            }
             ],
             data: [],
             loading: false,
@@ -293,11 +261,43 @@ window.layinit(function (htConfig) {
  
 let methods = {
 
-beforeUpLoadFile() {//导入Excel表格
-//  vm.condata.companyId=vm.editForm.companyId;
-//  vm.condata.productPropertiesId.companyId=vm.editForm.productPropertiesId;
+	submitUpdateForm(){
+	   	 var self = this;
+       axios.post(basePath + 'InvoiceController/updateBuy', self.updateForm)
+       .then(res => {
+           if (!!res.data && res.data.code == '1') {
+               self.$Modal.success({
+                   content: "编辑成功"
+               })
+               self.search();
+               self.hideEditModal();
+           } else {
+               self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
+           }
+       })
+       .catch(err => {
+           self.$Modal.error({content: '操作失败!'})
+       });
+	},
+	update(row) {
+		debugger
+	    this.$refs['updateForm'].resetFields();
+	    Object.assign(this.updateForm, row);
+	  
+	    this.showUpdateModal();
+	},
+	  showUpdateModal() {
+       this.updateModal= true;
+   },
+   hideUpdateModal() {
+       this.updateModal = false;
+       this.$refs['updateForm'].resetFields();
+   },
+   beforeUpLoadFile() {
+		vm.loading =  true;
 
-},
+	}
+	,
 generateByInvoice(){
  	 var self = this;
   	if(vm.selectIds.length==0){

@@ -1,7 +1,7 @@
 package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
-
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
@@ -39,6 +39,15 @@ public class SellDat extends Model<SellDat> {
     @TableId("import_type")
 	@ApiModelProperty(required= true,value = "销售单类型 ")
 	private String importType;
+    
+    
+    /**
+     * 现金支付金额
+     */
+    @TableId("cash")
+	@ApiModelProperty(required= true,value = "现金支付金额 ")
+	private BigDecimal cash;
+    
     
     
     /**
@@ -953,6 +962,7 @@ public class SellDat extends Model<SellDat> {
 			", heTongHao=" + heTongHao +
 			", zengPinBiaoZhi=" + zengPinBiaoZhi +
 			", createTime=" + createTime +
+				", cash=" + cash +
 			"}";
 	}
 }

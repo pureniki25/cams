@@ -206,17 +206,8 @@ public class SalaryDatController {
 			for (String keMuDaiMa : resultList.keySet()) {
 				List<SalaryDat> salarys = resultList.get(keMuDaiMa);
 				BigDecimal benQiShouRuSum = BigDecimal.ZERO;
-				BigDecimal jiBenYangLaoBaoXianSum = BigDecimal.ZERO;
-				BigDecimal jiBenYiLiaoBaoXianSum = BigDecimal.ZERO;
-				BigDecimal shiYeBaoXianFeiSum = BigDecimal.ZERO;
-				BigDecimal zhuFangGongJiJinSum = BigDecimal.ZERO;
 				for (SalaryDat salary : salarys) {
-					benQiShouRuSum = benQiShouRuSum.add(new BigDecimal(salary.getBenQiShouRu()));
-					jiBenYangLaoBaoXianSum = jiBenYangLaoBaoXianSum
-							.add(new BigDecimal(salary.getJiBenYangLaoBaoXian()));
-					jiBenYiLiaoBaoXianSum = jiBenYiLiaoBaoXianSum.add(new BigDecimal(salary.getJiBenYiLiaoBaoXian()));
-					shiYeBaoXianFeiSum = shiYeBaoXianFeiSum.add(new BigDecimal(salary.getShiYeBaoXian()));
-					zhuFangGongJiJinSum = zhuFangGongJiJinSum.add(new BigDecimal(salary.getZhuFangGongJiJin()));
+					benQiShouRuSum = benQiShouRuSum.add(new BigDecimal(salary.getBenQiShouRu()==null?"0":salary.getBenQiShouRu()));
 				}
 				BigDecimal salarySum = benQiShouRuSum;
 				monthSalarySum=monthSalarySum.add(salarySum);

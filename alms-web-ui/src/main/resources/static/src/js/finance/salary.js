@@ -480,12 +480,12 @@ let methods = {
                     .then(res => {
                         debugger
                         if (!!res.data && res.data.code == '1') {
-
+                        	 self.$Modal.success({
+                                 content: '操作成功!'
+                             })
                             self.search()
                         } else {
-                            self.$Modal.error({
-                                content: '请求接口失败,消息:' + res.data.msg
-                            })
+                            alert('请求接口失败,消息:' + res.data.msg)
                         } 
                     })
                     .catch(err => {

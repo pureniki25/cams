@@ -30,7 +30,7 @@ window.layinit(function (htConfig) {
             cities: [],
             banks: [],
             upload: {
-                url: coreBasePath + 'pickStoreDatController/importStoreExcel',
+                url: coreBasePath + 'pickStoreDatController/importPickStoreExcel',
                 headers: {
                     Authorization: axios.defaults.headers.common['Authorization'],
                 },
@@ -450,7 +450,7 @@ let methods = {
         var self = this;
         //self.loading =  true;
         //self.table.loading = true;
-        axios.post(basePath + 'pickStoreDatController/searchStore', this.searchForm).then(res => {
+        axios.post(basePath + 'pickStoreDatController/searchPick', this.searchForm).then(res => {
             self.table.loading = false;
             if (!!res.data && res.data.code == 0) {
                 self.table.data = res.data.data;

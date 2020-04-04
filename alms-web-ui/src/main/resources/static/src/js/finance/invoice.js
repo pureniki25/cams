@@ -23,6 +23,7 @@ window.layinit(function (htConfig) {
             editModalTitle: '新增',
             editModalLoading: true,
             detailModal: false,
+            updateModal: false,
             selectIds:[],
             companys: [],
             camsTaxs: [],
@@ -57,6 +58,9 @@ window.layinit(function (htConfig) {
                 template: ''
                 
                 
+            },
+            updateForm:{
+            cash:''
             },
             condata:{
           	  companyId:"123",
@@ -130,11 +134,6 @@ window.layinit(function (htConfig) {
                     key: 'createTime',
                     sortable: true// 开启排序
                 }, {
-                    title: '到期日期',
-                    width: 100,
-                    key: 'dueDate',
-                    sortable: true// 开启排序
-                }, {
                     title: '开票日期',
                     width: 100,
                     key: 'openDate',
@@ -164,10 +163,6 @@ window.layinit(function (htConfig) {
                     key: 'originalAmount',
                     sortable: true// 开启排序
                 },{
-                    title: '本币金额',
-                    key: 'localAmount',
-                    sortable: true// 开启排序
-                },{
                     title: '税率',
                     key: 'taxRate',
                     sortable: true// 开启排序
@@ -176,34 +171,38 @@ window.layinit(function (htConfig) {
                     key: 'originalTax',
                     sortable: true// 开启排序
                 },{
-                    title: '本币税额',
-                    key: 'localhostTax',
+                    title: '现金',
+                    key: 'cash',
                     sortable: true// 开启排序
                 }
-// ,{
-// title: '操作',
-// key: 'action',
-// // fixed: 'right',
-// align: 'center',
-// render: (h, params) => {
-// let del = h('Button', {
-// props: {type: '', size: 'small'},
-// style: {marginRight: '10px'},
-// on: {
-// click: () => {
-// vm.delete(params.row);
-// }
-// }
-// }, '删除');
-//        
-// let btnArr = [];
-// btnArr.push(del);
-//        
-//                      
-//                        
-// return h('div', btnArr);
-// }
-// }
+				 ,{
+				 title: '操作',
+				 key: 'action',
+				 // fixed: 'right',
+				 align: 'center',
+				 render: (h, params) => {
+					    let update = h('Button', {
+                            props: {
+                                type: '',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '10px'
+                            },
+                            on: {
+                                click: () => {
+                                    vm.update(params.row);
+                                }
+                            },
+                        }, '编辑');
+
+              
+
+                        let btnArr = [];
+                        btnArr.push(update);
+                        return h('div', btnArr);
+				 }
+				 }
                 ],
                 data: [],
                 loading: false,
@@ -239,6 +238,38 @@ window.layinit(function (htConfig) {
 
  
 let methods = {
+	submitUpdateForm(){
+	   	 var self = this;
+        axios.post(basePath + 'InvoiceController/update', self.updateForm)
+        .then(res => {
+            if (!!res.data && res.data.code == '1') {
+                self.$Modal.success({
+                    content: "编辑成功"
+                })
+                self.search();
+                self.hideEditModal();
+            } else {
+                self.$Modal.error({content: '请求接口失败,消息:' + res.data.msg})
+            }
+        })
+        .catch(err => {
+            self.$Modal.error({content: '操作失败!'})
+        });
+	},
+	update(row) {
+		debugger
+	    this.$refs['updateForm'].resetFields();
+	    Object.assign(this.updateForm, row);
+	  
+	    this.showUpdateModal();
+	},
+	  showUpdateModal() {
+        this.updateModal= true;
+    },
+    hideUpdateModal() {
+        this.updateModal = false;
+        this.$refs['updateForm'].resetFields();
+    },
 
 beforeUpLoadFile() {debugger// 导入Excel表格
 	vm.loading =  true;

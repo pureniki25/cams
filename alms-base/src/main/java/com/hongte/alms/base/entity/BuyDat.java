@@ -1,7 +1,7 @@
 package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
-
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 /**
  * <p>
  * 采购单表
@@ -18,6 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author czs
  * @since 2019-02-07
  */
+@Data
 @ApiModel
 @TableName("tb_buy_dat")
 public class BuyDat extends Model<BuyDat> {
@@ -30,6 +32,8 @@ public class BuyDat extends Model<BuyDat> {
     @TableId("buy_id")
 	@ApiModelProperty(required= true,value = "采购单ID")
 	private String buyId;
+    
+    
     
     
     /**
@@ -45,6 +49,14 @@ public class BuyDat extends Model<BuyDat> {
     @TableId("deduction_type")
 	@ApiModelProperty(required= true,value = "抵扣类型")
 	private String deductionType;
+    
+    
+    /**
+     * 现金支付金额
+     */
+    @TableId("cash")
+	@ApiModelProperty(required= true,value = "现金支付金额 ")
+	private BigDecimal cash;
     
     
     /**
@@ -954,6 +966,7 @@ public class BuyDat extends Model<BuyDat> {
 			", heTongHao=" + heTongHao +
 			", zengPinBiaoZhi=" + zengPinBiaoZhi +
 			", createTime=" + createTime +
+			", cash=" + cash +
 			"}";
 	}
 

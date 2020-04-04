@@ -293,6 +293,8 @@ public class SalaryDatServiceImpl extends BaseServiceImpl<SalaryDatMapper, Salar
 			if (salary == null) {
 				salary=new SalaryDat();
 				salary.setCompanyName(companyName);
+				salary.setIdcardNo(cardNo);
+				salary.setBenQiShouRu("0");
 				salary.setName(name);
 				salary.setDanWeiSheBaoSum(danWeiSheBaoSum);
 				salary.setGeRenSheBaoSum(geRenSheBaoSum);

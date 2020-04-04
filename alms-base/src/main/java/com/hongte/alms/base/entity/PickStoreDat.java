@@ -301,7 +301,20 @@ public class PickStoreDat extends Model<PickStoreDat> {
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "")
 	private Date createTime;
+	
+	@TableField(exist=false)
+	private String pencent;
+	
+	
 
+
+	public String getPencent() {
+		return pencent;
+	}
+
+	public void setPencent(String pencent) {
+		this.pencent = pencent;
+	}
 
 	public String getPickStoreId() {
 		return pickStoreId;
