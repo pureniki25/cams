@@ -78,7 +78,7 @@
 			</if>
 		
 		AND pd.bank_type in ('1','2')
-		  ORDER BY pd.ping_zheng_Hao,pd.borrow_Amount desc
+		  ORDER BY pd.ping_zheng_Hao,pd.hang_hao 
 
 
 	</select>

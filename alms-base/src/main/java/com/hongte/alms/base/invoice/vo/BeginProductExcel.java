@@ -25,6 +25,8 @@ public class BeginProductExcel implements Serializable {
     private String qiChuDanJia;
     @Excel(name = "期初金额", orderNum = "6")
     private String qiChuJine;
+    @Excel(name = "单位", orderNum = "7")
+    private String danWei;
 
 
     

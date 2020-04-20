@@ -26,4 +26,7 @@ public interface PickStoreDatService extends BaseService<PickStoreDat> {
 	 */
 	void importPick(MultipartFile file, String companyName, String type, String openDate,CamsSubject subject)
 			throws Exception;
+	
+	void addPick( String companyName,  String openDate,PickStoreDat dat)
+			throws Exception;
 }

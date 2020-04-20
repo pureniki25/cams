@@ -529,7 +529,7 @@ let methods = {
         });
     },
 
-}
+} 
 var addInput = function (form, type, name, value) {
     var input = document.createElement("input");
     input.type = type;

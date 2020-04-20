@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -116,11 +117,8 @@ public class ProductDatController {
 			}
 
 			LOGGER.info("====>>>>>导入往来商品excel开始[{}]", file);
-			if (importType.equals("1")) {
-				productDatService.importProductDat(file, companyName, productPropertiesName);
-			} else {
-				productDatService.updateKuCunLiang(file, companyName);
-			}
+				productDatService.importProductDat(file, companyName, productPropertiesName, null);
+			
 
 			result = Result.success();
 		} catch (ServiceRuntimeException se) {
@@ -144,12 +142,22 @@ public class ProductDatController {
 		try {
 			Map<String, String[]> map = request.getParameterMap();
 			String companyName = map.get("companyName")[0];
+			String productPropertiesName = map.get("productPropertiesName")[0];
+			String openTime = map.get("qiChuRiQi")[0];
 			if (StringUtil.isEmpty(companyName)) {
 				return Result.error("请选择公司名");
 			}
-		
+			if (StringUtil.isEmpty(productPropertiesName)) {
+				return Result.error("请选择商品性质");
+			}
+			if (StringUtil.isEmpty(openTime)) { 
+				return Result.error("请选择期初日期");
+			}
+			Date date = new Date(openTime);
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+			String openDate = format.format(date.getTime()); 
 			LOGGER.info("====>>>>>导入库存期初余额[{}]", file);
-				productDatService.updateKuCunLiang(file, companyName);
+				productDatService.updateKuCunLiang(file, companyName,productPropertiesName,openDate);
 
 			result = Result.success();
 		} catch (ServiceRuntimeException se) {

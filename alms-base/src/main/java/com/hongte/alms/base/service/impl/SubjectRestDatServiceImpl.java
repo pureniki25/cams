@@ -149,7 +149,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		    	 temp.setBorrowAmount("0");
 		    	 temp.setAlmsAmount("0");
 		    	 CamsSubject camsSubjectTemp= camsSubjectService.selectOne(new EntityWrapper<CamsSubject>().eq("id", temp.getSubject()));
-		    	 if(camsSubjectTemp.getId().equals("3141")) {
+		    	 if(camsSubjectTemp==null) {
 		    		 System.out.println("stop");
 		    	 }
 		    	 String restAmountStr=getRestAmount(temp.getFirstAmount(), temp.getBorrowAmount(), temp.getAlmsAmount(), camsSubjectTemp.getDirection());
@@ -354,7 +354,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 	
 		}
 		for(SubjectRestVo subjectRestVo:finalResult) {
-			BigDecimal firstAmount2 = new BigDecimal(Double.valueOf(subjectRestVo.getFirstAmount())).setScale(2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal firstAmount2 = new BigDecimal(Double.valueOf(subjectRestVo.getFirstAmount()==null?"0":subjectRestVo.getFirstAmount())).setScale(2, BigDecimal.ROUND_HALF_UP);
 			BigDecimal restAmount2 = new BigDecimal(Double.valueOf(subjectRestVo.getRestAmount())).setScale(2, BigDecimal.ROUND_HALF_UP);
 			BigDecimal borrowAmount2 = new BigDecimal(Double.valueOf(subjectRestVo.getBorrowAmount())).setScale(2, BigDecimal.ROUND_HALF_UP);
 			BigDecimal almsAmount2 = new BigDecimal(Double.valueOf(subjectRestVo.getAlmsAmount())).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -369,10 +369,10 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 	@SuppressWarnings("unused")
 	private String getRestAmount(String firstAmount,String borrowAmount,String almsAmount,String direction) {
 		if(null!=direction&&direction.equals(CamsConstant.DirectionEnum.DAI.getValue().toString())) {
-		    Double restAmountStr=Double.valueOf(firstAmount)-Double.valueOf(borrowAmount)+Double.valueOf(almsAmount);
+		    Double restAmountStr=Double.valueOf(firstAmount==null?"0":firstAmount)-Double.valueOf(borrowAmount)+Double.valueOf(almsAmount);
 		    return restAmountStr.toString();
 		}else {
-			 Double restAmountStr=Double.valueOf(firstAmount)+Double.valueOf(borrowAmount)-Double.valueOf(almsAmount);
+			 Double restAmountStr=Double.valueOf(firstAmount==null?"0":firstAmount)+Double.valueOf(borrowAmount)-Double.valueOf(almsAmount);
 			    return restAmountStr.toString();
 		}
 		

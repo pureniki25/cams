@@ -48,7 +48,7 @@ public interface ProductDatService extends BaseService<ProductDat> {
 	 * @param packageUnit
 	 * @throws UnsupportedEncodingException
 	 */
-	void addProductDatByExcel(String productCode, String productType, String productName, String companyName,
+	ProductDat addProductDatByExcel(String productCode, String productType, String productName, String companyName,
 			String productPropertiesName, String minCalUnit, String restCalUnit, String productUnit, String calUnit,
 			String packageUnit) throws UnsupportedEncodingException;
 
@@ -60,7 +60,7 @@ public interface ProductDatService extends BaseService<ProductDat> {
 	 * @param productPropertiesName
 	 * @throws Exception
 	 */
-	void importProductDat(MultipartFile file, String companyName, String productPropertiesName) throws Exception;
+	void importProductDat(MultipartFile file, String companyName, String productPropertiesName,String openDate) throws Exception;
 
 	/**
 	 * 
@@ -68,7 +68,7 @@ public interface ProductDatService extends BaseService<ProductDat> {
 	 * @param companyName
 	 * @throws Exception
 	 */
-	void updateKuCunLiang(MultipartFile file, String companyName) throws Exception;
+	void updateKuCunLiang(MultipartFile file, String companyName,String productPropertiesName,String openDate) throws Exception;
 
 	public Page<RestProductVo> inventoryPage(RestProductVo vo);
 }

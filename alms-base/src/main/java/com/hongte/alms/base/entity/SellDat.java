@@ -42,6 +42,14 @@ public class SellDat extends Model<SellDat> {
     
     
     /**
+     * 分摊的比例
+     */
+    @TableField(exist=false)
+	@ApiModelProperty(required= true,value = "分摊的比例 ")
+	private BigDecimal percent;
+    
+    
+    /**
      * 现金支付金额
      */
     @TableId("cash")

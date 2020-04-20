@@ -305,7 +305,7 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 
 
 	@Override
-	public void addProductDatByExcel(String productCode, String productType, String productName, String companyName,
+	public ProductDat addProductDatByExcel(String productCode, String productType, String productName, String companyName,
 			String productPropertiesName, String minCalUnit, String restCalUnit, String productUnit, String calUnit,
 			String packageUnit) throws UnsupportedEncodingException {
 		CamsProductProperties properties = camsProductPropertiesService.selectOne(
@@ -338,7 +338,7 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 		tempProductDat = tempProductDatService.selectOne(tempProductDatWrapper);
 
 		if (tempProductDat != null) {
-			return;
+			return productDat;
 		}
 
 		tempProductDat = new TempProductDat();
@@ -375,11 +375,12 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 		productDat.setCreateTime(new Date());
 		productDat.setOpenDate("");
 		insert(productDat);
+		return productDat;
 	}
 
 	@Override
 	@Transactional
-	public void importProductDat(MultipartFile file, String companyName, String productPropertiesName)
+	public void importProductDat(MultipartFile file, String companyName, String productPropertiesName,String openDate)
 			throws Exception {
 		ImportParams importParams = new ImportParams();
 		List<InvoiceProductExcel> excels = ExcelImportUtil.importExcel(file.getInputStream(), InvoiceProductExcel.class,
@@ -410,18 +411,23 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 			} else {
 				danwei = "无";
 			}
-			addProductDatByExcel(excel.getProductCode(), excel.getProductType(), excel.getProductName(), companyName,
+			ProductDat dat=addProductDatByExcel(excel.getProductCode(), excel.getProductType(), excel.getProductName(), companyName,
 					productPropertiesName, danwei, danwei, danwei, danwei, danwei);
+			
+			dat.setKuCunLiang(excel.getKuCunLiang());
+			dat.setQiChuJine(excel.getQiChuJine());
+			dat.setOpenDate(openDate);
+			updateById(dat);
 
 		}
 	}
 
 	@Override
-	public void updateKuCunLiang(MultipartFile file, String companyName) throws Exception {
+	public void updateKuCunLiang(MultipartFile file, String companyName,String productPropertiesName,String openDate) throws Exception {
 		ImportParams importParams = new ImportParams();
-		List<BeginProductExcel> excels = ExcelImportUtil.importExcel(file.getInputStream(), BeginProductExcel.class,
+		List<InvoiceProductExcel> excels = ExcelImportUtil.importExcel(file.getInputStream(), InvoiceProductExcel.class,
 				importParams);
-		for (BeginProductExcel excel1 : excels) {
+		for (InvoiceProductExcel excel1 : excels) {
 			ProductDat product = selectOne(new EntityWrapper<ProductDat>().eq("product_code", excel1.getProductCode())
 					.eq("company_name", companyName));
 			if (product != null) {
@@ -429,6 +435,8 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 				product.setQiChuJine(excel1.getQiChuJine());
 				update(product, new EntityWrapper<ProductDat>().eq("product_code", excel1.getProductCode())
 						.eq("company_name", companyName));
+			}else {
+				importProductDat(file, companyName, productPropertiesName,openDate);
 			}
 
 		}

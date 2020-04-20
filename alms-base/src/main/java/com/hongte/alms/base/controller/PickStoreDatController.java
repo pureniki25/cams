@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,12 +187,32 @@ public class PickStoreDatController {
 	
 	@ApiOperation(value = "自动按比例领料")
 	@RequestMapping("/addPick")
-	public Result addPick(@RequestBody PickStoreDat pickStoreDat) {
+	public Result addPick(@RequestBody @Valid PickStoreDat pickStoreDat) throws  Exception {
 		String openDate= pickStoreDat.getOpenDate();
 		String pencent=pickStoreDat.getPencent();
 		String compoanyName=pickStoreDat.getCompanyName();
-		System.out.println(123);
-		return null;
+		if(StringUtil.isEmpty(openDate)) {
+			return Result.error("开票日期不能为空");
+		}
+		if(StringUtil.isEmpty(pencent)) {
+			return Result.error("百分比不能为空");
+		}
+		if(StringUtil.isEmpty(compoanyName)) {
+			return Result.error("公司名称不能为空");
+		}
+		if(null==pickStoreDat.getSalary()) {
+			return Result.error("人工不能为空");
+		}
+		if(null==pickStoreDat.getOtherSalary()) {
+			return Result.error("辅料不能为空");
+		}
+		try {
+		pickStoreDatService.addPick(compoanyName, openDate, pickStoreDat);
+		}catch(Exception e) {
+			LOGGER.error("按比例领料失败",e);
+			return Result.error("操作失败：",e.getMessage());
+		}
+		return Result.success();
 	}
 	
 
@@ -213,7 +234,7 @@ public class PickStoreDatController {
 		if (!StringUtil.isEmpty(beginTimeStr)) {
 			beginDate = DateUtil.formatDate(new Date(beginTimeStr));
 		}
-		if (!StringUtil.isEmpty(endTimeStr)) {
+		if (!StringUtil.isEmpty(endTimeStr)) { 
 			endDate = DateUtil.formatDate(new Date(endTimeStr));
 		}
 

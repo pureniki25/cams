@@ -218,7 +218,7 @@ public class BankIncomeDatServiceImpl extends BaseServiceImpl<BankIncomeDatMappe
 			bankDat.setPingZhengHao(pingZhengHao);
 
 			if (bankType.equals("1")) {// 收入
-				if (bankDat.getZhaiYao().contains("利息")) {// 如果是利息，银行科目和费用科目位置要调换,并且费用金额是负数
+				if (keMuDaiMa.equals("5503-01")) {// 如果是利息，银行科目和费用科目位置要调换,并且费用金额是负数
 					bankDat.setHangHao("2");
 					incomeDat.setHangHao("1");
 

@@ -1,15 +1,19 @@
 package com.hongte.alms.base.entity;
 
 import java.io.Serializable;
-
+import java.math.BigDecimal;
 import java.util.Date;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableField;
+
+import javax.validation.constraints.NotNull;
+
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
-import java.io.Serializable;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 /**
  * <p>
  * 领料入库表
@@ -19,6 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2019-07-22
  */
 @ApiModel
+@Data
 @TableName("tb_pick_store_dat")
 public class PickStoreDat extends Model<PickStoreDat> {
 
@@ -44,6 +49,7 @@ public class PickStoreDat extends Model<PickStoreDat> {
     /**
      * 公司名称
      */
+	@NotNull(message="公司名称不能为空")
 	@TableField("company_name")
 	@ApiModelProperty(required= true,value = "公司名称")
 	private String companyName;
@@ -119,6 +125,7 @@ public class PickStoreDat extends Model<PickStoreDat> {
     /**
      * 开票日期
      */
+	@NotNull(message="开票日期不能为空")
 	@TableField("open_date")
 	@ApiModelProperty(required= true,value = "开票日期")
 	private String openDate;
@@ -302,8 +309,17 @@ public class PickStoreDat extends Model<PickStoreDat> {
 	@ApiModelProperty(required= true,value = "")
 	private Date createTime;
 	
+	
+	@NotNull(message="百分比不能为空")
 	@TableField(exist=false)
 	private String pencent;
+	
+	@TableField(exist=false)
+	private BigDecimal salary;
+	
+	
+	@TableField(exist=false)
+	private BigDecimal otherSalary;
 	
 	
 
