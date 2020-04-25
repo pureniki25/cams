@@ -467,8 +467,7 @@ let methods = {
              where: vm.search,
              page: {curr: 1}
          })*/
-        vm.searchForm.condition.GE_create_time = getSearchDate(vm.searchForm.condition.GE_create_time);
-        vm.searchForm.condition.LE_create_time = getSearchDate(vm.searchForm.condition.LE_create_time);
+     
         if (vm.searchForm.condition.GE_ping_zheng_ri_qi != '') {
             vm.searchForm.condition.GE_ping_zheng_ri_qi = getSearchDate(vm.searchForm.condition.GE_ping_zheng_ri_qi);
         }

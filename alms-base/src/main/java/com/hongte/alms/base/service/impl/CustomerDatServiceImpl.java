@@ -10,6 +10,7 @@ import com.hongte.alms.base.mapper.CustomerDatMapper;
 import com.hongte.alms.base.service.CustomerDatService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.CamsUtil;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
 
 
@@ -126,7 +127,7 @@ public class CustomerDatServiceImpl extends BaseServiceImpl<CustomerDatMapper, C
 			String companyName) {
 		
 		CustomerDat customerDat=selectOne(new EntityWrapper<CustomerDat>().eq("customer_code",  customerCode).eq("company_code", companyName));
-	
+	    DateUtil.getLastEndDate();
 		if(customerDat!=null) {
 			return;
 		}else {
@@ -140,6 +141,7 @@ public class CustomerDatServiceImpl extends BaseServiceImpl<CustomerDatMapper, C
         	customerDat.setType(Integer.valueOf(type));
         	customerDat.setCustomerType("3");
         	customerDat.setCustomerName(customerName);
+        	customerDat.setOpenDate(DateUtil.formatDate(DateUtil.getThisEndDate()));
         	customerDat.setCompanyCode(companyName);
         	customerDat.setCustomerCategory("003");
         	customerDat.setXinYongEDu("0");

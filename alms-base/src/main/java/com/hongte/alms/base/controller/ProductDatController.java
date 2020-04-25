@@ -83,7 +83,14 @@ public class ProductDatController {
 		// page = new Page<>(layTableQuery.getPage(), layTableQuery.getLimit());
 		// departmentBankService.selectPage()
 		// page.getCondition().put("EQ_is_del", 0);
-
+	 	String GE_open_date=(String) page.getCondition().get("GE_open_date");
+    	String LE_open_date=(String) page.getCondition().get("LE_open_date");
+    	if(StringUtil.isEmpty(GE_open_date)) {
+    		 page.getCondition().put("GE_open_date", DateUtil.getLastFirstDate());
+    	}
+    	if(StringUtil.isEmpty(LE_open_date)) {
+   		 page.getCondition().put("LE_open_date", DateUtil.getLastEndDate());
+   	    }
 		page.setOrderByField("productCode").setOrderByField("company_name").setAsc(true);
 		productDatService.selectByPage(page);
 		return PageResult.success(page.getRecords(), page.getTotal());

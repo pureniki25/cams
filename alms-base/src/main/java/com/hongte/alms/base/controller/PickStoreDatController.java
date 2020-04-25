@@ -40,6 +40,7 @@ import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.CamsSubjectService;
 import com.hongte.alms.base.service.PickStoreDatService;
 import com.hongte.alms.base.service.SellDatService;
+import com.hongte.alms.base.service.SubjectRestDatService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
@@ -68,6 +69,11 @@ public class PickStoreDatController {
 	@Autowired
 	@Qualifier("CamsSubjectService")
 	private CamsSubjectService camsSubjectService;
+	
+	
+	@Autowired
+	@Qualifier("SubjectRestDatService")
+	private SubjectRestDatService subjectRestDatService;
 
 	@ApiOperation(value = "导入领料excel")
 	@RequestMapping("/importPickStoreExcel")
@@ -146,11 +152,14 @@ public class PickStoreDatController {
 	@ApiOperation(value = "查询领料单列表")
 	@RequestMapping("/searchPick")
 	public PageResult searchPick(@RequestBody Page<PickStoreDat> page) {
-		// Map<String,Object> searchParams = Servlets.getParametersStartingWith(request,
-		// "search_");
-		// page = new Page<>(layTableQuery.getPage(), layTableQuery.getLimit());
-		// departmentBankService.selectPage()
-		// page.getCondition().put("EQ_is_del", 0);
+	 	String GE_open_date=(String) page.getCondition().get("GE_open_date");
+    	String LE_open_date=(String) page.getCondition().get("LE_open_date");
+    	if(StringUtil.isEmpty(GE_open_date)) {
+    		 page.getCondition().put("GE_open_date", DateUtil.getLastFirstDate());
+    	}
+    	if(StringUtil.isEmpty(LE_open_date)) {
+   		 page.getCondition().put("LE_open_date", DateUtil.getLastEndDate());
+   	    }
 		page.getCondition().put("EQ_pick_store_type", 1);
 		page.setOrderByField("createTime").setAsc(false);
 		pickStoreDatService.selectByPage(page);
@@ -160,11 +169,14 @@ public class PickStoreDatController {
 	@ApiOperation(value = "查询入库单列表")
 	@RequestMapping("/searchStore")
 	public PageResult searchStore(@RequestBody Page<PickStoreDat> page) {
-		// Map<String,Object> searchParams = Servlets.getParametersStartingWith(request,
-		// "search_");
-		// page = new Page<>(layTableQuery.getPage(), layTableQuery.getLimit());
-		// departmentBankService.selectPage()
-		// page.getCondition().put("EQ_is_del", 0);
+	 	String GE_open_date=(String) page.getCondition().get("GE_open_date");
+    	String LE_open_date=(String) page.getCondition().get("LE_open_date");
+    	if(StringUtil.isEmpty(GE_open_date)) {
+    		 page.getCondition().put("GE_open_date", DateUtil.getLastFirstDate());
+    	}
+    	if(StringUtil.isEmpty(LE_open_date)) {
+   		 page.getCondition().put("LE_open_date", DateUtil.getLastEndDate());
+   	    }
 		page.getCondition().put("EQ_pick_store_type", 2);
 		page.setOrderByField("produceCode").setAsc(false);
 		pickStoreDatService.selectByPage(page);
@@ -178,6 +190,21 @@ public class PickStoreDatController {
 			for (PickStoreDat dat : pickStoreDats) {
 				pickStoreDatService.deleteById(dat.getPickStoreId());
 			}
+			return Result.success();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			return Result.error(e.getMessage());
+		}
+	}
+	
+	@ApiOperation(value = "自动生成领料单")
+	@RequestMapping("/generatePick")
+	public Result generatePick(@RequestBody @Valid PickStoreDat pickStoreDat) {
+		try {
+			String companyName=pickStoreDat.getCompanyName();
+			String openDate= pickStoreDat.getOpenDate();
+			pickStoreDatService.generatePcik(companyName, openDate, pickStoreDat);
+			
 			return Result.success();
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);

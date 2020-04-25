@@ -427,8 +427,6 @@ let methods = {
              where: vm.search,
              page: {curr: 1}
          })*/
-        vm.searchForm.condition.GE_create_time = getSearchDate(vm.searchForm.condition.GE_create_time);
-        vm.searchForm.condition.LE_create_time = getSearchDate(vm.searchForm.condition.LE_create_time);
         if (vm.searchForm.condition.GE_open_date != '') {
             vm.searchForm.condition.GE_open_date = getSearchDate(vm.searchForm.condition.GE_open_date);
         }

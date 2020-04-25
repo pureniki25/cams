@@ -19,16 +19,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.CamsSubject;
 import com.hongte.alms.base.entity.PickStoreDat;
 import com.hongte.alms.base.entity.SellDat;
 import com.hongte.alms.base.invoice.vo.PickExcel;
 import com.hongte.alms.base.mapper.PickStoreDatMapper;
 import com.hongte.alms.base.service.PickStoreDatService;
+import com.hongte.alms.base.service.ProductDatService;
 import com.hongte.alms.base.service.SellDatService;
+import com.hongte.alms.base.vo.cams.RestProductVo;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.CamsUtil;
-import com.ht.ussp.util.DateUtil;
+import com.hongte.alms.common.util.DateUtil;
 
 /**
  * <p>
@@ -53,6 +56,10 @@ public class PickStoreDatServiceImpl extends BaseServiceImpl<PickStoreDatMapper,
 	@Autowired
 	@Qualifier("SellDatService")
 	SellDatService sellDatService;
+	
+	@Autowired
+	@Qualifier("ProductDatService")
+	private ProductDatService productDatService;
 
 
 	@Override
@@ -295,6 +302,21 @@ public class PickStoreDatServiceImpl extends BaseServiceImpl<PickStoreDatMapper,
 			pickStoreDatService.insert(dat);
 		}
 		
+	}
+
+
+
+	@Override
+	public void generatePcik(String companyName, String openDate, PickStoreDat dat) throws Exception {
+		Date endDate=DateUtil.getDate(openDate);
+		Date beginDate=DateUtil.getYearFirst(DateUtil.getYear(endDate));
+		RestProductVo vo=new RestProductVo ();
+		vo.setLimit(1000);
+		vo.setPage(1);
+		vo.setBeginDate(beginDate);
+		vo.setEndDate(endDate);
+		Page<RestProductVo> page=productDatService.inventoryPage(vo);
+		List<RestProductVo> list=page.getRecords();
 	}
  
 }

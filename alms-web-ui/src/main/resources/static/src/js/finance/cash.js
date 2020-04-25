@@ -411,15 +411,8 @@ window.layinit(function (htConfig) {
             },
             searchData() {
 
-                /* table.reload('main_table', {
-                     where: vm.search,
-                     page: {curr: 1}
-                 })*/
-                if (vm.searchForm.condition.GE_create_time === '') {
-                    return
-                }
-                vm.searchForm.condition.GE_create_time = getSearchDate(vm.searchForm.condition.GE_create_time);
-                vm.searchForm.condition.LE_create_time = getSearchDate(vm.searchForm.condition.LE_create_time);
+             
+          
                 if (vm.searchForm.condition.GE_ping_zheng_ri_qi != '') {
                     vm.searchForm.condition.GE_ping_zheng_ri_qi = getSearchDate(vm.searchForm.condition.GE_ping_zheng_ri_qi);
                 }

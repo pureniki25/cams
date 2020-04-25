@@ -29,4 +29,7 @@ public interface PickStoreDatService extends BaseService<PickStoreDat> {
 	
 	void addPick( String companyName,  String openDate,PickStoreDat dat)
 			throws Exception;
+	
+	void generatePcik( String companyName,  String openDate,PickStoreDat dat)
+			throws Exception;
 }
