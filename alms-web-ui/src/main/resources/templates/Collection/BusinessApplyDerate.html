@@ -1,0 +1,593 @@
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <title>业务管理申请减免</title>
+    <script src="/properties/config.js"></script>
+    <!-- 默认主题样式 -->
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--<link rel="stylesheet" type="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!--iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--    <script src="//unpkg.com/vue/dist/vue.js"></script>
+        <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+
+    <!-- 流程组件的  -->
+    <link rel="stylesheet" href="/Components/ProcessLine/ProcessLine.css">
+    <script src="/Components/ProcessLine/ProcessLine.js"></script>
+
+    <!--表格样式-->
+    <link rel="stylesheet" href="/Components/Table/Table.css">
+
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+    <script src="http://blueimp.github.io/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
+	<script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+
+<style type="text/css">
+
+.layui-form-item {
+	border-bottom: 2px solid #DBDBDB; /*下边框线*/
+}
+
+.layui-form-item .layui-form-label {
+	width: 30%
+}
+
+.layui-form-item .layui-input-block {
+	margin-left: 35%;
+	width: 60%;
+}
+
+.input-border-none {
+	border: none;
+	font-size: 14px;
+	width: 100%;
+}
+.input-border-input {
+	font-size: 14px;
+	width: 100%;
+}
+.layui-row .grid-demo {
+	margin-left: 1%;
+	width: 90%;
+}
+
+.td_label {
+	font-weight: bolder;
+}
+.input_label{
+color: #FF3030;
+}
+.selectFile{
+    padding: 4px 10px;
+    height: 20px;
+    line-height: 20px;
+    position: relative;
+    border: 1px solid #999;
+    text-decoration: none;
+    color: #666;
+}
+.uploadFile{
+    position: absolute;
+    overflow: hidden;
+    right: 0;
+    top: 0;
+    opacity: 0;
+}
+
+
+</style>
+
+</head>
+<body>
+<!--隐藏元素-->
+<p id="businessId"  th:attr="value=${businessId}"  hidden />
+<p id="crpId"  th:attr="value=${crpId}"  hidden />
+<p id="processStatus"  th:attr="value=${processStatus}"  hidden />
+<p id="processId"  th:attr="value=${processId}"  hidden />
+<p id="pResult"  th:attr="value=${pResult}"  hidden />
+<p id="reqPageeType"  th:attr="value=${reqPageeType}"  hidden />
+
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak  >
+
+    <row type="flex" justify="end" class="code-row-bg">
+        <i-col span="24" style="text-align: center">
+            <font size="16px" color="#464c5b" >{{ applyInfoForm.title }}</font>
+
+        </i-col>
+
+    </row>
+    <!--    <row text-align="center" justify="center">
+
+            &lt;!&ndash;<Col span="24"> 张三违逾期违约金减免申请</Col>&ndash;&gt;
+
+
+
+        </row>-->
+    <br>
+    <Card>
+        <p slot="title">
+             一、审批流程
+        </p>
+       <p slot="extra">
+            <i-button  type="text" @click="showtest = !showtest"  v-show="!showtest" >
+                <Icon type="ios-arrow-up" style="font-weight: 800;font-size: 20px;"></Icon>
+            </i-button>
+            <i-button  type="text"  @click="showtest = !showtest" v-show="showtest" >
+                <Icon type="ios-arrow-down" style="font-weight: 800;font-size: 20px;"></Icon>
+            </i-button>
+        </p>
+        <div class="ProcessWarp"  v-show="showtest" >
+            <ProcessLine :data='myProcess'></ProcessLine>
+        </div>
+    </Card>
+    <br>
+    <row>
+
+        <!--<i-col span="20">-->
+        <Card>
+            <p slot="title">
+                二、基本信息
+            </p>
+     <p slot="extra">
+	            <i-button  type="text" @click="showtest2 = !showtest2"  v-show="!showtest2" >
+	                <Icon type="ios-arrow-up" style="font-weight: 800;font-size: 20px;"></Icon>
+	            </i-button>
+	            <i-button  type="text"  @click="showtest2 = !showtest2" v-show="showtest2" >
+	                <Icon type="ios-arrow-down" style="font-weight: 800;font-size: 20px;"></Icon>
+	            </i-button>
+	        </p>
+	         <div v-show="showtest2" >
+            <!--基本信息表单内容-->
+            <row :gutter="36">
+                        <i-form  v-if="otherFeeShowFlage" ref="baseInfoForm"  :model="baseInfoForm"  :rules = "validApplyInfoForm"   label-position="right" :label-width="200">
+                    <div class="table">
+                        <div class="tr">
+                                <div class="td_2" v-if="applyInfoFormEditFlage == true" ><div class="td-box"> 减免类型    </div>
+		                                 <div class="td-box"> 
+					                          <radio-group v-model="applyInfoForm.isSettleFlage" > 
+			                                        <span @click="isClosedClick(true)"> <radio label="结清减免" ></radio></span>
+			                                 </radio-group>
+										</div>
+                               </div>  
+                               <div class="td_2" v-else ><div class="td-box"> 减免类型     </div>
+	                                      <div class="td-box" > 
+					                          <radio-group v-model="applyInfoForm.isSettleFlage" > 
+			                                        <span @click="isClosedClick(true)" > <radio label="结清减免" disabled></radio></span>
+			                                 </radio-group>
+										</div>
+                               </div>
+                            <div class="td_2"> <div class="td-box"></div><div class="td-box"> </div> </div>
+                            <div class="td_2"> <div class="td-box"></div><div class="td-box"> </div> </div>
+                    <div class="td_2"> <div class="td-box"></div><div class="td-box"> </div> </div>
+                        </div>
+                        <div class="tr">
+                        
+                             <div class="td_2"> <div class="td-box">客户姓名：</div><div class="td-box">{{ baseInfoForm.customerName }} </div> </div>
+                             <div class="td_2"> <div class="td-box">业务编号：</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
+                             <div class="td_2"> <div class="td-box">申请期数：</div><div class="td-box">{{ baseInfoForm.afterId }} </div> </div>
+                            <div class="td_2"> <div class="td-box">所属分公司：</div><div class="td-box">{{ baseInfoForm.companyName }} </div> </div>
+               
+            
+                 
+                        </div>
+                        <div class="tr">
+                        <div class="td_2"> <div class="td-box">借款期限：</div><div class="td-box">{{ baseInfoForm.borrowLimit }} </div> </div>
+                        <div class="td_2"> <div class="td-box">年利率：</div><div class="td-box">{{ baseInfoForm.borrowRateStr }} </div> </div>
+                        <div class="td_2"> <div class="td-box">还款方式：</div><div class="td-box">{{ baseInfoForm.repaymentTypeName }} </div> </div>
+                        <div class="td_2"> <div class="td-box">业务类型：</div><div class="td-box">{{ baseInfoForm.businessTypeName }} </div> </div>
+              
+                        </div>
+                         <div class="tr">
+                           <div class="td_2"> <div class="td-box">借款金额：</div><div class="td-box">{{ baseInfoForm.businessBorrowMoney }} </div> </div>
+                            <div class="td_2"> <div class="td-box">出款金额：</div><div class="td-box">{{baseInfoForm.getMoney}}</div> </div>
+                            <div class="td_2"> <div class="td-box">剩余本金：</div><div class="td-box">{{baseInfoForm.remianderPrincipal}}</div> </div>
+                             <div class="td_2"> <div class="td-box">应付本金：</div><div class="td-box">{{baseInfoForm.remianderPrincipal}}</div> </div>
+                        </div>
+                        
+                        <div class="tr">
+                            <div class="td_2"> <div class="td-box">应付利息：</div><div class="td-box">{{baseInfoForm.noSettleNeedPayInterest}} </div> </div>
+                            <div class="td_2"> <div class="td-box">应付分公司服务费：</div><div class="td-box">{{baseInfoForm.noSettleNeedPayService}} </div> </div>
+                            <div class="td_2"> <div class="td-box">应付平台服务费：</div><div class="td-box">{{baseInfoForm.needPayPlatform}} </div> </div>
+                            <div class="td_2"> <a href="javascript:;" title="应付提前结清平台服务费违约金：" class="td-box">应付提前结清分公司服务费违约金：</a><div class="td-box">{{baseInfoForm.monthServicePenalty}}</div> </div>
+                        </div>
+                          <div class="tr">
+                            <div class="td_2"> <a href="javascript:;" title="应付提前结清平台服务费违约金：" class="td-box">应付提前结清平台服务费违约金：</a><div class="td-box">{{baseInfoForm.platServicePenalty}} </div> </div>
+                            <div class="td_2"> <div class="td-box">应付提前结清本金违约金：</div><div class="td-box">{{baseInfoForm.principlePenalty}} </div> </div>
+                              <div class="td_2"> <div class="td-box">上门费：</div><div class="td-box"> <i-input v-model="baseInfoForm.doorFee" @on-blur="getTotalShouldPay" placeholder="0">{{baseInfoForm.doorFee}}</i-input></div> </div>
+                              <div class="td_2"> <div class="td-box">应付总额：</div><div class="td-box">{{baseInfoForm.totalBorrowAmount}} </div> </div>
+
+                        </div>
+                    </div>
+
+                </i-form>
+                
+                    <i-form v-if="!otherFeeShowFlage" ref="baseInfoForm"  :model="baseInfoForm"  :rules = "validApplyInfoForm"   label-position="right" :label-width="100">
+                        <div class="table">
+                        <div class="tr">
+                                <div class="td_2" v-if="applyInfoFormEditFlage == true" ><div class="td-box"> 减免类型    </div>
+		                                 <div class="td-box"> 
+					                          <radio-group v-model="applyInfoForm.isSettleFlage" > 
+			                                        <span @click="isClosedClick(true)"> <radio label="结清减免" checked ></radio></span> 
+			                                       <span @click="isClosedClick(false)"> <radio label="月还减免" ></radio></span> 
+			                                 </radio-group>
+										</div>
+                               </div>  
+                               <div class="td_2" v-else ><div class="td-box"> 减免类型     </div>
+	                                      <div class="td-box" > 
+					                          <radio-group v-model="applyInfoForm.isSettleFlage" > 
+			                                        <span @click="isClosedClick(true)" > <radio label="结清减免" disabled></radio></span> 
+			                                       <span @click="isClosedClick(false)"> <radio label="月还减免" disabled ></radio></span> 
+			                                 </radio-group>
+										</div>
+                               </div>
+                        </div>
+                           <div class="tr">
+                        
+                             <div class="td_2"> <div class="td-box">客户姓名：</div><div class="td-box">{{ baseInfoForm.customerName }} </div> </div>
+                             <div class="td_2"> <div class="td-box">业务编号：</div><div class="td-box">{{ baseInfoForm.businessId }} </div> </div>
+                             <div class="td_2"> <div class="td-box">申请期数：</div><div class="td-box">{{ baseInfoForm.afterId }} </div> </div>
+                            <div class="td_2"> <div class="td-box">所属分公司：</div><div class="td-box">{{ baseInfoForm.companyName }} </div> </div>
+               
+            
+                 
+                        </div>
+                        <div class="tr">
+                        <div class="td_2"> <div class="td-box">借款期限：</div><div class="td-box">{{ baseInfoForm.borrowLimit }} </div> </div>
+                        <div class="td_2"> <div class="td-box">年利率：</div><div class="td-box">{{ baseInfoForm.borrowRateStr }} </div> </div>
+                        <div class="td_2"> <div class="td-box">还款方式：</div><div class="td-box">{{ baseInfoForm.repaymentTypeName }} </div> </div>
+                        <div class="td_2"> <div class="td-box">业务类型：</div><div class="td-box">{{ baseInfoForm.businessTypeName }} </div> </div>
+              
+                        </div>
+                         <div class="tr">
+                           <div class="td_2"> <div class="td-box">借款金额：</div><div class="td-box">{{ baseInfoForm.businessBorrowMoney }} </div> </div>
+                            <div class="td_2"> <div class="td-box">出款金额：</div><div class="td-box">{{baseInfoForm.getMoney}}</div> </div>
+                            <div class="td_2"> <div class="td-box">剩余本金：</div><div class="td-box">{{baseInfoForm.remianderPrincipal}}</div> </div>
+                             <div class="td_2"> <div class="td-box">应付本金：</div><div class="td-box">{{baseInfoForm.noSettleNeedPayPrincipal}}</div> </div>
+                        </div>
+                        
+                        <div class="tr">
+                            <div class="td_2"> <div class="td-box">应付利息：</div><div class="td-box">{{baseInfoForm.noSettleNeedPayInterest}} </div> </div>
+                            <div class="td_2"> <div class="td-box">应付分公司服务费：</div><div class="td-box">{{baseInfoForm.noSettleNeedPayService}} </div> </div>
+                             <div class="td_2"> <div class="td-box">应付平台服务费：</div><div class="td-box">{{baseInfoForm.needPayPlatform}} </div> </div>
+                            <div class="td_2"> <div class="td-box">应付总额：</div><div class="td-box">{{baseInfoForm.totalBorrowAmount}} </div> </div>
+                         </div>
+                       
+                    </div>
+             
+
+                </i-form>
+            </row>
+            </div>
+           
+        </Card>
+        
+    
+
+
+        <Card>
+            <p slot="title">
+                三、减免信息
+            </p>
+              <p slot="extra">
+	            <i-button  type="text" @click="showtest3 = !showtest3"  v-show="!showtest3" >
+	                <Icon type="ios-arrow-up" style="font-weight: 800;font-size: 20px;"></Icon>
+	            </i-button>
+	            <i-button  type="text"  @click="showtest3 = !showtest3" v-show="showtest3" >
+	                <Icon type="ios-arrow-down" style="font-weight: 800;font-size: 20px;"></Icon>
+	            </i-button>
+	        </p>
+	          <div v-show="showtest3" >
+            <!--申请信息表单内容-->
+            <row :gutter="16" style="margin-top:1rem">
+                <i-form ref="applyInfoForm"  :model="applyInfoForm"  :rules = "validApplyInfoForm"  label-position="right" :label-width="100">
+                    <row :gutter="16" >
+                         <i-col span="5">
+                            <form-item v-if="applyInfoFormEditFlage"  label="申请减免金额："   prop="applyDerateMoney">
+                                <i-input v-model="applyInfoForm.applyDerateMoney" @on-blur="checkApplyDerateMoney()" ></i-input>
+                            </form-item>
+                            <form-item v-else label="申请减免金额："   prop="applyDerateMoney" disabled>
+                                <i-input v-model="applyInfoForm.applyDerateMoney" disabled ></i-input>
+                            </form-item>
+                            
+                        
+                           
+                        </i-col>
+                        
+                         <i-col span="5">
+                          <form-item  label="减免后应还金额："   disabled>
+                                <i-input v-model="applyInfoForm.shouldReceiveMoney" disabled ></i-input>
+                            </form-item>
+                          </i-col>
+                             <i-col span="5">
+                          <form-item v-if="applyInfoFormEditFlage"  label="计划还款日期："  prop="planRepayTime">
+                                <date-picker v-model="applyInfoForm.planRepayTime"
+                                             placement="bottom-end" placeholder="选择日期"
+                                             :options="planRepayTimeOption"
+                                             format="yyyy-MM-dd"
+                                             style="width: 200px"></date-picker>
+                            </form-item>
+                                 <form-item v-else label="计划还款日期："  prop="planRepayTime">
+                                     <date-picker v-model="applyInfoForm.planRepayTime"
+                                                  placement="bottom-end" placeholder="选择日期"
+                                                  :options="planRepayTimeOption"
+                                                  format="yyyy-MM-dd"
+                                                  disabled
+                                                  style="width: 200px"></date-picker>
+                                 </form-item>
+                          </i-col>
+                
+                 
+                    </row>
+     
+                   
+                    <row :gutter="16">
+                        <i-col v-if="applyInfoFormEditFlage" span="22">
+                            <form-item    label="减免原因："   prop="derateReson" >
+                                <i-input v-model="applyInfoForm.derateReson" type="textarea" :rows="4" placeholder="请填写减免原因" maxlength="500" ></i-input>
+                            </form-item>
+                        </i-col>
+                        <i-col v-else span="22">
+                            <form-item   label="减免原因："   prop="derateReson" disabled >
+                                <i-input v-model="applyInfoForm.derateReson" type="textarea" :rows="4" placeholder="请填写减免原因" disabled></i-input>
+                            </form-item>
+                        </i-col>
+                    </row>
+                </i-form>
+                
+                	<div class="layui-row">
+				<div class="layui-col-xs6 layui-col-md12">
+					<div class="grid-demo layui-bg-gray">
+						<tr>
+								<td colspan="5"> 
+									<div class="progress" style="background-color: #E8E8E8">
+	           					 		<div class="bar"  style="width: 0%;">0%</div>
+	        						</div>  
+	        					</td>
+	        				</tr>
+						<table class="layui-table" id="fTab">
+							<tr v-for="(info, index) in returnRegFiles">
+								<td class="td_label" >附件{{index+1}}<input type="text" hidden="" v-model="info.oldDocId" :id="'docId'+index" /></td>
+								<td v-if="applyInfoFormEditFlage">
+									<a href="javascript:;" class="selectFile">请选择
+									<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+										class="uploadFile"/>
+										
+									</a>{{info.name}}
+								</td>
+								<td v-else disabled>
+									<a href="javascript:;" class="selectFile" disabled>请选择
+									<input type="file" title="请选择" v-model="info.file" :id="'uploadfile'+index" v-on:click="uploadFile($event,index)" width="100px"
+										class="uploadFile" disabled/>
+										
+									</a>{{info.name}}
+								</td>
+								<td class="td_label" v-if="applyInfoFormEditFlage">重命名文件名称</td>
+								<td v-if="applyInfoFormEditFlage">
+									  <i-input v-model="info.originalName" :id="'uploadfileName'+index"></i-input>
+								</td>
+								<td>
+								<td v-if="applyInfoFormEditFlage">
+								  <div class="layui-btn-group">
+								    <button class="layui-btn layui-btn-primary layui-btn-sm" v-on:click="addTabTr($event)"><i class="layui-icon"></i></button>
+								    
+								    <button class="layui-btn layui-btn-primary layui-btn-sm"  v-on:click="removeTabTr($event, index)"><i class="layui-icon"></i></button>
+								    <a  class="layui-btn layui-btn-primary layui-btn-sm downLoadBtn"  @click="downloadFile(info)" >下载</a>
+								  
+								  </div>
+								
+								</td>
+								<td v-else>
+								  <div class="layui-btn-group">
+								    <a  class="layui-btn layui-btn-primary layui-btn-sm downLoadBtn"  @click="downloadFile(info)" >下载</a>
+								  </div>
+								
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+            </row>
+            </div>
+        </Card>
+
+		<Card>
+			<p slot="title" >
+			四、减免明细
+			</p>
+				</p>
+			      <p slot="extra">
+	            <i-button  type="text" @click="showtest4 = !showtest4"  v-show="!showtest4" >
+	                <Icon type="ios-arrow-up" style="font-weight: 800;font-size: 20px;"></Icon>
+	            </i-button>
+	            <i-button  type="text"  @click="showtest4 = !showtest4" v-show="showtest4" >
+	                <Icon type="ios-arrow-down" style="font-weight: 800;font-size: 20px;"></Icon>
+	            </i-button>
+	        </p>
+	        <div v-show="showtest4">
+            <div style="background-color:rgba(204, 235, 248, 1);height:30px;padding:5px 20px">
+                <span style="color:#169BD5">
+                   减免明细合计：上标金额总额(元):{{projAmountTotal}},原应还金额总额(元):{{itemAmountTotal}},减免金额总额(元):{{itemDerateAmountTotal}},减免后应还金额总额(元):{{itemRepayAmountTotal}}
+                </span>
+            </div>
+         <i-col span="24" style="position: relative;z-index: 500;">
+            <!-- 使用方法渲染模式 -->
+            <table id="applyTable" lay-filter="applyTable"></table>
+        </i-col>
+
+            <i-col>
+                <div id="reduceRemarks">
+                    <p>注：非逾期类减免费用优先减免顺序按阶段划分：</p>
+                    <p>6.28日之后减免的费用顺序为：本金违约金、分公司服务费违约金、平台服务费违约金、 分公司服务费、平台服务费、利息、本金 优先减免共借标在减免主标的</p>
+                </div>
+
+            </i-col>
+
+        <Card v-if="approvalInfoFormShowFlage">
+            <p slot="title">
+                五、审批信息
+            </p>
+            <!--审批信息表单内容-->
+            <row :gutter="16">
+                <i-form ref="approvalInfoForm"  :model="approvalInfoForm"   :rules = "approvalInfoFormValidate"  label-position="right" :label-width="100">
+
+                    <row :gutter="16" v-for="(approvalInfo) in approvalInfoList"   :value="approvalInfo.processLogId" :key="approvalInfo.processLogId">
+                        <i-col span="4" >
+                            <font size="3px" color="#464c5b">{{approvalInfo.stepName}}</font>
+                        </i-col>
+                        <i-col span="20">
+                            <row :gutter="16">
+                                <i-col span="20" >
+                                    <form-item label="是否同意审批："   >
+                                        <radio-group v-model="approvalInfo.isPassFlage" disabled>
+                                            <radio label="是" disabled></radio>
+                                            <radio label="否" disabled></radio>
+                                        </radio-group>
+                                    </form-item>
+                                </i-col>
+                            </row>
+                            <row :gutter="16">
+                                <i-col span="22">
+                                    <i-input v-model="approvalInfo.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" disabled  placeholder="请填写审批记录"></i-input>
+                                </i-col>
+                            </row>
+                            <row >
+                                <i-col span="8"  offset="16">
+                                    <form-item label="审批人：" >{{ approvalInfo.approveUserName }} </form-item>
+                                </i-col>
+                                <i-col span="8"  offset="16">
+                                    <form-item label="审批日期：" >{{ approvalInfo.createTime }} </form-item>
+                                </i-col>
+                            </row>
+                        </i-col>
+                    </row>
+                    <!--当前审批人操作信息  开始-->
+                    <row  v-if = "applyOprShowFlage"  :gutter="16"  >
+                        <i-col span="4" >
+                            <font size="3px" color="#464c5b">{{approvalInfoForm.approvalUserInfo}}</font>
+                        </i-col>
+                        <i-col span="20">
+                            <row :gutter="16">
+                                <i-col span="6" >
+                                    <form-item label="是否同意审批："  prop="isPassFlage">
+                                        <radio-group v-model="approvalInfoForm.isPassFlage" @click="isPassClick()" >
+                                            <span @click="isPassClick(true)"> <radio label="是" ></radio> </span>
+                                            <span @click="isPassClick(false)"> <radio label="否" ></radio> </span>
+                                            <!--<radio label="是" ></radio>-->
+                                            <!--<radio label="否" ></radio>-->
+                                        </radio-group>
+                                    </form-item>
+                                </i-col>
+                                <i-col v-if="rockBackShowFlage" span="6" >
+                                    <form-item label="是否回退："  prop="isDirectBack">
+                                        <radio-group v-model="approvalInfoForm.isDirectBackFlage" >
+                                            <span @click="isRockBackClick(true)"> <radio label="是" ></radio> </span>
+                                            <span @click="isRockBackClick(false)"> <radio label="否" ></radio> </span>
+                                        </radio-group>
+                                    </form-item>
+                                </i-col>
+                               <i-col v-if="rockBackStepShowFlage" span="10" >
+                                   <form-item label="回退步骤：" prop="areaId">
+                                       <i-select v-model="approvalInfoForm.nextStep" clearable  filterable >
+                                           <i-option v-for="item in rockBackStepList" :value="item.step" :key="item.stepName">{{ item.stepName }}</i-option>
+                                       </i-select>
+                                   </form-item>
+                                </i-col>
+                            </row>
+                            <row :gutter="16">
+                                <i-col span="22">
+                                    <i-input v-model="approvalInfoForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}"   placeholder="请填写审批记录"></i-input>
+                                </i-col>
+                            </row>
+                            <row >
+                                <i-col span="8"  offset="16">
+                                    <form-item label="审批人：" >{{ approvalInfoForm.approveUserName }} </form-item>
+                                </i-col>
+                                <i-col span="8"  offset="16">
+                                    <form-item label="审批日期：" >{{ approvalInfoForm.approveDate }} </form-item>
+                                </i-col>
+                            </row>
+                        </i-col>
+                    </row>
+                    <!--当前审批人操作信息  结束-->
+
+                    <!--抄送信息  开始-->
+                    <row  v-if = "applyOprShowFlage"  :gutter="16" >
+                        <i-col span="4" >
+                            <font size="3px" color="#464c5b">添加抄送</font>
+                        </i-col>
+                        <i-col span="20">
+                            <row :gutter="16">
+                                <form-item label="选择抄送人员：" >
+                                    <i-select v-model="approvalInfoForm.sendUserIds"  multiple filterable>
+                                        <i-option v-for="item in canSendUserList" :value="item.userId" :key="item.userName">{{ item.userName }}</i-option>
+                                    </i-select>
+                                </form-item>
+                            </row>
+                            <row :gutter="16">
+                                <i-col span="22">
+                                    <i-input v-model="approvalInfoForm.copySendInfo" type="textarea" :autosize="{minRows: 3,maxRows: 5}"   placeholder="请填写抄送备注"></i-input>
+                                </i-col>
+                            </row>
+
+                        </i-col>
+                    </row>
+                    <!--抄送信息  结束-->
+
+                </i-form>
+            </row>
+            
+        </Card>
+
+        <row style="padding: 10px">  <!--@click="showCollectionStackLog()"-->
+            <i-col span="24">
+                          <div class="layui-btn-group" style="float: right;" >
+                            <button v-if = "buttonShowFlage" class="layui-btn"  @click="saveAppply()">提交审批</button>
+                            <button v-if ="saveDraftShowFlage" class="layui-btn" @click="saveDeraf()">保存草稿</button>
+                            
+<!--                                        <button v-if = "buttonShowFlage" class="layui-btn"  @click="alert('系统升级中')">提交审批</button> -->
+<!--                             <button v-if ="saveDraftShowFlage" class="layui-btn" @click="alert('系统升级中')">保存草稿</button> -->
+                            <button v-if = "buttonShowFlage" class="layui-btn layui-btn-danger" @click="resetEdit()">撤销</button>
+                              <button v-if = "startAgainFlage" class="layui-btn layui-btn-danger" @click="saveAppply()">再次发起</button>
+                          </div>
+            </i-col>
+        </row>
+       </div>
+      </Card>
+
+    </row>
+    <br>
+
+</div>
+
+<script src="/src/js/collection/businessApplyDerate.js" ></script>
+<script>
+
+</script>
+</body>
+</html>

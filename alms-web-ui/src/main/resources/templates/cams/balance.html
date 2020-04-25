@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>科目余额表</title>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+    <link rel="stylesheet" type="text/css" href="/plugins/layui/css/layui.css" media="all" />
+    <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/plugins/upLoadTree/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
+    <script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
+    <script src="/build/js/appToken.js"></script>
+    <style type="text/css">
+        .layui-form-item {
+            border-bottom: 2px solid #DBDBDB;
+            /*下边框线*/
+        }
+
+        .layui-form-item .layui-form-label {
+            width: 30%
+        }
+
+        .layui-form-item .layui-input-block {
+            margin-left: 35%;
+            width: 60%;
+        }
+
+        .input-border-none {
+            border: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .input-border-input {
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .layui-row .grid-demo {
+            margin-left: 1%;
+            width: 90%;
+        }
+
+        .td_label {
+            font-weight: bolder;
+        }
+
+        .input_label {
+            color: #FF3030;
+        }
+
+        .selectFile {
+            padding: 4px 10px;
+            height: 20px;
+            line-height: 20px;
+            position: relative;
+            border: 1px solid #999;
+            text-decoration: none;
+            color: #666;
+        }
+
+        .uploadFile {
+            position: absolute;
+            overflow: hidden;
+            right: 0;
+            top: 0;
+            opacity: 0;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <Row style="padding:10px">
+            <i-col span="24">
+                <Card>
+                    <p slot="title">
+                        <Icon type="ios-search" />搜索条件</p>
+
+                    <div class="layui-btn-group" slot="extra">
+                        <button class="layui-btn layui-btn-sm" @click="search">
+                            <span v-show="!loading"> <i class="layui-icon">&#xe615;</i>查询</span>
+                            <span v-else><i
+                                    class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                        </button>
+
+                        <button class="layui-btn layui-btn-sm" @click="daochu">
+                            <span v-if="!loading"> <i class="layui-icon">&#xe615;</i>导出</span>
+                            <span v-else><i
+                                    class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>导出中...</span>
+                        </button>
+                        <!-- 
+                        <button class="layui-btn layui-btn-sm"
+                            @click="editForm.accountId=null;editModal=true;">导入</button>
+                        <button class="layui-btn layui-btn-sm" @click="deleteAll">删除</button> -->
+                    </div>
+                    <i-form ref="searchForm" :model="searchForm" label-position="right" label-width="100">
+                        <Row :gutter="0">
+                            <i-col span="5">
+                                <Form-item label="公司名称:" prop="companyName">
+                                    <i-select v-model="searchForm.companyName" clearable filterable>
+                                        <!--<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>-->
+                                        <i-option v-for="item in companys" :value="item.companyName"
+                                            :key="item.companyName">{{item.companyName}}</i-option>
+                                    </i-select>
+                                </Form-item>
+                            </i-col>
+
+
+                        </Row>
+                        <Row :gutter="5">
+                            <i-col span="3">
+                                <form-item label="开票日期:" prop="openDate">
+                                    <date-picker type=date v-model="searchForm.beginDate"
+                                        placement="bottom-end" placeholder="开始日期" style="width: 200px"></date-picker>
+                                </form-item>
+                            </i-col>
+                            <i-col span="1">
+                                <form-item label="至">
+                                </form-item>
+                            </i-col>
+                            <i-col span="1">
+                                <form-item label="" prop="openDate">
+                                    <date-picker type="date" v-model="searchForm.endDate"
+                                        placement="bottom-end" placeholder="结束日期" style="width: 200px"></date-picker>
+
+                                    <!--<date-picker  v-model="searchForm.showRepayDateBegin" type="date" placeholder="Select date"   style="width: 200px"></date-picker>-->
+                                </form-item>
+                            </i-col>
+                        </Row>
+                    </i-form>
+                </Card>
+            </i-col>
+        </Row>
+
+        <Row style="padding:10px">
+            <i-col span="24">
+                <table id="main_table" lay-filter="main_table"></table>
+                <!--                     <script type="text/html" id="bar_tools"> 
+                        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">编辑</a>&ndash;&gt;
+                        <a class="layui-btn layui-btn-xs layui-btn-danger " lay-event="del">删除</a>
+                    </script>-->
+                <i-table ref="selection" :columns="table.col" :data="table.data" :loading="table.loading"
+                    @on-selection-change="requires" stripe></i-table>
+                <p style="text-align: center; margin-top: 20px;">
+                    <Page :total="table.total" :page-size="searchForm.size" @on-change="paging"
+                        :current="searchForm.current" show-total></Page>
+                </p>
+            </i-col>
+        </Row>
+
+
+        <Modal :title="editModalTitle" v-model="editModal" :loading="editModalLoading" @on-ok="submitEditForm"
+            @on-cancel="hideEditModal" :styles="{top: '150px'}" width="70" height="100">
+            <i-form ref="editForm" :model="editForm" :rules="ruleValidate" label-position="right" label-width="50">
+                <!--<input type="hidden" v-model="editForm.accountId"/>-->
+
+                <i-col span="6">
+                    <Form-item label="公司名称:" prop="companyName">
+                        <i-select v-model="editForm.companyName" clearable filterable>
+                            <!--<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>-->
+                            <i-option v-for="item in companys" :value="item.companyName" :key="item.companyName">
+                                {{item.companyName}}</i-option>
+                        </i-select>
+                    </Form-item>
+                </i-col>
+
+                <!--<input type="hidden" v-model="editForm.accountId"/>-->
+
+                <i-col span="6">
+                    <Form-item label="商品性质:" prop="productPropertiesName">
+                        <i-select v-model="editForm.productPropertiesName" clearable filterable>
+                            <!--<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>-->
+                            <i-option v-for="item in camsProductProperties" :value="item.productPropertiesName"
+                                :key="item.productPropertiesName">{{item.productPropertiesName}}</i-option>
+                        </i-select>
+                    </Form-item>
+                </i-col>
+
+                <i-col span="6">
+                    <Form-item label="导入类型:" prop="importType">
+                        <i-select v-model="editForm.importType" clearable filterable>
+                            <i-option :value="1" :key="1">期初往来单位</i-option>
+                            <i-option :value="2" :key="1">期初商品</i-option>
+                        </i-select>
+                    </Form-item>
+                </i-col>
+
+                <!--                                   <i-col span="6"> -->
+                <!--                                     <Form-item label="税率:" prop="taxId"> -->
+                <!--                                         <i-select v-model="searchForm.condition.LIKE_tax_name" clearable filterable> -->
+                <!--                                             <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option> -->
+                <!--                                             <i-option v-for="item in camsTaxs" :value="item.taxId" :key="item.taxId">{{item.taxName}}</i-option> -->
+                <!--                                         </i-select> -->
+                <!--                                     </Form-item> -->
+                <!--                                 </i-col> -->
+
+
+          
+          
+
+                </i-col>
+
+            </i-form>
+        </Modal>
+
+
+
+        <Modal title="详情" v-model="detailModal" :closable="false" :mask-closable="false">
+            <Row :gutter="16" style="margin-top: 15px;">
+                <i-col span="6">公司名称：</i-col>
+                <i-col span="18">{{editForm.companyName}}</i-col>
+            </Row>
+
+        </Modal>
+
+
+    </div>
+    <script src="/plugins/vue/vue.min.js"></script>
+    <script src="/plugins/iview/js/iview.js"></script>
+    <script src="/plugins/layui/layui.js"></script>
+    <script src="/plugins/axios/axios.min.js"></script>
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <script src="/properties/config.js"></script>
+    <script src="/build/js/appToken.js"></script>
+    <script src="/src/js/comm.js"></script>
+    <script src="/src/js/finance/balance.js"></script>
+</body>
+
+</html>

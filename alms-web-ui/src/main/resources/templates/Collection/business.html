@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-cn">
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+    <title>业务管理</title>
+    <script src="/properties/config.js"></script>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
+    <!-- iview样式 -->
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
+    <!--@import url("//unpkg.com/iview/dist/styles/iview.css");-->
+    <!--<link rel="stylesheet" type="text/css" href="//unpkg.com/iview/dist/styles/iview.css"/>-->
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+    <link rel="stylesheet" href="/plugins/popover/popover.css">
+    <!--   <script src="//unpkg.com/vue/dist/vue.js"></script>
+       <script src="//unpkg.com/iview/dist/iview.min.js"></script>-->
+    <!-- 引入vue -->
+    <script type="text/javascript" src="/plugins/vue/vue.min.js"></script>
+    <!-- iview js -->
+    <script type="text/javascript" src="/plugins/iview/js/iview.js"></script>
+    <!--引入layui.js-->
+    <script src="/plugins/layui/layui.js"></script>
+    <!--引入axios.js 用于ajax调用-->
+    <script src="/plugins/axios/axios.min.js"></script>
+    <!-- 引入jQuery，必须在appToken.js 之前引入 -->
+    <script src="/build/js/jquery-3.3.1.min.js"></script>
+    <!-- 设置全局请求头:app、Authorization -->
+    <script src="/build/js/appToken.js"></script>
+    <!--引入公共的一些方法-->
+    <script src="/src/js/comm.js"></script>
+    <!-- 弹出下拉组件 -->
+    <script src="/plugins/popover/popover.js"></script>
+</head>
+<body>
+<!--隐藏元素-->
+<!--<p id="staffType"  th:attr="value=${staffType}"  hidden />-->
+<!--使用v-cloak技术，在vue渲染完毕前隐藏页面，渲染完成后显示-->
+<div id="app" v-cloak>
+
+    <!-- 搜索工具框 开始-->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <Card>
+                <p slot="title">
+                    <Icon type="ios-search"></Icon>
+                    搜索条件
+                </p>
+
+
+          
+
+                <!--查询表单内容-->
+                <row :gutter="16">
+                    <i-form ref="searchForm" :model="searchForm" :rules="ruleValidate" label-position="right"
+                            :label-width="100">
+                    
+                  
+                    
+                        <i-col span="8"  v-if="isShowMoreQuery">
+                            <form-item label="分公司：" prop="companyId">
+                                <i-select v-model="searchForm.companyId" clearable filterable>
+                                    <i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{
+                                        item.areaName }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        <i-col span="8" >
+                            <form-item label="应还日期：" prop="showRepayDateRange">
+                                <date-picker type="daterange" v-model="searchForm.showRepayDateRange"
+                                             placement="bottom-end" placeholder="选择日期"
+                                             style="width: 200px"></date-picker>
+
+                            </form-item>
+                        </i-col>
+                        <i-col span="8">
+                            <form-item label="客户名称：" prop="customerName">
+                                <i-input v-model="searchForm.customerName"></i-input>
+                            </form-item>
+                        </i-col>
+
+                        <i-col span="8" v-if="isShowMoreQuery">
+                            <form-item label="业务获取：" prop="operatorName">
+                                <i-input v-model="searchForm.operatorName"></i-input>
+                            </form-item>
+                        </i-col>
+                       <!--repayStatus:'',          //还款状态-->
+                        <i-col span="8" v-if="isShowMoreQuery">
+                            <form-item label="还款状态：" prop="repayStatus">
+                                <i-select v-model="searchForm.repayStatus" clearable filterable style="width:200px">
+                                    <i-option v-for="item in repayStatusList" :value="item.paramName"
+                                              :key="item.paramName">{{ item.paramName }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                        <i-col span="8">
+                            <form-item label="业务编号：" prop="businessId">
+                                <i-input v-model="searchForm.businessId"></i-input>
+                            </form-item>
+                        </i-col>
+                     <i-col span="8" v-if="isShowMoreQuery">
+                            <form-item label="出款平台：" prop="paymentPlatform">
+                                <i-select v-model="searchForm.paymentPlatform" clearable filterable>
+                                    <i-option v-for="item in paymentPlatformList" :value="item"
+                                              :key="item">{{ item }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                     
+
+                      
+                        <i-col span="8" v-if="isShowMoreQuery">
+                            <form-item label="业务类型：" prop="businessType">
+                                <i-select v-model="searchForm.businessType" clearable filterable>
+                                    <i-option v-for="item in businessTypeList" :value="item.businessTypeId"
+                                              :key="item.businessTypeId">{{ item.businessTypeName }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+                   
+                 
+
+                 
+                        <!--businessStatus:'',          //业务状态-->
+                        <i-col span="8" v-if="isShowMoreQuery">
+                            <form-item label="业务状态：" prop="businessStatus">
+                                <i-select v-model="searchForm.businessStatus" clearable filterable style="width:200px">
+                                    <i-option v-for="item in businessStatusList" :value="item.paramValue"
+                                              :key="item.paramValue">{{ item.paramName }}
+                                    </i-option>
+                                </i-select>
+                            </form-item>
+                        </i-col>
+
+                
+
+                        <!--customerName:'',     //客户名字-->
+                 
+               
+
+                    </i-form>
+                </row>
+
+                <div style="text-align: center;">
+                    <button class="layui-btn layui-btn-sm" @click="toLoading" v-if="authValid('search')">
+                        <span v-if="!loading"><i class="layui-icon">&#xe615;</i>查询</span>
+                        <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                    </button>
+                    <button class="layui-btn layui-btn-sm" v-if="authValid('reset')" @click="handleReset('searchForm')">
+                        <span>重置</span>
+                    </button>
+                    <button class="layui-btn layui-btn-sm" id="exportBtn" v-if="authValid('export')" :disabled="exporting"
+                            @click="clickExport">
+                         <span v-if="!exporting">导出</span>
+                        <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>导出中...</span>
+                    </button>
+                </div>
+            </Card>
+        </i-col>
+    </row>
+    <!-- 搜索工具框 结束-->
+
+    <!-- 批量操作按钮 开始-->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <!--:loading="saving"-->
+            <i-button v-if="authValid('setPhone')" type="info" @click="showSetPhoneStaff()"> 分配电催</i-button>
+            <i-button v-if="authValid('setVisit')" type="info" @click="showSetVisitStaff()"> 移交催收</i-button>
+            <!--            <i-button type="info" @click="showSetOutsideCommission()"> 委外受理</i-button>
+                        <i-button type="info" @click="showTestCalculation()"> 结清试算</i-button>-->
+
+        </i-col>
+    </row>
+    <!-- 批量操作按钮 结束-->
+
+
+    <!-- 表单Grid，使用layerUI的表格组件 开始 -->
+    <row style="padding: 10px">
+        <i-col span="24">
+            <!-- 使用方法渲染模式 -->
+            <table id="listTable" lay-filter="listTable"></table>
+            <div style="display: none; " id="barTools">
+                <!--layui-btn layui-btn-xs-->
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="operate" id="operate">操作</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="info" ht-auth="detail" v-if="authValid('detail')">详情</a>
+            </div>
+        </i-col>
+    </row>
+    <!-- 表单Grid，使用layerUI的表格组件 结束 -->
+
+    <!--导出Excel隐藏表单-->
+
+    <iframe id="frame" name="iframe" style="display:none;"></iframe>
+    <!--导出Excel隐藏表单-->
+
+
+    <!--设置电催Modal-->
+    <!--<Modal   ref="menu_modal"   v-model="menu_modal" title="菜单管理">-->
+    <!--    <Modal v-model="menu_modal" title="设置电催"
+               :styles="{left:'0px',top:'10px',width:'1300px',height:'1000px'}"
+               :mask-closable="false">
+            &lt;!&ndash;<row>&ndash;&gt;
+                <iframe src="setPhoneStaffUI" width="1250px" height="1000px" ></iframe>
+            &lt;!&ndash;</row>&ndash;&gt;
+            <div slot="footer">
+                &lt;!&ndash;<i-button type="error" size="large" long :loading="modal_loading" @click="del">Delete</i-button>&ndash;&gt;
+            </div>
+        </Modal>-->
+
+    <!--单行操作按钮Modal-->
+    <!-- <Modal  ref="edit_modal" v-model="edit_modal" title="选择操作">
+         <row>
+             <i-button type="info" @click="showCollectionStackLog()">贷后跟踪记录</i-button>
+             </i-col>
+             <i-col span="6">
+             <i-button type="info" @click="showApplyDerate()">减免申请</i-button>
+              <i-button type="info" @click="showDeduction()">执行代扣</i-button>
+             <i-button type="info" @click="showCarLoanData()">移交法务诉讼（车）</i-button>
+             <i-button type="info" @click="showHouseLoanData()">移交法务诉讼（房）</i-button>
+
+             </i-col>
+             <i-col span="6">
+             <i-button type="info" @click="showDeduction()">执行代扣</i-button>
+             </i-col>
+             <i-col span="6">
+             <i-button type="info" @click="showdragRegistration()">拖车登记</i-button>
+             </i-col>
+             <i-col span="6">
+             <i-button type="info" @click="showRepaymentRegister()">还款登记</i-button>
+             </i-col>
+             <i-col span="6">
+             <i-button type="info" @click="showCheckFundPool()">查看款项池</i-button>
+             </i-col>
+         </row>
+         <row>
+
+         </row>
+         <div slot="footer">
+         </div>
+     </Modal>-->
+
+
+</div>
+<script src="/src/js/collection/business.js"></script>
+<script>
+
+</script>
+</body>
+</html>
