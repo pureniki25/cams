@@ -417,6 +417,7 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 			dat.setKuCunLiang(excel.getKuCunLiang());
 			dat.setQiChuJine(excel.getQiChuJine());
 			dat.setOpenDate(openDate);
+			dat.setQiChuDanJia(excel.getDanJia());
 			updateById(dat);
 
 		}
@@ -448,7 +449,6 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 		Page<RestProductVo> pages = new Page<>();
 		pages.setCurrent(vo.getPage());
 		pages.setSize(vo.getLimit());
-	
 		if(vo.getBeginDate()==null) {
 			Calendar cale = Calendar.getInstance();
 			cale.setTime(new Date());
@@ -468,8 +468,14 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 		if(null!=vo.getEndDate()) {
 			Calendar cale = Calendar.getInstance();
 			cale.setTime(vo.getEndDate());
-			vo.setLocalBeginDate(cale.getTime());
+			vo.setEndDate(cale.getTime());
 			vo.setLocalEndDate(cale.getTime());
+		}
+		if(null!=vo.getBeginDate()) {
+			Calendar cale = Calendar.getInstance();
+			cale.setTime(vo.getBeginDate());
+			vo.setBeginDate(cale.getTime());
+			vo.setLocalBeginDate(cale.getTime());
 		}
 		List<RestProductVo> list = productRestDatMapper.productRestPage(pages, vo);
 //		for(RestProductVo product:list) {

@@ -1,0 +1,99 @@
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>发票管理</title>
+    <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
+    <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
+    <link rel="stylesheet" type="text/css" href="/plugins/layui/css/layui.css" media="all" />
+    <script type="text/javascript" src="/plugins/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/plugins/upLoadTree/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/plugins/fileUpload/jquery.iframe-transport.js"></script>
+    <script type="text/javascript" src="/plugins/fileUpload/jquery.fileupload.js"></script>
+    <script src="/build/js/appToken.js"></script>
+    <style type="text/css">
+
+        .layui-form-item {
+            border-bottom: 2px solid #DBDBDB; /*下边框线j*/
+        }
+
+        .layui-form-item .layui-form-label {
+            width: 30%
+        }
+
+        .layui-form-item .layui-input-block {
+            margin-left: 35%;
+            width: 60%;
+        }
+
+        .input-border-none {
+            border: none;
+            font-size: 14px;
+            width: 100%;
+        }
+        .input-border-input {
+            font-size: 14px;
+            width: 100%;
+        }
+        .layui-row .grid-demo {
+            margin-left: 1%;
+            width: 90%;
+        }
+
+        .td_label {
+            font-weight: bolder;
+        }
+        .input_label{
+            color: #FF3030;
+        }
+        .selectFile{
+            padding: 4px 10px;
+            height: 20px;
+            line-height: 20px;
+            position: relative;
+            border: 1px solid #999;
+            text-decoration: none;
+            color: #666;
+        }
+        .uploadFile{
+            position: absolute;
+            overflow: hidden;
+            right: 0;
+            top: 0;
+            opacity: 0;
+        }
+
+
+    </style>
+
+</head>
+<body>
+<div id="app" v-cloak>
+    <i-form   :model="searchForm" :label-width="80">
+        <Form-item  label="公司" prop="city">
+            <i-select v-model="searchForm.companyName" placeholder="请选择公司">
+                <i-option v-for="item in companys" :value="item.companyName" :key="item.companyName">{{item.companyName}}</i-option>
+
+            </i-select>
+        </Form-item>
+
+        <Form-item>
+            <i-button type="primary" @click="setUpCompany">提交</i-button>
+        </Form-item>
+    </i-form>
+
+
+
+
+</div>
+<script src="/plugins/vue/vue.min.js"></script>
+<script src="/plugins/iview/js/iview.js"></script>
+<script src="/plugins/layui/layui.js"></script>
+<script src="/plugins/axios/axios.min.js"></script>
+<script src="/build/js/jquery-3.3.1.min.js"></script>
+<script src="/properties/config.js"></script>
+<script src="/build/js/appToken.js"></script>
+<script src="/src/js/comm.js"></script>
+<script src="/src/js/System/companySetUp.js"></script>
+</body>
+</html>

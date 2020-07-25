@@ -56,6 +56,10 @@ public class LoginUser extends Model<LoginUser> {
 	@ApiModelProperty(required= true,value = "创建时间")
 	private Date createTime;
 
+	@TableField("company_name")
+	@ApiModelProperty(required= true,value = "公司名称")
+	private String companyName;
+
 
 	public String getId() {
 		return id;

@@ -1,10 +1,13 @@
 package com.hongte.alms.base.service;
 
+import com.hongte.alms.base.vo.cams.RestProductVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hongte.alms.base.entity.CamsSubject;
 import com.hongte.alms.base.entity.PickStoreDat;
 import com.hongte.alms.common.service.BaseService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -29,7 +32,10 @@ public interface PickStoreDatService extends BaseService<PickStoreDat> {
 	
 	void addPick( String companyName,  String openDate,PickStoreDat dat)
 			throws Exception;
-	
-	void generatePcik( String companyName,  String openDate,PickStoreDat dat)
+
+	List<RestProductVo> generatePcik(String companyName, String openDate, PickStoreDat dat)
 			throws Exception;
+
+	void secondPick(List<PickStoreDat> dats) throws Exception;
+
 }

@@ -12,8 +12,8 @@ import com.hongte.alms.base.service.CamsProductPropertiesService;
 import com.hongte.alms.base.service.CustomerDatService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.CamsUtil;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.ht.ussp.util.DateUtil;
 
 import java.text.DecimalFormat;
 import java.util.Collections;

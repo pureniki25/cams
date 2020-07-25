@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
+import com.hongte.alms.common.util.*;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +39,6 @@ import com.hongte.alms.base.service.JtDatService;
 import com.hongte.alms.base.service.PickStoreDatService;
 import com.hongte.alms.base.service.SalaryDatService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
-import com.hongte.alms.common.util.CamsUtil;
-import com.hongte.alms.common.util.ClassCopyUtil;
-import com.hongte.alms.common.util.ReadExcelTools;
-import com.hongte.alms.common.util.StringUtil;
-import com.ht.ussp.util.DateUtil;
 
 /**
  * <p>
@@ -489,6 +486,19 @@ public class SalaryDatServiceImpl extends BaseServiceImpl<SalaryDatMapper, Salar
 		bankIncomeDatService.insert(geRendat);
 		bankIncomeDatService.insert(danWei);
 		bankIncomeDatService.insert(sumDat);
+	}
+
+	@Override
+	public BigDecimal getChengBenJine(String openDate, String companyName) throws Exception {
+		Date lastSalaryDate= DateUtil.getLastMoneEndDate(DateUtil.getDate(openDate));
+		String dateStr=DateUtil.formatDate(lastSalaryDate);
+		//4101
+	    List<SalaryDat> dats=selectList(new EntityWrapper<SalaryDat>().eq("company_name",companyName).eq("salary_date",dateStr).like("ke_mu_dai_ma","4101"));
+        BigDecimal chengBen=BigDecimal.ZERO;
+	    for(SalaryDat dat:dats){
+			chengBen=chengBen.add(new BigDecimal(dat.getBenQiShouRu()));
+		 }
+	    return chengBen;
 	}
 
 	private String getPingZhengHao(String companyName, String openDate) {

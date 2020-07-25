@@ -1,15 +1,16 @@
 package com.hongte.alms.base.entity;
 
-import java.io.Serializable;
-
-import java.util.Date;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * <p>
  * 产品表
@@ -19,6 +20,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2019-01-26
  */
 @ApiModel
+@Data
 @TableName("tb_product_dat")
 public class ProductDat extends Model<ProductDat> {
 
@@ -30,13 +32,20 @@ public class ProductDat extends Model<ProductDat> {
     @TableId("product_code")
 	@ApiModelProperty(required= true,value = "商品编号")
 	private String productCode;
-    
-    
-    
-    /**
+
+	/**
+	 * 商品编号+名称
+	 */
+	@TableField(exist = false)
+	@ApiModelProperty(required= true,value = "商品编号+名称")
+	private String productCodeName;
+
+
+
+	/**
      * 公司名称
      */
-    @TableId("company_name")
+    @TableField("company_name")
 	@ApiModelProperty(required= true,value = "公司名称")
 	private String companyName;
     /**

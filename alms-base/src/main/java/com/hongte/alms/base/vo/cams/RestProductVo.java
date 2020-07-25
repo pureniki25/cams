@@ -2,6 +2,7 @@ package com.hongte.alms.base.vo.cams;
 
 import java.io.Serializable;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
@@ -52,7 +53,16 @@ public class RestProductVo extends PageRequest {
 	private String restJieCunJine;
 
 	private String qiMoDanJia;
-	
+
+	private String productProperties;
+
+	private BigDecimal unitPrice;
+
+	private BigDecimal percent;
+
+	private BigDecimal localAmount;
+
+	private BigDecimal chengBenNum;
 	@JsonFormat(timezone = "GMT-16",pattern = "yyyy-MM-dd")
 	private Date beginDate;
 	
@@ -65,7 +75,7 @@ public class RestProductVo extends PageRequest {
 	@JsonFormat(timezone = "GMT-16",pattern = "yyyy-MM-dd")
 	private Date localEndDate;
 	
-
+   
 
 
 }

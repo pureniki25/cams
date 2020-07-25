@@ -38,8 +38,8 @@ import com.hongte.alms.base.service.JtDatService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.CamsUtil;
 import com.hongte.alms.common.util.ClassCopyUtil;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.ht.ussp.util.DateUtil;
 
 /**
  * <p>
@@ -182,6 +182,9 @@ public class JtDatServiceImpl extends BaseServiceImpl<JtDatMapper, JtDat> implem
 				SubjectEnum mapKey = entry.getKey();
 				String mapValue = entry.getValue();
 				BigDecimal localJine = new BigDecimal(mapValue).setScale(2, RoundingMode.HALF_UP);
+				if(localJine.compareTo(BigDecimal.ZERO)==0){ //如果税金为0，继续循环
+                   continue;
+				}
 				dat1 = new JtDat();
 				dat1.setUuid(UUID.randomUUID().toString());
 				dat1.setPingZhengRiQi(openDate);

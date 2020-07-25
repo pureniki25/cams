@@ -18,6 +18,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.hongte.alms.base.enums.TokenTypeEnum;
+import com.hongte.alms.base.service.CamsCompanyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,25 +74,23 @@ public class ProductDatController {
 	@Qualifier("TempProductDatService")
 	private TempProductDatService tempProductDatService;
 
-	public String fileName = "product.dat";// 文件名称
-	public String urlPath = "D:/datPath";// 文件存放路径
+
+	@Autowired
+	@Qualifier("CamsCompanyService")
+	private CamsCompanyService camsCompanyService;
 
 	@ApiOperation(value = "查询产品列表")
 	@RequestMapping("/search")
-	public PageResult search(@RequestBody Page<ProductDat> page) {
-		// Map<String,Object> searchParams = Servlets.getParametersStartingWith(request,
-		// "search_");
-		// page = new Page<>(layTableQuery.getPage(), layTableQuery.getLimit());
-		// departmentBankService.selectPage()
-		// page.getCondition().put("EQ_is_del", 0);
+	public PageResult search(@RequestBody Page<ProductDat> page,HttpServletRequest request) {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			page.getCondition().put("LIKE_company_name",companyName);
+		}
 	 	String GE_open_date=(String) page.getCondition().get("GE_open_date");
     	String LE_open_date=(String) page.getCondition().get("LE_open_date");
-    	if(StringUtil.isEmpty(GE_open_date)) {
-    		 page.getCondition().put("GE_open_date", DateUtil.getLastFirstDate());
-    	}
-    	if(StringUtil.isEmpty(LE_open_date)) {
-   		 page.getCondition().put("LE_open_date", DateUtil.getLastEndDate());
-   	    }
+
 		page.setOrderByField("productCode").setOrderByField("company_name").setAsc(true);
 		productDatService.selectByPage(page);
 		return PageResult.success(page.getRecords(), page.getTotal());
@@ -98,7 +98,13 @@ public class ProductDatController {
 
 	@ApiOperation(value = "库存余额表查询")
 	@RequestMapping("/inventoryPage")
-	public PageResult<List<RestProductVo>> inventoryPage(@RequestBody RestProductVo vo) {
+	public PageResult<List<RestProductVo>> inventoryPage(@RequestBody RestProductVo vo,HttpServletRequest request) {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName=null;
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			vo.setCompanyName(companyName);
+		}
 		Page<RestProductVo> pages = productDatService.inventoryPage(vo);
 		return PageResult.success(pages.getRecords(), pages.getTotal());
 	}
@@ -107,10 +113,13 @@ public class ProductDatController {
 	@RequestMapping("/importProductFlowExcel")
 	public Result importProductFlowExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		try {
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
 			String productPropertiesName = map.get("productPropertiesName")[0];
 			String importType = map.get("importType")[0]; // 导入类型 1：往来单位 2：商品期初
 			if (StringUtil.isEmpty(companyName)) {
@@ -130,12 +139,12 @@ public class ProductDatController {
 			result = Result.success();
 		} catch (ServiceRuntimeException se) {
 			result = Result.error(se.getErrorCode(), se.getMessage());
-			LOGGER.error("====>>>>>导入往来单位出错{}", se.getMessage());
+			LOGGER.error("====>>>>>导入商品excel出错{}", se.getMessage());
 		} catch (Exception e) {
 			result = Result.error("500", "导入出错");
-			LOGGER.error("====>>>>>导入往来单位出错{}", e);
+			LOGGER.error("====>>>>>导入商品excel出错{}", e);
 		}
-		LOGGER.info("====>>>>>导入往来单位excel结束");
+		LOGGER.info("====>>>>>导入商品excel结束");
 		return result;
 	}
 	
@@ -145,10 +154,13 @@ public class ProductDatController {
 	@RequestMapping("/importProductRestExcel")
 	public Result importProductRestExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		try {
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
 			String productPropertiesName = map.get("productPropertiesName")[0];
 			String openTime = map.get("qiChuRiQi")[0];
 			if (StringUtil.isEmpty(companyName)) {
@@ -200,30 +212,19 @@ public class ProductDatController {
 	@PostMapping("/export")
 	public void export(HttpServletResponse response, HttpServletRequest request, @ModelAttribute ProductDat productDat)
 			throws IOException {
-		// Map<String,Object> searchParams = Servlets.getParametersStartingWith(request,
-		// "search_");
-		// page = new Page<>(layTableQuery.getPage(), layTableQuery.getLimit());
-		// departmentBankService.selectPage()
-		// page.getCondition().put("EQ_is_del", 0);
-		// page.setSize(10000);
-		// page.setOrderByField("companyName").setOrderByField("produuctCode").setOrderByField("createTime").setAsc(false);
-		// page= productDatService.selectByPage(page);
-		// List<ProductDat> dats=page.getRecords();
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		Map<String, String[]> map = request.getParameterMap();
-		String beginTimeStr = map.get("beginTime")[0];
-		String endTimeStr = map.get("endTime")[0];
 		String openBeginTimeStr = map.get("openBeginTime")[0];
 		String openEndTimeStr = map.get("openEndTime")[0];
 		String beginDate = null;
 		String endDate = null;
 		String openBeginTime = null;
 		String openEndTime = null;
-		if (beginTimeStr != null) {
-			beginDate = DateUtil.formatDate(new Date(beginTimeStr));
-		}
-		if (endTimeStr != null) {
-			endDate = DateUtil.formatDate(new Date(endTimeStr));
-		}
+
 		if (!StringUtil.isEmpty(openBeginTimeStr)) {
 			openBeginTime = DateUtil.formatDate(new Date(openBeginTimeStr));
 		}
@@ -231,8 +232,8 @@ public class ProductDatController {
 			openEndTime = DateUtil.formatDate(new Date(openEndTimeStr));
 		}
 		Wrapper<ProductDat> wrapperProductDat = new EntityWrapper<ProductDat>();
-		if (!StringUtil.isEmpty(productDat.getCompanyName())) {
-			wrapperProductDat.eq("company_name", productDat.getCompanyName());
+		if (!StringUtil.isEmpty(companyName)) {
+			wrapperProductDat.eq("company_name", companyName);
 		}
 		if (!StringUtil.isEmpty(productDat.getProductCode())) {
 			wrapperProductDat.eq("product_code", productDat.getProductCode());

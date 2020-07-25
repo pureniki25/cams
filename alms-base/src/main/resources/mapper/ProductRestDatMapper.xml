@@ -4,120 +4,116 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hongte.alms.base.entity.ProductRestDat">
-        <result column="product_code" property="productCode" />
-        <result column="company_name" property="companyName" />
-        <result column="product_name" property="productName" />
-        <result column="product_type" property="productType" />
-        <result column="open_date" property="openDate" />
-        <result column="cal_unit" property="calUnit" />
-        <result column="qi_chu_shu_linag" property="qiChuShuLinag" />
-        <result column="qi_chu_jine" property="qiChuJine" />
-        <result column="ben_qi_shou_ru_shu_linag" property="benQiShouRuShuLinag" />
-        <result column="ben_qi_shou_ru_jine" property="benQiShouRuJine" />
-        <result column="ben_qi_fa_chu_shu_linag" property="benQiFaChuShuLinag" />
-        <result column="ben_qi_fa_chu_jine" property="benQiFachuJine" />
-        <result column="qi_mo_jie_cun_shu_linag" property="qiMoJieCunShuLinag" />
-        <result column="qi_mo_dan_jia" property="qiMoDanJia" />
-        <result column="qi_mo_jie_cun_jine" property="qiMoJieCunJine" />
-        <result column="create_time" property="createTime" />
+        <result column="product_code" property="productCode"/>
+        <result column="company_name" property="companyName"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_type" property="productType"/>
+        <result column="open_date" property="openDate"/>
+        <result column="cal_unit" property="calUnit"/>
+        <result column="qi_chu_shu_linag" property="qiChuShuLinag"/>
+        <result column="qi_chu_jine" property="qiChuJine"/>
+        <result column="ben_qi_shou_ru_shu_linag" property="benQiShouRuShuLinag"/>
+        <result column="ben_qi_shou_ru_jine" property="benQiShouRuJine"/>
+        <result column="ben_qi_fa_chu_shu_linag" property="benQiFaChuShuLinag"/>
+        <result column="ben_qi_fa_chu_jine" property="benQiFachuJine"/>
+        <result column="qi_mo_jie_cun_shu_linag" property="qiMoJieCunShuLinag"/>
+        <result column="qi_mo_dan_jia" property="qiMoDanJia"/>
+        <result column="qi_mo_jie_cun_jine" property="qiMoJieCunJine"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         product_code AS productCode, company_name AS companyName, product_name AS productName, product_type AS productType, open_date AS openDate, cal_unit AS calUnit, qi_chu_shu_linag AS qiChuShuLinag, qi_chu_jine AS qiChuJine, ben_qi_shou_ru_shu_linag AS benQiShouRuShuLinag, ben_qi_shou_ru_jine AS benQiShouRuJine, ben_qi_fa_chu_shu_linag AS benQiFaChuShuLinag, ben_qi_fa_chu_jine AS benQiFachuJine, qi_mo_jie_cun_shu_linag AS qiMoJieCunShuLinag, qi_mo_dan_jia AS qiMoDanJia, qi_mo_jie_cun_jine AS qiMoJieCunJine, create_time AS createTime
     </sql>
-<select id="productRestPage"
-		resultType="com.hongte.alms.base.vo.cams.RestProductVo"
-		parameterType="com.hongte.alms.base.vo.cams.RestProductVo">
-		
-		select * from (
-		select
-	
-		t.product_code as productCode,
-		max(t.company_name) as companyName,
-		max(t.product_name) as productName,
-		max(t.product_type) as productType,
-		max(t.open_date) as openDate,
-		max(t.cal_unit) as unit,
-		max(t.qi_chu_shu_linag) as kuCunLiang,
-		max(t.qi_chu_jine) as qiChuJine,
-	
-		(select sum(p.ben_qi_fa_chu_shu_linag) from tb_product_rest_dat p where 1=1
-		and p.product_code=t.product_code and p.company_name=t.company_name
-		and 
-		(DATE_FORMAT(p.open_date,'%Y-%m') &gt;=
-		date_format(#{localBeginDate},'%Y-%m') AND
-		DATE_FORMAT(p.open_date,'%Y-%m') &lt;=
-		date_format(#{localEndDate},'%Y-%m'))
-		group by p.product_code) as outcomeCount,
-	
-		(select sum(p.ben_qi_fa_chu_jine) from tb_product_rest_dat p where 1=1 and
-		p.product_code=t.product_code and p.company_name=t.company_name
-		and 
-		(DATE_FORMAT(p.open_date,'%Y-%m') &gt;=
-		date_format(#{localBeginDate},'%Y-%m') AND
-		DATE_FORMAT(p.open_date,'%Y-%m') &lt;=
-		date_format(#{localEndDate},'%Y-%m'))
-		group by p.product_code) as outcomeJine,
-	
-		(select sum(p.ben_qi_shou_ru_shu_linag) from tb_product_rest_dat p where 1=1
-		and p.product_code=t.product_code and p.company_name=t.company_name
-		and 
-		(DATE_FORMAT(p.open_date,'%Y-%m') &gt;=
-		date_format(#{localBeginDate},'%Y-%m') AND
-		DATE_FORMAT(p.open_date,'%Y-%m') &lt;=
-		date_format(#{localEndDate},'%Y-%m'))
-		group by p.product_code) as incomeCount,
-	
-		(select sum(p.ben_qi_shou_ru_jine) from tb_product_rest_dat p where 1=1 and
-		p.product_code=t.product_code and p.company_name=t.company_name
-		and 
-		(DATE_FORMAT(p.open_date,'%Y-%m') &gt;=
-		date_format(#{localBeginDate},'%Y-%m') AND
-		DATE_FORMAT(p.open_date,'%Y-%m') &lt;=
-		date_format(#{localEndDate},'%Y-%m'))
-		group by p.product_code) as incomeJine,
-	
-	
-	
-	    (sum(t.ben_qi_shou_ru_shu_linag)-sum(t.ben_qi_fa_chu_shu_linag)+max(t.qi_chu_shu_linag)) as
-		restKuCunLiang,
-		(sum(t.ben_qi_shou_ru_jine)-sum(t.ben_qi_fa_chu_jine)+max(t.qi_chu_jine)) as
-		restJieCunJine,
-		round((sum(t.ben_qi_shou_ru_jine)-sum(t.ben_qi_fa_chu_jine))/(sum(t.ben_qi_shou_ru_shu_linag)-sum(t.ben_qi_fa_chu_shu_linag)),2)
-		as qiMoDanJia
-	
-		from tb_product_rest_dat t where 1=1 
-	
+    <select id="productRestPage"
+            resultType="com.hongte.alms.base.vo.cams.RestProductVo"
+            parameterType="com.hongte.alms.base.vo.cams.RestProductVo">
 
-		<if test="companyName != null and companyName != ''">
-			AND t.company_name like '${companyName}%'
-		</if>
+        select * from (
+        select
 
-		<if test="productCode != null and productCode != ''">
-			AND t.product_code = #{productCode}
-		</if>
-		<if test="productName != null and productName != ''">
-			AND t.product_name like '${productName}%'
-		</if>
-        	AND
-		(DATE_FORMAT(t.open_date,'%Y-%m') &gt;=
-		date_format(#{beginDate},'%Y-%m') AND 
-		DATE_FORMAT(t.open_date,'%Y-%m') &lt;=
-		date_format(#{endDate},'%Y-%m'))
-	
-	
-        group by t.product_code ) a 
-        
-        where (a.qiChuJine!=0 and a.qiChuJine is not null)  or
-              (a.incomeJine!=0 and a.incomeJine is not null) or
-              (a.outcomeJine!=0 and a.outcomeJine is not null) or
-              (a.restKuCunLiang!=0 and a.restKuCunLiang is not null)
-        
-         
-        
-	
+        t.product_code as productCode,
+        max(t.company_name) as companyName,
+        max(t.product_name) as productName,
+        max(t.product_type) as productType,
+        max(t.open_date) as openDate,
+        max(t.cal_unit) as unit,
+        max(t.qi_chu_shu_linag) as kuCunLiang,
+        max(t.qi_chu_jine) as qiChuJine,
+
+        (select sum(p.ben_qi_fa_chu_shu_linag) from tb_product_rest_dat p where 1=1
+        and p.product_code=t.product_code and p.company_name=t.company_name
+        and
+        (DATE_FORMAT(p.open_date,'%Y-%m') &gt;=
+        date_format(#{localBeginDate},'%Y-%m') AND
+        DATE_FORMAT(p.open_date,'%Y-%m') &lt;=
+        date_format(#{localEndDate},'%Y-%m'))
+        group by p.product_code) as outcomeCount,
+
+        (select sum(p.ben_qi_fa_chu_jine) from tb_product_rest_dat p where 1=1 and
+        p.product_code=t.product_code and p.company_name=t.company_name
+        and
+        (DATE_FORMAT(p.open_date,'%Y-%m') &gt;=
+        date_format(#{localBeginDate},'%Y-%m') AND
+        DATE_FORMAT(p.open_date,'%Y-%m') &lt;=
+        date_format(#{localEndDate},'%Y-%m'))
+        group by p.product_code) as outcomeJine,
+
+        (select sum(p.ben_qi_shou_ru_shu_linag) from tb_product_rest_dat p where 1=1
+        and p.product_code=t.product_code and p.company_name=t.company_name
+        and
+        (DATE_FORMAT(p.open_date,'%Y-%m') &gt;=
+        date_format(#{localBeginDate},'%Y-%m') AND
+        DATE_FORMAT(p.open_date,'%Y-%m') &lt;=
+        date_format(#{localEndDate},'%Y-%m'))
+        group by p.product_code) as incomeCount,
+
+        (select sum(p.ben_qi_shou_ru_jine) from tb_product_rest_dat p where 1=1 and
+        p.product_code=t.product_code and p.company_name=t.company_name
+        and
+        (DATE_FORMAT(p.open_date,'%Y-%m') &gt;=
+        date_format(#{localBeginDate},'%Y-%m') AND
+        DATE_FORMAT(p.open_date,'%Y-%m') &lt;=
+        date_format(#{localEndDate},'%Y-%m'))
+        group by p.product_code) as incomeJine,
 
 
-	</select>
+        (sum(t.ben_qi_shou_ru_shu_linag)-sum(t.ben_qi_fa_chu_shu_linag)+max(ifnull(t.qi_chu_shu_linag,0))) as
+        restKuCunLiang,
+        (sum(t.ben_qi_shou_ru_jine)-sum(t.ben_qi_fa_chu_jine)+max(ifnull(t.qi_chu_jine,0))) as
+        restJieCunJine,
+        round((sum(t.ben_qi_shou_ru_jine)-sum(t.ben_qi_fa_chu_jine)+ MAX(t.qi_chu_shu_linag))/(sum(t.ben_qi_shou_ru_shu_linag)-sum(t.ben_qi_fa_chu_shu_linag)),2)
+        as qiMoDanJia
+
+        from tb_product_rest_dat t where 1=1
+
+
+        <if test="companyName != null and companyName != ''">
+            AND t.company_name like '${companyName}%'
+        </if>
+
+        <if test="productCode != null and productCode != ''">
+            AND t.product_code = #{productCode}
+        </if>
+        <if test="productName != null and productName != ''">
+            AND t.product_name like '${productName}%'
+        </if>
+
+        AND
+        (DATE_FORMAT(t.open_date,'%Y-%m') &gt;=
+        date_format(#{beginDate},'%Y-%m') AND
+        DATE_FORMAT(t.open_date,'%Y-%m') &lt;=
+        date_format(#{endDate},'%Y-%m'))
+
+
+        group by t.company_name,t.product_code) a
+
+        where ((a.qiChuJine!=0 and a.qiChuJine is not null) or
+        (a.incomeJine!=0 and a.incomeJine is not null) or
+        (a.outcomeJine!=0 and a.outcomeJine is not null) or
+        (a.restKuCunLiang!=0 and a.restKuCunLiang is not null))
+
+
+    </select>
 </mapper>

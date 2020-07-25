@@ -1,52 +1,43 @@
 package com.hongte.alms.base.controller;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.entity.CamsSubject;
+import com.hongte.alms.base.entity.PickStoreDat;
+import com.hongte.alms.base.entity.ProductDat;
+import com.hongte.alms.base.enums.CamsConstant;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.service.CamsSubjectService;
+import com.hongte.alms.base.service.PickStoreDatService;
+import com.hongte.alms.base.service.ProductDatService;
+import com.hongte.alms.base.service.SubjectRestDatService;
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.JsonUtil;
+import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.common.vo.PageResult;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartRequest;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartRequest;
-
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.entity.BuyDat;
-import com.hongte.alms.base.entity.CamsSubject;
-import com.hongte.alms.base.entity.PickStoreDat;
-import com.hongte.alms.base.entity.SellDat;
-import com.hongte.alms.base.enums.CamsConstant;
-import com.hongte.alms.base.exception.ServiceRuntimeException;
-import com.hongte.alms.base.service.CamsSubjectService;
-import com.hongte.alms.base.service.PickStoreDatService;
-import com.hongte.alms.base.service.SellDatService;
-import com.hongte.alms.base.service.SubjectRestDatService;
-import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.DateUtil;
-import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.common.vo.PageResult;
-
-import io.swagger.annotations.ApiOperation;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * <p>
@@ -69,6 +60,11 @@ public class PickStoreDatController {
 	@Autowired
 	@Qualifier("CamsSubjectService")
 	private CamsSubjectService camsSubjectService;
+
+
+	@Autowired
+	@Qualifier("ProductDatService")
+	private ProductDatService productDatService;
 	
 	
 	@Autowired
@@ -109,6 +105,42 @@ public class PickStoreDatController {
 			LOGGER.error("====>>>>>导入领料出错{}", e);
 		}
 		LOGGER.info("====>>>>>导入领料excel结束");
+		return result;
+	}
+
+
+	@ApiOperation(value = "获取该公司所有产品编码")
+	@RequestMapping("/findAllProduct")
+	public Result findAllProduct(@RequestBody PickStoreDat dat) {
+		LOGGER.info("@findAll@获取所有产品--开始[]");
+		Result result = null;
+		Map<String, JSONArray> retMap = new HashMap<String, JSONArray>();
+		List<ProductDat> list=productDatService.selectList(new EntityWrapper<ProductDat>().eq("company_name", dat.getCompanyName()));
+		for(ProductDat productDat:list){
+			productDat.setProductCodeName(productDat.getProductCode()+"__"+productDat.getProductName());
+		}
+		retMap.put("products", (JSONArray) JSON.toJSON(list, JsonUtil.getMapping()));
+		result = Result.success(retMap);
+		LOGGER.info("@findAll@获取所有产品--结束[{}]", result);
+		return result;
+	}
+
+	@ApiOperation(value = "关联产成品")
+	@RequestMapping("/bindProduct")
+	public Result bindProduct(@RequestBody PickStoreDat dat) {
+		LOGGER.info("@bindProduct@关联产成品--开始[]");
+		Result result = null;
+		Map<String, JSONArray> retMap = new HashMap<String, JSONArray>();
+		PickStoreDat pickStoreDat=pickStoreDatService.selectOne(new EntityWrapper<PickStoreDat>().eq("pick_store_id",dat.getPickStoreId()));
+
+		String str="";
+		if(dat.getArray().length>0){
+			str=Arrays.toString(dat.getArray()).replace("[","").replace("]","");
+		}
+		pickStoreDat.setBindProductCode(str);
+		pickStoreDatService.updateById(pickStoreDat);
+		result = Result.success(null);
+		LOGGER.info("@bindProduct@关联产成品--结束[{}]", result);
 		return result;
 	}
 
@@ -155,11 +187,15 @@ public class PickStoreDatController {
 	 	String GE_open_date=(String) page.getCondition().get("GE_open_date");
     	String LE_open_date=(String) page.getCondition().get("LE_open_date");
     	if(StringUtil.isEmpty(GE_open_date)) {
-    		 page.getCondition().put("GE_open_date", DateUtil.getLastFirstDate());
-    	}
+    		 page.getCondition().put("LE_open_date", DateUtil.getLastFirstDate());
+    	}else{
+			page.getCondition().put("LE_open_date", DateUtil.getThisMonthEndDate(LE_open_date));
+		}
     	if(StringUtil.isEmpty(LE_open_date)) {
-   		 page.getCondition().put("LE_open_date", DateUtil.getLastEndDate());
-   	    }
+   		    page.getCondition().put("GE_open_date", DateUtil.getLastEndDate());
+   	    }else{
+			page.getCondition().put("GE_open_date", DateUtil.getThisMonthFirstDate(GE_open_date));
+		}
 		page.getCondition().put("EQ_pick_store_type", 1);
 		page.setOrderByField("createTime").setAsc(false);
 		pickStoreDatService.selectByPage(page);
@@ -201,9 +237,20 @@ public class PickStoreDatController {
 	@RequestMapping("/generatePick")
 	public Result generatePick(@RequestBody @Valid PickStoreDat pickStoreDat) {
 		try {
-			String companyName=pickStoreDat.getCompanyName();
 			String openDate= pickStoreDat.getOpenDate();
-			pickStoreDatService.generatePcik(companyName, openDate, pickStoreDat);
+			String pencent=pickStoreDat.getPencent();
+			String compoanyName=pickStoreDat.getCompanyName();
+			if(StringUtil.isEmpty(openDate)) {
+				return Result.error("开票日期不能为空");
+			}
+			if(StringUtil.isEmpty(pencent)) {
+				return Result.error("百分比不能为空");
+			}
+			if(StringUtil.isEmpty(compoanyName)) {
+				return Result.error("公司名称不能为空");
+			}
+			String companyName=pickStoreDat.getCompanyName();
+			pickStoreDatService.addPick(companyName, openDate, pickStoreDat);
 			
 			return Result.success();
 		} catch (Exception e) {
@@ -211,7 +258,23 @@ public class PickStoreDatController {
 			return Result.error(e.getMessage());
 		}
 	}
-	
+
+
+	@ApiOperation(value = "第二种生成领料单(用户主动导入领料单，自动计算人工成本分摊到每个领料单)")
+	@RequestMapping("/secondPick")
+	public Result secondPick(@RequestBody List<PickStoreDat> pickStoreDats) {
+		try {
+			if(!(pickStoreDats.size() >0)){
+				return Result.error("没有数据");
+			}
+			pickStoreDatService.secondPick(pickStoreDats);
+
+			return Result.success();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			return Result.error(e.getMessage());
+		}
+	}
 	@ApiOperation(value = "自动按比例领料")
 	@RequestMapping("/addPick")
 	public Result addPick(@RequestBody @Valid PickStoreDat pickStoreDat) throws  Exception {

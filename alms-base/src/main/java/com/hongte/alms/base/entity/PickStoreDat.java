@@ -35,6 +35,16 @@ public class PickStoreDat extends Model<PickStoreDat> {
     @TableId("pick_store_id")
 	@ApiModelProperty(required= true,value = "领料入库ID")
 	private String pickStoreId;
+
+
+	/**
+	 * 领料入库ID
+	 */
+	@TableId("uuid")
+	@ApiModelProperty(required= true,value = "uuid")
+    private String uuid;
+
+
     /**
      * 序号
      */
@@ -308,9 +318,15 @@ public class PickStoreDat extends Model<PickStoreDat> {
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "")
 	private Date createTime;
-	
-	
-	@NotNull(message="百分比不能为空")
+
+
+	@TableField("bind_product_code")
+	@ApiModelProperty(required= true,value = "")
+	private String bindProductCode;
+
+	@TableField(exist=false)
+	private String array[];
+
 	@TableField(exist=false)
 	private String pencent;
 	
@@ -320,9 +336,6 @@ public class PickStoreDat extends Model<PickStoreDat> {
 	
 	@TableField(exist=false)
 	private BigDecimal otherSalary;
-	
-	
-
 
 	public String getPencent() {
 		return pencent;

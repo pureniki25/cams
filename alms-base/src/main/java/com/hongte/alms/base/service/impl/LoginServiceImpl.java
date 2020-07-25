@@ -1,12 +1,11 @@
 package com.hongte.alms.base.service.impl;
 
 
-import com.hongte.alms.base.service.*;
-import com.ht.ussp.bean.LoginUserInfoHelper;
-import com.ht.ussp.client.dto.LoginInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.hongte.alms.base.service.LoginService;
 
 
 /**
@@ -17,17 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class LoginServiceImpl implements LoginService {
 
     @Autowired
-    private LoginUserInfoHelper loginUserInfoHelper;
 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveloginInfo() {
         //用户信息
-        LoginInfoDto dto = loginUserInfoHelper.getLoginInfo();
-        if(dto == null){
-            return;
-        }
+       
 //        if(dto.getUserId().equals(Constant.ADMIN_ID)) {
 //            sysUserPermissionService.setUserPermissons(dto.getUserId());
 //            return;

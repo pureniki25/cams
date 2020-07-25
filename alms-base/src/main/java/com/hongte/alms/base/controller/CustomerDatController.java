@@ -17,6 +17,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.hongte.alms.base.enums.TokenTypeEnum;
+import com.hongte.alms.base.service.CamsCompanyService;
 import org.apache.tomcat.jni.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,28 +82,24 @@ public class CustomerDatController {
 	
 	
 	@Autowired
-	@Qualifier("productDatService")
+	@Qualifier("ProductDatService")
 	private ProductDatService productDatService;
-	
-	
-	
-	
-    @ApiOperation(value = "查询客户与供应商列表")
+
+	@Autowired
+	@Qualifier("CamsCompanyService")
+	private CamsCompanyService camsCompanyService;
+
+
+	@ApiOperation(value = "查询客户与供应商列表")
     @RequestMapping("/search")
-    public PageResult search(@RequestBody Page<CustomerDat> page) {
-        // Map<String,Object> searchParams = Servlets.getParametersStartingWith(request,
-        // "search_");
-        // page = new Page<>(layTableQuery.getPage(), layTableQuery.getLimit());
-        // departmentBankService.selectPage()
-//    	page.getCondition().put("EQ_is_del", 0);
-    	String GE_open_date=(String) page.getCondition().get("GE_open_date");
-    	String LE_open_date=(String) page.getCondition().get("LE_open_date");
-    	if(StringUtil.isEmpty(GE_open_date)) {
-    		 page.getCondition().put("GE_open_date", DateUtil.getLastFirstDate());
-    	}
-    	if(StringUtil.isEmpty(LE_open_date)) {
-   		 page.getCondition().put("LE_open_date", DateUtil.getLastEndDate());
-   	    }
+    public PageResult search(@RequestBody Page<CustomerDat> page,HttpServletRequest request) {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			page.getCondition().put("LIKE_company_code",companyName);
+		}
+
         page.setOrderByField("customerCode").setOrderByField("companyCode").setAsc(true);
         customerDatService.selectByPage(page);
         return PageResult.success(page.getRecords(), page.getTotal());
@@ -124,10 +122,13 @@ public class CustomerDatController {
 	@RequestMapping("/importCustomerFlowExcel")
 	public Result importCustomerFlowExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		try {
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
            if(StringUtil.isEmpty(companyName)) {
         	   return Result.error("请选择公司名");
            }
@@ -176,15 +177,11 @@ public class CustomerDatController {
 	   @ApiOperation(value = "查询供应商列表")
 	   @PostMapping("/export")
 	    public void export(HttpServletResponse response,HttpServletRequest request,@ModelAttribute CustomerDat customertDat ) throws IOException {
-	        // Map<String,Object> searchParams = Servlets.getParametersStartingWith(request,
-	        // "search_");
-	        // page = new Page<>(layTableQuery.getPage(), layTableQuery.getLimit());
-	        // departmentBankService.selectPage()
-//	    	page.getCondition().put("EQ_is_del", 0);
-//		   page.setSize(10000);
-//	        page.setOrderByField("companyName").setOrderByField("productCode").setOrderByField("createTime").setAsc(false);
-//	       page= productDatService.selectByPage(page);
-//	       List<ProductDat> dats=page.getRecords();
+		   Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		   String companyName="";
+		   if(result.getCode().equals("1")){
+			   companyName= (String) result.getData();
+		   }
 			Map<String, String[]> map =request.getParameterMap();
     		String beginTimeStr=map.get("beginTime")[0];
     		String endTimeStr=map.get("endTime")[0];
@@ -207,8 +204,8 @@ public class CustomerDatController {
     			openEndTime = DateUtil.formatDate(new Date(openEndTimeStr));
     		}
 			 Wrapper<CustomerDat> wrapperCustomerDat= new EntityWrapper<CustomerDat>();
-			 if(!StringUtil.isEmpty(customertDat.getCompanyCode())) {
-				 wrapperCustomerDat.eq("company_code", customertDat.getCompanyCode());
+			 if(!StringUtil.isEmpty(companyName)) {
+				 wrapperCustomerDat.eq("company_code",companyName);
 			 }
 			 if(!StringUtil.isEmpty(customertDat.getCustomerCode())) {
 				 wrapperCustomerDat.eq("customer_code", customertDat.getCustomerCode());

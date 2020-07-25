@@ -27,6 +27,8 @@ public interface SalaryDatService extends BaseService<SalaryDat> {
 	public void addJtSalary(String keMuDaiMa,String openDate,String companyName,String localAmount,CamsConstant.DirectionEnum directionEnum,String pingZhengHao) throws Exception;
 
 	public void insertGongJiJin(List<SalaryDat> salarys, String openDate, String companyName) throws Exception ;
+
+	public BigDecimal getChengBenJine(String openDate, String companyName) throws Exception;
 	
 	
 	/**

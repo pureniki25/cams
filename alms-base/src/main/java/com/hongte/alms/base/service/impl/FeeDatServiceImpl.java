@@ -17,8 +17,8 @@ import com.hongte.alms.base.service.ProductDatService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.CamsUtil;
 import com.hongte.alms.common.util.ClassCopyUtil;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.ht.ussp.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;

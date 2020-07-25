@@ -1,10 +1,25 @@
 package com.hongte.alms.base.service.impl;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.hongte.alms.base.entity.BankIncomeDat;
 import com.hongte.alms.base.entity.CustomerDat;
-import com.hongte.alms.base.entity.FeeDat;
 import com.hongte.alms.base.entity.JtDat;
 import com.hongte.alms.base.entity.SalaryDat;
 import com.hongte.alms.base.enums.SubjectEnum;
@@ -17,30 +32,8 @@ import com.hongte.alms.base.service.SalaryDatService;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.CamsUtil;
 import com.hongte.alms.common.util.ClassCopyUtil;
+import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
-import com.ht.ussp.util.DateUtil;
-import com.mysql.cj.core.io.BigDecimalValueFactory;
-
-import java.lang.reflect.Array;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -270,8 +263,8 @@ public class BankIncomeDatServiceImpl extends BaseServiceImpl<BankIncomeDatMappe
 					
 					
 					BankIncomeDat geRenSuoDeShui=selectOne(new EntityWrapper<BankIncomeDat>().eq("company_name", companyName).eq("ke_mu_dai_ma","2171-12").eq("ping_zheng_ri_qi", productDate));
-					BankIncomeDat geRenSheBao=selectOne(new EntityWrapper<BankIncomeDat>().eq("company_name", companyName).eq("ke_mu_dai_ma","1133-01").eq("ping_zheng_ri_qi", lastPingZhengRiQi));
-					BankIncomeDat gongJiJin=selectOne(new EntityWrapper<BankIncomeDat>().eq("company_name", companyName).eq("ke_mu_dai_ma","1133-03").eq("ping_zheng_ri_qi", lastPingZhengRiQi));
+					BankIncomeDat geRenSheBao=selectOne(new EntityWrapper<BankIncomeDat>().eq("company_name", companyName).eq("ke_mu_dai_ma","1133-01").eq("ping_zheng_ri_qi", productDate));
+					BankIncomeDat gongJiJin=selectOne(new EntityWrapper<BankIncomeDat>().eq("company_name", companyName).eq("ke_mu_dai_ma","1133-03").eq("ping_zheng_ri_qi", productDate));
 					int i=1;
 					BigDecimal restAlmsAmount=new BigDecimal(hanShuiJine);
 					if(geRenSuoDeShui!=null) {

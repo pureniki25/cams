@@ -14,7 +14,7 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ht.ussp.util.DateUtil;
+import com.hongte.alms.common.util.DateUtil;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
