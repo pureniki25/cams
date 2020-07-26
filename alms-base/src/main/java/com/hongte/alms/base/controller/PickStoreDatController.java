@@ -9,11 +9,9 @@ import com.hongte.alms.base.entity.CamsSubject;
 import com.hongte.alms.base.entity.PickStoreDat;
 import com.hongte.alms.base.entity.ProductDat;
 import com.hongte.alms.base.enums.CamsConstant;
+import com.hongte.alms.base.enums.TokenTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
-import com.hongte.alms.base.service.CamsSubjectService;
-import com.hongte.alms.base.service.PickStoreDatService;
-import com.hongte.alms.base.service.ProductDatService;
-import com.hongte.alms.base.service.SubjectRestDatService;
+import com.hongte.alms.base.service.*;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
@@ -65,8 +63,11 @@ public class PickStoreDatController {
 	@Autowired
 	@Qualifier("ProductDatService")
 	private ProductDatService productDatService;
-	
-	
+
+	@Autowired
+	@Qualifier("CamsCompanyService")
+	private CamsCompanyService camsCompanyService;
+
 	@Autowired
 	@Qualifier("SubjectRestDatService")
 	private SubjectRestDatService subjectRestDatService;
@@ -75,10 +76,13 @@ public class PickStoreDatController {
 	@RequestMapping("/importPickStoreExcel")
 	public Result importPickExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		try {
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
 			if (!file.getOriginalFilename().contains(companyName)) {
 				return Result.error("选择的公司与导入的公司不一致");
 			}
@@ -111,11 +115,15 @@ public class PickStoreDatController {
 
 	@ApiOperation(value = "获取该公司所有产品编码")
 	@RequestMapping("/findAllProduct")
-	public Result findAllProduct(@RequestBody PickStoreDat dat) {
+	public Result findAllProduct(@RequestBody PickStoreDat dat,HttpServletRequest request) {
 		LOGGER.info("@findAll@获取所有产品--开始[]");
-		Result result = null;
+		Result result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		Map<String, JSONArray> retMap = new HashMap<String, JSONArray>();
-		List<ProductDat> list=productDatService.selectList(new EntityWrapper<ProductDat>().eq("company_name", dat.getCompanyName()));
+		List<ProductDat> list=productDatService.selectList(new EntityWrapper<ProductDat>().eq("company_name",companyName));
 		for(ProductDat productDat:list){
 			productDat.setProductCodeName(productDat.getProductCode()+"__"+productDat.getProductName());
 		}
@@ -148,10 +156,13 @@ public class PickStoreDatController {
 	@RequestMapping("/importStoreExcel")
 	public Result importStoreExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		try {
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
 			if (!file.getOriginalFilename().contains(companyName)) {
 				return Result.error("选择的公司与导入的公司不一致");
 			}
@@ -183,9 +194,15 @@ public class PickStoreDatController {
 
 	@ApiOperation(value = "查询领料单列表")
 	@RequestMapping("/searchPick")
-	public PageResult searchPick(@RequestBody Page<PickStoreDat> page) {
+	public PageResult searchPick(@RequestBody Page<PickStoreDat> page,HttpServletRequest request) {
 	 	String GE_open_date=(String) page.getCondition().get("GE_open_date");
     	String LE_open_date=(String) page.getCondition().get("LE_open_date");
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			page.getCondition().put("EQ_company_name",companyName);
+		}
     	if(StringUtil.isEmpty(GE_open_date)) {
     		 page.getCondition().put("LE_open_date", DateUtil.getLastFirstDate());
     	}else{
@@ -204,7 +221,13 @@ public class PickStoreDatController {
 
 	@ApiOperation(value = "查询入库单列表")
 	@RequestMapping("/searchStore")
-	public PageResult searchStore(@RequestBody Page<PickStoreDat> page) {
+	public PageResult searchStore(@RequestBody Page<PickStoreDat> page,HttpServletRequest request) {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			page.getCondition().put("EQ_company_name",companyName);
+		}
 	 	String GE_open_date=(String) page.getCondition().get("GE_open_date");
     	String LE_open_date=(String) page.getCondition().get("LE_open_date");
     	if(StringUtil.isEmpty(GE_open_date)) {
@@ -235,8 +258,14 @@ public class PickStoreDatController {
 	
 	@ApiOperation(value = "自动生成领料单")
 	@RequestMapping("/generatePick")
-	public Result generatePick(@RequestBody @Valid PickStoreDat pickStoreDat) {
+	public Result generatePick(@RequestBody @Valid PickStoreDat pickStoreDat,HttpServletRequest request) {
 		try {
+			Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+			String companyName="";
+			if(result.getCode().equals("1")){
+				companyName=result.getData();
+				pickStoreDat.setCompanyName(companyName);
+			}
 			String openDate= pickStoreDat.getOpenDate();
 			String pencent=pickStoreDat.getPencent();
 			String compoanyName=pickStoreDat.getCompanyName();
@@ -249,7 +278,6 @@ public class PickStoreDatController {
 			if(StringUtil.isEmpty(compoanyName)) {
 				return Result.error("公司名称不能为空");
 			}
-			String companyName=pickStoreDat.getCompanyName();
 			pickStoreDatService.addPick(companyName, openDate, pickStoreDat);
 			
 			return Result.success();
@@ -277,17 +305,21 @@ public class PickStoreDatController {
 	}
 	@ApiOperation(value = "自动按比例领料")
 	@RequestMapping("/addPick")
-	public Result addPick(@RequestBody @Valid PickStoreDat pickStoreDat) throws  Exception {
+	public Result addPick(@RequestBody @Valid PickStoreDat pickStoreDat,HttpServletRequest request) throws  Exception {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+		}
 		String openDate= pickStoreDat.getOpenDate();
 		String pencent=pickStoreDat.getPencent();
-		String compoanyName=pickStoreDat.getCompanyName();
 		if(StringUtil.isEmpty(openDate)) {
 			return Result.error("开票日期不能为空");
 		}
 		if(StringUtil.isEmpty(pencent)) {
 			return Result.error("百分比不能为空");
 		}
-		if(StringUtil.isEmpty(compoanyName)) {
+		if(StringUtil.isEmpty(companyName)) {
 			return Result.error("公司名称不能为空");
 		}
 		if(null==pickStoreDat.getSalary()) {
@@ -297,7 +329,7 @@ public class PickStoreDatController {
 			return Result.error("辅料不能为空");
 		}
 		try {
-		pickStoreDatService.addPick(compoanyName, openDate, pickStoreDat);
+		pickStoreDatService.addPick(companyName, openDate, pickStoreDat);
 		}catch(Exception e) {
 			LOGGER.error("按比例领料失败",e);
 			return Result.error("操作失败：",e.getMessage());
@@ -310,6 +342,11 @@ public class PickStoreDatController {
 	@PostMapping("/export")
 	public void exportBuy(HttpServletResponse response, HttpServletRequest request,
 			@ModelAttribute PickStoreDat pickStoreDat) throws IOException {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+		}
 		Map<String, String[]> map = request.getParameterMap();
 		String beginTimeStr = map.get("beginTime")[0];
 		String endTimeStr = map.get("endTime")[0];
@@ -335,8 +372,8 @@ public class PickStoreDatController {
 			openEndTime = DateUtil.formatDate(new Date(openEndTimeStr));
 		}
 		Wrapper<PickStoreDat> pickStoreDatParam = new EntityWrapper<PickStoreDat>();
-		if (!StringUtil.isEmpty(pickStoreDat.getCompanyName())) {
-			pickStoreDatParam.eq("company_name", pickStoreDat.getCompanyName());
+		if (!StringUtil.isEmpty(companyName)) {
+			pickStoreDatParam.eq("company_name", companyName);
 		}
 		if (!StringUtil.isEmpty(beginDate)) {
 			pickStoreDatParam.ge("create_time", beginDate);

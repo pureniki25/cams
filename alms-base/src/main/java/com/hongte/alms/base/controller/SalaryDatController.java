@@ -11,6 +11,10 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.hongte.alms.base.enums.TokenTypeEnum;
+import com.hongte.alms.base.service.CamsCompanyService;
+import com.hongte.alms.common.util.*;
+import com.netflix.ribbon.proxy.annotation.Http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +47,6 @@ import com.hongte.alms.base.service.BankIncomeDatService;
 import com.hongte.alms.base.service.JtDatService;
 import com.hongte.alms.base.service.SalaryDatService;
 import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.CamsUtil;
-import com.hongte.alms.common.util.ClassCopyUtil;
-import com.hongte.alms.common.util.JsonUtil;
-import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
 
 import io.swagger.annotations.ApiOperation;
@@ -78,14 +78,21 @@ public class SalaryDatController {
 	@Qualifier("BankIncomeDatService")
 	private BankIncomeDatService bankIncomeDatService;
 
+	@Autowired
+	@Qualifier("CamsCompanyService")
+	private CamsCompanyService camsCompanyService;
+
 	@ApiOperation(value = "导入工资excel")
 	@RequestMapping("/importSalaryExcel")
 	public Result importSalaryExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		try {
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
 			if (!file.getOriginalFilename().contains(companyName)) {
 				return Result.error("选择的公司与导入的公司不一致");
 			}
@@ -117,10 +124,13 @@ public class SalaryDatController {
 	@RequestMapping("/importSheBaoExcel")
 	public Result importSheBaoExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		try {
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
 			if (!file.getOriginalFilename().contains(companyName)) {
 				return Result.error("选择的公司与导入的公司不一致");
 			}
@@ -152,13 +162,28 @@ public class SalaryDatController {
 
 	@ApiOperation(value = "查询工资列表")
 	@RequestMapping("/searchSalary")
-	public PageResult searchSalary(@RequestBody Page<SalaryDat> page) {
+	public PageResult searchSalary(@RequestBody Page<SalaryDat> page,HttpServletRequest request) {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			page.getCondition().put("EQ_company_name",companyName);
+		}
 		String beginDate = (String) page.getCondition().get("GE_salary_date");
-		beginDate = CamsUtil.getCurrentFirstDate(beginDate.substring(0, 10));
-		page.getCondition().put("GE_salary_date", beginDate);
 		String endDate = (String) page.getCondition().get("LE_salary_date");
-		endDate = CamsUtil.getCurrentLastDate(endDate.substring(0, 10));
-		page.getCondition().put("LE_salary_date", endDate);
+		if(StringUtil.isEmpty(beginDate)) {
+			page.getCondition().put("GE_salary_date", DateUtil.getLastFirstDate());
+		}else{
+
+			beginDate = CamsUtil.getCurrentFirstDate(beginDate.substring(0, 10));
+			page.getCondition().put("GE_salary_date", beginDate);
+		}
+		if(StringUtil.isEmpty(endDate)) {
+			page.getCondition().put("LE_salary_date", DateUtil.getLastEndDate());
+		}else{
+			endDate = CamsUtil.getCurrentLastDate(endDate.substring(0, 10));
+			page.getCondition().put("LE_salary_date", endDate);
+		}
 		page.setOrderByField("createTime").setAsc(true);
 		salaryDatService.selectByPage(page);
 		return PageResult.success(page.getRecords(), page.getTotal());

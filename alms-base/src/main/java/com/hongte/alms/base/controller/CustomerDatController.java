@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.hongte.alms.base.enums.TokenTypeEnum;
 import com.hongte.alms.base.service.CamsCompanyService;
+import com.netflix.ribbon.proxy.annotation.Http;
 import org.apache.tomcat.jni.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,11 +108,15 @@ public class CustomerDatController {
     
 	@ApiOperation(value = "获取所有单位")
 	@RequestMapping("/findAllCustomer")
-	public Result findAll(@RequestBody BankIncomeDat dat) {
+	public Result findAll(@RequestBody BankIncomeDat dat,HttpServletRequest request) {
+		Result result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName= (String) result.getData();
+		}
 		LOGGER.info("@findAll@获取所有单位--开始[]");
-		Result result = null;
 		Map<String, JSONArray> retMap = new HashMap<String, JSONArray>();
-		List<CustomerDat> list=customerDatService.selectList(new EntityWrapper<CustomerDat>().eq("company_code", dat.getCompanyName()));
+		List<CustomerDat> list=customerDatService.selectList(new EntityWrapper<CustomerDat>().eq("company_code", companyName));
 		retMap.put("customers", (JSONArray) JSON.toJSON(list, JsonUtil.getMapping()));
 		result = Result.success(retMap);
 		LOGGER.info("@findAll@获取所有单位--结束[{}]", result);
