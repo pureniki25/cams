@@ -176,10 +176,7 @@
                     </script>-->
                 <i-table ref="selection" :columns="table.col" :data="table.data" :loading="table.loading"
                     @on-selection-change="requires" stripe></i-table>
-                <p style="text-align: center; margin-top: 20px;">
-                    <Page :total="table.total" :page-size="searchForm.size" @on-change="paging"
-                        :current="searchForm.current" show-total></Page>
-                </p>
+
             </i-col>
         </Row>
 

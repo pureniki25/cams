@@ -97,7 +97,7 @@ public class CustomerDatController {
 		String companyName="";
 		if(result.getCode().equals("1")){
 			companyName=result.getData();
-			page.getCondition().put("LIKE_company_code",companyName);
+			page.getCondition().put("EQ_company_code",companyName);
 		}
 
         page.setOrderByField("customerCode").setOrderByField("companyCode").setAsc(true);

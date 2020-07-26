@@ -20,6 +20,7 @@ window.layinit(function (htConfig) {
             submitLoading: false,
             editModal: false,
             pickModal:false,
+            bindModal:false,
             editModalTitle: '新增',
             editModalLoading: true,
             detailModal: false,
@@ -29,6 +30,8 @@ window.layinit(function (htConfig) {
             pickSubjects:[],
             provinces: [],
             cities: [],
+            products:[],
+            productsCodeArray:[],
             banks: [],
             upload: {
                 url: coreBasePath + 'pickStoreDatController/importPickStoreExcel',
@@ -56,9 +59,8 @@ window.layinit(function (htConfig) {
                 openDate: '',
                 pencent:'',
                 salary:'',
-                otherSalary:''
-
-
+                otherSalary:'',
+                array:[]
             },
             condata: {
                 companyId: "123",
@@ -106,6 +108,13 @@ window.layinit(function (htConfig) {
                         type: 'selection',
                         width: 60,
                         align: 'center',
+                        sortable: true,//开启排序
+                    },
+
+                    {
+                        title: '公司名称',
+                        width: 100,
+                        key: 'companyName',
                         sortable: true,//开启排序
                     },
                     {
@@ -187,62 +196,42 @@ window.layinit(function (htConfig) {
                         title: '本币税额',
                         key: 'localhostTax',
                         sortable: true,//开启排序
+                    },
+                    {
+                        title: '关联产成品',
+                        key: 'bindProductCode',
+                        sortable: true,//开启排序
                     }
-                    //            ,{
-                    //                title: '操作',
-                    //                key: 'action',
-                    //                // fixed: 'right',
-                    //                align: 'center',
-                    //                render: (h, params) => {
-                    //                    let detail = h('Button', {
-                    //                        props: {
-                    //                            type: '',
-                    //                            size: 'small'
-                    //                        },
-                    //                        style: {
-                    //                            marginRight: '10px'
-                    //                        },
-                    //                        on: {
-                    //                            click: () => {
-                    //                                vm.detail(params.row)
-                    //                            }
-                    //                        }
-                    //                    }, '详情');
-                    //
-                    //                    let edit = h('Button', {
-                    //                        props: {
-                    //                            type: '',
-                    //                            size: 'small'
-                    //                        },
-                    //                        style: {
-                    //                            marginRight: '10px'
-                    //                        },
-                    //                        on: {
-                    //                            click: () => {
-                    //                                vm.edit(params.row);
-                    //                            }
-                    //                        },
-                    //                    }, '编辑');
-                    //
-                    //                    let del = h('Button', {
-                    //                        props: {type: '', size: 'small'},
-                    //                        style: {marginRight: '10px'},
-                    //                        on: {
-                    //                            click: () => {
-                    //                                vm.delete(params.row);
-                    //                            }
-                    //                        }
-                    //                    }, '删除');
-                    //
-                    //                    let btnArr = [];
-                    //                    btnArr.push(detail);
-                    //                    btnArr.push(del);
-                    //
-                    //                  
-                    //                    
-                    //                    return h('div', btnArr);
-                    //                }
-                    //            }
+                   ,{
+                       title: '操作',
+                       key: 'action',
+                       // fixed: 'right',
+                       align: 'center',
+                       render: (h, params) => {
+                           let edit = h('Button', {
+                               props: {
+                                   type: '',
+                                   size: 'small'
+                               },
+                               style: {
+                                   marginRight: '10px'
+                               },
+                               on: {
+                                   click: () => {
+                                       vm.bindProduct(params.row);
+                                   }
+                               },
+                           }, '关联产成品');
+
+
+                           let btnArr = [];
+                           btnArr.push(edit);
+
+
+
+                           return h('div', btnArr);
+                       }
+                   }
                 ],
                 data: [],
                 loading: false,
@@ -303,7 +292,32 @@ window.layinit(function (htConfig) {
 
 
 let methods = {
+    secondPick(){
+        var self = this;
+        var selectIds=vm.selectIds
+        for(var i=0;i<vm.selectIds.length;i++){
+            if(vm.selectIds[i].bindProductCode==null){
+                vm.$Modal.error({
+                    content: "其中有单据的关联产品编码为空，请先关联"
+                })
+            }
+        }
+        axios.post(coreBasePath + 'pickStoreDatController/secondPick',selectIds)
+            .then(res => {
+                if (!!res.data && res.data.code == '1') {
+                    self.$Modal.success({content: '操作成功!'});
+                } else {
+                    self.$Modal.error({content: '调用接口失败，消息:' + res.data.msg});
+                }
+                this.bindModal = false;
+                this.$refs['editForm'].resetFields();
+                this.search();
+            })
+            .catch(err => {
+                self.$Modal.error({content: '操作失败!'});
+            })
 
+    },
     beforeUpLoadFile() {
         debugger //导入Excel表格
         //  vm.condata.companyId=vm.editForm.companyId;
@@ -326,6 +340,9 @@ let methods = {
     showEditModal() {
         this.editModal = true;
     },
+    showBindModal() {
+        this.bindModal = true;
+    },
     hideEditModal() {
         this.editModalTitle = '新增';
         this.editModal = false;
@@ -335,6 +352,27 @@ let methods = {
         this.editModalTitle = '自动按比例领料';
         this.pickModal = false;
         this.$refs['editForm'].resetFields();
+    },
+    hideBindModal() {
+        debugger
+        var self = this;
+        this.editForm.array=this.productsCodeArray;
+        axios.post(coreBasePath + 'pickStoreDatController/bindProduct',self.editForm)
+            .then(res => {
+                if (!!res.data && res.data.code == '1') {
+                    self.$Modal.success({content: '操作成功!'});
+                } else {
+                    self.$Modal.error({content: '调用接口失败，消息:' + res.data.msg});
+                }
+                self.bindModal = false;
+                self.searchData()
+            })
+            .catch(err => {
+                self.$Modal.error({content: '操作失败!'});
+            })
+
+
+
     },
     showDetailModal() {
         this.detailModal = true;
@@ -383,13 +421,43 @@ let methods = {
                 });
             })
     },
-
+    change(val){
+        debugger
+        this.editForm.companyName=val;
+        this.getCustomer();
+    },
+    getProduct() {
+        var self = this;
+        axios.post(coreBasePath + 'pickStoreDatController/findAllProduct',this.editForm)
+            .then(res => {
+                if (!!res.data && res.data.code == '1') {
+                    self.products = res.data.data.products;
+                } else {
+                    self.$Modal.error({content: '调用接口失败，消息:' + res.data.msg});
+                }
+            })
+            .catch(err => {
+                self.$Modal.error({content: '操作失败!'});
+            })
+    },
     paging(current) {
         this.searchForm.current = current;
+        if (vm.searchForm.condition.GE_open_date != '') {
+            vm.searchForm.condition.GE_open_date = getSearchDate(vm.searchForm.condition.GE_open_date);
+        }
+        if (vm.searchForm.condition.LE_open_date != '') {
+            vm.searchForm.condition.LE_open_date = getSearchDate(vm.searchForm.condition.LE_open_date);
+        }
         this.searchData();
     },
     search() {
         this.searchForm.current = 1;
+        if (vm.searchForm.condition.GE_open_date != '') {
+            vm.searchForm.condition.GE_open_date = getSearchDate(vm.searchForm.condition.GE_open_date);
+        }
+        if (vm.searchForm.condition.LE_open_date != '') {
+            vm.searchForm.condition.LE_open_date = getSearchDate(vm.searchForm.condition.LE_open_date);
+        }
         this.searchData();
     },
     daochu() {
@@ -402,7 +470,7 @@ let methods = {
             title: '提示',
             content: '确定要删除吗?',
             onOk: () => {
-                axios.post(basePath + 'pickStoreDatController/deleteBuy', vm.selectIds)
+                axios.post(basePath + 'pickStoreDatController/delete', vm.selectIds)
                     .then(res => {
                         debugger
                         if (!!res.data && res.data.code == '1') {
@@ -434,7 +502,7 @@ let methods = {
         addInput(ExportForm, "text", "endTime", vm.searchForm.condition.LE_create_time);
         addInput(ExportForm, "text", "openBeginTime", vm.searchForm.condition.GE_open_date);
         addInput(ExportForm, "text", "openEndTime", vm.searchForm.condition.LE_open_date);
-        addInput(ExportForm, "text", "type", "2");
+        addInput(ExportForm, "text", "type", "1")
         ExportForm.submit();
         document.body.removeChild(ExportForm);
 
@@ -459,6 +527,26 @@ let methods = {
                 })
          });
     },
+    generatePick(){
+        let self=this
+        this.editForm.openDate=getSearchDate(this.editForm.openDate)
+        axios.post(basePath + 'pickStoreDatController/generatePick', this.editForm).then(res => {
+            debugger
+            if (!!res.data && res.data.code == 0) {
+                self.search();
+                self.hidePickModal();
+            } else {
+                self.$Message.error({
+                    content: res.data.msg
+                })
+                self.hidePickModal();
+            }
+        }).catch(err => {
+            self.$Modal.error({
+                content: '操作失败!'
+            })
+        });
+    },
     searchData() {
         debugger
         /* table.reload('main_table', {
@@ -466,14 +554,6 @@ let methods = {
              page: {curr: 1}
          })*/
  
-        if (vm.searchForm.condition.GE_open_date != '') {
-            vm.searchForm.condition.GE_open_date = getSearchDate(vm.searchForm.condition.GE_open_date);
-        }
-        if (vm.searchForm.condition.LE_open_date != '') {
-            vm.searchForm.condition.LE_open_date = getSearchDate(vm.searchForm.condition.LE_open_date);
-        }
-        vm.searchForm.type = 1
-
         var self = this;
         //self.loading =  true;
         //self.table.loading = true;
@@ -547,6 +627,13 @@ let methods = {
         Object.assign(this.editForm, row);
         this.editForm.deptIds = !!row.deptId ? row.deptId.split(',') : [];
         this.showEditModal();
+    },
+    bindProduct(row){
+        this.editModalTitle = '关联产成品';
+        this.$refs['editForm'].resetFields();
+        Object.assign(this.editForm, row);
+
+        this.showBindModal();
     },
     detail(row) {
         Object.assign(this.editForm, row);

@@ -86,7 +86,7 @@ public class ProductDatController {
 		String companyName="";
 		if(result.getCode().equals("1")){
 			companyName=result.getData();
-			page.getCondition().put("LIKE_company_name",companyName);
+			page.getCondition().put("EQ_company_name",companyName);
 		}
 	 	String GE_open_date=(String) page.getCondition().get("GE_open_date");
     	String LE_open_date=(String) page.getCondition().get("LE_open_date");

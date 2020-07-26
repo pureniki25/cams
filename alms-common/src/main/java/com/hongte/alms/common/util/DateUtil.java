@@ -704,6 +704,27 @@ public class DateUtil {
 		return cal.getTime();
 	}
 
+	public static Date getMoneEndDate(Date date){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar cale = Calendar.getInstance();
+		cale.setTime(date);
+		// 获取前月的最后一天
+		cale.add(Calendar.MONTH, 1);
+		cale.set(Calendar.DAY_OF_MONTH, 0);
+		String lastday = format.format(cale.getTime());
+		return getDate(lastday);
+	}
+
+	public static Date getLastMoneEndDate(Date date){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar cale = Calendar.getInstance();
+		cale.setTime(date);
+		cale.add(Calendar.MONTH, -1);
+		cale.set(Calendar.DAY_OF_MONTH, 0);
+		String lastday = format.format(cale.getTime());
+		return getDate(lastday);
+	}
+
 	/**
 	 * 获取某月第一天的0时0分0秒的Date对象
 	 * 
@@ -1022,7 +1043,7 @@ public class DateUtil {
 	/**
 	 * 获取本月末日期
 	 * 
-	 * @param that
+	 * @param
 	 * @return
 	 */
 	public static Date getThisEndDate() {
@@ -1042,7 +1063,7 @@ public class DateUtil {
 	/**
 	 * 获取上月月末日期
 	 * 
-	 * @param that
+	 * @param
 	 * @return
 	 */
 	public static Date getLastEndDate() {
@@ -1059,8 +1080,51 @@ public class DateUtil {
 
 		return c.getTime();
 	}
-	
-	  /**
+
+	/**
+	 * 获取本月第一天日期
+	 *
+	 * @param date
+	 * @return
+	 */
+	public static Date getThisMonthFirstDate(String date) {
+		Date firstDate=DateUtil.getDate(date);
+		Calendar c = Calendar.getInstance();
+		c.setTime(firstDate);
+		c.set(Calendar.DAY_OF_MONTH, 1);
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		// 将分钟至59
+		c.set(Calendar.MINUTE, 0);
+		// 将秒至59
+		c.set(Calendar.SECOND, 0);
+		// 将毫秒至999
+		c.set(Calendar.MILLISECOND, 0);
+
+		return c.getTime();
+	}
+	/**
+	 * 获取本月月末日期
+	 *
+	 * @param date
+	 * @return
+	 */
+	public static Date getThisMonthEndDate(String date) {
+		Date endDate=DateUtil.getDate(date);
+		Calendar c = Calendar.getInstance();
+		c.setTime(endDate);
+		c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+		c.set(Calendar.HOUR_OF_DAY, 23);
+		// 将分钟至59
+		c.set(Calendar.MINUTE, 59);
+		// 将秒至59
+		c.set(Calendar.SECOND, 59);
+		// 将毫秒至999
+		c.set(Calendar.MILLISECOND, 999);
+
+		return c.getTime();
+	}
+
+	/**
      * 获取某年第一天日期
      * 
      * @param year

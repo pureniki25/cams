@@ -58,14 +58,14 @@
             </li>
             <li class="layui-nav-item">
                 <!-- 显示当前登录的用户名 -->
-                <a href="javascript:;" id="userName">
+                <a href="javascript:;" id="companyName">
                 </a>
             </li>
             <li class="layui-nav-item">
 
             	<a href="javascript:;" id="changePwd">
                     <i class="fa fa-cog" aria-hidden="true"></i>
-                   修改密码
+                   设置公司
                 </a>
                 <!-- <a href="javascript:;" id="userName">
                     <img src="http://m.zhengjinfan.cn/images/0.jpg" class="layui-nav-img">
@@ -110,6 +110,7 @@
         base: './plugins/layui/extend/modules/',
         version: '1.0.11'
     }).use(['app','message','ht_ajax','ht_auth','layer','ht_cookie',"ht_config"], function() {
+        debugger
         var app = layui.app,
             $ = layui.jquery,
             layer = layui.layer,
@@ -163,17 +164,19 @@
          });
          //填充用户名
         $.get(config.loadSelfinfoUrl, null, function (result) {
+            debugger
             //表单数据填充
-            if (result.result) {
-                $("#userName").html(result.result.userName);
+            if (result.code==='1') {
+                $("#companyName").html(result.data.companyName);
             }
         });
          
          $("#changePwd").on("click", function () {
+             debugger
              var loginUrl = top.location.protocol + "//" + top.location.host + config.loginPath;
-             top.location.href = changePwdPath+"\?token="+cookie.getToken()+"&urls="+loginUrl;
+             top.location.href = config.changePwdPath;
          });
-         
+
          //初始化权限资源
          // ht_auth.load();
          /* $.get(config.baseInfo, null, function (result) {

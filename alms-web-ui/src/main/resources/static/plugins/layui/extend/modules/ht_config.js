@@ -18,7 +18,7 @@ layui.define(function (exports) {debugger
         //, loadBtnAndTabUrl: base + "login/loadBtnAndTab"
         , loginUrl: base + "login/login"
         , refreshTokenUrl: base + "uaa/auth/token"
-        //, loadSelfinfoUrl: base + "uc/user/in/selfinfo"   //查询用户个人信息
+        , loadSelfinfoUrl: base + "login/findUser"   //查询用户个人信息
         ,instanceId:instanceId
 
         //--------------   切换是否使用网关 --------------
@@ -45,7 +45,7 @@ layui.define(function (exports) {debugger
 		 * UAT：http://120.79.154.198:30131/html/user/changePwdOther.html
 		 * PRD：http://120.79.162.165:30131/html/user/changePwdOther.html
 		 */
-        ,changePwdPath:"http://172.16.200.110:30131/html/user/changePwdOther.html"
+        ,changePwdPath:"http://localhost:30601/system/companySetUp.html"
         //--------------   切换是否使用网关 --------------
     });
     window.YYYYMMDD="YYYY年MM月DD日"

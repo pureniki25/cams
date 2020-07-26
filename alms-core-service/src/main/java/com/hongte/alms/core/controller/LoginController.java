@@ -10,6 +10,7 @@ import com.hongte.alms.base.vo.user.MenuVo;
 import com.hongte.alms.common.result.Result;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.hongte.alms.common.util.TokenUtil;
 import io.swagger.annotations.Api;
 
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author:喻尊龙
@@ -60,6 +63,18 @@ public class LoginController {
 			return result.success(loginUser);
 		} else {
 			return result.error("9999", "密码错误或用户不存在");
+		}
+	}
+
+	@RequestMapping("/findUser")
+	public Result findUser(HttpServletRequest request) {
+		String token= TokenUtil.getToekn(request);
+		LoginUser loginUser = loginUserService
+				.selectOne(new EntityWrapper<LoginUser>().eq("token", token));
+		if (loginUser != null) {
+			return Result.success(loginUser);
+		} else {
+			return Result.error("9999", "用户不存在");
 		}
 	}
 

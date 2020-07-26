@@ -1,16 +1,9 @@
 package com.hongte.alms.webui.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.ht.ussp.bean.LoginUserInfoHelper;
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author zengkun

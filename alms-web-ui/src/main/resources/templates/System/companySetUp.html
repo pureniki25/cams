@@ -71,7 +71,7 @@
 <div id="app" v-cloak>
     <i-form   :model="searchForm" :label-width="80">
         <Form-item  label="公司" prop="city">
-            <i-select v-model="searchForm.companyName" placeholder="请选择公司">
+            <i-select v-model="searchForm.companyName" placeholder="请选择公司" clearable filterable>
                 <i-option v-for="item in companys" :value="item.companyName" :key="item.companyName">{{item.companyName}}</i-option>
 
             </i-select>

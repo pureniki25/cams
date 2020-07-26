@@ -34,7 +34,7 @@ public class MysqlGenerator {
 //        String tableName="tb_basic_company";//本次需要生成的表名
 //        String tableName="tb_collection_status";//本次需要生成的表名
        // String tableName="tb_withholding_flow_record";//本次需要生成的表名
-        String tableName="tb_customer_first_dat";//本次需要生成的表名
+        String tableName="tb_product_rest_dat";//本次需要生成的表名
         //1 设定生成配置
         GeneratorConfig inputConfig = new GeneratorConfig(
 //                "陈泽圣",
@@ -49,7 +49,7 @@ public class MysqlGenerator {
                 //{自定义}项目名称
 //                "alms-generator",
                 "alms-generator",
-                //表前缀，不需修改
+                //表前缀，不需修改 
                 "tb_");
         //2 设定数据源账号密码
         DataSourceConfig dataSourceConfig = GeneratorUtil.setDataSorceConfig("root","123456",dburl);

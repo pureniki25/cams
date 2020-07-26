@@ -391,7 +391,7 @@ let methods = {
         ExportForm.action = basePath + "productDat/export";
         ExportForm.target = "iframe";
         ExportForm.action = basePath + "productDat/export";
-        addInput(ExportForm, "text", "companyName", vm.searchForm.condition.LIKE_company_name);
+        addInput(ExportForm, "text", "companyName", vm.searchForm.condition.eq_company_name);
         addInput(ExportForm, "text", "productName", vm.searchForm.condition.LIKE_product_name);
         addInput(ExportForm, "text", "productCode", vm.searchForm.condition.LIKE_product_code);
         addInput(ExportForm, "text", "beginTime", vm.searchForm.condition.GE_create_time);
