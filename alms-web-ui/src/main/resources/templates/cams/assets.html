@@ -95,16 +95,6 @@
                     </div>
                     <i-form ref="searchForm" :model="searchForm" label-position="right" label-width="100">
                         <Row :gutter="0">
-
-                            <i-col span="6">
-                                <Form-item label="公司名称:">
-                                    <i-select v-model="searchForm.condition.LIKE_company_name" clearable filterable>
-                                        <!--<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>-->
-                                        <i-option v-for="item in companys" :value="item.companyName"
-                                            :key="item.companyName">{{item.companyName}}</i-option>
-                                    </i-select>
-                                </Form-item>
-                            </i-col>
                             <i-col span="5">
                                 <form-item label="导入日期：从" prop="createTime">
                                     <date-picker type="date" v-model="searchForm.condition.GE_create_time"
@@ -155,19 +145,6 @@
             <Modal :title="editModalTitle" v-model="editModal" :loading="editModalLoading" @on-ok="hideEditModal"
                  :styles="{top: '150px'}"  width="70" height="100">
                         <i-form ref="editForm" :model="editForm" :rules="ruleValidate" label-position="right" label-width="50" >
-                            <!--<input type="hidden" v-model="editForm.accountId"/>-->
-                            
-                         <i-col span="6">
-                                    <Form-item label="公司名称:" prop="companyName">
-                                        <i-select v-model="editForm.companyName" clearable filterable>
-                                            <!--<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>-->
-                                            <i-option v-for="item in companys" :value="item.companyName" :key="item.companyName">{{item.companyName}}</i-option>
-                                        </i-select>
-                                    </Form-item>
-                                </i-col>
-                                
-                                         <!--<input type="hidden" v-model="editForm.accountId"/>-->
-                            
                                 <i-col span="6">
                                     <Form-item label="商品性质:" prop="productPropertiesName">
                                         <i-select v-model="editForm.productPropertiesName" clearable filterable>

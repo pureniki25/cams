@@ -98,19 +98,19 @@
                         <button class="layui-btn layui-btn-sm" @click="deleteAll">删除</button> -->
                     </div>
                     <i-form ref="searchForm" :model="searchForm" label-position="right" label-width="100">
-                        <Row :gutter="0">
-                            <i-col span="5">
-                                <Form-item label="公司名称:" prop="companyName">
-                                    <i-select v-model="searchForm.companyName" clearable filterable>
-                                        <!--<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>-->
-                                        <i-option v-for="item in companys" :value="item.companyName"
-                                            :key="item.companyName">{{item.companyName}}</i-option>
-                                    </i-select>
-                                </Form-item>
-                            </i-col>
+<!--                        <Row :gutter="0">-->
+<!--                            <i-col span="5">-->
+<!--                                <Form-item label="公司名称:" prop="companyName">-->
+<!--                                    <i-select v-model="searchForm.companyName" clearable filterable>-->
+<!--                                        &lt;!&ndash;<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>&ndash;&gt;-->
+<!--                                        <i-option v-for="item in companys" :value="item.companyName"-->
+<!--                                            :key="item.companyName">{{item.companyName}}</i-option>-->
+<!--                                    </i-select>-->
+<!--                                </Form-item>-->
+<!--                            </i-col>-->
 
 
-                        </Row>
+<!--                        </Row>-->
                         <Row :gutter="5">
                             <i-col span="3">
                                 <form-item label="开票日期:" prop="openDate">

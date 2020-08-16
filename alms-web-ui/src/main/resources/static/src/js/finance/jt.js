@@ -440,6 +440,7 @@ window.layinit(function (htConfig) {
         },
         methods: methods,
         created: function () {
+            this.getCustomer();
             this.initData();
             this.search();
         },

@@ -3,6 +3,9 @@ package com.hongte.alms.base.controller;
 
 import java.util.List;
 
+import com.hongte.alms.base.enums.TokenTypeEnum;
+import com.hongte.alms.base.service.CamsCompanyService;
+import com.hongte.alms.common.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContextException;
@@ -22,6 +25,8 @@ import com.hongte.alms.common.vo.PageResult;
 
 import io.swagger.annotations.ApiOperation;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * <p>
  * 单位余额表 前端控制器
@@ -36,10 +41,20 @@ public class CustomerRestDatController {
 	@Autowired
 	@Qualifier("CustomerRestDatService")
 	private CustomerRestDatService customerRestDatService;
+
+	@Autowired
+	@Qualifier("CamsCompanyService")
+	private CamsCompanyService camsCompanyService;
 	
 	@ApiOperation(value = "单位余额表查询")
 	@RequestMapping("/selectCustomerRest")
-	public PageResult<List<CustomerRestVo>> selectCustomerRest(@RequestBody CustomerRestVo vo) throws InstantiationException, IllegalAccessException {
+	public PageResult<List<CustomerRestVo>> selectCustomerRest(@RequestBody CustomerRestVo vo, HttpServletRequest request) throws InstantiationException, IllegalAccessException {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			vo.setCompanyName(companyName);
+		}
 		if(StringUtil.isEmpty(vo.getCompanyName())) {
 			throw new ApplicationContextException("请选择公司名称");
 		}

@@ -1,42 +1,36 @@
 package com.hongte.alms.base.controller;
 
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.entity.CamsCompany;
+import com.hongte.alms.base.enums.CamsConstant;
+import com.hongte.alms.base.enums.TokenTypeEnum;
+import com.hongte.alms.base.service.CamsCompanyService;
+import com.hongte.alms.base.service.CustomerRestDatService;
+import com.hongte.alms.base.service.SubjectRestDatService;
+import com.hongte.alms.base.vo.cams.BalanceVo;
+import com.hongte.alms.base.vo.cams.SubjectRestVo;
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.common.vo.PageResult;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.entity.CamsCompany;
-import com.hongte.alms.base.enums.CamsConstant;
-import com.hongte.alms.base.service.CamsCompanyService;
-import com.hongte.alms.base.service.CustomerRestDatService;
-import com.hongte.alms.base.service.SubjectRestDatService;
-import com.hongte.alms.base.vo.cams.BalanceVo;
-import com.hongte.alms.base.vo.cams.CustomerRestVo;
-import com.hongte.alms.base.vo.cams.SubjectRestVo;
-import com.hongte.alms.common.util.DateUtil;
-import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.common.vo.PageResult;
-
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -71,7 +65,13 @@ public class SubjectRestDatController {
 
 	@ApiOperation(value = "科目余额表查询")
 	@RequestMapping("/selectSubjectRest")
-	public PageResult<List<SubjectRestVo>> selectSubjectRest(@RequestBody SubjectRestVo vo) throws InstantiationException, IllegalAccessException {
+	public PageResult<List<SubjectRestVo>> selectSubjectRest(@RequestBody SubjectRestVo vo,HttpServletRequest request) throws InstantiationException, IllegalAccessException {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			vo.setCompanyName(companyName);
+		}
 		if(StringUtil.isEmpty(vo.getCompanyName())) {
 			throw new ApplicationContextException("请选择公司名称");
 		}
@@ -81,7 +81,13 @@ public class SubjectRestDatController {
 	
 	@ApiOperation(value = "资产负债表查询")
 	@RequestMapping("/selectBalace")
-	public PageResult<List<BalanceVo>> selectBalace(@RequestBody SubjectRestVo vo) throws Exception {
+	public PageResult<List<BalanceVo>> selectBalace(@RequestBody SubjectRestVo vo, HttpServletRequest request) throws Exception {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			vo.setCompanyName(companyName);
+		}
 		if(StringUtil.isEmpty(vo.getCompanyName())) {
 			throw new ApplicationContextException("请选择公司名称");
 		}
@@ -91,7 +97,13 @@ public class SubjectRestDatController {
 	
 	@ApiOperation(value = "利润表查询")
 	@RequestMapping("/selectProfit")
-	public PageResult<List<BalanceVo>> selectProfit(@RequestBody SubjectRestVo vo) throws Exception {
+	public PageResult<List<BalanceVo>> selectProfit(@RequestBody SubjectRestVo vo,HttpServletRequest request) throws Exception {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			vo.setCompanyName(companyName);
+		}
 		if(StringUtil.isEmpty(vo.getCompanyName())) {
 			throw new ApplicationContextException("请选择公司名称");
 		}
@@ -104,10 +116,14 @@ public class SubjectRestDatController {
 	@PostMapping("/exportBalance")
 	public void export(HttpServletResponse response, HttpServletRequest request, @ModelAttribute SubjectRestVo vo)
 			throws Exception {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+		}
 		Map<String, String[]> map = request.getParameterMap();
 		String openBeginTimeStr = map.get("openBeginTime")[0];
 		String openEndTimeStr = map.get("openEndTime")[0];
-		String companyName = map.get("companyName")[0];
 		String openBeginTime = null;
 		String openEndTime = null;
 	
@@ -303,10 +319,14 @@ public class SubjectRestDatController {
 	@PostMapping("/exportProfit")
 	public void exportProfit(HttpServletResponse response, HttpServletRequest request, @ModelAttribute SubjectRestVo vo)
 			throws Exception {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+		}
 		Map<String, String[]> map = request.getParameterMap();
 		String openBeginTimeStr = map.get("openBeginTime")[0];
 		String openEndTimeStr = map.get("openEndTime")[0];
-		String companyName = map.get("companyName")[0];
 		String openBeginTime = null;
 		String openEndTime = null;
 	

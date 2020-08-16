@@ -1,7 +1,7 @@
 /**
  * add by tanrq 2018/1/21
  */
-layui.define(function (exports) {debugger
+layui.define(function (exports) {
     // var base = "http://172.16.200.110:30111/";
     var base = gateWayUrl;
     // "http://172.16.200.110:30111/";
@@ -45,7 +45,8 @@ layui.define(function (exports) {debugger
 		 * UAT：http://120.79.154.198:30131/html/user/changePwdOther.html
 		 * PRD：http://120.79.162.165:30131/html/user/changePwdOther.html
 		 */
-        ,changePwdPath:"http://localhost:30601/system/companySetUp.html"
+        //,changePwdPath:"http://localhost:30601/system/companySetUp.html"
+        ,changePwdPath:"http://106.52.127.140:30601/system/companySetUp.html"
         //--------------   切换是否使用网关 --------------
     });
     window.YYYYMMDD="YYYY年MM月DD日"

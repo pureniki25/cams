@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.hongte.alms.base.enums.TokenTypeEnum;
+import com.hongte.alms.base.service.CamsCompanyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +55,20 @@ public class SubjectFirstDatController {
 	@Autowired
 	@Qualifier("SubjectFirstDatService")
 	private SubjectFirstDatService subjectFirstDatService;
+
+	@Autowired
+	@Qualifier("CamsCompanyService")
+	private CamsCompanyService camsCompanyService;
 	
 	@ApiOperation(value = "查询科目期初余额列表")
 	@RequestMapping("/searchSubjectFirst")
-	public PageResult searchSubjectFirst(@RequestBody Page<SubjectFirstDat> page) {
-		
+	public PageResult searchSubjectFirst(@RequestBody Page<SubjectFirstDat> page,HttpServletRequest request) {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			page.getCondition().put("EQ_company_name",companyName);
+		}
 		page.setOrderByField("createTime").setAsc(false);
 		subjectFirstDatService.selectByPage(page);
 		List<SubjectFirstDat> list=page.getRecords();
@@ -70,10 +81,13 @@ public class SubjectFirstDatController {
 	@RequestMapping("/importSubjectFirstExcel")
 	public Result importSubjectFirstExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+		}
 		try {
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
 			if (!file.getOriginalFilename().contains(companyName)) {
 				return Result.error("选择的公司与导入的公司不一致");
 			}

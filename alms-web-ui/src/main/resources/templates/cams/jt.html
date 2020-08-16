@@ -102,16 +102,16 @@
                     </div>
                     <i-form ref="searchForm" :model="searchForm" label-position="right" label-width="100">
                         <Row :gutter="0">
-                            <i-col span="6">
-                                <Form-item label="公司名称:">
-                                    <i-select v-model="searchForm.condition.LIKE_company_name" clearable filterable>
-                                        <!--<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>-->
-                                        <i-option v-for="item in companys" :value="item.companyName"
-                                            :key="item.companyName">{{item.companyName}}</i-option>
-                                    </i-select>
-                                </Form-item>
-                                <i-input v-model="searchForm.condition.EQ_fee_type" value="1" style="visibility:hidden; display:none" />
-                            </i-col>
+<!--                            <i-col span="6">-->
+<!--                                <Form-item label="公司名称:">-->
+<!--                                    <i-select v-model="searchForm.condition.LIKE_company_name" clearable filterable>-->
+<!--                                        &lt;!&ndash;<i-option v-for="item in companyList" :value="item.areaId" :key="item.areaId">{{item.areaName}}</i-option>&ndash;&gt;-->
+<!--                                        <i-option v-for="item in companys" :value="item.companyName"-->
+<!--                                            :key="item.companyName">{{item.companyName}}</i-option>-->
+<!--                                    </i-select>-->
+<!--                                </Form-item>-->
+<!--                                <i-input v-model="searchForm.condition.EQ_fee_type" value="1" style="visibility:hidden; display:none" />-->
+<!--                            </i-col>-->
                             <i-col span="3">
 					                    <Form-item label="计提类型:" prop="jtType">
 					                        <i-select v-model="searchForm.condition.EQ_jt_type" clearable filterable>
@@ -241,14 +241,14 @@
                   
             <i-form ref="editForm" :model="editForm" :rules="ruleValidate" label-position="right" label-width="50">
                 <Row :gutter="0">
-                    <i-col span="6">
-                        <Form-item label="公司名称:" prop="companyName">
-                            <i-select v-model="editForm.companyName" clearable filterable @on-change="change">
-                                <i-option v-for="item in companys" :value="item.companyName" :key="item.companyName">
-                                    {{item.companyName}}</i-option>
-                            </i-select>
-                        </Form-item>
-                    </i-col>
+<!--                    <i-col span="6">-->
+<!--                        <Form-item label="公司名称:" prop="companyName">-->
+<!--                            <i-select v-model="editForm.companyName" clearable filterable @on-change="change">-->
+<!--                                <i-option v-for="item in companys" :value="item.companyName" :key="item.companyName">-->
+<!--                                    {{item.companyName}}</i-option>-->
+<!--                            </i-select>-->
+<!--                        </Form-item>-->
+<!--                    </i-col>-->
 
                     <i-col span="6">
 

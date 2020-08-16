@@ -240,6 +240,7 @@ window.layinit(function (htConfig) {
         },
         methods: methods,
         created: function () {
+            this.getProduct();
             this.initData();
             this.search();
         },

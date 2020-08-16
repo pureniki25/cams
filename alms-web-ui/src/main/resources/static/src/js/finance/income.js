@@ -34,7 +34,7 @@ window.layinit(function (htConfig) {
             smallSubjects:[],
             camsTaxs: [],
             camsProductProperties:[],
-          
+            bankSubjects:[],
             provinces: [],
             cities: [],
             banks: [],
@@ -455,8 +455,10 @@ window.layinit(function (htConfig) {
         },
         methods: methods,
         created: function () {
+            this.getCustomer();
             this.initData();
             this.search();
+
         },
         updated: function () {
             this.loading = false;
@@ -651,6 +653,7 @@ uploadSuccess(response) {
   
     },
     getCustomer() {
+	    debugger
         var self = this;
         // 根据所选择的省查询市列表
         axios.post(coreBasePath + 'customerDat/findAllCustomer',this.editForm)
@@ -719,7 +722,7 @@ uploadSuccess(response) {
         document.body.removeChild(ExportForm);
 
     },
-    searchData() {debugger
+    searchData() {
         /*
 		 * table.reload('main_table', { where: vm.search, page: {curr: 1} })
 		 */

@@ -1,68 +1,44 @@
 package com.hongte.alms.base.controller;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.hongte.alms.base.enums.TokenTypeEnum;
-import com.hongte.alms.base.service.CamsCompanyService;
-import com.netflix.ribbon.proxy.annotation.Http;
-import org.apache.tomcat.jni.File;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartRequest;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.BankIncomeDat;
-import com.hongte.alms.base.entity.CamsCompany;
-import com.hongte.alms.base.entity.CamsProductProperties;
-import com.hongte.alms.base.entity.CamsSubject;
-import com.hongte.alms.base.entity.CamsTax;
 import com.hongte.alms.base.entity.CustomerDat;
-import com.hongte.alms.base.entity.ProductDat;
-import com.hongte.alms.base.entity.SellDat;
-import com.hongte.alms.base.entity.SysUserRole;
-import com.hongte.alms.base.enums.SubjectEnum;
+import com.hongte.alms.base.enums.TokenTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.service.CamsCompanyService;
 import com.hongte.alms.base.service.CustomerDatService;
 import com.hongte.alms.base.service.ProductDatService;
 import com.hongte.alms.common.result.Result;
 import com.hongte.alms.common.util.CamsUtil;
-import com.hongte.alms.common.util.Convert;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.JsonUtil;
 import com.hongte.alms.common.util.StringUtil;
 import com.hongte.alms.common.vo.PageResult;
-
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartRequest;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>

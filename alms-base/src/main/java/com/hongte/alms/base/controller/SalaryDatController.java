@@ -1,20 +1,25 @@
 package com.hongte.alms.base.controller;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.entity.JtDat;
+import com.hongte.alms.base.entity.SalaryDat;
+import com.hongte.alms.base.enums.CamsConstant;
+import com.hongte.alms.base.enums.SubjectEnum;
 import com.hongte.alms.base.enums.TokenTypeEnum;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.service.BankIncomeDatService;
 import com.hongte.alms.base.service.CamsCompanyService;
-import com.hongte.alms.common.util.*;
-import com.netflix.ribbon.proxy.annotation.Http;
+import com.hongte.alms.base.service.JtDatService;
+import com.hongte.alms.base.service.SalaryDatService;
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.CamsUtil;
+import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.common.vo.PageResult;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,30 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.fasterxml.jackson.databind.util.BeanUtil;
-import com.hongte.alms.base.entity.CamsSubject;
-import com.hongte.alms.base.entity.FeeDat;
-import com.hongte.alms.base.entity.JtDat;
-import com.hongte.alms.base.entity.PickStoreDat;
-import com.hongte.alms.base.entity.ProductDat;
-import com.hongte.alms.base.entity.SalaryDat;
-import com.hongte.alms.base.entity.TempProductDat;
-import com.hongte.alms.base.enums.CamsConstant;
-import com.hongte.alms.base.enums.SubjectEnum;
-import com.hongte.alms.base.exception.ServiceRuntimeException;
-import com.hongte.alms.base.service.BankIncomeDatService;
-import com.hongte.alms.base.service.JtDatService;
-import com.hongte.alms.base.service.SalaryDatService;
-import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.vo.PageResult;
-
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>

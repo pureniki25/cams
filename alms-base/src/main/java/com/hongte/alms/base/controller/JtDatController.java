@@ -1,6 +1,33 @@
 package com.hongte.alms.base.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.hongte.alms.base.entity.BankIncomeDat;
+import com.hongte.alms.base.entity.JtDat;
+import com.hongte.alms.base.enums.TokenTypeEnum;
+import com.hongte.alms.base.exception.ServiceRuntimeException;
+import com.hongte.alms.base.service.CamsCompanyService;
+import com.hongte.alms.base.service.JtDatService;
+import com.hongte.alms.common.result.Result;
+import com.hongte.alms.common.util.CamsUtil;
+import com.hongte.alms.common.util.DateUtil;
+import com.hongte.alms.common.util.StringUtil;
+import com.hongte.alms.common.vo.PageResult;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartRequest;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -9,39 +36,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartRequest;
-
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.hongte.alms.base.entity.BankIncomeDat;
-import com.hongte.alms.base.entity.JtDat;
-import com.hongte.alms.base.exception.ServiceRuntimeException;
-import com.hongte.alms.base.service.JtDatService;
-import com.hongte.alms.common.result.Result;
-import com.hongte.alms.common.util.CamsUtil;
-import com.hongte.alms.common.util.DateUtil;
-import com.hongte.alms.common.util.StringUtil;
-import com.hongte.alms.common.vo.PageResult;
-
-import io.swagger.annotations.ApiOperation;
 
 /**
  * <p>
@@ -58,18 +52,23 @@ public class JtDatController {
 	@Autowired
 	@Qualifier("JtDatService")
 	private JtDatService jtDatService;
-	
-	
+
+	@Autowired
+	@Qualifier("CamsCompanyService")
+	private CamsCompanyService camsCompanyService;
 	
 	
 	@ApiOperation(value = "导入固定资产")
 	@RequestMapping("/importZiChan")
 	public Result importZiChan(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+		}
 		try {
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
 			String feeType = map.get("feeType")[0];// 费用类型
 			String fileName = CamsUtil.getCompanyName(file.getOriginalFilename());
 			if (!fileName.equals(companyName)) {
@@ -130,11 +129,15 @@ public class JtDatController {
 	
 	@ApiOperation(value = "新增")
 	@RequestMapping("/save")
-	public Result save(@RequestParam Map<String, Object> map) {
+	public Result save(@RequestParam Map<String, Object> map,HttpServletRequest request) {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+		}
 		String selects = (String) map.get("selects");
 		List<JtDat>  addDats = JSONObject.parseArray(selects, JtDat.class);
 		String openDateStr = (String) map.get("date");
-		String companyName = (String) map.get("companyName");
 		String customerCode = (String) map.get("customerCode");
 		String openDate = CamsUtil.getLastDate(openDateStr);
 		String jtType = (String) map.get("jtType");
@@ -155,8 +158,13 @@ public class JtDatController {
 	
 	@ApiOperation(value = "查询费列表")
 	@RequestMapping("/search")
-	public PageResult search(@RequestBody Page<JtDat> page) {
-		
+	public PageResult search(@RequestBody Page<JtDat> page, HttpServletRequest request) {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			page.getCondition().put("EQ_company_name",companyName);
+		}
 		page.setOrderByField("pingZhengHao").setAsc(true);
 		jtDatService.selectByPage(page);
 		return PageResult.success(page.getRecords(), page.getTotal());
@@ -165,6 +173,12 @@ public class JtDatController {
 	@PostMapping("/export")
 	public void export(HttpServletResponse response, HttpServletRequest request, @ModelAttribute JtDat jtDat)
 			throws IOException {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			jtDat.setCompanyName(companyName);
+		}
 		Map<String, String[]> map = request.getParameterMap();
 		String openBeginTimeStr = map.get("openBeginTime")[0];
 		String openEndTimeStr = map.get("openEndTime")[0];
