@@ -157,6 +157,13 @@ public class BankIncomeDat extends Model<BankIncomeDat> {
 	@TableField("zhi_dan_ren")
 	@ApiModelProperty(required = true, value = "制单人")
 	private String zhiDanRen;
+
+	/**
+	 * 对账日期
+	 */
+	@TableField("dui_zhang_ri_qi")
+	@ApiModelProperty(required = true, value = "对账日期")
+	private String duiZhangRiQi;
 	/**
 	 * 审核人
 	 */
@@ -471,6 +478,14 @@ public class BankIncomeDat extends Model<BankIncomeDat> {
 
 	public String getShuLiang() {
 		return shuLiang;
+	}
+
+	public String getDuiZhangRiQi() {
+		return duiZhangRiQi;
+	}
+
+	public void setDuiZhangRiQi(String duiZhangRiQi) {
+		this.duiZhangRiQi = duiZhangRiQi;
 	}
 
 	public void setShuLiang(String shuLiang) {

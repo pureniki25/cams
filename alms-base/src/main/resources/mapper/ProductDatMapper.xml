@@ -312,7 +312,17 @@
 
 	</insert>
 
-
-
+	<update id="updateOne"  parameterType="com.hongte.alms.base.entity.ProductDat">
+		UPDATE tb_product_dat
+		<set>
+			<if test="kuCunLiang != null">Ku_Cun_Liang=#{kuCunLiang},</if>
+			<if test="qiChuJine != null">Qi_Chu_Jine=#{qiChuJine},</if>
+			<if test="openDate != null">Open_Date=#{openDate},</if>
+			<if test="qiChuDanJia != null">Qi_Chu_Dan_Jia=#{qiChuDanJia}</if>
+			update_time=now()
+		</set>
+		WHERE product_code=#{productCode} and company_name=#{companyName}
+	</update>
 
 </mapper>
+

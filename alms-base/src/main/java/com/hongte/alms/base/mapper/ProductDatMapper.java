@@ -26,4 +26,5 @@ public interface ProductDatMapper extends SuperMapper<ProductDat> {
 	List<RestProductVo> inventoryPage(Pagination pages, RestProductVo vo);
 	
 	void syncProductRestData();
+	int updateOne(ProductDat vo);
 }

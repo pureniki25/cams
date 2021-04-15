@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-    <title>发票管理</title>
+    <title>暂估单管理</title>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css"/>
     <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css"/>
     <link rel="stylesheet" type="text/css" href="/plugins/layui/css/layui.css" media="all"/>
@@ -94,8 +94,6 @@
                     </button>
                     <button class="layui-btn layui-btn-sm" @click="editForm.accountId=null;editModal=true;">导入</button>
                     <button class="layui-btn layui-btn-sm" @click="deleteAll">删除</button>
-                    <button class="layui-btn layui-btn-sm" @click="generateByCompany">按单位生成凭证</button>
-                    <button class="layui-btn layui-btn-sm" @click="generateByInvoice">按发票号生成凭证</button>
                 </div>
                 <i-form ref="searchForm" :model="searchForm" label-position="right" label-width="100">
                     <Row :gutter="1">
@@ -232,6 +230,6 @@
 <script src="/properties/config.js"></script>
 <script src="/build/js/appToken.js"></script>
 <script src="/src/js/comm.js"></script>
-<script src="/src/js/finance/buy.js"></script>
+<script src="/src/js/finance/temporary.js"></script>
 </body>
 </html>

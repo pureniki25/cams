@@ -298,7 +298,7 @@ let methods = {
                     content: '操作失败!'
                 });
             });
-
+      this.searchData();
 
     },
     initCityData() {

@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hongte.alms.common.vo.PageRequest;
 
 import java.io.Serializable;
+import java.util.List;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -61,6 +63,8 @@ public class RestProductVo extends PageRequest {
 	private BigDecimal percent;
 
 	private BigDecimal localAmount;
+
+	private List<String> productCodes;
 
 	private BigDecimal chengBenNum;
 	@JsonFormat(timezone = "GMT-16",pattern = "yyyy-MM-dd")

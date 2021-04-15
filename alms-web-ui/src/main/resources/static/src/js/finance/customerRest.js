@@ -306,7 +306,7 @@ let methods = {
                 });
             });
 
-
+     this.searchData();
     },
     initCityData() {
         var self = this;

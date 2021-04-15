@@ -6,6 +6,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.hongte.alms.base.enums.TokenTypeEnum;
+import com.hongte.alms.base.service.CamsCompanyService;
+import com.hongte.alms.common.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,11 @@ public class CustomerFirstDatController {
 	@Autowired
 	@Qualifier("CustomerFirstDatService")
 	private CustomerFirstDatService customerFirstDatService;
+
+	@Autowired
+	@Qualifier("CamsCompanyService")
+	private CamsCompanyService camsCompanyService;
+
 	
 	@ApiOperation(value = "查询单位期初余额列表")
 	@RequestMapping("/searchCustomerFirst")
@@ -70,12 +78,16 @@ public class CustomerFirstDatController {
 	@RequestMapping("/importCustomerFirstExcel")
 	public Result importSubjectFirstExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request,
 			MultipartRequest req) {
-		Result result = null;
+		Result<String> result = null;
 		try {
+			result=camsCompanyService.getCompany(request, TokenTypeEnum.COOKIES);
+			String companyName="";
+			if(result.getCode().equals("1")){
+				companyName= (String) result.getData();
+			}
 			Map<String, String[]> map = request.getParameterMap();
-			String companyName = map.get("companyName")[0];
-			if (!file.getOriginalFilename().contains(companyName)) {
-				return Result.error("选择的公司与导入的公司不一致");
+			if(StringUtil.isEmpty(companyName)) {
+				return Result.error("请选择公司名");
 			}
 			
 			LOGGER.info("====>>>>>导入单位期初余额开始[{}]", file);

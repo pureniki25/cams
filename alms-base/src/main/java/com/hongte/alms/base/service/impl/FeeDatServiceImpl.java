@@ -243,7 +243,7 @@ public class FeeDatServiceImpl extends BaseServiceImpl<FeeDatMapper, FeeDat> imp
 	@Override
 	public void addSellPingZheng(String feeName, String companyName, CustomerDat customerDat, String shuLiang,
 			String produceDate, String faPiaoHao, String buyType, String hanShuiJine, String buHanShuiJine,
-			String shuie, String danJia, String feeType,String productCode,BigDecimal cash) throws InstantiationException, IllegalAccessException {
+			String shuie, String danJia, String feeType,String productCode,BigDecimal cash,String keMuDaiMa) throws InstantiationException, IllegalAccessException {
         String uuid=UUID.randomUUID().toString();
  		String customerCode = customerDat.getCustomerCode();
 		feeName = CamsUtil.getProductName(feeName);
@@ -280,7 +280,7 @@ public class FeeDatServiceImpl extends BaseServiceImpl<FeeDatMapper, FeeDat> imp
 		}
 		
 
-		FeeDat keMuDaiMa = selectOne(new EntityWrapper<FeeDat>().eq("company_name", companyName)
+		FeeDat keMu = selectOne(new EntityWrapper<FeeDat>().eq("company_name", companyName)
 				.eq("customer_code", customerCode).eq("zhai_yao", feeName).eq("fee_type", feeType));
 		FeeDat feeDat = new FeeDat();
 		feeDat.setPingZhengRiQi(produceDate);
@@ -336,7 +336,7 @@ public class FeeDatServiceImpl extends BaseServiceImpl<FeeDatMapper, FeeDat> imp
 			feeDat.setBuyType("销售发票");
 			feeDat.setKeMuDaiMa(SubjectEnum.CLIENT_SUBJECT.getValue().toString());
 			shuieDat.setKeMuDaiMa("2171-01-05"); //销项税额科目
-			buHanShuiDat.setKeMuDaiMa("5101-01");
+			buHanShuiDat.setKeMuDaiMa(keMuDaiMa);
 			feeDat.setLocalAmount(hanShuiJine);
 			feeDat.setBorrowAmount(hanShuiJine);
 			feeDat.setAlmsAmount("0.00");

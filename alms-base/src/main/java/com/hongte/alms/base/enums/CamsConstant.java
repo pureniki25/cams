@@ -42,7 +42,10 @@ public class CamsConstant {
 	public enum JiTiTypeEnum implements IEnum {
 
 	    SALARY("1","工资"),
-	    TAX("2","税金");
+	    SHE_BAO("2","社保"),
+		ZO_CHAN("3","资产"),
+		TAX("4","待代扣税"),
+		XIAO_SHOU_CHENG_BEN("5","结转销售成本");
 
 	    private String value;
 	    private String desc;
@@ -69,7 +72,8 @@ public class CamsConstant {
 	    CHAN_PIN("产品"),
 	    GONG_CHENG_SHOU_RU("工程收入"),
 	    FU_WU_FEI_SHOU_RU("工程收入"),
-	    CAI_LIAO("材料");
+	    CAI_LIAO("材料"),
+		XIAO_SHOU_SHOU_RU("销售收入");
 
 	    private String value;
 
@@ -257,6 +261,71 @@ public class CamsConstant {
 	    public String getDesc(){
 	        return this.desc;
 	    }
+	}
+
+
+	/**
+	 * 凭证类型
+	 * @author 24043
+	 *
+	 */
+	public enum BankTypeEnum implements IEnum {
+
+
+
+
+		SHOU_RU("1","收入"),
+		ZHI_CHU("2","支出");
+
+		private String value;
+		private String desc;
+
+		BankTypeEnum(final String value, final String desc) {
+			this.value = value;
+			this.desc = desc;
+		}
+
+		@Override
+		public Serializable getValue() {
+			return this.value;
+		}
+
+		@JsonValue
+		public String getDesc(){
+			return this.desc;
+		}
+	}
+
+	/**
+	 * 发票类型
+	 * @author 24043
+	 *
+	 */
+	public enum InvoiceTypeEnum implements IEnum {
+
+
+
+
+		PU_PIAO("1","普票"),
+		ZHUAN_PIAO("2","专票");
+
+		private String value;
+		private String desc;
+
+		InvoiceTypeEnum(final String value, final String desc) {
+			this.value = value;
+			this.desc = desc;
+		}
+
+		@Override
+		public Serializable getValue() {
+			return this.value;
+		}
+
+		@JsonValue
+		public String getDesc(){
+			return this.desc;
+		}
 	}
 	
 	

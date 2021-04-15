@@ -45,5 +45,8 @@ public interface JtDatService extends BaseService<JtDat> {
 	
     //手动增加
     public void saveJtDat(List<JtDat>  addDats,String openDate,String companyName,String customerCode,String jtType);
+
+	//通用增加凭证
+	public void saveCommonDat(JtDat jtDat,String openDate,String companyName,String prekeMuDaiMa,String aftKeMuDaiMa);
 		
 }

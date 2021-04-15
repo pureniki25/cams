@@ -27,28 +27,22 @@ public class InvoiceBuyExel implements Serializable {
     private String xiaoFangDiZhi; //'业务编号'
     @Excel(name = "销方银行账号", orderNum = "7")
     private String xiaoFangYingHangZhangHao;//'客户名称'
-
     @Excel(name = "合计金额", orderNum = "8")
     private String heJiJine;//'期数'
     @Excel(name = "合计税额", orderNum = "9")
     private String heJiShuie;//'所属分公司'
     @Excel(name = "价税合计", orderNum = "10")
     private String jiaShuiHeJi;//'转账金额'
-
     @Excel(name = "备注", orderNum = "11")
     private String beiZhu;//'本期应还金额'
     @Excel(name = "作废标志", orderNum = "12")
     private String zuoFeiBiaoZhi;//'实际转账人'
     @Excel(name = "发票种类", orderNum = "13")
     private String faPiaoZhongLei;//'转账日期'
-    
     @Excel(name = "行号", orderNum = "14")
     private String hangHao;//'转账日期'
-    
-    
     @Excel(name = "产品名称", orderNum = "15")
     private String chanPinMingChen;//'转账日期'
-    
     @Excel(name = "产品型号", orderNum = "16")
     private String changPinXingHao;//'转账日期'
     @Excel(name = "计量单位", orderNum = "17")
@@ -65,26 +59,16 @@ public class InvoiceBuyExel implements Serializable {
     private String shuie;//'转账日期'
     @Excel(name = "含税金额", orderNum = "23")
     private String hanShuiJine;//'转账日期'
-    
     @Excel(name = "扫描时间", orderNum = "24")
     private String saoMiaoShiJian;//'转账日期'
-    
-    
     @Excel(name = "购方公司", orderNum = "25")
     private String gouFangGongSi;//'转账日期'
-    
     @Excel(name = "扫描人", orderNum = "26")
     private String saoMiaoRen;//'转账日期'
-
-
     @Excel(name = "认证标志", orderNum = "27")
     private String renZhengBiaoZhi;//'转账日期'
-    
     @Excel(name = "认证时间", orderNum = "28")
     private String renZhengShjJian;//'转账日期'
-    
     @Excel(name = "认证所属期", orderNum = "29")
     private String renZhengSuoShuQi;//'转账日期'
- 
-    
 }

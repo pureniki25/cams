@@ -107,6 +107,12 @@ public class SubjectRestDatController {
 		if(StringUtil.isEmpty(vo.getCompanyName())) {
 			throw new ApplicationContextException("请选择公司名称");
 		}
+		if(vo.getBeginDate()==null) {
+			vo.setBeginDate(DateUtil.getYearFirst(DateUtil.getYear(new Date())));
+		}
+		if(vo.getEndDate()==null) {
+			vo.setEndDate(DateUtil.getLastEndDate());
+		}
 		Page<BalanceVo> pages = subjectRestDatService.selectProfit(vo);
 		return PageResult.success(pages.getRecords(), pages.getTotal());
 	}
@@ -136,6 +142,12 @@ public class SubjectRestDatController {
 		}
 		vo.setBeginDate(DateUtil.getDate(openBeginTime));
 		vo.setEndDate(DateUtil.getDate(openEndTime));
+		if(vo.getBeginDate()==null) {
+			vo.setBeginDate(DateUtil.getYearFirst(DateUtil.getYear(new Date())));
+		}
+		if(vo.getEndDate()==null) {
+			vo.setEndDate(DateUtil.getLastEndDate());
+		}
 		vo.setCompanyName(companyName);
 		vo.setPage(1);
 		vo.setLimit(2000);
@@ -339,6 +351,12 @@ public class SubjectRestDatController {
 		}
 		vo.setBeginDate(DateUtil.getDate(openBeginTime));
 		vo.setEndDate(DateUtil.getDate(openEndTime));
+		if(vo.getBeginDate()==null) {
+			vo.setBeginDate(DateUtil.getYearFirst(DateUtil.getYear(new Date())));
+		}
+		if(vo.getEndDate()==null) {
+			vo.setEndDate(DateUtil.getLastEndDate());
+		}
 		vo.setCompanyName(companyName);
 		vo.setPage(1);
 		vo.setLimit(2000);

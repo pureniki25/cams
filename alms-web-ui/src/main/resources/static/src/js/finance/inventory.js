@@ -312,7 +312,7 @@ let methods = {
                 });
             });
 
-
+        this.search();
     },
     initCityData() {
         var self = this;

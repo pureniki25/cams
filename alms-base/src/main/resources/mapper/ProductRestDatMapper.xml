@@ -99,7 +99,13 @@
         <if test="productName != null and productName != ''">
             AND t.product_name like '${productName}%'
         </if>
-
+        <if test="productCodes != null and productCodes.size()>0">
+            AND t.product_code in
+            <foreach collection="productCodes" item="productCode" index="index"
+                     open="(" close=")" separator=",">
+                #{productCode}
+            </foreach>
+        </if>
         AND
         (DATE_FORMAT(t.open_date,'%Y-%m') &gt;=
         date_format(#{beginDate},'%Y-%m') AND

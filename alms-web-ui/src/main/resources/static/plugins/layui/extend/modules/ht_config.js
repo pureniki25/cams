@@ -45,8 +45,8 @@ layui.define(function (exports) {
 		 * UAT：http://120.79.154.198:30131/html/user/changePwdOther.html
 		 * PRD：http://120.79.162.165:30131/html/user/changePwdOther.html
 		 */
-        //,changePwdPath:"http://localhost:30601/system/companySetUp.html"
-        ,changePwdPath:"http://106.52.127.140:30601/system/companySetUp.html"
+        ,changePwdPath:"http://localhost:30601/system/companySetUp.html"
+        // ,changePwdPath:"http://106.52.127.140:30601/system/companySetUp.html"
         //--------------   切换是否使用网关 --------------
     });
     window.YYYYMMDD="YYYY年MM月DD日"

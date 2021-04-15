@@ -38,4 +38,7 @@ public interface BankIncomeDatService extends BaseService<BankIncomeDat> {
     
     //手动增加
     public void saveIncomeDat(List<BankIncomeDat>  addDats,String openDate,String companyName,String customerCode);
+
+    //通用增加凭证
+    public void saveCommonDat(BankIncomeDat incomeDat,String openDate,String companyName,String prekeMuDaiMa,String aftKeMuDaiMa);
 }

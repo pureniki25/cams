@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <title>现金支付管理</title>
+    <title>计提管理</title>
     <link rel="stylesheet" type="text/css" href="/src/css/themes/default.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/iview/css/iview.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/layui/css/layui.css" media="all" />
@@ -79,28 +79,26 @@
             <i-col span="24">
                 <Card>
                     <p slot="title">
-                        <Icon type="ios-search" />搜索条件</p>
-
+                        <Icon type="ios-search" />搜索条件
+                    </p>
                     <div class="layui-btn-group" slot="extra">
                         <button class="layui-btn layui-btn-sm" @click="search" ht-auth="search">
                             <span v-if="!loading"> <i class="layui-icon">&#xe615;</i>查询</span>
-                            <span v-else><i
-                                    class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
+                            <span v-else><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>查询中...</span>
                         </button>
-                        <button class="layui-btn layui-btn-sm" @click="daochu">
-                            <span v-if="!loading"> <i class="layui-icon">&#xe615;</i>导出</span>
-                            <span v-else><i
-                                    class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63e;</i>导出中...</span>
-                        </button>
-                        <button class="layui-btn layui-btn-sm" @click="addCash">新增导入</button>
+
+                    <button class="layui-btn layui-btn-sm"
+                             @click="addModal=true;">新增</button>
                         <button class="layui-btn layui-btn-sm" @click="deleteAll">删除</button>
                     </div>
                     <i-form ref="searchForm" :model="searchForm" label-position="right" label-width="100">
-                        <Row :gutter="1">
+                        <Row :gutter="0">
                             <i-col span="5">
-                                <form-item label="开票日期：从" prop="openDate">
+                                <form-item label="计提日期：从" prop="openDate">
                                     <date-picker type="date" v-model="searchForm.condition.GE_ping_zheng_ri_qi"
                                         placement="bottom-end" placeholder="开始日期" style="width: 200px"></date-picker>
+
+                                    <!--<date-picker  v-model="searchForm.showRepayDateBegin" type="date" placeholder="Select date"   style="width: 200px"></date-picker>-->
                                 </form-item>
                             </i-col>
                             <i-col span="1">
@@ -111,9 +109,18 @@
                                 <form-item label="" prop="openDate">
                                     <date-picker type="date" v-model="searchForm.condition.LE_ping_zheng_ri_qi"
                                         placement="bottom-end" placeholder="结束日期" style="width: 200px"></date-picker>
+
+                                    <!--<date-picker  v-model="searchForm.showRepayDateBegin" type="date" placeholder="Select date"   style="width: 200px"></date-picker>-->
                                 </form-item>
                             </i-col>
+                                      <i-col span="6">
+
+                 
+    
+                </i-col>
                         </Row>
+
+                        
 
                     </i-form>
                 </Card>
@@ -136,47 +143,21 @@
             </i-col>
         </Row>
 
-
         <Modal :mask-closable="false" :title="editModalTitle" v-model="editModal" :loading="editModalLoading" @on-ok="handleSubmit"
-            :styles="{top: '20px'}" width="90">
-            <i-form ref="editForm2" :model="editForm" :rules="ruleValidate" label-position="right" label-width="150">
-                <Row :gutter="0">
-                    <i-col span="6">
-                        <form-item label="开票日期" prop="openDate">
-                            <date-picker type="date" v-model="editForm.openDate" placement="bottom-end"
-                                placeholder="开票日期日期" style="width: 200px"></date-picker>
-                        </form-item>
-                    </i-col>
-                </Row>
-                <Row :gutter="0">  
-                    <i-col span="6">
-                        <Form-item ref="cashSubjects" v-for="(item, index) in editForm.cashSubjects" :key="index"
-                            :label=" item.id+' '+item.subjectName+'  '"  prop="jine'" >
-                            <i-input type="text" clearable v-model="item.jine"></i-input>
-                            <i-input type="text" clearable v-model="item.id" style="visibility:hidden; display:none">
-                            </i-input>
-                        </Form-item>
-                    </i-col>
-                    <i-col span="6">
-                        <Form-item ref="cash2Subjects" v-for="(item, index) in editForm.cash2Subjects" :key="index"
-                            :label=" item.id+' '+item.subjectName+'  '"  prop="'jine'">
-                            <i-input type="text" clearable v-model="item.jine"></i-input>
-                            <i-input type="text" clearable v-model="item.id" style="visibility:hidden; display:none">
-                            </i-input>
-                        </Form-item>
-                    </i-col>
-                    <i-col span="8">
-                        <Form-item ref="cash3Subjects" v-for="(item, index) in editForm.cash3Subjects" :key="index"
-                            :label=" item.id+' '+item.subjectName+'  '"  prop="'jine'">
-                            <i-input type="text" clearable v-model="item.jine"></i-input>
-                            <i-input type="text" clearable v-model="item.id" style="visibility:hidden; display:none">
-                            </i-input>
-                        </Form-item>
-                    </i-col>
-                </Row>
-            </i-form>
-        </Modal>
+               :styles="{top: '20px'}" width="90">
+            <Row style="padding:10px">
+                <i-col span="24">
+                    <table id="main_table2" lay-filter="main_table"></table>
+                    <!--                     <script type="text/html" id="bar_tools">
+                            <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">编辑</a>&ndash;&gt;
+                            <a class="layui-btn layui-btn-xs layui-btn-danger " lay-event="del">删除</a>
+                        </script>-->
+                    <i-table ref="selection" :columns="table2.col" :data="table2.data" :loading="table2.loading"
+                             @on-selection-change="requires" stripe></i-table>
 
+                </i-col>
+            </Row>
+        </Modal>
 
 
     </div>
@@ -188,7 +169,7 @@
     <script src="/properties/config.js"></script>
     <script src="/build/js/appToken.js"></script>
     <script src="/src/js/comm.js"></script>
-    <script src="/src/js/finance/cash.js"></script>
+    <script src="/src/js/finance/chengben.js"></script>
 </body>
 
 </html>

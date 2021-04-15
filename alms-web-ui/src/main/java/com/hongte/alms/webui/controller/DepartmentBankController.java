@@ -59,10 +59,21 @@ public class DepartmentBankController {
     public String income() {
         return "/cams/income" ;
     }
+
+    @RequestMapping("/chengben")
+    public String chengBen() {
+        return "/cams/chengben" ;
+    }
     
     @RequestMapping("/jt")
     public String jt() {
         return "/cams/jt" ;
+    }
+
+
+    @RequestMapping("/temporary")
+    public String temporary() {
+        return "/cams/temporary";
     }
     
     /**

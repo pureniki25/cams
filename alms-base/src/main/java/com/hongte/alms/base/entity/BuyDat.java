@@ -32,9 +32,13 @@ public class BuyDat extends Model<BuyDat> {
     @TableId("buy_id")
 	@ApiModelProperty(required= true,value = "采购单ID")
 	private String buyId;
-    
-    
-    
+
+	/**
+	 * 关联凭证ID
+	 */
+	@TableId("rel_id")
+	@ApiModelProperty(required= true,value = "关联凭证ID")
+	private String relId;
     
     /**
      * 序号
@@ -327,6 +331,10 @@ public class BuyDat extends Model<BuyDat> {
 	@TableField("create_time")
 	@ApiModelProperty(required= true,value = "")
 	private Date createTime;
+
+	@TableField("is_zan_gu")
+	@ApiModelProperty(required= true,value = "")
+	private String isZanGu;
 
 
 	public Integer getidx() {

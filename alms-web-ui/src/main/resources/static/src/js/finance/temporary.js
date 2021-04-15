@@ -452,7 +452,7 @@ uploadSuccess(response) {
         addInput(ExportForm, "text", "endTime", vm.searchForm.condition.LE_create_time); 
         addInput(ExportForm, "text", "openBeginTime", vm.searchForm.condition.GE_open_date); 
         addInput(ExportForm, "text", "openEndTime", vm.searchForm.condition.LE_open_date);
-        addInput(ExportForm, "text", "isZanGu", "N");
+        addInput(ExportForm, "text", "isZanGu", "Y");
         ExportForm.submit();
         document.body.removeChild(ExportForm);
 
@@ -473,7 +473,7 @@ uploadSuccess(response) {
         var self = this;
         //self.loading =  true;
         //self.table.loading = true;
-        axios.post(basePath + 'InvoiceController/buySearch', this.searchForm).then(res => {
+        axios.post(basePath + 'InvoiceController/temporarySearch', this.searchForm).then(res => {
             self.table.loading = false;
             if (!!res.data && res.data.code == 0) {
                 self.table.data = res.data.data;

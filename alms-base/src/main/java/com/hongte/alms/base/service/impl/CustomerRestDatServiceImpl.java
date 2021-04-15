@@ -17,11 +17,7 @@ import com.hongte.alms.base.vo.cams.SubjectRestVo;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
 import com.hongte.alms.common.util.DateUtil;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +63,12 @@ public class CustomerRestDatServiceImpl extends BaseServiceImpl<CustomerRestDatM
 		Page<CustomerRestVo> pages = new Page<>();
 		pages.setCurrent(vo.getPage());
 		pages.setSize(vo.getLimit());
+		if(vo.getBeginDate()==null) {
+			vo.setBeginDate(DateUtil.getYearFirst(DateUtil.getYear(new Date())));
+		}
+		if(vo.getEndDate()==null) {
+			vo.setEndDate(DateUtil.getLastEndDate());
+		}
 		List<CustomerRestVo> list=customerRestDatMapper.selectCustomerRestList(pages, vo);
 		String beginDate=String.valueOf(DateUtil.getYear(vo.getBeginDate()));
 		List<CustomerFirstDat> firstDats= customerFirstDatService.selectList(new EntityWrapper<CustomerFirstDat>().eq("company_name", vo.getCompanyName()).eq("period", beginDate));

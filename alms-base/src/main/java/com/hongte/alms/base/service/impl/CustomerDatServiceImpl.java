@@ -45,6 +45,7 @@ public class CustomerDatServiceImpl extends BaseServiceImpl<CustomerDatMapper, C
 		if(customerName.contains("曼秀")) {
 			System.out.println("stop");
 		}
+		kaiPiaoRiQi=DateUtil.formatDate(DateUtil.getDate(kaiPiaoRiQi));
 		if(customerName!=null) {
 			customerName=customerName.replace("?", "");
 			customerName=customerName.replace("？", "");
@@ -56,7 +57,7 @@ public class CustomerDatServiceImpl extends BaseServiceImpl<CustomerDatMapper, C
         	 customerDat=new CustomerDat();
         	 customerDat.setCompanyCode(companyName);
         	 
-        	List<CustomerDat> dats=selectList(new EntityWrapper<CustomerDat>().eq("company_code", companyName).eq("type", type).orderBy("customer_code",false));
+        	List<CustomerDat> dats=selectList(new EntityWrapper<CustomerDat>().eq("company_code", companyName).eq("type", type).orderBy("SUBSTR(customer_code,2)*1",false));
         	if(type.equals("1")&&dats.size()==0) {//客户
         		customerDat.setCustomerCode("A0001");
         	}else if(type.equals("2")&&dats.size()==0) {//供应商

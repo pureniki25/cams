@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hongte.alms.base.entity.BankIncomeDat;
 import com.hongte.alms.base.entity.JtDat;
+import com.hongte.alms.base.enums.CamsConstant;
 import com.hongte.alms.base.enums.TokenTypeEnum;
 import com.hongte.alms.base.exception.ServiceRuntimeException;
 import com.hongte.alms.base.service.CamsCompanyService;
@@ -169,6 +170,23 @@ public class JtDatController {
 		jtDatService.selectByPage(page);
 		return PageResult.success(page.getRecords(), page.getTotal());
 	}
+
+
+	@ApiOperation(value = "查询结转销售成本列表")
+	@RequestMapping("/searchChengBen")
+	public PageResult searchChengBen(@RequestBody Page<JtDat> page, HttpServletRequest request) {
+		Result<String> result=camsCompanyService.getCompany(request, TokenTypeEnum.TOKEN);
+		String companyName="";
+		if(result.getCode().equals("1")){
+			companyName=result.getData();
+			page.getCondition().put("EQ_jt_type", CamsConstant.JiTiTypeEnum.XIAO_SHOU_CHENG_BEN.getValue().toString());
+			page.getCondition().put("EQ_company_name",companyName);
+		}
+		page.setOrderByField("pingZhengHao").setAsc(true);
+		jtDatService.selectByPage(page);
+		return PageResult.success(page.getRecords(), page.getTotal());
+	}
+
 	@ApiOperation(value = "导出计提列表")
 	@PostMapping("/export")
 	public void export(HttpServletResponse response, HttpServletRequest request, @ModelAttribute JtDat jtDat)

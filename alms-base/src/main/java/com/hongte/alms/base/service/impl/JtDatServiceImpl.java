@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.hongte.alms.base.enums.CamsConstant;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.entity.ImportParams;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -452,7 +454,7 @@ public class JtDatServiceImpl extends BaseServiceImpl<JtDatMapper, JtDat> implem
 			return;
 		}
 
-		// 获取下月的日期
+		// 获取凭证日期
 		Date lastDate = DateUtil.addMonth2Date(1, DateUtil.getDate(openDate));
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		Calendar cale = Calendar.getInstance();
@@ -667,5 +669,34 @@ public class JtDatServiceImpl extends BaseServiceImpl<JtDatMapper, JtDat> implem
 			insert(jtDat);
 
 		}
+	}
+	@Override
+	public void saveCommonDat(JtDat incomeDat,String openDate, String companyName,  String preKeMuDaiMa, String aftKeMuDaiMa) {
+		String pingZhengHao=getPingZhengHao(companyName,openDate);
+		// 第一行的凭证记录
+		JtDat preIncomeDat=new JtDat();
+		BeanUtils.copyProperties(incomeDat,preIncomeDat);
+		preIncomeDat.setCompanyName(companyName);
+		preIncomeDat.setJtType(CamsConstant.JiTiTypeEnum.XIAO_SHOU_CHENG_BEN.getValue().toString());
+		preIncomeDat.setPingZhengHao(pingZhengHao);
+		preIncomeDat.setPingZhengRiQi(openDate);
+		preIncomeDat.setBorrowAmount(incomeDat.getLocalAmount());
+		preIncomeDat.setAlmsAmount("0.00");
+		preIncomeDat.setKeMuDaiMa(preKeMuDaiMa);
+		preIncomeDat.setHangHao("1");
+		insert(preIncomeDat);
+		// 第二行凭证
+		JtDat aftIncomeDat=new JtDat();
+		BeanUtils.copyProperties(incomeDat,aftIncomeDat);
+		aftIncomeDat.setCompanyName(companyName);
+		aftIncomeDat.setJtType(CamsConstant.JiTiTypeEnum.XIAO_SHOU_CHENG_BEN.getValue().toString());
+		aftIncomeDat.setPingZhengHao(pingZhengHao);
+		aftIncomeDat.setPingZhengRiQi(openDate);
+		aftIncomeDat.setBorrowAmount("0.00");
+		aftIncomeDat.setAlmsAmount(incomeDat.getLocalAmount());
+		aftIncomeDat.setKeMuDaiMa(aftKeMuDaiMa);
+		aftIncomeDat.setHangHao("2");
+		insert(aftIncomeDat);
+
 	}
 }

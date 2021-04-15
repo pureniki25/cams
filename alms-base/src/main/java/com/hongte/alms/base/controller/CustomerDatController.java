@@ -355,13 +355,16 @@ public class CustomerDatController {
 
 	}
        public static void main(String[] args) {
-    	   String str1="异硬脂醇异硬脂酸酯 DUB ISIS(ISOSTEARATE D'ISOSTEARYLE)";
-    	   String str2="异硬脂醇异硬脂酸酯DUB ISIS（ISOSTEARATE DˊISOSTEARYLE)";
-    	   str1=CamsUtil.getTempProductName(str1);
-    	   str2=CamsUtil.getTempProductName(str2);
-    	   System.out.println(str1);
-    	   System.out.println(str2);
-    	   System.out.println(str1.equals(str2));
+//    	   String str1="异硬脂醇异硬脂酸酯 DUB ISIS(ISOSTEARATE D'ISOSTEARYLE)";
+//    	   String str2="异硬脂醇异硬脂酸酯DUB ISIS（ISOSTEARATE DˊISOSTEARYLE)";
+    	   Date date=DateUtil.getDate("2021-3-14");
+
+		   System.out.println(DateUtil.formatDate(date));
+//    	   str1=CamsUtil.getTempProductName(str1);
+//    	   str2=CamsUtil.getTempProductName(str2);
+//    	   System.out.println(str1);
+//    	   System.out.println(str2);
+//    	   System.out.println(str1.equals(str2));
 		
 	}
 }

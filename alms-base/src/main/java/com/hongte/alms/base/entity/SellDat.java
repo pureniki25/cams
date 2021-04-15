@@ -32,6 +32,13 @@ public class SellDat extends Model<SellDat> {
     @TableId("sell_id")
 	@ApiModelProperty(required= true,value = "销售单ID")
 	private String sellId;
+
+	/**
+	 * 关联凭证ID
+	 */
+	@TableId("rel_id")
+	@ApiModelProperty(required= true,value = "关联凭证ID")
+	private String relId;
     
     /**
      * 销售单类型 

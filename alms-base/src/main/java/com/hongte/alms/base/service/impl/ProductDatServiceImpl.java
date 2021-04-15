@@ -20,6 +20,7 @@ import com.hongte.alms.base.service.ProductDatService;
 import com.hongte.alms.base.service.TempProductDatService;
 import com.hongte.alms.base.vo.cams.RestProductVo;
 import com.hongte.alms.common.service.impl.BaseServiceImpl;
+import com.hongte.alms.common.util.AsciiUtil;
 import com.hongte.alms.common.util.CamsUtil;
 import com.hongte.alms.common.util.DateUtil;
 import com.hongte.alms.common.util.StringUtil;
@@ -82,14 +83,20 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 				new EntityWrapper<CamsProductProperties>().eq("product_properties_name", productPropertiesName));
 		productName = CamsUtil.getProductName(productName);
 		ProductDat productDat = null;
+		if(productName.contains("牛奶")){
+			System.out.println(123);
+		}
 
 		String productNameTemp = getShangPingMingChenTemp(productName);
-		String productTypeTemp = getGuiGeTemp(productName);
+		String productTypeTemp =getGuiGeTemp(productName) ;
 		String tempProductName = "";
 		if (!StringUtil.isEmpty(productType)) {
 			productType = productType.replace("*", "x");
 			productType = productType.replace("＊", "x");
 			productType = productType.replace("﹡", "x");
+		}else{
+			productNameTemp = getShangPingMingChenTemp(CamsUtil.removeBracket(productName));
+			productTypeTemp=getGuiGeTemp(CamsUtil.removeBracket(productName));
 		}
 		if (productTypeTemp.equals("")) {// 如果产品名称经过中文和英文分离，规格为空的话，说明是纯中文，按照原来的判断逻辑判断是否含有相同产品
 			tempProductName = productNameTemp + (productType == null ? "" : productType);
@@ -119,7 +126,6 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 			} else {
 				String productCode = CamsUtil.generateCode(dats.get(0).getProductCode());
 				tempProductDat.setProductCode(productCode);
-
 			}
 
 			tempProductDat.setCreateTime(new Date());
@@ -155,7 +161,6 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 			productDat.setOpenDate(openDate);
 			insert(productDat);
 		}
-		
 		return productDat;
 	}
 
@@ -274,6 +279,7 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 	}
 
 	private String getShangPingMingChenTemp(String s) {
+		s=AsciiUtil.sbc2dbcCase(s);
 		int position = 0;
 		for (int index = s.length() - 1; index >= 0; index--) {
 			// 将字符串拆开成单个的字符
@@ -289,6 +295,7 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 	}
 
 	private String getGuiGeTemp(String s) {
+		s=AsciiUtil.sbc2dbcCase(s);
 		int position = 0;
 		for (int index = s.length() - 1; index >= 0; index--) {
 			// 将字符串拆开成单个的字符
@@ -310,10 +317,17 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 			String packageUnit) throws UnsupportedEncodingException {
 		CamsProductProperties properties = camsProductPropertiesService.selectOne(
 				new EntityWrapper<CamsProductProperties>().eq("product_properties_name", productPropertiesName));
+		if(productName.contains("化妆品防腐剂")){
+			System.out.println(123);
+		}
+		if(productName.contains("巴西5倍")){
+			System.out.println(123);
+		}
+
 		ProductDat productDat = null;
 		TempProductDat tempProductDat = null;
-		String productNameTemp = getShangPingMingChenTemp(productName);
-		String productTypeTemp = getGuiGeTemp(productName);
+		String productNameTemp = getShangPingMingChenTemp(CamsUtil.getTempProductName(productName));
+		String productTypeTemp = getGuiGeTemp(CamsUtil.getTempProductName(productName));
 		String tempProductName = "";
 		tempProductName = CamsUtil.getTempProductName(tempProductName);
 		if (!StringUtil.isEmpty(productType)) {
@@ -321,6 +335,10 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 			productType = productType.replace("＊", "x");
 			productType = productType.replace("﹡", "x");
 		}
+//		else{
+//			productNameTemp = getShangPingMingChenTemp(productName);
+//			productTypeTemp=getGuiGeTemp(productName);
+//		}
 		if (productTypeTemp.equals("")) {// 如果产品名称经过中文和英文分离，规格为空的话，说明是纯中文，按照原来的判断逻辑判断是否含有相同产品
 			tempProductName = productNameTemp + (productType == null ? "" : productType);
 			tempProductName = CamsUtil.getTempProductName(tempProductName);
@@ -338,7 +356,8 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 		tempProductDat = tempProductDatService.selectOne(tempProductDatWrapper);
 
 		if (tempProductDat != null) {
-			return productDat;
+			ProductDat returnDat=selectOne(new EntityWrapper<ProductDat>().eq("company_name",companyName).eq("product_code",tempProductDat.getProductCode()));
+			return returnDat;
 		}
 
 		tempProductDat = new TempProductDat();
@@ -375,7 +394,8 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 		productDat.setCreateTime(new Date());
 		productDat.setOpenDate("");
 		insert(productDat);
-		return productDat;
+		ProductDat returnDat=selectOne(new EntityWrapper<ProductDat>().eq("company_name",companyName).eq("product_code",tempProductDat.getProductCode()));
+		return returnDat;
 	}
 
 	@Override
@@ -413,12 +433,15 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 			}
 			ProductDat dat=addProductDatByExcel(excel.getProductCode(), excel.getProductType(), excel.getProductName(), companyName,
 					productPropertiesName, danwei, danwei, danwei, danwei, danwei);
-			
-			dat.setKuCunLiang(excel.getKuCunLiang());
-			dat.setQiChuJine(excel.getQiChuJine());
-			dat.setOpenDate(openDate);
-			dat.setQiChuDanJia(excel.getDanJia());
-			updateById(dat);
+			if(dat!=null){
+				dat.setKuCunLiang(excel.getKuCunLiang());
+				dat.setQiChuJine(excel.getQiChuJine());
+				dat.setOpenDate(openDate);
+				dat.setQiChuDanJia(excel.getDanJia());
+				productDatMapper.updateOne(dat);
+			}
+
+
 
 		}
 	}
@@ -450,20 +473,12 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 		pages.setCurrent(vo.getPage());
 		pages.setSize(vo.getLimit());
 		if(vo.getBeginDate()==null) {
-			Calendar cale = Calendar.getInstance();
-			cale.setTime(new Date());
-			// 获取当前时间的上一个月 1号
-			cale.set(Calendar.DAY_OF_MONTH, 1);
-			vo.setBeginDate(cale.getTime());
-			vo.setLocalBeginDate(cale.getTime());
+			vo.setBeginDate(DateUtil.getYearFirst(DateUtil.getYear(new Date())));
+			vo.setLocalBeginDate(vo.getBeginDate());
 		}
 		if(vo.getEndDate()==null) {
-			Calendar cale = Calendar.getInstance();
-			cale.setTime(new Date());
-			// 获取当前时间的上一个月 1号
-			cale.set(Calendar.DAY_OF_MONTH, 1);
-			vo.setEndDate(cale.getTime());
-			vo.setLocalEndDate(cale.getTime());
+			vo.setEndDate(DateUtil.getLastEndDate());
+			vo.setLocalEndDate(DateUtil.getLastEndDate());
 		}
 		if(null!=vo.getEndDate()) {
 			Calendar cale = Calendar.getInstance();
@@ -584,18 +599,18 @@ public class ProductDatServiceImpl extends BaseServiceImpl<ProductDatMapper, Pro
 		
 	}
 	
-	public static void main(String[] args) {
-
-		Calendar cale = Calendar.getInstance();
-		cale.setTime(new Date());
-		// 获取当前时间的上一个月
-		cale.add(Calendar.MONTH, -1);
-		
-		System.out.println(DateUtil.formatDate(cale.getTime()));
-	}
 
 	@Override
 	public void syncProductRestData() {
 		productDatMapper.syncProductRestData();
 	}
+
+	public static void main(String[] args) {
+		String str2="2号风  扇罩";
+		String str="２号风  扇罩";
+		System.out.println(str2);
+
+		System.out.println(AsciiUtil.sbc2dbcCase(str));
+	}
+
 }

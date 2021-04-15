@@ -112,10 +112,17 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		Page<SubjectRestVo> pages = new Page<>();
 		pages.setCurrent(vo.getPage());
 		pages.setSize(vo.getLimit());
+		if(vo.getBeginDate()==null) {
+			vo.setBeginDate(DateUtil.getYearFirst(DateUtil.getYear(new Date())));
+		}
+		if(vo.getEndDate()==null) {
+			vo.setEndDate(DateUtil.getLastEndDate());
+		}
+
 		List<SubjectRestVo> list=subjectRestDatMapper.selectSubjectRestList(pages, vo);
 		String beginDate=String.valueOf(DateUtil.getYear(vo.getBeginDate()));
 		List<SubjectFirstDat> firstDats= subjectFirstDatService.selectList(new EntityWrapper<SubjectFirstDat>().eq("company_name", vo.getCompanyName()).eq("period", beginDate));
-		
+
 		//初始化所有有期初余额的科目为flase
 		HashMap<SubjectFirstDat,Boolean> resultMap=new HashMap<SubjectFirstDat,Boolean>();
 		for(SubjectFirstDat firstDat:firstDats) {
@@ -162,9 +169,6 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		Map<String, List<SubjectRestVo>> secondAndThirdSubjects=list.stream().collect(Collectors.groupingBy(SubjectRestVo::getGroupBySubject));
 		for(Map.Entry<String, List<SubjectRestVo>> entry : secondAndThirdSubjects.entrySet()) {
 			List<SubjectRestVo> tempList=secondAndThirdSubjects.get(entry.getKey());
-			if(entry.getKey().equals("1002-01")) {
-				System.out.println("stop");
-			}
 	        //如果只有1个一级科目,不用处理
 			if(tempList.size()==1&&tempList.get(0).getSubject().equals(entry.getKey())) {
 				SubjectRestVo restVo=tempList.get(0);
@@ -213,6 +217,9 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 						   }
 					   }
 					   for(SubjectRestVo restVo:tempList) {
+					   	if(restVo.getSubject().equals("2171-01")){
+                          System.out.println("123");
+						}
 						   //设置二级科目的金额成三级科目的总和
 						   if(restVo.getSubject().length()==7) {
 							   restVo.setFirstAmount(secondFirstAmount.toString());
@@ -340,6 +347,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 							
 				          }
 					}
+
 				   temp.setSubject(CamsConstant.SubjectTypeEnum.getDesc(entry.getKey())+"小计");
 				   String direction=CamsConstant.SubjectTypeEnum.getDirect(entry.getKey());
 				   temp.setCompanyName(vo.getCompanyName());
@@ -373,6 +381,7 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 		    return restAmountStr.toString();
 		}else {
 			 Double restAmountStr=Double.valueOf(firstAmount==null?"0":firstAmount)+Double.valueOf(borrowAmount)-Double.valueOf(almsAmount);
+
 			    return restAmountStr.toString();
 		}
 		
@@ -382,6 +391,12 @@ public  class SubjectRestDatServiceImpl extends BaseServiceImpl<SubjectRestDatMa
 	public Page<BalanceVo> selectBalance(SubjectRestVo vo) throws Exception {
 		//查询单位余额表数据
 		CustomerRestVo customerRestVo=new CustomerRestVo();
+		if(vo.getBeginDate()==null) {
+			vo.setBeginDate(DateUtil.getYearFirst(DateUtil.getYear(new Date())));
+		}
+		if(vo.getEndDate()==null) {
+			vo.setEndDate(DateUtil.getLastEndDate());
+		}
 		customerRestVo.setCompanyName(vo.getCompanyName());
 		customerRestVo.setBeginDate(vo.getBeginDate());
 		customerRestVo.setEndDate(vo.getEndDate());

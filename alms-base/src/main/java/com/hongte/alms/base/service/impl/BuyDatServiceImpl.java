@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.hongte.alms.base.entity.BuyDat;
 import com.hongte.alms.base.entity.BuyDatExe;
 import com.hongte.alms.base.entity.SellDat;
+import com.hongte.alms.base.enums.YNEnum;
 import com.hongte.alms.base.mapper.BuyDatMapper;
 import com.hongte.alms.base.service.BuyDatExeService;
 import com.hongte.alms.base.service.BuyDatService;
@@ -111,6 +112,7 @@ public class BuyDatServiceImpl extends BaseServiceImpl<BuyDatMapper, BuyDat> imp
 		buyDat.setBuyType(buyType);
 		buyDat.setDocumentNo(documentNo);
 		buyDat.setidx(idx);
+		buyDat.setIsZanGu(YNEnum.NO.getValue().toString());
 		buyDat.setCompanyCode(companyName);
 		buyDat.setProduceCode(productCode);
 		buyDat.setCustomerCode(customerCode);
